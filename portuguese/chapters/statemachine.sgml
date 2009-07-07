@@ -1,0 +1,995 @@
+ <chapter id="statemachine">
+  <title id="statemachine.title">The state machine</title>
+
+  <para>
+  This chapter will deal with the state machine and explain it in
+detail. After reading trough it, you should have a complete understanding of
+how the State machine works. We will also go through a large set of examples on
+how states are dealt within the state machine itself. These should clarifly
+everything in practice. </para>
+
+  <section>
+   <title>Introduction</title>
+
+   <para>
+  The state machine is a special part within iptables that should really not
+be called the state machine at all, since it is really a connection tracking
+machine. However, most people recognize it under the first name. Throughout
+this chapter i will use this namnes more or less as if they where synonymous.
+This sould not be overly confusing. Connections tracking is done to let the
+netfilter framework know the state of a specific connection. Firewalls that
+implement this are generally called statful firewalls. A stateful firewall is
+generally much more secure than non-stateful firewalls since it allows us to
+write much tighter rulesets. </para>
+
+   <para>
+Whitin iptables, the state of a connection can be divaded in 4 different
+basic  states. These are known as <command>NEW</command>,
+<command>ESTABLISHED</command>, <command>RELATED</command> and
+<command>INVALID</command>. We will discuss each of these in more depth later.
+With the <command>--state</command> match we can specify which states that we
+want to allow in or out. The conntrack module keeps all states freshly in
+memory, according to certain rules on when to release a certain state and on
+specific information. The connection tracking module calculates the state of a
+specific packet upon 4 basic values in <systemitem>TCP</systemitem> and
+<systemitem>UDP</systemitem> and then on a few extra values. The basic values
+used to calculate a state for <systemitem>TCP</systemitem> and
+<systemitem>UDP</systemitem> streams are: The <systemitem>source IP
+address</systemitem>, the <systemitem>destination IP address</systemitem>,
+the <systemitem>source port</systemitem> and, lastly, the
+<systemitem>destination port</systemitem>. For <systemitem>ICMP</systemitem>
+packages, other rules apply. The same goes for other subprotocols of the
+<systemitem>IP</systemitem> protocol.
+   </para>
+
+   <para>
+In previous kernels, we had the possibility to turn on and off
+defragmentation. However, since iptables and Netfilter were introduced
+and connection tracking in particular, this option was gotten rid of. The
+reason for this, is that connection tracking can not work properly without
+defragmenting packets, and hence defragmenting has been incorporated to
+conntrack and is carried out automatically. It can not be turned off,
+except by turning off connection tracking. Defragmentation is always carried
+out if connection tracking is turned on.
+   </para>
+
+   <para>
+All connection tracking is handled in the <systemitem>PREROUTING</systemitem>
+chain. What this means, is that iptables will do all recalculation of states
+and so on, within the <systemitem>PREROUTING</systemitem> chain. If we send
+the initial packet in a stream, this is where the state gets set to
+<command>NEW</command>, and when we receive a return packet, this is where the
+state is changed to <command>ESTABLISHED</command>, and so on.
+   </para>
+
+   </section>
+
+   <section>
+    <title>The conntrack entries</title>
+
+    <para>
+   Let's take a brief look at a conntrack entry and how to read them in
+<filename>/proc/net/ip_conntrack</filename>. This gives a list of all the
+current entries in your conntrack database. If you have the
+<systemitem>ip_conntrack</systemitem> module loaded, a <command>cat</command>
+of <filename>/proc/net/ip_conntrack</filename> might look like:
+    </para>
+
+    <para>
+     <literallayout>
+<command>
+tcp      6 117 SYN_SENT src=192.168.1.6 dst=192.168.1.9 sport=32775 dport=22
+[UNREPLIED] src=192.168.1.9 dst=192.168.1.6 sport=22 dport=32775 use=2
+</command>
+     </literallayout>
+    </para>
+
+    <para>
+   This example contains all the information that the conntrack module
+maintains to know which state a specific connection is in. First of all, we
+have a protocol, which in this case is tcp. Next, the same value
+in normal decimal coding. After this, we see how long this conntrack entry has
+to live. This value is set to 117 seconds right now and is decremented
+regularly until we see more traffic. This value is then reset to the default
+value for the specific state that it is in at that relevant point of time.
+Next comes the actual state that this entry is in at the present point of
+time. In the above mentioned case we are looking at a packet that is in the
+<computeroutput>SYN_SENT</computeroutput> state. The internal value of a
+connection is slightly different from the ones used externally with
+<command>iptables</commanD>. The
+value <computeroutput>SYN_SENT</computeroutput> tells us that we are looking
+at a connection that has only seen a <systemitem>TCP SYN</systemitem> packet
+in one direction. Next, we see the <systemitem>source IP
+address</systemitem>, <systemitem>destination IP address</systemitem>,
+<systemitem>source port</systemitem> and <systemitem>destination
+port</systemitem>. At this point we see a specific keyword that tells us that
+we have seen no return traffic for this connection. Lastly, we
+see what we expect of return packets. The information details the
+<systemitem>source IP address</systemitem> and <systemitem>destination IP
+address</systemitem> (which are both inverted, since the packet is
+to be directed back to us). The same thing goes for the
+<systemitem>source port</systemitem> and <systemitem>destination
+port</systemitem> of the connection. These are the values that should be of
+any interest to us.
+    </para>
+
+    <para>
+   The connection tracking entries may take on a series of different values,
+all specified in the conntrack headers available in
+<filename>linux/include/netfilter-ipv4/ip_conntrack*.h</filename> files.
+These values are dependant on which subprotocol of
+<systemitem>IP</systemitem> we use. <systemitem>TCP</systemitem>,
+<systemitem>UDP</systemitem> or <systemitem>ICMP</systemitem> protocols
+take specific default values as specified in
+<filename>linux/include/netfilter-ipv4/ip_conntrack.h</filename>. We will
+look closer at this when we look at each of the protocols; however, we
+will not use them extensively through this chapter, since they are not used
+outside of the conntrack internals. Also, depending on how this state
+changes, the default value of the time until the connection is destroyed
+will also change. 
+    </para>
+
+    <para>
+    </para>
+
+    <note>
+     <para>
+Recently there was a new patch made available in iptables patch-o-matic, 
+called tcp-window-tracking. This patch adds, among other things, all of 
+the above timeouts to special sysctl variables, which means that they can 
+be changed on the fly, while the system is still running. Hence, this 
+makes it unnecessary to recompile the kernel every time you want to change 
+the timeouts.
+     </para>
+
+     <para>
+ These can be altered via using specific system calls available in the
+<filename>/proc/sys/net/ipv4/netfilter</filename> directory. You should
+in particular look at the
+<filename>/proc/sys/net/ipv4/netfilter/ip_ct_*</filename> variables.
+     </para>
+    </note>
+
+    <para>
+   When a connection has seen traffic in both directions, the conntrack entry
+will erase the <computeroutput>[UNREPLIED]</computeroutput> flag, and then
+reset it. The entry tells us that the connection has not seen any
+traffic in both directions, will be replaced by the
+<computeroutput>[ASSURED]</computeroutput> flag, to be found close to the end
+of the entry. The <computeroutput>[ASSURED}</computeroutput> flag tells us
+that this connection is assured and that it will not be erased if we reach the
+maximum possible tracked connections. Thus, connections marked as
+<computeroutput>[ASSURED]</computeroutput> will not be erased, contrary to
+the non assured connections (those not marked as
+<computeroutput>[ASSURED]</computeroutput>). How many connections that the
+connection tracking table can hold depends upon a variable that can be set
+through the ipsysctl functions in recent kernels. The default value held by
+this entry varies heavily depending on how much memory you have. On 128 MB of
+RAM you will get 8192 possible entries, and at 256 MB of RAM, you will get
+16376 entries. You can read and set your settings through the
+<filename>/proc/sys/net/ipv4/ip_conntrack_max</filename> setting.
+    </para>
+
+    </section>
+
+    <section>
+     <title>Userland states</title>
+
+     <para>
+     As you have seen, packets may take on several different states within the
+kernel itself, depending on what protocol we are talking about. However,
+outside the kernel, we only have the 4 states as described previously. These
+states can mainly be used in conjunction with the state match which will then
+be able to match packets based on their current connection tracking state. The
+valid states are <command>NEW</command>,
+<command>ESTABLISHED</command>, <command>RELATED</command> and
+<command>INVALID</command> states. The following table will briefly explain
+each possible state.
+     </para>
+
+     <table>
+      <title>Userland states</title>
+      <tgroup cols=2 align=left colsep=1 rowsep=1>
+      <colspec colwidth="1*">
+      <colspec colwidth="5*">
+       <thead>
+        <row>
+         <entry>State</entry>
+         <entry>Explanation</entry>
+        </row>
+       </thead>
+       <tbody>
+
+       <row>
+        <entry>NEW</entry>
+        <entry>The <command>NEW</command> state tells us that the packet is
+new in the connection. This means that the first packet that the conntrack
+module sees will be matched. For example, if we see a
+<systemitem>SYN</systemitem> packet and it is the first packet in a connection
+that we see, it will match. However, the packet may as well not be a
+<systemitem>SYN</systemitem> packet and still be considered
+<command>NEW</command>. This may lead to certain problems in some instances,
+but it may also be extremely helpful when we need to pick up lost connections
+from other firewalls, or when a connection has already timed out, but in
+reality is not closed.
+        </entry>
+       </row>
+
+       <row>
+        <entry>ESTABLISHED</entry>
+        <entry>The <command>ESTABLISHED</command> state has seen traffic in both
+directions and will then match those packets. <command>ESTABLISHED</command>
+connections are fairly easy to understand. The only requirement to get into an
+<command>ESTABLISHED</command> state is that one host sends a packet, and
+that it later on gets a reply from the other host. The <command>NEW</command>
+state will upon receipt to the firewall change to the
+<command>ESTABLISHED</command> state.
+        </entry>
+       </row>
+
+       <row>
+        <entry>RELATED</entry>
+        <entry>The <command>RELATED</command> state is one of the more tricky
+states. A connection is considered <command>RELATED</command> when it is
+related to another already <command>ESTABLISHED</command> connection. What
+this means, is that for a connection to be considered as
+<command>RELATED</command>, we must first have a connection that is considered
+<command>ESTABLISHED</command>. The <command>ESTABLISHED</command> connection
+will then spawn a connection outside of the main connection. The newly spawned
+connection will then be considered <command>RELATED</command>, if the
+conntrack module is able to understand that it is <command>RELATED</command>.
+<systemitem>ICMP</systemitem> error messages and redirects etc can be
+considered as <command>RELATED</command> if we have generated a packet that in
+turn generated the <systemitem>ICMP</systemitem> message. Other good examples
+of connections that can be considered as <command>RELATED</command> are the
+<systemitem>FTP-data</systemitem> connections that are considered
+<command>RELATED</command> to the <systemitem>FTP control</systemitem> port,
+and the <systemitem>DCC</systemitem> connections issued through
+<systemitem>IRC</systemitem>. This could be used to allow
+<systemitem>ICMP</systemitem> replies, <systemitem>FTP</systemitem> transfers
+and <systemitem>DCC</systemitem>'s to work properly through the firewall. Do
+note that most <systemitem>TCP</systemitem> protocols and some
+<systemitem>UDP</systemitem> protocols that rely on this mechanism are quite
+complex and send connection information within the payload of the
+<systemitem>TCP</systemitem> or <systemitem>UDP</systemitem> data segments,
+and hence require special helper modules to be correctly understood.
+        </entry>
+       </row>
+
+       <row>
+        <entry>INVALID</entry>
+        <entry>The <command>INVALID</command> state means that the packet can
+not be identified or that it does not have any state. This may be due to
+several reasons, such as the system running out of memory or
+<systemitem>ICMP</systemitem> error messages that do not respond to any known
+connections. Generally, it is a good idea to <command>DROP</command>
+everything in this state.
+        </entry>
+       </row>
+
+       </tbody>
+      </tgroup>
+     </table>
+
+     <para>
+     These states can be used together with the <command>--state</command>
+match to match packets based on their connection tracking state. This is what
+makes the state machine so incredibly strong and efficient for our firewall.
+Previously, we often had to open up all ports above 1024 to let all traffic
+back into our local networks again. With the state machine in place this is
+not necessary any longer, since we can now just open up the firewall for
+return traffic and not for all kinds of other traffic.
+     </para>
+
+  </section>
+
+  <section>
+   <title>TCP connections</title>
+
+   <para>
+In this section and the upcoming ones, we will take a closer look at the
+states and how they are handled for each of the three basic protocols
+<systemitem>TCP</systemitem>, UDP and <systemitem>ICMP</systemitem>. Also, we
+will take a closer look at how connections are handled per default, if they
+can not be classified as either of these three protocols. We have chosen to
+start out with the <systemitem>TCP</systemitem> protocol since it is a
+stateful protocol in itself, and has a lot of interesting details with regard
+to the state machine in iptables.
+   </para>
+
+   <para>
+A <systemitem>TCP</systemitem> connection is always initiated with the 3-way
+handshake, which establishes and negotiates the actual connection over which
+data will be sent. The whole session is begun with a
+<systemitem>SYN</systemitem> packet, then a <systemitem>SYN/ACK</systemitem>
+packet and finally an <systemitem>ACK</systemitem> packet to acknowledge the
+whole session establishment. At this point the connection is established and
+able to start sending data. The big problem is, how does connection tracking
+hook up into this? Quite simply really.
+   </para>
+
+   <para>
+As  far  as the user is concerned, connection tracking works basically the
+same for all connection types. Have a look at the picture
+below to see exactly what state the stream enters during the different stages
+of the connection. As you can see, the connection tracking code does not
+really follow the flow of the <systemitem>TCP</systemitem> connection, from
+the users viewpoint. Once it has seen one packet(the
+<systemitem>SYN</systemitem>), it considers the connection as NEW. Once it
+sees the return packet(<systemitem>SYN/ACK</systemitem>), it considers the
+connection as <command>ESTABLISHED</command>. If you think about this a
+second, you will understand why. With this particular implementation, you can
+allow <command>NEW</command> and <command>ESTABLISHED</command> packets to
+leave your local network, only allow <command>ESTABLISHED</command>
+connections back, and that will work perfectly. Conversely, if the connection
+tracking machine werer to consider the whole connection establishment as
+<command>NEW</command>, we would never really be able to stop outside
+connections to our local network, since we would have to allow
+<command>NEW</command> packets back in again. To make things more complicated,
+there is a number of other internal states that are used for
+<systemitem>TCP</systemitem> connections inside the kernel, but which are not
+available for us in Userland. Roughly, they follow the state standards
+specified within <ULINK
+URL="http://iptables-tutorial.frozentux.net/other/rfc793.txt">
+RFC 793 - Transmission Control Protocol</ulink> at page 21-23.
+We will consider these in more detail further along in this section.
+   </para>
+
+   <para>
+    <mediaobject>
+     <imageobject>
+      <imagedata fileref="images/state-tcp-connecting.eps" format=eps>
+     </imageobject>
+     <imageobject>
+      <imagedata fileref="images/state-tcp-connecting.jpg" format=jpg>
+     </imageobject>
+    </mediaobject>
+   </para>
+
+   <para>
+As you can see, it is really quite simple, seen from the user's point of view.
+However, looking at the whole construction from the kernel's point of view,
+it's a little more difficult. Let's look at an example. Consider exactly how
+the connection states change in the
+<filename>/proc/net/ip_conntrack</filename> table. The first state is reported
+upon receipt of the first <systemitem>SYN</systemitem> packet in a connection.
+
+   </para>
+
+   <literallayout>
+<command>
+tcp      6 117 SYN_SENT src=192.168.1.5 dst=192.168.1.35 sport=1031 dport=23
+[UNREPLIED] src=192.168.1.35 dst=192.168.1.5 sport=23 dport=1031 use=1
+</command>
+   </literallayout>
+
+   <para>
+As you can see from the above entry, we have a precise state in which a SYN
+packet has been sent, (the <computeroutput>SYN_SENT</computeroutput>
+flag is set), and to which as yet no reply has been sent (witness the
+<computeroutput>[UNREPLIED]</computeroutput> flag). The next internal state
+will be reached when we see another packet in the other direction.
+   </para>
+
+   <literallayout>
+<command>
+tcp      6 57 SYN_RECV src=192.168.1.5 dst=192.168.1.35 sport=1031 dport=23
+src=192.168.1.35 dst=192.168.1.5 sport=23 dport=1031 use=1
+</command>
+   </literallayout>
+
+   <para>
+Now we have received a corresponding <systemitem>SYN/ACK</systemitem> in
+return. As soon as this packet has been received, the state changes once
+again, this time to <computeroutput>SYN_RECV</computeroutput>.
+<computeroutput>SYN_RECV</computeroutput> tells us that the original
+<systemitem>SYN</systemitem> was delivered correctly and that the
+<systemitem>SYN/ACK</systemitem> return packet also got through the firewall
+properly. Moreover, this connection tracking entry has now seen traffic in
+both directions and is hence considered as having been replied to. This is not
+explicit, but rather assumed, as was the
+<computeroutput>[UNREPLIED]</computeroutput> flag above. The final step will
+be reached once we have seen the final <systemitem>ACK</systemitem> in the
+3-way handshake.
+   </para>
+
+   <literallayout>
+<command>
+tcp      6 431999 <command>ESTABLISHED</command> src=192.168.1.5 dst=192.168.1.35 sport=1031
+dport=23 src=192.168.1.35 dst=192.168.1.5 sport=23 dport=1031 use=1
+</command>
+   </literallayout>
+
+   <para>
+In the last example, we have gotten the final <systemitem>ACK</systemitem> in
+the 3-way handshake and the connection has entered the
+<command>ESTABLISHED</command> state, as far as the internal mechanisms of
+iptables are aware. After a few more packets, the connection will also become
+<computeroutput>[ASSURED]</computeroutput>, as shown in the introduction
+section of this chapter.
+   </para>
+
+   <para>
+When a <systemitem>TCP</systemitem> connection is closed down, it is done in
+the following way and takes the following states.
+   </para>
+
+   <para>
+    <mediaobject>
+     <imageobject>
+      <imagedata fileref="images/state-tcp-closing.eps" format=eps>
+     </imageobject>
+     <imageobject>
+      <imagedata fileref="images/state-tcp-closing.jpg" format=jpg>
+     </imageobject>
+    </mediaobject>
+   </para>
+
+   <para>
+As you can see, the connection is never really closed until the last
+<systemitem>ACK</systemitem> is sent. Do note that this picture only describes
+how it is closed down under normal circumstances. A connection may also, for
+example, be closed by sending a <systemitem>RST</systemitem>(reset), if
+the connection were to be refused. In this case, the connection would be
+closed down after a predetermined time.
+   </para>
+
+   <para>
+When the <systemitem>TCP</systemitem> connection has been closed down, the
+connection enters the <computeroutput>TIME_WAIT</computeroutput> state, which
+is per default set to 2 minutes. This is used so that all packets that have
+gotten out of order can still get through our ruleset, even after the
+connection has already closed. This is used as a kind of buffer time so that
+packets that have gotten stuck in one or another congested router can still
+get to the firewall, or to the other end of the connection.
+   </para>
+
+   <para>
+   If the connection is reset by a <systemitem>RST</systemitem> packet,
+the state is changed to <computeroutput>CLOSE</computeroutput>. This
+means that the connection per default have 10 seconds before the whole
+connection is definitely closed down. <systemitem>RST</systemitem> packets are
+not acknowledged in any sense, and will break the connection directly. There
+are also other states than the ones we have told you about so far. Here is the
+complete list of possible states that a <systemitem>TCP</systemitem> stream
+may take, and their timeout values.
+</para>
+
+   <table>
+    <title>Internal states</title>
+    <tgroup cols=2 align=left colsep=1 rowsep=1>
+    <colspec colwidth="1*">
+    <colspec colwidth="5*">
+     <thead>
+      <row>
+       <entry>State</entry>
+       <entry>Timeout value</entry>
+      </row>
+     </thead>
+     <tbody>
+
+     <row>
+      <entry>NONE</entry>
+      <entry>30 minutes</entry>
+     </row>
+     <row>
+      <entry>ESTABLISHED</entry>
+      <entry>5 days</entry>
+     </row>
+     <row>
+      <entry>SYN_SENT</entry>
+      <entry>2 minutes</entry>
+     </row>
+     <row>
+      <entry>SYN_RECV</entry>
+      <entry>60 seconds</entry>
+     </row>
+     <row>
+      <entry>FIN_WAIT</entry>
+      <entry>2 minutes</entry>
+     </row>
+     <row>
+      <entry>TIME_WAIT</entry>
+      <entry>2 minutes</entry>
+     </row>
+     <row>
+      <entry>CLOSE</entry>
+      <entry>10 seconds</entry>
+     </row>
+     <row>
+      <entry>CLOSE_WAIT</entry>
+      <entry>12 hours</entry>
+     </row>
+     <row>
+      <entry>LAST_ACK</entry>
+      <entry>30 seconds</entry>
+     </row>
+     <row>
+      <entry>LISTEN></entry>
+      <entry>2 minutes</entry>
+     </row>
+
+     </tbody>
+    </tgroup>
+   </table>
+
+   <para>
+   These values are most definitely not absolute. They may change with kernel
+revisions, and they may also be changed via the proc filesystem in the
+<filename>/proc/sys/net/ipv4/netfilter/ip_ct_tcp_*</filename> variables. The
+default values should, however, be fairly well established in practice. These
+values are set in jiffies (or 1/100th parts of seconds), so 3000 means 30
+seconds.
+   </para>
+
+   <note>
+    <para>
+Also note that the Userland side of the state machine does not look at
+<systemitem>TCP</systemitem> flags set in the <systemitem>TCP</systemitem>
+packets. This is generally bad, since you may want to allow packets in the
+<command>NEW</command> state to get through the firewall, but when you specify
+the <command>NEW</command> flag, you will in most cases mean
+<systemitem>SYN</systemitem> packets.
+    </para>
+
+    <para>
+This not what happens with the current state implementation; instead, even a
+packet with no bit set or an <systemitem>ACK</systemitem> flag, will count as
+<command>NEW</command> and if you match on <command>NEW</command> packets.
+This can be used for redundant firewalling and so on, but it is generally
+extremely bad on your home network, where you only have a single firewall. To
+get around this behavior, you could use the command explained in the <link
+linkend="newnotsyn" endterm="newnotsyn.title"></link> section of the <link
+linkend="commonproblems" endterm="commonproblems.title"></link> appendix.
+Another way is to install the <command>tcp-window-tracking</command> extension
+from <command>patch-o-matic</command>, which will make the firewall able to
+track states depending on the <systemitem>TCP</systemitem> window settings.
+    </para>
+   </note>
+
+  </section>
+
+  <section>
+   <title>UDP connections</title>
+<para>----</para>
+   <para>
+<systemitem>UDP</systemitem> connections are in themself not stateful
+connections, but rather stateless. This is so for several reasons, mainly it
+does not contain any connection establishment or connection closing, but most
+of all it lacks sequencing. Receiving two <systemitem>UDP</systemitem>
+datagrams in a specific order does not say anything about which order they
+where sent in. It is however still possible to set states on the connections
+within the kernel. Lets have a look at how a connection can be tracked and
+how it may look in conntrack.
+
+   </para>
+
+   <para>
+    <mediaobject>
+     <imageobject>
+      <imagedata fileref="images/state-udp-connection.eps" format=eps>
+     </imageobject>
+     <imageobject>
+      <imagedata fileref="images/state-udp-connection.jpg" format=jpg>
+     </imageobject>
+    </mediaobject>
+   </para>
+
+   <para>
+As you can see from this, the connection is brought up almost exactly the
+same as the <systemitem>TCP</systemitem> connection, from the userland view.
+Inside conntrack it looks quite a bit different, but they are generally the
+same. First of all, lets have a look at the entry after the initial
+<systemitem>UDP</systemitem> packet has been sent.
+   </para>
+
+   <literallayout>
+<command>
+udp      17 20 src=192.168.1.2 dst=192.168.1.5 sport=137 dport=1025
+[UNREPLIED] src=192.168.1.5 dst=192.168.1.2 sport=1025 dport=137 use=1
+</command>
+   </literallayout>
+
+   <para>
+As you can see, this is an <systemitem>UDP</systemitem> packet, from the
+first and second values. The first is the named value, and the second is
+protocol number. This is just the same as for <systemitem>TCP</systemitem>
+connections. The third value marks how many seconds this state entry has to
+live. After this, we get the values of the packet that we have seen and the
+future expectations of the packets reaching us from the initiating packet
+sender, these are the source, destination, source port and destination port
+values. At this point, we see that the packet has so far been unreplied by the
+<computeroutput>[UNREPLIED]</computeroutput> flag. Finally, we get a brief
+list of the expectations for returning packets. Do note that these are
+reversed in comparison to the first list of values. The timeout at this point
+is set to 30 seconds per default.
+   </para>
+
+   <literallayout>
+<command>
+udp      17 170 src=192.168.1.2 dst=192.168.1.5 sport=137 dport=1025
+src=192.168.1.5 dst=192.168.1.2 sport=1025 dport=137 use=1
+</command>
+   </literallayout>
+
+   <para>
+At this point the server has seen a reply to the first packet sent out and is
+now considered as <command>ESTABLISHED</command>. This is not shown in the
+connection tracking as you can see. The main difference is that the
+<computeroutput>[UNREPLIED]</computeroutput> flag is now gone, and the default
+timeout has changed to 180 seconds. In this example, we only see 170 seconds
+as you can see. One thing can change a bit, and that is the
+<computeroutput>[ASSURED]</computeroutput> flag which was previously
+described. To get the <computeroutput>[ASSURED]</computeroutput> flag set on a
+tracked connection, there must be a small amount of traffic on the connection
+before it can be assured.
+   </para>
+
+   <literallayout>
+<command>
+udp      17 175 src=192.168.1.5 dst=195.22.79.2 sport=1025 dport=53
+src=195.22.79.2 dst=192.168.1.5 sport=53 dport=1025 [ASSURED] use=1
+</command>
+   </literallayout>
+
+   <para>
+At this point, the connection has become assured. The connection looks
+exactly the same as the previous example, except for the
+<computeroutput>[ASSURED]</computeroutput> flag. If this connection is not
+used for 180 seconds, it times out. This is a rather low value but should be
+enough for most of us. However, this value is counted from the last packet
+going through the firewall and is reimbursed to its full value once we get a
+new packet that matches the same entry, just the same as for all of the
+internal states.
+   </para>
+
+  </section>
+
+  <section>
+   <title>ICMP connections</title>
+
+   <para>
+<systemitem>ICMP</systemitem> packets are far from a stateful stream since
+they are only used for controlling and should never establish any connections.
+There are 4 <systemitem>ICMP</systemitem> types that will generate return
+packets however, and these have 2 different states. These
+<systemitem>ICMP</systemitem> messages can take the <command>NEW</command> and
+<command>ESTABLISHED</command> states. The <systemitem>ICMP</systemitem> types
+we are talking about are <systemitem>Echo request</systemitem> and
+<systemitem>reply</systemitem>, <systemitem>Timestamp request</systemitem> and
+<systemitem>reply</systemitem>, <systemitem>Information request</systemitem>
+and <systemitem>reply</systemitem> and finally <systemitem>Address mask
+request</systemitem> and <systemitem>reply</systemitem>. Out of these, the
+<systemitem>timestamp request</systemitem> and <systemitem>information
+request</systemitem> are obsolete and could most probably just be dropped.
+However, the <systemitem>Echo</systemitem> messages are used in several setups
+such as pinging hosts. <systemitem>Address mask requests</systemitem> are
+fairly unused, but at times it could be worth allowing it. To get an idea of
+how this could look, have a look at the following image.
+   </para>
+
+   <para>
+    <mediaobject>
+     <imageobject>
+      <imagedata fileref="images/state-icmp-ping.eps" format=eps>
+     </imageobject>
+     <imageobject>
+      <imagedata fileref="images/state-icmp-ping.jpg" format=jpg>
+     </imageobject>
+    </mediaobject>
+   </para>
+
+   <para>
+As you can see in the above picture, the server sends a <systemitem>echo
+request</systemitem> to the client, which is considered as
+<command>NEW</command> by the firewall. The client then responds with a
+<systemitem>echo reply</systemitem> which the firewall considers as state
+<command>ESTABLISHED</command>. When the first echo request has been seen, the
+following state entry goes into the <filename>ip_conntrack</filename>.
+   </para>
+
+   <literallayout>
+<command>
+icmp     1 25 src=192.168.1.6 dst=192.168.1.10 type=8 code=0 id=33029
+[UNREPLIED] src=192.168.1.10 dst=192.168.1.6 type=0 code=0 id=33029 use=1
+</command>
+   </literallayout>
+
+   <para>
+This entry looks a little bit different from the standard states for
+<systemitem>TCP</systemitem> and <systemitem>UDP</systemitem> as you can see.
+The protocol is there, and the timeout, as well as source and destination
+addresses. The problem comes after that however. We now have 3 new fields
+called <computeroutput>type</computeroutput>,
+<computeroutput>code</computeroutput> and <computeroutput>id</computeroutput>.
+They are not special in any way, the <computeroutput>type</computeroutput>
+field contains the <systemitem>ICMP</systemitem> type and the
+<computeroutput>code</computeroutput> field contains the
+<systemitem>ICMP</systemitem> code. These are all available in <link
+linkend="icmptypes" endterm="icmptypes.title"></link> appendix. The final
+<computeroutput>id</computeroutput> field, contains the <systemitem>ICMP
+ID</systemitem>. Each <systemitem>ICMP</systemitem> packet gets an ID set to
+it when it is sent, and when the receiver gets the
+<systemitem>ICMP</systemitem> message, it sets the same
+<systemitem>ID</systemitem> within the new <systemitem>ICMP</systemitem>
+message so that the sender will recognise the reply and will be able to
+connect it with the correct <systemitem>ICMP</systemitem> request.
+   </para>
+
+   <para>
+The next field, we once again recognize as the
+<computeroutput>[UNREPLIED]</computeroutput> flag, which we have seen before.
+Just as before, this flag tells us that we are currently looking at a
+connection tracking entry that has seen only traffic in one direction.
+Finally, we see the reply expectations for the reply
+<systemitem>ICMP</systemitem> packet, which is the inversion of the original
+source and destination IP addresses. As for the type and code, these are
+changed to the correct values for the return packet, so a echo request is
+changed to echo reply and so on. The <systemitem>ICMP ID</systemitem> is
+preserved from the request packet.
+   </para>
+
+   <para>
+The reply packet is considered as <command>ESTABLISHED</command>, as we have
+already explained. However, we can know for sure that after the
+<systemitem>ICMP</systemitem> reply, there will be absolutely no more legal
+traffic in the same connection. For this reason, the connection tracking entry
+is destroyed once the reply has traveled all the way through the netfilter
+structure.
+   </para>
+
+   <para>
+In each of the above cases, the request is considered as
+<command>NEW</command>, while the reply is considered as
+<command>ESTABLISHED</command>. Lets consider this a little bit. When the
+firewall sees a request packet, it considers it as <command>NEW</command>.
+When the host sends a reply packet to the request it is considered
+<command>ESTABLISHED</command>. Do note that this means that the reply packet
+must match the criterias given by the connection track entry to be considered
+as established, just as with all other traffic types.
+   </para>
+
+   <para>
+ICMP requests has a default timeout of 30 seconds, which you can change in the
+<filename>/proc/sys/net/ipv4/netfilter/ip_ct_icmp_timeout</filename> entry.
+This should generally be a good timeout value which will be able to catch most
+packets in transit.
+   </para>
+
+   <para>
+Another huge part of <systemitem>ICMP</systemitem> is the fact that they are
+used to tell the hosts what happened to specific <systemitem>UDP</systemitem>
+and <systemitem>TCP</systemitem> connections or connection attempts. For this
+simple reason, they will very often be recognized as
+<command>RELATED</command> to original connections. A simple example would be
+the <systemitem>ICMP</systemitem> Host unreachable or <systemitem>ICMP Network
+unreachable</systemitem>. These should always be spawned by us trying to issue
+a connection to some other host, but the network or host may be down, and
+hence the last router trying to reach the site in question will reply with a
+<systemitem>ICMP</systemitem> message telling us about it. In this case, the
+<systemitem>ICMP</systemitem> reply is considered as a
+<command>RELATED</command> packet. The following picture should explain how it
+would look.
+   </para>
+
+   <para>
+    <mediaobject>
+     <imageobject>
+      <imagedata fileref="images/state-tcp-icmp-reply.eps" format=eps>
+     </imageobject>
+     <imageobject>
+      <imagedata fileref="images/state-tcp-icmp-reply.jpg" format=jpg>
+     </imageobject>
+    </mediaobject>
+   </para>
+
+   <para>
+   In the above example, we send out a <systemitem>SYN</systemitem> packet to
+a specific address. This is considered as a <command>NEW</command> connection
+by the firewall. However, the network the packet is trying to reach is
+unreachable, so a router returns a network unreachable
+<systemitem>ICMP</systemitem> error to us. The connection tracking code can
+recognize this packet as <command>RELATED</command>. thanks to the already
+added tracking entry, so the <systemitem>ICMP</systemitem> reply is correctly
+sent to the client which will then hopefully abort. Meanwhile, the firewall
+has destroyed the connection tracking entry since it knows this was an error
+message.
+   </para>
+
+   <para>
+The same behaviour as above is experienced with <systemitem>UDP</systemitem>
+connections if they run into any problem like the above. All
+<systemitem>ICMP</systemitem> messages sent in reply to
+<systemitem>UDP</systemitem> connections are considered as
+<command>RELATED</command>. Consider the following image.
+   </para>
+
+   <para>
+    <mediaobject>
+     <imageobject>
+      <imagedata fileref="images/state-udp-icmp-reply.eps" format=eps>
+     </imageobject>
+     <imageobject>
+      <imagedata fileref="images/state-udp-icmp-reply.jpg" format=jpg>
+     </imageobject>
+    </mediaobject>
+   </para>
+
+   <para>
+This time an <systemitem>UDP</systemitem> packet is sent to the server. This
+<systemitem>UDP</systemitem> connection is considered as
+<command>NEW</command>. However, the network is administratively prohibited by
+some firewall or router on the way over. Hence, our firewall receives a
+<systemitem>ICMP Network Prohibited</systemitem> in return. The firewall knows
+that this <systemitem>ICMP</systemitem> error message is related to the
+already opened <systemitem>UDP</systemitem> connection and sends it as an
+<command>RELATED</command> packet to the client. At this point, the firewall
+destroys the connection tracking entry, and the client receives the
+<systemitem>ICMP</systemitem> message and should hopefully abort.
+
+   </para>
+
+  </section>
+
+  <section>
+   <title>Default connections</title>
+
+   <para>
+In certain cases, the conntrack entries does not know how to handle a specific
+protocol. This happens as soon as it does not know about the protocol in
+specific or how it works. In these cases, it goes back to a default behaviour.
+The default behaviour is used on, for example,
+<systemitem>NETBLT</systemitem>, <systemitem>MUX</systemitem> and
+<systemitem>EGP</systemitem>. The default behaviour looks pretty much the
+same as the <systemitem>UDP</systemitem> connection tracking. The first packet
+is considered <command>NEW</command>, and reply traffic and so forth is
+considered <command>ESTABLISHED</command>.
+
+   </para>
+
+   <para>
+When the default behaviour is used, all of these packets will use the same
+default timeout value. This can be set via the
+<filename>/proc/sys/net/ipv4/netfilter/ip_ct_generic_timeout</filename>
+variable. The default value here is 600 seconds, or 10 minutes. Depending 
+on
+what traffic you are trying to send over a link that uses the default
+connection tracking behaviour, this could be changed. Especially if you are
+bouncing traffic through satellites and such which takes long times.
+   </para>
+
+  </section>
+
+  <section>
+   <title>Complex protocols and connection tracking</title>
+
+   <para>
+Certain protocols are more complex than others. What this means when it comes
+to connection tracking, is that some protocols may be harder to track
+correctly. Some good examples of this is the <systemitem>ICQ</systemitem>,
+<systemitem>IRC</systemitem> and <systemitem>FTP</systemitem> protocols. Each
+and one of these protocols carry information within the actual data payload of
+the packets and hence requires special connection tracking helpers to be
+tracked correctly.
+
+   </para>
+
+   <para>
+Lets take the <systemitem>FTP</systemitem> protocol as a first example. The
+<systemitem>FTP</systemitem> protocol first opens up a single connection that
+is called the <systemitem>FTP</systemitem> control session. When we issue
+commands through this session, other ports are opened to carry the rest of the
+data related to that specific command. These connections can be done in two
+ways, either actively or passively. When a connection is done actively, the
+<systemitem>FTP</systemitem> client sends the server a port and IP address to
+connect to. After this, the <systemitem>FTP</systemitem> client opens up the
+port and the server connects to that specified port from its own port 20
+(known as FTP-Data) and sends the data over it.
+   </para>
+
+   <para>
+The problem here is that the firewall will not know about these
+extra connections since they where negotiated within the actual payload of
+the protocol data. Because of this, the firewall will be unable to know that
+it should let the server connect to the client over these specific ports.
+   </para>
+
+   <para>
+The solution to this problem is to add special helpers to the connection
+tracking module which will scan through the data in the control connection
+for specific syntaxes and information. When it runs into the correct
+information, it will add that specific information as
+<command>RELATED</command> and the server will be able to do the connection
+thanks to that <command>RELATED</command> entry. Consider the following
+picture to understand the states when the <systemitem>FTP</systemitem> server
+connects back to you.
+   </para>
+
+   <para>
+    <mediaobject>
+     <imageobject>
+      <imagedata fileref="images/state-tcp-server-subconn.eps" format=eps>
+     </imageobject>
+     <imageobject>
+      <imagedata fileref="images/state-tcp-server-subconn.jpg" format=jpg>
+     </imageobject>
+    </mediaobject>
+   </para>
+
+   <para>
+<systemitem>Passive FTP</systemitem> works the opposite way. The
+<systemitem>FTP</systemitem> client tells the server that it wants some
+specific data, upon which the server replies with an IP address to connect to
+and at what port. The client will upon receipt of this data connect to that
+specific port, from port 20(the FTP-data port), and get the data in question.
+If you have an <systemitem>FTP</systemitem> server behind your firewall, you
+will in other words require this module as well to let clients on the Internet
+connect to the <systemitem>FTP</systemitem> server properly. The same goes if
+you are extremely restrictive to your users, and only want to let them reach
+<systemitem>HTTP</systemitem> and <systemitem>FTP</systemitem> servers on the
+internet and block all other ports. Consider the following image when doing
+Passive <systemitem>FTP</systemitem> and how it looks.
+   </para>
+
+   <para>
+    <mediaobject>
+     <imageobject>
+      <imagedata fileref="images/state-tcp-client-subconn.eps" format=eps>
+     </imageobject>
+     <imageobject>
+      <imagedata fileref="images/state-tcp-client-subconn.jpg" format=jpg>
+     </imageobject>
+    </mediaobject>
+   </para>
+
+   <para>
+Some conntrack helpers are already available within the kernel itself. More
+specifically, the <systemitem>FTP</systemitem> and
+<systemitem>IRC</systemitem> protocols have conntrack helpers as of writing
+this. If you can not find the conntrack helpers that you need within the
+kernel itself, you should have a look at the
+<systemitem>patch-o-matic</systemitem> tree within userland iptables. The
+<systemitem>patch-o-matic</systemitem> tree may contain more conntrack
+helpers, such as for the <systemitem>ntalk</systemitem> or
+<systemitem>H.323</systemitem> protocols. If they are not available in the
+patch-o-matic tree, you have a number of options. Either you can look at the
+CVS source of iptables if it has recently gone into that tree, or you can
+contact the netfilter-devel mailing list and ask if it is available. If it is
+not, and there are no plans for adding it, you are left to your own devices
+and would most probably want to read the <link
+linkend="netfilterhacking">Rusty Russells Unreliable Netfilter Hacking
+HOWTO</link> which is linked from the <link linkend="otherresources"
+endterm="otherresources.title"></link> appendix.
+   </para>
+
+   <para>
+Conntrack helpers may either be statically compiled into the kernel, or as
+modules. If they are compiled as modules, you can load them with the following
+command
+   </para>
+
+   <para>
+    <command>modprobe ip_conntrack_*</command>
+   </para>
+
+   <para>
+Do note that connection tracking has nothing to do with
+<systemitem>NAT</systemitem>, and hence you may require more modules if you
+are NAT'ing connections as well. For example, if you would want to
+<systemitem>NAT</systemitem> and track <systemitem>FTP</systemitem>
+connections, you would need the <systemitem>NAT</systemitem> module as well.
+All <systemitem>NAT</systemitem> helpers starts with ip_nat_ and follow that
+naming convention, so for example the <systemitem>FTP</systemitem>
+<systemitem>NAT</systemitem> helper would be named
+<systemitem>ip_nat_ftp</systemitem> and the <systemitem>IRC</systemitem>
+module would be named <systemitem>ip_nat_irc</systemitem>. The conntrack
+helpers follow the same naming convention, and hence the
+<systemitem>IRC</systemitem> conntrack helper would be named
+<systemitem>ip_conntrack_irc</systemitem>, while the
+<systemitem>FTP</systemitem> conntrack helper would be named
+<systemitem>ip_conntrack_ftp</systemitem>.
+   </para>
+
+  </section>
+
+ </chapter>

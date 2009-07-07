@@ -1,0 +1,269 @@
+ <appendix id="otherresources">
+  <title id="otherresources.title">Otras fuentes y enlaces</title>
+  <para>
+He aquí una lista de enlaces y fuentes donde he conseguido información (mientras
+no se indique lo contrario, los documentos están en inglés):
+  </para>
+
+  <para>
+   <itemizedlist>
+   
+    <listitem id="ip-sysctltxt">
+     <para>
+      <ulink url="http://iptables-tutorial.frozentux.net/other/ip-sysctl.txt"
+      id="ip-sysctltxt.title">ip-sysctl.txt</ulink> - del núcleo 2.4.14. Algo
+      corto, pero una buena referencia sobre los controles de gestión IP y qué
+      le hacen al núcleo. Documento traducido al castellano.
+     </para>
+    </listitem>
+
+    <listitem id="theicmp">
+     <para>
+     <ulink url="http://www.ee.siue.edu/~rwalden/networking/icmp.htm"  id="theicmp.title">
+     Protocolo de Mensajes de Control de Internet</ulink> - Un documento bueno
+     y breve que describe el protocolo ICMP detalladamente. Escrito por Ralph
+     Walden.
+     </para>
+    </listitem>
+
+    <listitem id="rfc792">
+     <para>
+     <ulink url="http://ipsysctl-tutorial.frozentux.net/other/rfc792.txt"
+     id="rfc792.title">RFC 792 - Protocolo de Mensajes de Control de Internet</ulink>
+     - La fuente de información definitiva acerca de los paquetes ICMP. Sea cual
+     sea la información técnica que necesites saber acerca del protocolo ICMP,
+     aquí es donde primero debes buscar. Escrito por J. Postel.
+     </para>
+    </listitem>
+	     
+    <listitem id="rfc793">
+     <para> 
+     <ulink url="http://iptables-tutorial.frozentux.net/other/rfc793.txt"
+     id="rfc793.title">RFC 793 - Protocolo de Control de Transmisiones</ulink> -
+     Esta es la fuente de información original sobre cómo debe comportarse TCP
+     en todos los hosts. Este documento es el estándar sobre el funcionamiento
+     de TCP desde 1981 en adelante. Extremadamente técnico, pero de obligada
+     lectura para aquél que quiera aprender TCP en profundidad. Originalmente
+     fue un estándar del Departamento de Defensa (Americano) escrito por J.
+     Postel.
+     </para>
+    </listitem>
+	      
+    <listitem>
+     <para>
+      <ulink url="http://iptables-tutorial.frozentux.net/other/ip_dynaddr.txt">
+      ip_dynaddr.txt</ulink> - del núcleo 2.4.14. Una referencia muy corta sobre
+      las opciones de configuración de ip_dynaddr, disponibles a través de
+      sysctl y el sistema de ficheros proc. Documento traducido al castellano.
+     </para>
+    </listitem>
+    
+    <listitem>
+     <para>
+      <ulink url="http://iptables-tutorial.frozentux.net/other/iptables.html">
+      iptables.8</ulink> - El manual de iptables 1.2.4. Ésta es una versión
+      HTML del manual, que es una referencia excelente al leer/escribir
+      conjuntos de reglas de iptables. Ténlo siempre a mano.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <ulink url="http://iptables-tutorial.frozentux.net/other/firewall_rules_table_final.pdf">
+      Tabla de reglas del cortafuegos</ulink> - Un pequeño documento PDF donado
+      amablemente a este proyecto por Stuart Clark, que ofrece un formulario de
+      referencia donde escribir toda la información necesaria para el cortafuegos,
+      de una forma sencilla.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <ulink url="http://www.netfilter.org/">http://www.netfilter.org/</ulink>
+      - El sitio web oficial de <command>Netfilter</command> e <command>iptables</command>.
+      De obligada visita para todo aquél que quiera configurar <command>iptables</command>
+      y <command>Netfilter</command> en Linux.
+     </para>
+    </listitem>
+
+    <listitem id="netfilter.org">
+     <para id="netfilter.org.title">
+      <ulink url="http://www.netfilter.org/documentation/index.html#FAQ">
+      http://www.netfilter.org/documentation/index.html#FAQ</ulink> - Las
+      <emphasis>Frequently Asked Questions</emphasis> (Preguntas Frecuentes)
+      oficiales de <command>Netfilter</command>. Éste es también un buen lugar
+      de comienzo cuando empiezas a preguntarte qué hacen <command>iptables</command>
+      y <command>Netfilter</command>.
+     </para>
+    </listitem>
+    
+    <listitem>
+     <para>
+      <ulink url="http://www.netfilter.org/unreliable-guides/packet-filtering-HOWTO/index.html">
+      http://www.netfilter.org/unreliable-guides/packet-filtering-HOWTO/index.html</ulink>
+      - La Guía "Poco fiable" (Unreliable Guide) sobre filtrado de paquetes de
+      Rusty Russells. Excelente documentación sobre filtrado básico de paquetes
+      con <command>iptables</command>, escrito por uno de los programadores del
+      núcleo de <command>iptables</command> y de <command>Netfilter</command>.
+     </para>
+    </listitem>
+    
+    <listitem>
+     <para>
+      <ulink url="http://www.netfilter.org/unreliable-guides/NAT-HOWTO/index.html">
+      http://www.netfilter.org/unreliable-guides/NAT-HOWTO/index.html</ulink>
+      - La Guía "Poco fiable" (Unreliable Guide) sobre la traducción de
+      direcciones de red de Rusty Russells. Excelente documentación sobre
+      <systemitem>Network Address Translation</systemitem> (NAT) en
+      <command>iptables</command>, escrito por uno de los programadores del
+      núcleo de <command>iptables</command> y de <command>Netfilter</command>.
+     </para>
+    </listitem>
+    
+    <listitem id="netfilterhackinghowto">
+     <para>
+      <ulink url="http://www.netfilter.org/unreliable-guides/netfilter-hacking-HOWTO/index.html">
+      http://www.netfilter.org/unreliable-guides/netfilter-hacking-HOWTO/index.html</ulink>
+      - La Guía "Poco fiable" (Unreliable Guide) sobre optimización (hacking) de
+      Netfilter, por Rusty Russells. Uno de los pocos documentos acerca de cómo
+      escribir código en el espacio de usuario en <command>Netfilter</command> e
+      <command>iptables</command>.
+     </para>
+    </listitem>
+    
+    <listitem>
+     <para>
+      <ulink url="http://www.linuxguruz.org/iptables/">http://www.linuxguruz.org/iptables/</ulink>
+      - Excelente página de enlaces (links) a la mayoría de las páginas de
+      Internet sobre <command>iptables</command> y <command>Netfilter</command>.
+      También mantiene una lista de <systemitem>scripts para iptables</systemitem>
+      destinados a distintos propósitos.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <ulink url="http://www.islandsoft.net/veerapen.html">http://www.islandsoft.net/veerapen.html</ulink>
+      - Excelente discusión acerca de cómo hacer más seguro <command>iptables</command>
+      automáticamente y cómo hacer pequeños cambios que permitirán a tu
+      ordenador añadir automáticamente todo sitio hostil a una lista especial de
+      sitios prohibidos en <command>iptables</command>.
+     </para>
+    </listitem>
+
+    <listitem id="protocolstxt">
+     <para>
+      <ulink url="http://iptables-tutorial.frozentux.net/other/protocols.txt"
+      id="protocolstxt.title"><filename>/etc/protocols</filename></ulink> - Un
+      ejemplo de fichero de protocolos sacado de la distribución Slackware
+      Se puede usar para saber qué número tienen los diferentes
+      protocolos, como pueden ser el protocolo IP, el ICMP o el TCP.
+     </para>
+    </listitem>
+
+    <listitem id="servicestxt">
+     <para>
+      <ulink url="http://iptables-tutorial.frozentux.net/other/services.txt"
+      id="servicestxt.title"><filename>/etc/services</filename></ulink> - Un
+      ejemplo de fichero de servicios, también de la distribución Slackware.
+      Es muy recomendable que lo leas de vez en cuando, especialmente si
+      necesitas una visión general de qué puertos utilizan los distintos
+      protocolos.
+     </para>
+    </listitem>
+
+    <listitem id="ietf">
+     <para>
+      <ulink url="http://www.ietf.org" id="ietf.title">Internet Engineering Task Force</ulink>
+      (sin traducción; vendría a ser "Equipo especial de ingenieros de Internet") - Éste
+      es uno de los grupos más grandes en lo que respecta a establecer y
+      mantener estándares de Internet. Son los que mantienen el "almacén"
+      (repository) de RFC y lo integran un gran grupo de compañías y
+      particulares que trabajan conjuntamente para asegurar la interoperabilidad
+      de Internet.
+     </para>
+    </listitem>
+		 
+   <listitem id="lartc">
+    <para>
+     <ulink url="http://www.lartc.org" id="lartc.title">Linux Advanced Routing
+     and Traffic Control HOW-TO</ulink> (CÓMO sobre Control de Tráfico y
+     Encaminamiento Avanzado de Linux) - Este documento es uno de los mejores
+     y más grandes acerca del encaminamiento avanzado de Linux. Mantenido por
+     Bert Hubert.
+    </para>
+   </listitem>
+		 
+   <listitem id="paksecured">
+    <para>
+     <ulink url="http://www.paksecured.com/patches/" id="paksecured.title">
+     Paksecured Linux Kernel patches</ulink> (parches Paksecured del núcleo de
+     Linux) - una web que contiene todos los parches (patches) del núcleo,
+     escrito por Matthew G. Marsh. Además de otros, el parche FTOS está
+     disponible en ésta web.
+    </para>
+   </listitem>
+  
+   <listitem id="ulogdsite">
+    <para>
+     <ulink url="http://www.gnumonks.org/gnumonks/projects/project_details?p_id=1"
+     id="ulogdsite.title">Página del proyecto ULOGD</ulink> - La página web
+     oficial del proyecto ULOGD.
+    </para>
+   </listitem>
+
+   <listitem id="tldp">
+      <para>
+       El <ulink url="http://www.tldp.org" id="tldp.title">Linux Documentation
+       Project</ulink> (Proyecto de Documentación sobre Linux) es un buen lugar
+       dónde buscar documentación. La mayoría de los grandes documentos para
+       Linux están disponibles aquí, de lo contrario, tendrás que rebuscar en la
+       Red fijándote mucho y pasando por muchas páginas hasta que encuentres lo
+       que buscas. Si hay algo sobre lo que quieras saber más, pásate por esta
+       web. Sin embargo recuerda que todo está en inglés. Para ver una parte de esos
+       documentos traducidos al español tendrás que ir a la página hermana:
+       <ulink url="http://es.tldp.org">El Proyecto LuCAS</ulink>, dónde
+       encontrarás bastantes documentos traducidos, aunque no todos, ni tampoco
+       tendrás siempre las últimas actualizaciones.
+      </para>
+    </listitem>
+		 
+
+    <listitem>
+     <para>
+      <ulink url="http://kalamazoolinux.org/presentations/20010417/conntrack.html">
+      http://kalamazoolinux.org/presentations/20010417/conntrack.html</ulink> -
+      Esta presentación contiene una explicación excelente de los módulos de
+      seguimiento de conexiones (conntrack) y cómo trabajan en Netfilter. Si
+      estás interesado en este tema, debes leertelo.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <ulink url="http://www.docum.org">http://www.docum.org</ulink> -
+      Información excelente sobre los comandos <systemitem>CBQ</systemitem>,
+      <command>tc</command> e <command>ip</command> de Linux. Uno de los pocos
+      sitios que tiene información sobre estos programas. Mantenido por Stef
+      Coene.
+     </para>
+    </listitem>
+
+    <listitem id="netfilterlist">
+     <para>
+      <ulink url="http://lists.samba.org/mailman/listinfo/netfilter">
+      http://lists.samba.org/mailman/listinfo/netfilter</ulink> - La lista de
+      correo oficial de Netfilter. Extremadamente útil si tienes dudas sobre
+      algo no tratado en este tutorial o que no se encuentre en algún enlace
+      de los aquí listados.
+     </para>
+    </listitem>
+    
+   </itemizedlist>
+  </para>
+
+  <para>
+Y, por supuesto, el código fuente de <command>iptables</command>, la
+documentación y los particulares que me ayudaron.
+  </para>
+ </appendix>

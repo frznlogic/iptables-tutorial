@@ -1,0 +1,120 @@
+ <appendix id="detailedexplanations">
+  <title id="detailedexplanations.title">Explicaciones detalladas sobre comandos
+  especiales</title>
+
+  <section id="listingruleset">
+   <title id="listinruleset.title">Haciendo un listado del conjunto de reglas
+   activo</title>
+
+   <para>
+Para conseguir un listado del conjunto de reglas que estás empleando, debes
+ejecutar una opción especial del comando <command>iptables</command>, que ya
+hemos desarrollado brevemente en el capítulo <link linkend="howaruleisbuilt"
+endterm="howaruleisbuilt.title"></link>. Deberás escribir lo siguiente:
+   </para>
+
+   <para>
+    <command>iptables -L</command>
+   </para>
+
+   <para>
+Con éllo obtendrás un listado del conjunto de reglas con algunas
+transformaciones para que sea más legible. Por ej., los puertos se traducirán
+según las equivalencias presentes en el archivo <filename>/etc/services</filename>
+y las direcciones IP serán traducidas según los nombres equivalentes que
+reconozca el servidor <systemitem>DNS</systemitem>. En concreto ésto último
+puede dar lugar a algún problema: intentará resolver (traducir) direcciones IP
+de la red local (como <computeroutput>192.168.1.1</computeroutput> ó
+<computeroutput>192.168.0.0/16</computeroutput>) a nombres más legibles (como
+puede ser www.google.com); sin embargo estas direcciones son privadas y no
+podrá resolver nada, con lo cual el comando parecerá colgarse mientras intenta
+traducir la IP. Para evitar este problema tendremos que hacer algo similar a:
+   </para>
+
+   <para>
+    <command>iptables -L -n</command>
+   </para>
+
+   <para>
+Otra cosa que puede ser interesante es poder ver algunas estadísticas sobre
+cada política, regla y cadena. Podemos conseguirlo añadiendo la opción (flag)
+"verbose" (detallado):
+   </para>
+
+   <para>
+    <command>iptables -L -n -v</command>
+   </para>
+
+   <para>
+No olvides que también es posible enumerar las tablas nat y mangle mediante la
+opción -t; así:
+   </para>
+
+   <para>
+    <command>iptables -L -t nat</command>
+   </para>
+
+   <para>
+Además hay unos cuantos ficheros a los que puede ser interesante echar un
+vistazo en el sistema de ficheros <filename>/proc</filename>. Por ejemplo, puede
+interesarnos saber qué conexiones hay actualmente en la tabla de seguimiento
+de conexiones: esta tabla contiene las diferentes conexiones que se están
+monitorizando en este momento y sirve como tabla básica dónde conocer el estado
+en que actualmente se encuentra una conexión. Esta tabla no se puede editar, y
+aunque se pudiera, no sería una buena idea. Para verla puedes ejecutar el
+siguiente comando:
+   </para>
+
+   <para>
+    <command>cat /proc/net/ip_conntrack | less</command>
+   </para>
+
+   <para>
+Con el anterior comando veremos todas las conexiones monitorizadas, si bien
+puede resultar algo difícil entenderlo todo.
+   </para>
+  </section>
+
+  <section id="updatingtables">
+   <title id="updatingtables.title">Actualizando y "aseando" tus tablas</title>
+
+   <para>
+Si en algún momento "estropeas" tus tablas de <command>iptables</command>,
+hay comandos para "arreglarlas", de forma que no tendrás que reiniciar el
+sistema. Ya me han preguntado sobre ésto en un par de ocasiones, así que he
+pensado contestar aquí: si has añadido una regla por error, lo más sencillo es
+cambiar el parámetro <command>-A</command> por el <command>-D</command> en la
+línea que has añadido por error. <command>iptables</command> encontrará esa
+línea errónea y la borrará; si tuvieras varias líneas exactamente iguales en
+la cadena, borrará la primera cadena que encuentre y sea coincidente con la regla que deseas
+borrar. Si ésto no es lo que deseas, puedes intentar usar la opción <command>-D</command>
+como sigue: <command>iptables -D INPUT 10</command>, ejemplo que borraría la
+décima regla de la cadena <systemitem>INPUT</systemitem>.
+   </para>
+
+   <para>
+Tambien hay situaciones en las que querrás borrar una cadena entera. Para ésto,
+puedes usar la opción <command>-F</command>: por ej., con <command>iptables -F
+INPUT</command> borrarás la cadena <systemitem>INPUT</systemitem> entera, aunque
+no modificarás su política por defecto, que si está establecida como
+<systemitem>DROP</systemitem> (desechar), con el ejemplo anterior bloquearás
+completamente la cadena <systemitem>INPUT</systemitem> (todo paquete que entre
+en esta cadena será desechado). Para modificar la
+política por defecto de la cadena, haz lo mismo que hiciste para establecerla,
+por ejemplo <command>iptables -P INPUT ACCEPT</command> (en este ejemplo
+cambiarás de desechar a aceptar los paquetes).
+   </para>
+
+   <para>
+He creado un <ulink url="http://iptables-tutorial.frozentux.net/scripts/rc.flush-iptables.txt">
+pequeño script</ulink> (disponible también como un apéndice) que limpiará y
+reinicializará tus tablas de <command>iptables</command>, lo cual puede que
+creas conveniente cuando quieras poner a punto el archivo
+<filename>rc.firewall.txt</filename>. Sólo un apunte, si has estado trasteando
+en la tabla <systemitem>mangle</systemitem>, este script no borrará nada en
+élla, aunque es bastante simple añadir las pocas líneas de código necesarias
+para hacerlo. La razón es simple: no utilizo la tabla <systemitem>mangle</systemitem>
+para nada en el script <filename>rc.firewall.txt</filename>.
+   </para>
+  </section>
+ </appendix>

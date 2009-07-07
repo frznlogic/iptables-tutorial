@@ -1,0 +1,3113 @@
+ <chapter id="howaruleisbuilt">
+  <title id="howaruleisbuilt.title">How a rule is built</title>
+
+  <para>
+This chapter will discuss in legth how to build your rules. A rule could
+be described as the pure rules the firewall will follow when blocking
+different connections and packets in each chain. Each line you write
+that's inserted to a chain should be considered a rule. We will also discuss
+the basic matches that str available and how to use them as well as the
+different targets and how we can make new targets to use (ie, new
+subchains).
+  </para>
+
+  <section>
+   <title>Basics</title>
+
+   <para>
+As we have already explained each rule is a line that the kernel looks at to
+find out what to do with a packet. If all the criterias, or matches, are
+met, we perform the target, or jump, instruction. Normally we would write a
+rule something like this:
+   </para>
+
+   <para>
+    <cmdsynopsis>
+     <command>iptables</command>
+     <arg>-t <replaceable>table</replaceable></arg>
+     <arg choice=plain>command</arg>
+     <arg>match</arg>
+     <arg>target/jump</arg>
+    </cmdsynopsis>
+   </para>
+
+   <para>
+There is nothing that says that the target instruction must be last in the
+line, however, you would do this normally to get a better readability. Also,
+we have used this way of writing rules since it is the most usual way of
+writing them. Hence, if you read someone elses script you'll most likely
+recognise the way of writing a rule and understand it quickly.
+   </para>
+
+   <para>
+If you want to use another table than the standard table, you could insert
+the table specification where [table] is specified. However, it is
+not necessary to specify it explicitly all the time since
+<command>iptables</command> per default uses the <systemitem>filter</systemitem>
+table to implement your commands on. It is not required to put the table
+specification at this location, either. It could be set pretty much anywhere in
+the rule, however, it is more or less standard to put the table specification at
+the beginning of the commandline.
+   </para>
+
+   <para>
+One thing to think about though; the command should always be
+first, or directly after the table specification. This tells the
+<command>iptables</command> command what to do. We will enter this a bit further
+on. We use this first variable to tell the program what to do, for example to
+insert a rule or to add a rule to the end of the chain, or to delete a rule.
+   </para>
+
+   <para>
+The match is the part which we send to the kernel that says what a packet
+must look like to be matched. We could specify what IP address the packet
+must come from, or which network interface the packet must come from
+etc. There is a heap of different matches that we can use that we will look
+closer at further on in this chapter.
+   </para>
+
+   <para>
+Finally we have the target of the packet. If all the matches are met for a
+packet we tell the kernel to perform this action on the packet. We could
+tell the kernel to send the packet to another chain that we create
+ourself, which must be part of this table. We could tell the kernel to
+drop this packet dead and do no further processing, or we could tell
+kernel to send a specified reply to be sent back. As with the rest of the
+content in this section, we'll look closer at them further on in the
+chapter.
+   </para>
+
+  </section>
+
+  <section id="tables">
+   <title id="tables.title">Tables</title>
+
+   <para>
+The <command>-t</command> option specifies which table to use. Per default, the
+<systemitem>filter</systemitem> table is used. We may specify one of the
+following tables with the <command>-t</command> option. Do note that this is an
+extremely brief repetition of the <link linkend="traversingoftables"
+endterm="traversingoftables.title"></link> chapter in certain parts.
+
+   </para>
+
+   <table frame=all>
+    <title>Tables</title>
+    <tgroup cols=2 align=left colsep=1 rowsep=1>
+    <colspec colwidth="1*">
+    <colspec colwidth="5*">
+      <thead>
+       <row>
+        <entry>Table</entry>
+        <entry>Explanation</entry>
+       </row>
+      </thead>
+      <tbody>
+       <row>
+        <entry>nat</entry>
+        <entry>The <systemitem>nat</systemitem> table is used mainly for
+<systemitem>Network Address Translation</systemitem>. Packets in a stream only
+traverse this table once. The first packet of a stream is allowed, we presume.
+The rest of the packets in the same stream are automatically
+<systemitem>NAT</systemitem>'ed or Masqueraded etc, in case they are supposed to
+have those actions taken on them. The rest of the packets in the stream will in
+other words not go through this table again, but instead they will automatically
+have the same actions taken to them as the first packet in the stream. This is
+one reason why you should not do any filtering in this table, as we will discuss
+more in length further on. The <systemitem>PREROUTING</systemitem> chain is used
+to alter packets as soon as they get in to the firewall. The
+<systemitem>OUTPUT</systemitem> chain is used for altering locally generated
+packets (ie, on the firewall) before they get to the routing decision. Note that
+<systemitem>OUTPUT</systemitem> is currently broken. Finally we have the
+<systemitem>POSTROUTING</systemitem> chain which is used to alter packets just
+as they are about to leave the firewall.</entry>
+       </row>
+       <row>
+        <entry>mangle</entry>
+        <entry>This table is used mainly for mangling packets. We could
+change different packets and how their headers look among other things.
+Examples of this would be to change the <command>TTL</command>,
+<command>TOS</command> or <command>MARK</command>. Note that the
+<command>MARK</command> is not really a change to the packet, but a mark for the
+packet is set in kernelspace which other rules or programs might use further on
+in the firewall to filter or do advanced routing on with tc as an example. The
+table consists of two built in chains, the <systemitem>PREROUTING</systemitem>
+and <systemitem>OUTPUT</systemitem> chains. <systemitem>PREROUTING</systemitem>
+is used for altering packets just as they enter the firewall and before they hit
+the routing decision. <systemitem>OUTPUT</systemitem> is used for changing and
+altering locally generated packets before they enter the routing decision. Note
+that mangle can not be used for any kind of <systemitem>Network Address
+Translation</systemitem> or <systemitem>Masquerading</systemitem>, the nat table
+was made for these kinds of operations.</entry>
+       </row>
+       <row>
+        <entry>filter</entry>
+        <entry>The <systemitem>filter</systemitem> table should be used for
+filtering packets generally. For example, we could <command>DROP</command>,
+<command>LOG</command>, <command>ACCEPT</command> or <command>REJECT</command>
+packets without problems as in the other tables. There are three chain built in
+to this table. The first one is named <systemitem>FORWARD</systemitem> and is
+used on all non-locally generated packets that are not destined for our
+localhost (the firewall, in other words). <systemitem>INPUT</systemitem> is used
+on all packets that are destined for our local host (the firewall) and
+<systemitem>OUTPUT</systemitem> is finally used for all locally generated
+packets. </entry>
+
+       </row>
+     </tbody>
+     </tgroup>
+    </table>
+
+    <para>
+The listing above has hopefully explained the basics about the three different
+tables that are available. They should be used for totally different
+things, and you should know what to use each chain for. If you do not
+understand their usage you may well fall into a pit once someone finds the
+hole you have unknowingly placed in the firewall yourself. We have
+already discussed the tables and chains in more detail within the <link
+linkend="traversingoftables" endterm="traversingoftables.title"></link> chapter.
+If you do not understand this fully you are recommended to go back and read
+through that chapter again.
+
+   </para>
+
+  </section>
+
+  <section id="commands">
+   <title>Commands</title>
+   <para>
+In this section we will bring up all the different commands and what can be
+done with them. The command tells <command>iptables</command> what to do with
+the rest of the commandline that we send to the program. Normally we want to
+either add or delete something to some table or another. The following commands
+are available to iptables:
+   </para>
+
+   <table frame=all>
+    <title>Commands</title>
+    <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+     <colspec colwidth="1*">
+     <colspec colwidth="6*">
+
+      <tbody>
+       <row>
+        <entry>Command</entry>
+        <entry><command>-A</command>, <command>--append</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A INPUT ...</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This command appends the rule to the end of the
+chain. The rule will will in other words always be put last in the ruleset in
+comparison to previously added rules, and hence be checked last, unless you
+append or insert more rules later on.</entry>
+       </row>
+       <row>
+        <entry>Command</entry>
+        <entry><command>-D</command>, <command>--delete</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry>
+          <command>iptables -D INPUT --dport 80 -j DROP</command>,
+          <command>iptables -D INPUT 1</command>
+        </entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This command deletes a rule in a chain. This could be done
+in two ways, either by specifying a rule to match with the <command>-D</command>
+option (as in the first example) or by specifying the rule number that we want
+to match. If you use the first way of deleting rules, they must match totally
+to the entry in the chain. If you use the second way, the rules are numbered
+from the top of each chain, and the top rule is number 1.</entry>
+       </row>
+       <row>
+        <entry>Command</entry>
+        <entry><command>-R</command>, <command>--replace</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -R INPUT 1 -s 192.168.0.1 -j
+DROP</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This command replaces the old entry at the specified line. It
+works in the same way as the <command>--delete</command> command, but instead of
+totally deleting the entry, it will replace it with a new entry. This might be
+good while experimenting with iptables mainly.</entry>
+       </row>
+       <row>
+        <entry>Command</entry>
+        <entry><command>-I</command>, <command>--insert</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -I INPUT 1 --dport 80 -j
+ACCEPT</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>Insert a rule somewhere in a chain. The rule is inserted at
+the actual number that we give. In other words, the above example would be
+inserted at place 1 in the <systemitem>INPUT</systemitem> chain, and hence it
+would be the absolutely first rule in the chain from now on.</entry>
+       </row>
+       <row>
+        <entry>Command</entry>
+        <entry><command>-L</command>, <command>--list</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -L INPUT</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This command lists all the entries in the specified chain.
+In the above case, we would list all the entries in the
+<systemitem>INPUT</systemitem> chain. It's also legal to not specify any chain
+at all. In the last case, the command would list all the chains in the specified
+table (To specify a table, see the <link linkend="tables"
+endterm="tables.title"></link> section). The exact output is affected by other
+options sent to the program, for example the <command>-n</command> and
+<command>-v</command> options, etcetera.</entry>
+       </row>
+       <row>
+        <entry>Command</entry>
+        <entry><command>-F</command>, <command>--flush</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -F INPUT</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This command flushes the specified chain from all rules and
+is equivalent to deleting each rule one by one but is quite a bit faster.
+The command can be used without options, and will then delete all rules in
+all chains within the specified table.</entry>
+       </row>
+       <row>
+        <entry>Command</entry>
+        <entry><command>-Z</command>, <command>--zero</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -Z INPUT</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This command tells the program to zero all counters in a
+specific chain or in all chains. If you have used the <command>-v</command>
+option with the <command>-L</command> command, you have probably seen the packet
+counter in the beginning of each field. To zero this packet counter, use the
+<command>-Z</command> option. This option works the same as
+<command>-L</command> except that <command>-Z</command> won't list the rules. If
+<command>-L</command> and <command>-Z</command> is used together (which is
+legal), the chains will first be listed, and then the packet counters are
+zeroised.</entry>
+       </row>
+       <row>
+        <entry>Command</entry>
+        <entry><command>-N</command>, <command>--new-chain</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -N allowed</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This command tells the kernel to create a new chain by the
+specified name in the specified table. In the above example we create a
+chain called <command>allowed</command>. Note that there must be no target of
+the same name previously to creating it.</entry>
+       </row>
+       <row>
+        <entry>Command</entry>
+        <entry><command>-X</command>, <command>--delete-chain</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -X allowed</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This command deletes the specified chain from the table.
+For this command to work, there must be no rules that are referring to the
+chain that is to be deleted. In other words, you would have to replace or
+delete all rules referring to the chain before actually deleting the
+chain. If this command is used without any options, all chains that are not
+built in will be deleted from the specified table.</entry>
+       </row>
+       <row>
+        <entry>Command</entry>
+        <entry><command>-P</command>, <command>--policy</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -P INPUT DROP</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This command tells the kernel to set a specified default
+target, or policy, on a chain. All packets that don't match any rule will
+then be forced to use the policy of the chain. Legal targets are:
+<command>DROP</command>, <command>ACCEPT</command> and <command>REJECT</command>
+(There might be more, mail me if so)</entry>
+       </row>
+       <row>
+        <entry>Command</entry>
+        <entry><command>-E</command>, <command>--rename-chain</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -E allowed disallowed</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>The <command>-E</command> command tells
+<command>iptables</command> to rename the first name of a chain, to the second
+name. In the example above we would, in other words, change the name of the
+chain from <varname>allowed</varname> to <varname>disallowed</varname>. Note
+that this will not affect the actual way the table will work. It is, in other
+words, just a cosmetic change to the table.</entry>
+       </row>
+     </tbody>
+     </tgroup>
+    </table>
+
+    <para>
+A command should always be specified, unless you just want to list the
+built-in help for <command>iptables</command> or get the version of the command.
+To get the version, use the <command>-v</command> option and to get the help
+message, use the <command>-h</command> option. As usual, in other words. Here
+comes a few options that can be used together with a few different commands.
+Note that we tell you with which commands the options can be used and what
+effect they will have. Also note that we do not tell you any options here that
+is only used to affect rules and matches. The matches and targets are instead
+looked upon in a later section of this chapter.
+    </para>
+
+    <table frame=all>
+     <title>Options</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+       <row>
+        <entry>Option</entry>
+        <entry><command>-v</command>, <command>--verbose</command></entry>
+       </row>
+       <row>
+        <entry>Commands used with</entry>
+        <entry><command>--list</command>, <command>--append</command>,
+<command>--insert</command>, <command>--delete</command>,
+<command>--replace</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This command shows a verbose output and is mainly
+used together with the <command>--list</command> command. If used together with
+the <command>--list</command> command it makes the output from the command
+include the interface address, rule options and TOS masks. The
+<command>--list</command> command will also include a bytes and packet counter
+for each rule if the <command>--verbose</command> option is set. These counters
+uses the K (x1000), M (x1,000,000) and G (x1,000,000,000) multipliers. To
+overcome this and to get exact output, you could use the -x option described
+later. If this option is used with the <command>--append</command>,
+<command>--insert</command>, <command>--delete</command> or
+<command>--replace</command> commands, the program will output detailed
+information on what happens to the rules and if it was inserted correctly
+etcetera.</entry>
+       </row>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>-x</command>, <command>--exact</command></entry>
+       </row>
+       <row>
+        <entry>Commands used with</entry>
+        <entry><command>--list</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This option expands the numerics. The output from
+<command>--list</command> will in other words not contain the K, M or G
+multipliers. Instead we will get an exact output of how many packets and bytes
+that has matched the rule in question from the packets and bytes counters. Note
+that this option is only usable in the <command>--list</command> command and
+isn't really relevant for any of the other commands.</entry>
+       </row>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>-n</command>, <command>--numeric</command></entry>
+       </row>
+       <row>
+        <entry>Commands used with</entry>
+        <entry><command>--list</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This option tells iptables to output numerical
+values. IP addresses and port numbers will be printed by using their
+numerical values and not hostnames, network names or application names.
+This option is only applicable to the <command>--list</command> command. This
+option overrides the default of resolving all numerics to hosts and names if
+possible. </entry>
+       </row>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>--line-numbers</command></entry>
+       </row>
+       <row>
+        <entry>Commands used with</entry>
+        <entry><command>--list</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>The <command>--line-numbers</command> command is used to output
+line numbers together with the <command>--list</command> command. Each rule is
+numbered together with this option and it might be easier to know which rule
+has which number when you're going to insert rules. This option only works
+with the <command>--list</command> command.</entry>
+       </row>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>-c</command>, <command>--set-counters</command></entry>
+       </row>
+       <row>
+        <entry>Commands used with</entry>
+        <entry><command>--insert</command>, <command>--append</command>,
+<command>--replace</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This option is used when creating a rule in some
+way or modifying it. We can then use the option to initialize the
+packets and bytes counters of the rule. The syntax would be something
+like <command>--set-counters 20 4000</command>, which would tell the kernel to
+set the packet counter to 20 and byte counter to 4000.</entry>
+       </row>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>--modprobe</command></entry>
+       </row>
+       <row>
+        <entry>Commands used with</entry>
+        <entry>All</entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>The <command>--modprobe</command> option is used to tell iptables
+which command to use when probing for modules to the kernel. It could be
+used if your <command>modprobe</command> command is not somewhere in the
+searchpath etc. In such cases it might be necessary to specify this option so
+the program knows what to do in case a needed module is not loaded. This
+option can be used with all commands.</entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+  </section>
+
+  <section id="matches">
+   <title id="matches.title">Matches</title>
+   <para> This section will talk a bit more about the matches. I've chosen
+to split down the matches into five different subcategories here. First of
+all we have the <emphasis>generic matches</emphasis> which are generic and can
+be used in all rules. Then we have the <emphasis>TCP matches</emphasis> which
+can only be applied to <systemitem>TCP</systemitem> packets. We have
+<emphasis>UDP matches</emphasis> which can only be applied to
+<systemitem>UDP</systemitem> packets and <emphasis>ICMP matches</emphasis> which
+can only be used on <systemitem>ICMP</systemitem> packets. Finally we have
+special matches such as the state, owner and limit matches and so on. These
+final matches has in turn been split down to even more subcategories even though
+they might not necessarily be different matches at all. I hope this is a
+reasonable breakdown and that all people out there can understand this
+breakdown.
+   </para>
+
+   <section>
+    <title>Generic matches</title>
+    <para>This section will deal with <emphasis>Generic matches</emphasis>. A
+generic match is a kind of match that is always available whatever kind of
+protocol we are working on or whatever match extensions we have loaded. No
+special parameters are in other words needed to load these matches at all. I
+have also added the <command>--protocol</command> match here, even though it is
+needed to use some protocol specific matches. For example, if we want to use an
+<emphasis>TCP match</emphasis>, we need to use the <command>--protocol</command>
+match and send <systemitem>TCP</systemitem> as an option to the match. However,
+<command>--protocol</command> is in itself a match, too, since it can be used
+to match specific protocols. The following matches are always available.
+   </para>
+
+   <table frame=all>
+    <title>Generic matches</title>
+    <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+     <colspec colwidth="1*">
+     <colspec colwidth="6*">
+
+      <tbody>
+       <row>
+        <entry>Match</entry>
+        <entry><command>-p</command>, <command>--protocol</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A INPUT -p tcp</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This match is used to check for certain protocols.
+Examples of protocols are <systemitem>TCP</systemitem>,
+<systemitem>UDP</systemitem> and <systemitem>ICMP</systemitem>. This list can
+vary a bit at the same time since it uses the <ulink
+url="http://people.unix-fu.org/andreasson/iptables-tutorial/other/protocols.txt"
+><filename>/etc/protocols</filename></ulink> if it can not recognise the
+protocol itself. First of all the protocol match can take one of the three
+aforementioned protocols, as well as ALL, which means to match all of the
+previous protocols. The protocol may also take a numeric value, such as 255
+which would mean the RAW IP protocol. Finally, the program knows about all the
+protocols in the <filename>/etc/protocols</filename> file as we already
+explained. The command may also take a comma delimited list of protocols, such
+as <command>udp,tcp</command> which would match all <systemitem>UDP</systemitem>
+and <systemitem>TCP</systemitem> packets. If this match is given the numeric
+value of zero (0), it means ALL protocols, which in turn is the default
+behaviour in case the <command>--protocol</command> match is not used. This
+match can also be inversed with the <command>!</command> sign, so <command>--protocol !
+tcp</command> would mean to match the <systemitem>ICMP</systemitem> and
+<systemitem>UDP</systemitem> protocols. </entry>
+       </row>
+
+       <row>
+        <entry>Match</entry>
+        <entry><command>-s</command>, <command>--src</command>,
+<command>--source</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A INPUT -s 192.168.1.1</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This is the source match which is used to match packets
+based on their source IP address. The main form can be used to match
+single IP addresses such as <emphasis>192.168.1.1</emphasis>. It could be used
+with a netmask in a bits form. One way is to do it with an regular netmask in
+the <emphasis>255.255.255.255</emphasis> form (ie,
+<emphasis>192.168.0.0/255.255.255.0</emphasis>), and the other way is to only
+specify the number of ones (1's) on the left side of the network mask. This
+means that we could for example add <emphasis>/24</emphasis> to use a
+<emphasis>255.255.255.0</emphasis> netmask. We could then match whole IP ranges,
+such as our local networks or network segments behind the firewall. The line
+would then look something like, for example,
+<emphasis>192.168.0.0/24</emphasis>. This would match all packets in the
+<emphasis>192.168.0.x</emphasis> range. We could also inverse the match with an
+<command>!</command> just as before. If we would in other words use a match in the form of
+<command>--source ! 192.168.0.0/24</command> we would match all packets with a
+source address not coming from within the <emphasis>192.168.0.x</emphasis>
+range. The default is to match all IP addresses. </entry>
+       </row>
+
+       <row>
+        <entry>Match</entry>
+        <entry><command>-d</command>, <command>--dst</command>,
+<command>--destination</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A INPUT -d 192.168.1.1</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>The <command>--destination</command> match is used to match
+packets based on their destination address or addresses. It works pretty much
+the same as the <command>--source</command> match and has the same syntax,
+except that it matches based on where the packets are going. To match an
+IP range, we can add a netmask either in the exact netmask form, or in the
+number of ones (1's) counted from the left side of the netmask bits. It would
+then look like either <emphasis>192.168.0.0/255.255.255.0</emphasis> or like
+<emphasis>192.168.0.0/24</emphasis> and both would be equivalent to each other.
+We could also invert the whole match with an <command>!</command> sign, just as before.
+<command>--destination ! 192.168.0.1</command> would in other words match all
+packets except those not destined to the <emphasis>192.168.0.1</emphasis> IP
+address.</entry>
+       </row>
+
+       <row>
+        <entry>Match</entry>
+        <entry><command>-i</command>, <command>--in-interface</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A INPUT -i eth0</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This match is used to match based on which interface the
+packet came in on. Note that this option is only legal in the
+<systemitem>INPUT</systemitem>, <systemitem>FORWARD</systemitem> and
+<systemitem>PREROUTING</systemitem> chains and will render an error message
+when used anywhere else. The default behaviour of this match, in case the match
+is not specified, is to assume a string value of <command>+</command>. The
+<command>+</command>  value is used to match a string of letters and numbers. A
+single <command>+</command> would in other words tell the kernel to match all
+packets without considering which interface it came in on. The
+<command>+</command> string can also be used at the end of an interface, and
+<command>eth+</command> would in other words match all ethernet devices. We can
+also invert the meaning of this option with the help of the <command>!</command>
+sign. The line would then have a syntax looking something like <command>-i !
+eth0</command>, which would mean to match all incoming interfaces, except
+<systemitem>eth0</systemitem>.</entry>
+       </row>
+
+       <row>
+        <entry>Match</entry>
+        <entry><command>-o</command>, <command>--out-interface</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A FORWARD -o eth0</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>The <command>--out-interface</command> match is used to match
+packets depending on which interface they are leaving on. Note that this
+match is only available in the <systemitem>OUTPUT</systemitem>,
+<systemitem>FORWARD</systemitem> and <systemitem>POSTROUTING</systemitem>
+chains, in opposite of the <command>--in-interface</command> match. Other than
+this, it works pretty much the same as the <command>--in-interface</command>
+match. The <command>+</command> extension is understood so you can match all eth
+devices with <command>eth+</command> and so on. To inverse the meaning of the
+match, you can use the <command>!</command> sign in exactly the same sense as in
+the <command>--in-interface</command> match. Of course, the default behaviour if
+this match is left out is to match all devices, regardless of where the packet
+is going.</entry>
+       </row>
+
+       <row>
+        <entry>Match</entry>
+        <entry><command>-f</command>, <command>--fragment</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A INPUT -f</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This match is used to match the second and third part of a
+fragmented packet. The reason for this is that in the case of fragmented
+packets, there is no way to tell the source or destination ports of the
+fragments, nor <systemitem>ICMP</systemitem> types, among other things. Also,
+fragmented packets might in rather special cases be used to compile attacks
+against computers. Such fragments of packets will not be matched by other rules
+when they look like this, and hence this match was created. This option can also
+be used in conjunction with the <command>!</command> sign, however, in this case
+the <command>!</command> sign must precede the match, like this <command>!
+-f</command>. When this match is inversed, we match all head fragments and/or
+unfragmented packets. What this means is that we match all the first fragments
+of a fragmented packets, and not the second, third, and so on, fragments. We
+also match all packets that has not been fragmented during the transfer. Also
+note that there are defragmentation options within the kernel that can be used
+which are really good. As a secondary note, in case you use connection
+tracking you will not see any defragmented packets since they are dealt
+with before hitting any chain or table in <command>iptables</command>.</entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section>
+    <title>Implicit matches</title>
+
+    <para>This section will describe the matches that are loaded
+implicitly. <emphasis>Implicit matches</emphasis> are loaded automatically when
+we tell <command>iptables</command> that this rule will match for example
+<systemitem>TCP</systemitem> packets with the <command>--protocol</command>
+match. There are currently three types of <emphasis>implicit matches</emphasis>
+that are loaded automatically for three different protocols. These are
+<emphasis>TCP matches</emphasis>, <emphasis>UDP matches</emphasis> and
+<emphasis>ICMP matches</emphasis>. The <systemitem>TCP</systemitem> based
+matches contain a set of different matches that are available for only
+<systemitem>TCP</systemitem> packets, and <systemitem>UDP</systemitem> based
+matches contain another set of matches that are available only for
+<systemitem>UDP</systemitem> packets, and the same thing for
+<systemitem>ICMP</systemitem> packets. There is also explicitly loaded matches
+that you must load explicitly with the <command>-m</command> or
+<command>--match</command> option which we will go through later on in the next
+section.
+   </para>
+
+   <section>
+    <title>TCP matches</title>
+
+    <para> These matches are protocol specific and are only available when
+working with <systemitem>TCP</systemitem> packets and streams. To use these
+matches you need to specify <command>--protocol tcp</command> on the command
+line before trying to use these matches. Note that the <command>--protocol
+tcp</command> match must be to the left of the protocol specific matches. These
+matches are loaded implicitly in a sense, just as the
+<emphasis>UDP</emphasis> and <emphasis>ICMP matches</emphasis> are
+loaded implicitly. The other matches will be looked over in the continuation of
+this section, after the <emphasis>TCP match</emphasis> section.
+    </para>
+
+    <table frame=all>
+     <title>TCP matches</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+       <row>
+        <entry>Match</entry>
+        <entry><command>--sport</command>,
+<command>--source-port</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A INPUT -p tcp --sport 22</command></entry>
+       </row>
+
+       <row>
+        <entry>Explanation</entry>
+        <entry>The <command>--source-port</command> match is used to match
+packets based on their source port. This match can either take a service name or
+a port number. If you specify a service name, the service name must be in the
+<ulink
+url="http://people.unix-fu.org/andreasson/iptables-tutorial/other/services.txt">
+<filename>/etc/services</filename></ulink> file since
+<command>iptables</command> uses this file to look up the service name in. If
+you specify the port by port number, the entry of the rule will be slightly
+faster since <command>iptables</command> don't have to check up the service
+name, however, it could be a little bit harder to read in case you specify the
+numeric value. If you are writing a ruleset consisting of a 200 rules or more,
+you should definitely do this by port numbers since you will be able to notice
+the difference(On a slow box, this could make as much as 10 seconds if you are
+running a large ruleset consisting of 1000 rules or so). The
+<command>--source-port</command> match can also be used to match a whole range
+of ports in this fashion <command>--source-port 22:80</command> for example.
+This example would match all source ports between 22 and 80. If we omit the
+first port specification, the port 0 is assumed to be the one we mean.
+<command>--source-port :80</command> would then match port 0 through 80. And if
+the last port specification is omitted, port 65535 is assumed. If we would write
+<command>--source-port 22:</command> we would in turn get a port specification
+that tells us to match all ports from port 22 through port 65535. If we inversed
+the port specification in the port range so the highest port would be first and
+the lowest would be last, <command>iptables</command> automatically reverses the
+inversion. If a source port definition looked like <command>--source-port
+80:22</command>, it would be understood just the same as <command>--source-port
+22:80</command>. We could also invert a match by adding a <command>!</command>
+sign like <command>--source-port ! 22</command> which would mean that we want to
+match all ports but port 22. The inversion could also be used together with a
+port range and would then look like <command>--source-port ! 22:80</command>,
+which in turn would mean that we want to match all ports but port 22 through 80.
+Note that this match does not handle multiple separated ports and port ranges.
+For more information about this, look at the multiport match extension. </entry>
+       </row>
+
+       <row>
+        <entry>Match</entry>
+        <entry><command>--dport</command>,
+<command>--destination-port</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A INPUT -p tcp --dport 22</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This match is used to match <systemitem>TCP</systemitem> packets
+depending on its destination port. It uses exactly the same syntax as the
+<command>--source-port</command> match. It understands port and port range
+specifications, as well as inversions. It does also reverse high and low ports
+in a port range specification if the high port went into the first spot and the
+low port into the last spot. The match will also assume the values of 0 or 65535
+if the high or low port is left out in a port range specification. In other
+words, exactly the same as <command>--source-port</command> in syntax. Note
+that this match does not handle multiple separated ports and port ranges. For
+more information about this, look at the multiport match extension.</entry>
+       </row>
+
+       <row>
+        <entry>Match</entry>
+        <entry><command>--tcp-flags</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -p tcp --tcp-flags SYN,ACK,FIN
+SYN</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This match is used to match depending on the
+<systemitem>TCP</systemitem> flags in a packet. First of all the match takes a
+list of flags to compare (a mask) and second it takes list of flags that should
+be set to 1, or turned on. Both lists should be comma-delimited. The match knows
+about the <systemitem>SYN</systemitem>, <systemitem>ACK</systemitem>,
+<systemitem>FIN</systemitem>, <systemitem>RST</systemitem>,
+<systemitem>URG</systemitem>, <systemitem>PSH</systemitem> flags but it also
+recognizes the words ALL and NONE. ALL and NONE is pretty much self describing,
+ALL means to use all flags and NONE means to use no flags for the option it is
+set. <command>--tcp-flags ALL NONE</command> would in other words mean to
+check all of the <systemitem>TCP</systemitem> flags and match if none of the
+flags are set. This option can also be inverted with the <command>!</command>
+sign. For example, if we specify the example rule above as an inversion, we
+would get a match that would match packets that had the ACK and FIN bits
+set, but not the SYN bit. Also note that the comma delimitation should not
+include spaces. The correct syntax could be seen in the example above.
+        </entry>
+       </row>
+
+       <row>
+        <entry>Match</entry>
+        <entry><command>--syn</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -p tcp --syn</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>The <command>--syn</command> match is more or less an old relic
+from the ipchains days and is still there out of compatibility reasons, and for
+ease of traversing from one to the other. This match is used to match
+packets if they have the <systemitem>SYN</systemitem> bit set and the
+<systemitem>ACK</systemitem> and <systemitem>FIN</systemitem> bits unset. This
+command would in other words be exactly the same as the <command>--tcp-flags
+SYN,ACK,FIN SYN</command> match. Such packets are used to request new
+<systemitem>TCP</systemitem> connections from a server mainly. If you block
+these packets, you should have effectively blocked all incoming connection
+attempts, however, you will not have blocked the outgoing connections which a
+lot of exploits today uses (for example, hack a legit service and then make a
+program or such make the connect to you instead of setting up an open port on
+your host). This match can also be inverted with the <command>!</command> sign
+in this, <command>! --syn</command>, way. This would tell the match to match all
+packet with the <systemitem>FIN</systemitem> or the <systemitem>ACK</systemitem>
+bits set, in other words packets in an already established connection. </entry>
+       </row>
+
+       <row>
+        <entry>Match</entry>
+        <entry><command>--tcp-option</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -p tcp --tcp-option 16</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This match is used to match packets depending on
+their TCP options. A TCP Option is a specific part of the header. This 
+part consists of 3 different fields. The first one is 8 bits long and 
+tells us which Options are used in this stream, the second one is also 8 
+bits long and tells us how long the options field is. The reason for this 
+length field is that TCP options are, well, optional. To be compliant with 
+the standards, we do not need to implement all options, but instead we can 
+just look at what kind of option it is, and if we do not support it, we 
+just look at the length field and can then jump over this data. This match 
+is used to match different TCP options depending on their decimal values. 
+It may also be inverted with the ! flag, so that the match matches all TCP 
+options but the option given to the match. For a complete list of all 
+options, take a closer look at the <ulink 
+url="http://www.ietf.org">Internet Engineering Task Force</ulink> who 
+maintains a list of all the standard numbers used on the Internet.</entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+
+   <section>
+    <title>UDP matches</title>
+
+    <para> This section describes matches that will only work together
+with <systemitem>UDP</systemitem> packets. These matches are implicitly loaded
+when you specify the <command>--protocol UDP</command> match and will be
+available after this specification. Note that <systemitem>UDP</systemitem>
+packets are not connection oriented, and hence there is no such thing as
+different flags to set in the packet to give data on what the datagram is
+supposed to do, such as open or closing a connection, or if they are just simply
+supposed to send data. <systemitem>UDP</systemitem> packets do not require any
+kind of acknowledgement either. If they are lost, they are simply lost (Not
+taking <systemitem>ICMP</systemitem> error messaging etcetera into account).
+This means that there is quite a lot less matches to work with on a
+<systemitem>UDP</systemitem> packet than there is on
+<systemitem>TCP</systemitem> packets. Note that the state machine will work on
+all kinds of packets even though <systemitem>UDP</systemitem> or
+<systemitem>ICMP</systemitem> packets are counted as connectionless protocols.
+The state machine works pretty much the same on <systemitem>UDP</systemitem>
+packets as on <systemitem>TCP</systemitem> packets. There will be more about the
+state machine in a future chapter.
+    </para>
+
+    <table frame=all>
+     <title>UDP matches</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+       <row>
+        <entry>Match</entry>
+        <entry><command>--sport</command>,
+<command>--source-port</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A INPUT -p udp --sport 53</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This match works exactly the same as its
+<systemitem>TCP</systemitem> counterpart. It is used to perform matches on
+packets based on their source <systemitem>UDP</systemitem> ports. It has support
+for port ranges, single ports and port inversions with the same syntax. To make
+a <systemitem>UDP</systemitem> port range you could do 22:80 which would match
+<systemitem>UDP</systemitem> ports 22 through 80. If the first value is omitted,
+port 0 is assumed. If the last port is omitted, port 65535 is assumed. If the
+high port comes before the low port, the ports switch place with eachother
+automatically. Single <systemitem>UDP</systemitem> port matches look as in the
+example above. To invert the port match, add a <command>!</command> sign in
+this, <command>--source-port ! 53</command> fashion. This would match all ports
+but port 80. Of course, the match can understand service names as long as they
+are available in the <ulink
+url="http://people.unix-fu.org/andreasson/iptables-tutorial/other/services.txt">
+<filename>/etc/services</filename></ulink> file. Note that this match does not
+handle multiple separated ports and port ranges. For more information about
+this, look at the multiport match extension. </entry>
+       </row>
+
+       <row>
+        <entry>Match</entry>
+        <entry><command>--dport</command>,
+<command>--destination-port</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A INPUT -p udp --dport 53</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>The same goes for this match as for the
+<systemitem>UDP</systemitem> version of <command>--source-port</command>, it is
+exactly the same as the equivalent <systemitem>TCP</systemitem> match, but will
+work with <systemitem>UDP</systemitem> packets instead. The match is used to
+match packets based on their <systemitem>UDP</systemitem> destination port. The
+match handles port ranges, single ports and inversions. To match a single port
+we do <command>--destination-port 53</command>, to invert this we could do
+<command>--destination-port ! 53</command>. The first would match all
+<systemitem>UDP</systemitem> packets going to port 53 while the second would
+match packets but those going to the destination port 53. To specify a port
+range, we would do <command>--destination-port 22:80</command> for example. This
+example would match all packets destined for <systemitem>UDP</systemitem> port
+22 through 80. If the first port is omitted, port 0 is assumed. If the second
+port is omitted, port 65535 is assumed. If the high port is placed before the
+low port, they automatically switch place so the low port winds up before the
+high port. Note that this match does not handle multiple ports and port ranges.
+For more information about this, look at the multiport match extension. </entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+
+   <section>
+    <title>ICMP matches</title>
+
+    <para> These are the <emphasis>ICMP matches</emphasis>. These packets are
+even worse than <systemitem>UDP</systemitem> packets in the sense that they are
+connectionless. The <systemitem>ICMP</systemitem> protocol is mainly used for
+error reporting and for connection controlling and such features.
+<systemitem>ICMP</systemitem> is not a protocol subordinated to the IP protocol,
+but more of a protocol beside the IP protocol that helps handling errors. The
+headers of a <systemitem>ICMP</systemitem> packet are very similar to those of
+the IP headers, but contains differences. The main feature of this protocol is
+the type header which tells us what the packet is to do. One example is if we
+try to access an unaccessible IP adress, we would get an
+<computeroutput>ICMP host unreachable</computeroutput> in return.For a complete
+listing of <systemitem>ICMP</systemitem> types, see the <link
+linkend="icmptypes" endterm="icmptypes.title"></link> appendix. There is only
+one <systemitem>ICMP</systemitem> specific match available for
+<systemitem>ICMP</systemitem> packets, and hopefully this should suffice. This
+match is implicitly loaded when we use the <command>--protocol ICMP</command>
+match and we get access to it automatically. Note that all the generic matches
+can also be used, so we can know source and destination adress too, among other
+things.
+    </para>
+
+    <table frame=all>
+     <title>ICMP matches</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+       <row>
+        <entry>Match</entry>
+        <entry><command>--icmp-type</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A INPUT -p icmp --icmp-type
+8</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This match is used to specify the <systemitem>ICMP
+type</systemitem> to match. <systemitem>ICMP types</systemitem> can be specified
+either by their numeric values or by their names. Numerical values are specified
+in RFC 792. To find a complete listing of the <systemitem>ICMP</systemitem> name
+values, do a <command>iptables --protocol icmp --help</command>, or check the
+<link linkend="icmptypes" endterm="icmptypes.title"></link> appendix. This
+match can also be inverted with the <command>!</command> sign in this,
+<command>--icmp-type ! 8</command>, fashion. Note that some <systemitem>ICMP
+types</systemitem> are obsolete, and others again may be "dangerous" for a
+simple host since they may, among other things, redirect packets to the wrong
+places.  </entry>
+       </row>
+
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+   </section>
+
+
+   <section>
+    <title>Explicit matches</title>
+    <para>
+Explicit matches are matches that must be specifically loaded with the
+<command>-m</command> or <command>--match</command> option. If we would like to
+use the state matches for example, we would have to write <command>-m
+state</command> to the left of the actual match using the state matches. Some of
+these matches may be specific to some protocols, or was created for
+testing/experimental use or plainly to show examples of what could be
+accomplished with <command>iptables</command>. This in turn means that all these
+matches may not always be useful, however, they should mostly be useful since it
+all depends on your imagination and your needs. The difference between
+implicitly loaded matches and explicitly loaded ones is that the implicitly
+loaded matches will automatically be loaded when you, for example, match
+<systemitem>TCP</systemitem> packets, while explicitly loaded matches will not
+be loaded automatically in any case and it is up to you to activate them before
+using them.
+    </para>
+
+   <section>
+    <title>MAC match</title>
+
+    <para>The <systemitem>MAC</systemitem> match can be used to match packets
+based on their <systemitem>MAC source address</systemitem>. As of writing this
+documentation, this match is a little bit limited, however, in the future this
+may be more evolved and may be more useful. This match can be used to match
+packets on the source <systemitem>MAC address</systemitem> only as previously
+said.
+    </para>
+
+    <note>
+     <para>
+Do note that to use this module we explicitly load it with the <command>-m
+mac</command> option. The reason that I am saying this is that a lot of people
+wonder if it should not be <command>-m mac-source</command>, which it should
+not.
+      </para>
+    </note>
+
+    <table frame=all>
+     <title>MAC match options</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+       <row>
+        <entry>Match</entry>
+        <entry><command>--mac-source</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A INPUT -m mac --mac-source
+00:00:00:00:00:01</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This match is used to match packets based on their
+<systemitem>MAC source address</systemitem>. The <systemitem>MAC
+address</systemitem> specified must be in the form
+<emphasis>XX:XX:XX:XX:XX:XX</emphasis>, else it will not be legal. The match may
+be reversed with an <command>!</command> sign and would look like
+<command>--mac-source ! 00:00:00:00:00:01</command>. This would in other words
+reverse the meaning of the match so all packets except packets from this
+<systemitem>MAC address</systemitem> would be matched. Note that since
+<systemitem>MAC addresses</systemitem> are only used on ethernet type networks,
+this match will only be possible to use on ethernet based networks. This match
+is also only valid in the <systemitem>PREROUTING</systemitem>,
+<systemitem>FORWARD</systemitem> and <systemitem>INPUT</systemitem> chains and
+nowhere else.</entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section>
+    <title>Limit match</title>
+
+    <para>
+The <command>limit</command> match extension must be loaded explicitly with the
+<command>-m limit</command> option. This match is excellent to use to do limited
+logging of specific rules etcetera. For example, you could use this to match all
+packets that goes over the edge of a certain chain, and get limited logging of
+this. What this means, is that when we add this match we
+<command>limit</command> how many times a certain rule may be matched in a
+certain timeframe. This is its main usage, but there are more usages, of course.
+The <command>limit</command> match may also be inversed by adding a <command>!</command>
+flag in front of the <command>limit</command> match explicit loading, it would
+then look like <command>-m ! limit</command>. This means that all packets will
+be matched after they have broken the limit.
+    </para>
+
+    <table frame=all>
+     <title>Limit match options</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+       <row>
+        <entry>Match</entry>
+        <entry><command>--limit</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A INPUT -m limit --limit
+3/hour</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This sets the maximum average matching rate of the
+<command>limit</command> match. This match is specified with a number and an
+optional time specifier. The following time specifiers are currently recognised:
+<command>/second</command> <command>/minute</command> <command>/hour</command>
+<command>/day</command>. The default value here is 3 per hour, or 3/hour. This
+tells the <command>limit</command> match how many times to let this match run
+per timeunit (ie /minute). </entry>
+       </row>
+
+       <row>
+        <entry>Match</entry>
+        <entry><command>--limit-burst</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A INPUT -m limit --limit-burst
+5</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This is the setting for the <emphasis>burst
+limit</emphasis> of the <command>limit</command> match. It tells
+<command>iptables</command> the maximum initial number of packets to
+match. This number gets recharged by one every time the average limit
+specified (with the <command>--limit</command> option) is not reached, up
+to the number specified with the <command>--limit-burst</command> option.
+When and if the burst limit is reached, we go down to the lowest possible
+delimiter, 1. After this, we get one "token" for every timeround specified
+that we do not hit the new delimiter, until the delimiter reach the burst
+limit again.. The default <command>--limit-burst</command> value is 5. For
+a simple way of checking out how this works, you can use the example
+<ulink
+url="http://iptables-tutorial.frozentux.net/scripts/limit-match.txt">
+limit-match.txt</ulink> one-rule-script. Together with this script, you
+can try out how the limit rule works by simply sending ping packets in
+different intervals and in different numbers. All <systemitem>echo
+replies</systemitem> will be blocked until the burst limit is reached.
+       </entry>
+      </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+
+   <section>
+    <title>Multiport match</title>
+
+    <para>
+The <command>multiport</command> match extension can be used to specify more destination
+ports and port ranges than one, which would sometimes mean you would have
+to make several rules looking exactly the same just to match different
+ports.
+    </para>
+
+    <note>
+     <para>
+     You can not use both standard port matching and multiport matching at the
+same time, such as --sport 1024:63353 -m multiport --dport 21,23,80. This will
+simply not work and the rule will not be added at all. What happens is that
+iptables will automatically use the first syntax used in the rule, and it will
+not recognize the multiport syntax.
+     </para>
+    </note>
+
+
+    <table frame=all>
+     <title>Multiport match options</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+       <row>
+        <entry>Match</entry>
+        <entry><command>--source-port</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A INPUT -p tcp -m multiport --source-port
+22,53,80,110</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This match matches multiple source ports. A maximum of 15
+separate ports may be specified. The ports must be comma delimited, as you
+can see in the example. This match may only be used in conjunction with
+the <command>-p tcp</command> or <command>-p udp</command> matches. It is
+mainly an enhanced version of the normal <command>--source-port</command>
+match.</entry>
+       </row>
+
+       <row>
+        <entry>Match</entry>
+        <entry><command>--destination-port</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A INPUT -p tcp -m multiport --destination-port
+22,53,80,110</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This match is used to match multiple destination ports. It
+works exactly the same way as the source port match mentioned just above,
+except that it matches destination ports. It has a maximum specification
+of 15 ports and may only be used in conjunction with <command>-p tcp</command>
+and <command>-p udp</command>. </entry>
+
+       </row>
+
+       <row>
+        <entry>Match</entry>
+        <entry><command>--port</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A INPUT -p tcp -m multiport --port
+22,53,80,110</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This match extension can be used to match packets based
+both on their destination port and their source port. It works the same
+way as the <command>--source-port</command> and
+<command>--destination-port</command> matches above. It can take a maximum of 15
+ports specified to it in one argument. It can only be used in conjunction with
+<command>-p tcp</command> and <command>-p udp</command>. Note that this means
+that it will only match packets that comes from, for example, port 80 to port 80
+and if you have specified port 80 to the <command>--port</command> match.
+</entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section>
+    <title>Mark match</title>
+
+    <para>
+The <command>mark</command> match extension is used to match packets based on
+the marks they have set. A <command>mark</command> is a special field only
+maintained within the kernel that is associated with the packets as they travel
+through the computer. They may be used by different kernel routines for such
+tasks as traffic shaping and filtering. As of today, there is only one way of
+setting a mark in Linux, namely the <command>MARK</command> target in
+<command>iptables</command>. This was previously done with the
+<command>FWMARK</command> target in <command>ipchains</command>, this is why
+people still refer to <command>FWMARK</command> in advanced routing areas. The
+mark field is currently set to an unsigned integer, or 4294967296 possible
+values on a 32 bit system. In other words, you are probably not going to run
+into this limit in quite some time.
+
+    </para>
+
+    <table frame=all>
+     <title>Mark match options</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+       <row>
+        <entry>Match</entry>
+        <entry><command>--mark</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -t mangle -A INPUT -m mark --mark
+1</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This match is used to match packets that have
+previously been marked. Marks can be set with the <command>MARK</command>
+target which we will discuss a bit more later on in the next section. All
+packets traveling through <systemitem>netfilter</systemitem> gets a special mark
+field associated with them. Note that this <systemitem>mark</systemitem> field
+does not in any way travel outside, with or without the packet, the actual
+computer itself. If this <systemitem>mark field</systemitem> matches the
+<command>mark</command> match it is a match. The <systemitem>mark
+field</systemitem> is an unsigned integer, hence there can be a maximum of 65535
+different marks. You may also use a mask with the mark. The mark specification
+would then look like, for example, <command>--mark 1/1</command>. If a mask is
+specified, it is logically ANDed with the mark specified before the actual
+comparison. </entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section id="ownermatch">
+    <title id="ownermatch.title">Owner match</title>
+
+    <para>
+The <command>owner</command> match extension is used to match packets based on
+who created them. This extension was originally written as an example on
+what <command>iptables</command> might be used for. This match only works
+within the <systemitem>OUTPUT</systemitem> chain as it looks today, for obvious
+reasons. It is pretty much impossible to find out any information about who sent
+a packet on the other end, or if we where an intermediate hop to the real
+destination. Even within the <systemitem>OUTPUT</systemitem> chain it is not
+very reliable since certain packets may not have an owner. Notorious packets of
+that sort is different <systemitem>ICMP responses</systemitem> among other
+things. <systemitem>ICMP responses</systemitem> will, hence, never match.
+    </para>
+
+    <table frame=all>
+     <title>Owner match options</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+       <row>
+        <entry>Match</entry>
+        <entry><command>--uid-owner</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A OUTPUT -m owner --uid-owner
+500</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This packet match will match if the packet was created by
+the given <computeroutput>User ID</computeroutput> (UID). This could be used to
+match outgoing packets based on who created them. One possible use would be to
+block any other user than root to open new connections outside your firewall, or
+another possible use could be to block everyone but the httpuser from creating
+packets from <systemitem>HTTP</systemitem>.
+         </entry>
+
+       </row>
+       <row>
+        <entry>Match</entry>
+        <entry><command>--gid-owner</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A OUTPUT -m owner --gid-owner
+0</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This match is used to match all packets based on their
+<computeroutput>Group ID</computeroutput> (GID). This means that we match all
+packets based on what group the user creating the packets are in. This could be
+used to block all but the users part of the "network" group from getting out
+onto the internet, or as described above to only allow "httpgroup" to be able to
+create packets going out on the <systemitem>HTTP</systemitem> port.
+        </entry>
+       </row>
+
+       <row>
+        <entry>Match</entry>
+        <entry><command>--pid-owner</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A OUTPUT -m owner --pid-owner
+78</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This match is used to match packets based on their
+<systemitem>Process ID</systemitem> (<systemitem>PID</systemitem>) and which
+<systemitem>PID</systemitem> created the packets. This match is a bit harder to
+use, but one example would be to only allow <systemitem>PID</systemitem> 94 to
+send packets on the <systemitem>HTTP</systemitem> port (in case the
+<systemitem>HTTP</systemitem> is not threaded, of course), or we could write a
+small script that grabs the <systemitem>PID</systemitem> from a
+<command>ps</command> output for a specific daemon and then adds a rule for it.
+For an example, you could have a rule as shown in the <ulink
+url="http://iptables-tutorial.frozentux.net/scripts/pid-owner.txt">
+pid-owner.txt</ulink> example.
+
+        </entry>
+       </row>
+
+       <row>
+        <entry>Match</entry>
+        <entry><command>--sid-owner</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A OUTPUT -m owner --sid-owner
+100</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>
+        This match is used to match packets based on their <systemitem>Session
+ID</systemitem> and the <systemitem>Session ID</systemitem> used by the program
+in question. The <systemitem>SID</systemitem>, or <systemitem>Session
+ID</systemitem>, value is set upon different processes depending on their
+originating process if they are threaded, or upon which process created it. So,
+for example, all of our <systemitem>HTTPD</systemitem> processes should have the
+same <systemitem>SID</systemitem> as their parent process (the original
+<systemitem>HTTPD</systemitem>) <systemitem>PID</systemitem>, if our
+<systemitem>HTTPD</systemitem> is threaded that is (most
+<systemitem>HTTPD</systemitem> are, Apache and Roxen for instance). To show this
+in example, we have created a small script called <ulink
+url="http://iptables-tutorial.frozentux.net/scripts/sid-owner.txt">
+sid-owner.txt</ulink>. This script could possibly be run every hour or so
+together with some extra code to check if the <systemitem>HTTPD</systemitem> is
+actually running and start it again if necessary, then flush and re-enter our
+<systemitem>OUTPUT</systemitem> chain if needed.
+         </entry>
+        </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section>
+    <title>State match</title>
+
+    <para>
+The <command>state</command> match extension is used in conjunction with the
+connection tracking code in the kernel and allows access to the connection
+tracking state of the packets. This allows us to know in what state the
+connection is, and works for pretty much all protocols, including stateless
+protocols such as <systemitem>ICMP</systemitem> and
+<systemitem>UDP</systemitem>. In all cases, there will be a default timeout for
+the connection and it will then be dropped from the connection tracking
+database. This match needs to be loaded explicitly by adding a <command>-m
+state</command> statement to the rule. You will then have access to one new
+match. This concept will be more deeply introduced in a future chapter since it
+is such a large area.
+    </para>
+
+    <table frame=all>
+     <title>State matches</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+
+       <row>
+        <entry>Match</entry>
+        <entry><command>--state</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A INPUT -m state --state
+RELATED,ESTABLISHED</command>
+        </entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This match option tells the <command>state</command> match what
+states the packets must be in to be matched. There is currently 4 states that
+can be used. <command>INVALID</command>, <command>ESTABLISHED</command>,
+<command>NEW</command> and <command>RELATED</command>.
+<command>INVALID</command> means that the packet is associated with no known
+stream or connection and that it may contain faulty data or headers.
+<command>ESTABLISHED</command> means that the packet is part of an already
+established connection that has seen packets in both directions and is fully
+valid. <command>NEW</command> means that the packet has or will start a new
+connection, or that it is associated with a connection that has not seen packets
+in both directions. Finally, <command>RELATED</command> means that the packet is
+starting a new connection and is associated with an already established
+connection. This could for example mean an <systemitem>FTP data
+transfer</systemitem>, or an <systemitem>ICMP error</systemitem> associated with
+an <systemitem>TCP</systemitem> or <systemitem>UDP</systemitem> connection for
+example. Note that the <command>NEW</command> state does not look for
+<systemitem>SYN</systemitem> bits in <systemitem>TCP</systemitem> packets trying
+to start a new connection and should, hence, not be considered very good in
+cases where we have only one firewall and no load balancing between different
+firewalls. However, there may be times where this could be useful. For more
+information on how this could be used, read in the future chapter on the state
+machine. </entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section>
+    <title>Unclean match</title>
+
+    <para>The <command>unclean</command> match takes no options and requires no
+more than explicit loading when you want to use it. Note that this option is
+regarded as experimental and may not work at all times, nor will it take care of
+all unclean packages or problems. This match tries to match packets which seems
+malformed or unusual, such as packets with bad headers or checksums and so on.
+This could be used to <command>DROP</command> connections and to check for bad
+streams etcetera, however you should be aware that this may break legal
+connections too.
+    </para>
+
+   </section>
+
+   <section>
+    <title>TOS match</title>
+
+    <para>
+The <command>TOS</command> match can be used to match packets based on their
+<systemitem>TOS field</systemitem>. <systemitem>TOS</systemitem> stands for
+<systemitem>Type Of Service</systemitem>, consists of 8 bits, and is located in
+the IP header. This match is loaded explicitly by adding <command>-m
+tos</command> to the rule. <systemitem>TOS</systemitem> is normally used to tell
+intermediate hosts the preceeding of the stream, and what kind of content it
+has(not really, but it tells us if there is any specific requirements for this
+stream such as that it needs to be sent as fast as possible, or it needs to be
+able to send as much payload as possible). How different routers and people deal
+with these values depends. Most do not care at all, while others try their best
+to do something good with the packets in question and the data they provide.
+     </para>
+
+
+    <table frame=all>
+     <title>TOS matches</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+
+       <row>
+        <entry>Match</entry>
+        <entry><command>--tos</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A INPUT -p tcp -m tos --tos
+0x16</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This match is used as described above, it can match packets
+based on their <systemitem>TOS field</systemitem> and their value. This could
+be used for, among other things, to <command>mark</command> packets for later
+usage together with the <command>iproute2</command> and advanced routing
+functions in linux. The match takes an hex or numeric value as an option, or
+possibly one of the names given if you do an <command>iptables -m tos
+-h</command>. At the time of writing it contained the following named values:
+<computeroutput>Minimize-Delay 16 (0x10)</computeroutput>,
+<computeroutput>Maximize-Throughput 8 (0x08)</computeroutput>,
+<computeroutput>Maximize-Reliability 4 (0x04)</computeroutput>,
+<computeroutput>Minimize-Cost 2 (0x02)</computeroutput>, and
+<computeroutput>Normal-Service 0 (0x00)</computeroutput>.
+<computeroutput>Minimize-Delay</computeroutput> means to minimize the delay for
+the packets, example of standard protocols that this includes are telnet,
+<systemitem>SSH</systemitem> and <systemitem>FTP-control</systemitem>.
+<computeroutput>Maximize-Throughput</computeroutput> means to find a path that
+allows as big throughput as possible, a standard protocol would be
+<systemitem>FTP-data</systemitem>.
+<computeroutput>Maximize-Reliability</computeroutput> means to maximize the
+reliability of the connection and to use lines that are as reliable as possible,
+some good protocols that would fit with this <systemitem>TOS</systemitem> values
+would be <systemitem>BOOTP</systemitem> and <systemitem>TFTP</systemitem>.
+<computeroutput>Minimize-Cost</computeroutput> means to minimize the cost
+until the packets gets through all the way to the client/server, for example to
+find the route that costs the least to travel through. Some normal protocols
+that would use this would be <systemitem>RTSP</systemitem> (Real Time Stream
+Control Protocol) and other streaming video/radio protocols.
+<computeroutput>Normal-Service</computeroutput> would finally mean any normal
+protocol that has no special needs for their transfers.</entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section>
+    <title>TTL match</title>
+
+    <para>
+    The <command>TTL</command> match is used to match packets based on their
+<systemitem>TTL</systemitem> (Time To Live) field residing in the IP header.
+The <systemitem>TTL field</systemitem> contains 8 bits of data and is
+decremented once every time it is processed by an intermediate host between the
+client and host. If the <systemitem>TTL</systemitem> reaches 0, an
+<systemitem>ICMP</systemitem> type 11 code 0 (TTL equals 0 during transit) or
+code 1 (TTL equals 0 during reassembly) is transmitted to the party sending the
+packet and telling about the problem. This match is only used to match packets
+based on their <systemitem>TTL</systemitem>, and not to change anything. This is
+true here, as well as in all kinds of matches. To load this match, you need to
+add an <command>-m ttl</command> to the rule.
+      </para>
+
+
+    <table frame=all>
+     <title>TTL matches</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+
+       <row>
+        <entry>Match</entry>
+        <entry><command>--ttl</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A OUTPUT -m ttl --ttl 60</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This match option is used to specify which
+<systemitem>TTL</systemitem> value to match. It takes an numeric value and
+matches based on this value. There is no inversion and there is no other
+specifics to this match. This target could be used for debugging your local
+network, for example hosts which seems to have problems connecting to hosts on
+the internet, or to find possible infestations of trojans etcetera. The usage is
+pretty much limited, however, it is only your imagination which stops you. One
+example, as described above, would be to find hosts with bad
+<systemitem>TTL</systemitem> values set as default (may be due to badly
+implemented <systemitem>TCP/IP</systemitem> stack, or due to a
+malconfiguration).
+        </entry>
+
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+    </section>
+
+   </section>
+
+  </section>
+
+  <section id="targets">
+   <title id="targets.title">Targets/Jumps</title>
+   <para>
+The target/jumps tells the rule what to do with a packet that is a perfect match
+with the match section of the rule. There is a few basic targets, the
+<command>ACCEPT</command> and <command>DROP</command> targets which we will deal
+with first of all targets. However, before we do that, let us have a brief look
+at how a jump is done.
+    </para>
+
+    <para>
+The jump specification is done exactly the same as the target definition except
+that it requires a chain within the same table to jump to. To jump to a specific
+chain, it is required that the chain has already been created. As we have
+already explained before, a chain is created with the <command>-N</command>
+command. For example, let's say we create a chain in the filter table called
+<command>tcp_packets</command> like this: <command>iptables -N
+tcp_packets</command>. We could then add a jump target to it like this:
+<command>iptables -A INPUT -p tcp -j tcp_packets</command>. We would then jump
+from the <command>INPUT</command> chain to the <command>tcp_packets</command>
+chain and start traversing that chain. When/If we reach the end of that chain,
+we get dropped back to the <command>INPUT</command> chain and the packet starts
+traversing from the rule one step below where it jumped to the other chain
+(tcp_packets in this case). If a packet is <command>ACCEPT</command>'ed within
+one of the subchains, it will automatically be <command>ACCEPT</command>'ed in
+the superset chain also and it will not traverse any of the superset chains any
+further. However, do note that the packet will traverse all other chains in the
+other tables in a normal fashion. For more information on table and chain
+traversing, see the <link linkend="traversingoftables"
+endterm="traversingoftables.title"></link> chapter.
+
+    </para>
+
+    <para>
+Targets on the other hand specify an action to take on the packet in question.
+We could for example, <command>DROP</command> or <command>ACCEPT</command> the
+packet depending on what we want to do. There is also a number of other actions
+we may want to take which we will describe further on in this section. Targets
+may also end with different results one could say, some targets will make the
+packet stop traversing the specific chain and superset chains as described
+above. Good examples of such rules are <command>DROP</command> and
+<command>ACCEPT</command>. Rules that are stopped, will not pass through any of
+the rules further on in the chain or superset chains. Other targets, may take an
+action on the packet and then the packet will continue passing through the rest
+of the rules anyway, a good example of this would be the <command>LOG</command>,
+<command>DNAT</command> and <command>SNAT</command> targets. These packets may
+be logged, Network Address Translationed and then be passed on to the other
+rules in the same chains. This may be good in cases where we want to take two
+actions on the same packet, such as both mangling the
+<systemitem>TTL</systemitem> and the <systemitem>TOS</systemitem> value of a
+specific packet/stream. Some targets will also take options that may be
+necessary (What address to do NAT to, what TOS value to use etcetera) while
+others have options not necessary, but available in any case (log prefixes,
+masquerade to ports and so on). We will try to answer all these questions as we
+go in the descriptions. Let us have a look at what kinds of targets there are.
+    </para>
+
+   <section>
+    <title>ACCEPT target</title>
+
+    <para>
+    This target takes no special options first of all. When a packet is
+perfectly matched and this target is set, it is accepted and will not continue
+traversing the chain where it was accepted in, nor any of the calling chains. Do
+note, that packets that was accepted in one chain will still travel through any
+subsequent chains within the other tables and may be dropped there. There is
+nothing special about this target whatsoever, and it does not require, or have
+the possibility, to add options to the target. To use this target, we specify it
+like <command>-j ACCEPT</command>.
+    </para>
+
+   </section>
+
+   <section>
+    <title>DROP target</title>
+
+    <para>
+The <command>DROP</command> target does just what it says, it drops packets
+dead to the ground and refuses to process them anymore. A packet that matches a
+rule perfectly and then has this action taken on it will be blocked and no
+further processing will be done. Note that this action may be a bit bad in
+certain cases since it may leave dead sockets around on the server and client. A
+better solution would be to use the <command>REJECT</command> target in those
+cases, especially when you want to block certain portscanners from getting to
+much information, such as filtered ports and so on. Also note that if a packet
+has the <command>DROP</command> action taken on them in a subchain, the packet
+will not be processed in any of the above chains in the structure, nor by any
+other tables. The packet is in other words totally dead. The target will not
+send any kind of information in either direction, either to tell the client or
+the server as told previously.
+    </para>
+
+   </section>
+
+   <section>
+    <title>QUEUE target</title>
+
+    <para>
+    The QUEUE target is used to queue packets to userland programs and
+applications. This is done in a programmatic way and may be used to, for
+example, create network accounting or to create specific and advanced
+applications to proxy or filter packets. We will not discuss this target in
+depth in this chapter, nor anywhere else within this document since it is out of
+the scope how to code such an application. First of all because it would simply
+take too much time, and second, because this documentation does not have
+anything to do with the programming side of netfilter and iptables. All of this
+should be fairly well covered in the <ulink url="http://www.iptables.org/documentation/HOWTO//netfilter-hacking-HOWTO.html">
+netfilter hacking HOWTO</ulink>.
+    </para>
+
+   </section>
+
+   <section>
+    <title>RETURN target</title>
+
+    <para>
+The <command>RETURN</command> target will make the current packet stop
+travelling through the chain where it hit the rule. If it is a subchain to
+another chain, the packet will continue to travel through the above chains in
+the structure as if nothing had happened. If the chain is the main chain, for
+example the INPUT chain, the packet will have the default policy taken on it.
+The default policy is normally set to <command>ACCEPT</command> or
+<command>DROP</command> or something the like.
+     </para>
+
+     <para>
+For example, lets say a packet enters the INPUT chain and then hits a rule that
+it matches and that gives it <command>--jump EXAMPLE_CHAIN</command>. The
+packet will then start traversing the <command>EXAMPLE_CHAIN</command>, and all
+of a sudden it matches a specific rule which has the <command>--jump
+RETURN</command> target set. It will then jump back to the previous chain, which
+in this case would be the <systemitem>INPUT</systemitem> chain. Another example
+would be if the packet hit a <command>--jump RETURN</command> rule in the
+<systemitem>INPUT</systemitem> chain. It would then be dropped to the default
+policy as previously described, and no more actions would be taken in this
+chain.
+    </para>
+
+   </section>
+
+   <section>
+    <title>LOG target</title>
+
+    <para>
+The <command>LOG</command> target is specially made to make it possible to log
+snippets of information about packets that may be illegal, or for pure
+bughunting and errorfinding. The <command>LOG</command> target will log specific
+information such as most of the IP headers and other interesting information via
+the kernel logging facility. This information may then be read with
+<command>dmesg</command> or <command>syslogd</command> and likely programs and
+applications. This is an excellent target to use while you are debugging your
+rulesets to see what packets go where and what rules are applied on what
+packets. Also note that it may be a really great idea to use the
+<command>LOG</command> target instead of the <command>DROP</command> target
+while you are testing a rule you are not 100% sure about on a production
+firewall since this may otherwise cause severe connectivity problems for your
+users. Also note that the <command>ULOG</command> target may be interesting in
+case you are getting heavy logs, since the <command>ULOG</command> target has
+support for logging directly to <systemitem>MySQL databases</systemitem> and
+such.
+    </para>
+
+    <para>
+Note that it is not a <command>iptables</command> or
+<systemitem>netfilter</systemitem> problem in case you get your logs to the
+consoles or likely, but instead a problem of your syslogd configuration which
+you may find in <filename>/etc/syslog.conf</filename>. Read more in <command>man
+syslog.conf</command> for information about these kind of problems.
+    </para>
+
+    <para>
+The <command>LOG</command> target currently takes five options that may be
+interesting to use in case you have specific needs for more information, or want
+to set different options to specific values. They are all listed below.
+
+    </para>
+
+    <table frame=all>
+     <title>LOG target options</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>--log-level</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A FORWARD -p tcp -j LOG --log-level
+debug</command>
+        </entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This is the option that we can use to tell
+<command>iptables</command> and <command>syslog</command> which log level to
+use. For a complete list of loglevels read the <filename>syslog.conf</filename>
+manual. Normally there are the following log levels, or priorities as they are
+normally referred to: <systemitem>debug</systemitem>,
+<systemitem>info</systemitem>, <systemitem>notice</systemitem>,
+<systemitem>warning</systemitem>, <systemitem>warn</systemitem>,
+<systemitem>err</systemitem>, <systemitem>error</systemitem>,
+<systemitem>crit</systemitem>, <systemitem>alert</systemitem>,
+<systemitem>emerg</systemitem> and <systemitem>panic</systemitem>. The keyword
+<systemitem>error</systemitem> is the same as <systemitem>err</systemitem>,
+<systemitem>warn</systemitem> is the same as <systemitem>warning</systemitem>
+and <systemitem>panic</systemitem> is the same as
+<systemitem>emerg</systemitem>. Note that all three of these are deprecated, in
+other words do not use <systemitem>error</systemitem>,
+<systemitem>warn</systemitem> and <systemitem>panic</systemitem>. The priority
+defines the severity of the message being logged. All messages are logged
+through the kernel facility. In other words, setting kern.=info
+<filename>/var/log/iptables</filename> in your syslog.conf file and then letting
+all your <command>LOG</command> messages in iptables use log level info, would
+make all messages appear in the <filename>/var/log/iptables</filename> file.
+Note that there may be other messages here as well from other parts of the
+kernel that uses the info priority. For more information on logging I recommend
+you to read the <command>syslog</command> and <filename>syslog.conf</filename>
+manpages as well as other HOWTO's etcetera.
+        </entry>
+       </row>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>--log-prefix</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A INPUT -p tcp -j LOG --log-prefix "INPUT
+packets"</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This option tells <command>iptables</command> to prefix all log
+messages with a specific prefix which may then be very good to use together
+with, for example, <command>grep</command> and other tools to distinguish
+specific problems and outputs from specific rules. The prefix may be up to 29
+letters long, including whitespace and those kind of symbols.
+        </entry>
+       </row>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>--log-tcp-sequence</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A INPUT -p tcp -j LOG --log-tcp-sequence</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This option will log the <systemitem>TCP Sequence</systemitem>
+numbers together with the log message. The <systemitem>TCP
+Sequence</systemitem> number are special numbers that identify each packet and
+where it fits into a <systemitem>TCP sequence</systemitem> and how the stream
+should be reassembled. Note that this option is a security risk if the log is
+readable by any users, or by the world for that matter. Any log that is, which
+may contain logging messages from <command>iptables</command>.
+        </entry>
+       </row>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>--log-tcp-options</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A FORWARD -p tcp -j LOG --log-tcp-options</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>The <command>--log-tcp-options</command> option will log the
+different options from the <systemitem>TCP</systemitem> packets header. These
+may be valuable when trying to debug what may go wrong and what has gone wrong.
+This option takes no variable fields or anything like that, just as most of the
+<command>LOG</command> options.
+        </entry>
+       </row>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>--log-ip-options</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A FORWARD -p tcp -j LOG --log-ip-options</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>The <command>--log-ip-options</command> option will log most of
+the IP packet header options. This works exactly thesame as the
+<command>--log-tcp-options</command> option, but instead works on the IP
+options. These logging messages may be valuable when trying to debug or finding
+out specific culprits and what goes wrong, just the same as the previous option.
+        </entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section>
+    <title>MARK target</title>
+
+     <para>
+The <command>MARK</command> target is used to set <command>netfilter</command>
+mark values that are associated with specific packets. This target is only valid
+in the <systemitem>mangle</systemitem> table, and will not work outside there.
+The <command>MARK</command> values may be used in conjunction with the advanced
+routing capabilities in Linux to send different packets through different routes
+and to tell them to use different queue disciplines (qdisc), etcetera. For more
+information on advanced routing, check out the <ulink
+url="http://www.lartc.org">LARTC HOWTO</ulink>. Note that the mark value is not 
+set within the actual package, but is an value that is associated within the
+kernel with the packet. In other words, you may not set a
+<command>MARK</command> for a package and then expect the
+<command>MARK</command> to still be there on another computer. If this is what
+you want, you will be better off with the <command>TOS</command> target which
+will mangle the <systemitem>TOS value</systemitem> in the IP header.
+     </para>
+
+
+
+    <table frame=all>
+     <title>MARK target options</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>--set-mark</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -t mangle -A PREROUTING -p tcp --dport 22 -j
+MARK --set-mark 2</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>The <command>--set-mark</command> option is required to set a
+mark. The <command>--set-mark</command> match takes an integer value. For example, we may
+set mark 2 to a specific stream of packets, or on all packets from a specific
+host and then do advanced routing on that host, limiting or unlimiting their
+network speed etcetera.
+        </entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section>
+    <title>REJECT target</title>
+    <para>
+The <command>REJECT</command> target works basically the same as the <command>DROP</command>
+target, but it also sends back an error message to the host sending the packet
+that was blocked. The <command>REJECT</command> target is as of today only valid in the
+<systemitem>INPUT</systemitem>, <systemitem>FORWARD</systemitem> and
+<systemitem>OUTPUT</systemitem> chain or subchains of those chains, which would
+also be the only chains where it would make any sense to put this target in.
+Note that the chains that uses the <command>REJECT</command> target may only be called
+upon by the <systemitem>INPUT</systemitem>, <systemitem>FORWARD</systemitem>,
+and <systemitem>OUTPUT</systemitem> chains, else they won't work. There
+currently is only one option which controls the nature of how this target works,
+which in turn may take a huge set of variables. Most of them are fairly easy to
+understand if you have a basic knowledge of <systemitem>TCP/IP</systemitem>.
+
+     </para>
+
+    <table frame=all>
+     <title>REJECT target</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>--reject-with</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A FORWARD -p TCP --dport 22 -j REJECT --reject-with
+tcp-reset</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This option tells the <command>REJECT</command> target what
+response to send to the host that sent the packet that we found to be a match.
+Once we get a packet that matches a specific rule and we specify this target,
+the target will first of all send the specified reply, and then the packet is
+dropped dead to the ground, just the same as with the <command>DROP</command>
+target. There are currently the following reject types that can be used:
+<computeroutput>icmp-net-unreachable</computeroutput>,
+<computeroutput>icmp-host-unreachable</computeroutput>,
+<computeroutput>icmp-port-unreachable</computeroutput>,
+<computeroutput>icmp-proto-unreachable</computeroutput>,
+<computeroutput>icmp-net-prohibited</computeroutput> and
+<computeroutput>icmp-host-prohibited</computeroutput>. The default error message
+is to send an <command>port-unreachable</command> to the host. All of the above
+are <systemitem>ICMP error messages</systemitem> and may be set as you wish, and
+you may get some more information by looking in the appendix <link
+linkend="icmptypes" endterm="icmptypes.title"></link>. There is also an option
+called <command>echo-reply</command>, but this option may only be used in
+conjunction with rules which would match ICMP ping packets. Finally, there is
+one more option called <command>tcp-reset</command> which may only be used
+together with the <systemitem>TCP</systemitem> protocol. the tcp-reset option
+will tell <command>REJECT</command> to send an <systemitem>TCP RST</systemitem>
+packet in reply to the sending host. <systemitem>TCP RST</systemitem> are used
+to close open connections gracefully. For more information about the
+<systemitem>TCP RST</systemitem> read <ulink
+url="http://iptables-tutorial.frozentux.net/other/rfc793.txt">RFC 793 - 
+Transmission Control Protocol</ulink>.
+ As stated in the <command>iptables</command> man page, this is mainly useful
+for blocking ident probes which frequently occur when sending mail to broken
+mail hosts, which won't accept your mail otherwise.
+
+        </entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section>
+    <title>TOS target</title>
+
+    <para>
+    The <command>TOS</command> target is used to set the <systemitem>Type of
+Service</systemitem> field within the IP header. The <systemitem>TOS
+field</systemitem> consists of 8 bits which are used to route packets. This is
+one of the fields that can be used directly within <command>iproute2</command>
+and its subsystem to route packets. Also note that if you handle several
+separate firewalls and routers, this is the only way to propagate routing
+information between these routers and firewalls within the actual packet. As
+noted before, the <command>MARK</command> target which sets a
+<command>MARK</command> associated with a specific packet is only available
+within the kernel, and can not be propagated with the packet. If you feel a need
+to propagate routing information on how to do routing for a specific packet or
+stream, you should hence set the <systemitem>TOS field</systemitem> which was
+developed for this. There are currently a lot of routers on the internet which
+do a pretty bad job at this so it may be a bit useless as of now to do any
+<systemitem>TOS</systemitem> mangling before sending the packets on to the
+internet. At best the routers will do nothing with the <systemitem>TOS
+field</systemitem>, and they will not even look at them. At worst, they will
+look at the <systemitem>TOS field</systemitem> and do the wrong thing based on
+the information. As stated previously, however, there is most definitely a good
+use if you have a large WAN or LAN with several routers and actually have the
+possibility to give packets different routes and preference depending on their
+<systemitem>TOS</systemitem> value, at least within your own network.
+</para>
+
+    <caution>
+     <para>
+The TOS target will only be able to set specific values, or named values on
+packets. These predefined TOS values can be found in the kernel include files,
+or more precisely, the <filename>linux/ip.h</filename> file. The reasons are
+many, and you should actually never need to set any other values, however, there
+are ways around this limitation. To get around the limitation of only being able
+to set the named values on packets, you can use the <ulink
+url="http://www.paksecured.com/patches/">FTOS</ulink> patch made by Matthew G.
+Marsh. Do be cautious with this patch. You should not need to use any other than
+the default values except in extreme cases.
+     </para>
+    </caution>
+
+    <note>
+     <para>
+    Note that this target is only valid within the
+<systemitem>mangle</systemitem> table and can not be used outside it.
+    </para>
+   </note>
+
+   <note>
+    <para>
+Also note that some old versions (1.2.2 or below) of iptables provided a broken
+implementation of this target which would not fix the packet checksum upon
+mangling, and hence rendered the packets bad and in need of retransmission,
+which in turn most probably would be mangled and the connection would never
+work.
+    </para>
+   </note>
+
+    <para>
+    The <command>TOS</command> target only takes one option as described below.
+    </para>
+
+    <table frame=all>
+     <title>TOS target</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>--set-tos</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -t mangle -A PREROUTING -p TCP --dport 22 -j
+TOS --set-tos 0x10</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>The <command>--set-tos</command> option tells the
+<command>TOS</command> mangler what <systemitem>TOS</systemitem> value to set on
+packets that are matched. The option takes a numeric value, either in hex or in
+decimal value. As the <systemitem>TOS</systemitem> value consists of 8 bits, the
+value may be 0-255, or in hex 0x00-0xFF. Note that in the standard TOS
+target you are limited using the named values available (which should be more or
+less standardized), as mentioned in the previous warning. These values are
+<computeroutput>Minimize-Delay</computeroutput> (decimal value 16, hex value
+0x10), <computeroutput>Maximize-Throughput</computeroutput> (decimal value 8,
+hex value 0x08), <computeroutput>Maximize-Reliability</computeroutput> (decimal
+value 4, hex value 0x04), <computeroutput>Minimize-Cost</computeroutput>
+(decimal value 2, hex 0x02) or <computeroutput>Normal-Service</computeroutput>
+(decimal value 0, hex value 0x00). The default value on most packets are
+<computeroutput>Normal-Service</computeroutput>, or 0. Note that you can, of
+course, use the actual names instead of the actual hex values to set up the
+<systemitem>TOS</systemitem> value, and it should generally be recommended since
+the values behind the names may be changed if you are unlucky. For a complete
+listing of the "descriptive values", do an <command>iptables -j TOS
+-h</command>. This listing is complete as of iptables 1.2.5 and should hopefully
+be so for another period of time.
+        </entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section>
+    <title>MIRROR target</title>
+
+    <para>
+    The <command>MIRROR</command> target is an experimental demonstration target
+only, and you should be warned of using this since it may result in really bad
+loops, hence resulting in a bad kind of Denial of Service, among other things.
+The <command>MIRROR</command> target is used to invert the source and
+destination fields in the IP header, and then to retransmit the packet. This
+results in some really funny things, and I would be quite sure that someone has
+had a good laugh at some cracker or another that has cracked his own box via
+this target by now. The result of this target is really simple. Lets say we set
+up a <command>MIRROR</command> target for port 80 at computer A. If computer B
+would be coming from yahoo.com, and tried to access the HTTP server at computer
+A, the MIRROR target would make so computer B got the webpage at yahoo.com back
+(since this is where he came from).
+    </para>
+
+    <para>
+    Note that the <command>MIRROR</command> target is only valid within the
+<systemitem>INPUT</systemitem>, <systemitem>FORWARD</systemitem> and
+<systemitem>PREROUTING</systemitem> chains, and any user-defined chains which are
+only called from those chains. Also note that the outgoing packets created by
+the <command>MIRROR</command> target is not seen by any of the normal chains in the
+filter, <command>NAT</command> or mangle tables to avoid loops and other problems.
+However, this does not make the target free of any likely problems. One thing
+would for example be to send a spoofed packet to a host that uses the
+<command>MIRROR</command>command with a <command>TTL</command> of 255, and see
+to it that the packet is spoofed so it looks as if it comes from another host
+that uses the <command>MIRROR</command> command. The packet will then bounce
+back and forth a huge set of times, depending on how many hops there is between
+them. If there is only 1 hop, the packet will jump back and forth 240-255 times.
+Not bad for a cracker in other words to send 1500 bytes of data, and eat up 380
+kbyte of your connection. Note that this is a best case scenario for the cracker
+or scriptkiddie, whichever we want to call them.
+
+    </para>
+
+   </section>
+
+   <section id="snattarget">
+    <title id="snattarget.title">SNAT target</title>
+
+    <para>
+    The <command>SNAT</command> target is used to do Source Network Address
+Translation, which means that this target will rewrite the Source IP address in
+the IP header of the packet. For example, this is good when we want several
+computers to share an internet connection. We could then turn on ip forwarding
+in the kernel, and then set an <command>SNAT</command> rule which would
+translate all packets from our local network to the <command>source IP</command> of our
+own internet connection. Without doing this, the outside world would not know
+where to send reply packets, since our local networks should use the IANA
+specified IP addresses which are allocated for <command>LAN</command> networks. If we
+forwarded these packets as is, noone on the internet would know that they where
+actually from us. The <command>SNAT</command> target does all the translation
+needed to do this kind of work, letting all packets leaving our
+<command>LAN</command> look as if they came from a single host, which would be
+our firewall.
+
+    </para>
+
+    <para>
+    The <command>SNAT</command> target is only valid within the nat table,
+within the <systemitem>POSTROUTING</systemitem> chain. This is in other words the
+only place that you may do <command>SNAT</command> in. If the first packet in a
+connection is mangled in this fashion, then all future packets in the same
+connection will also be <command>SNAT</command>'ed and, also, no further
+processing of rules in the <systemitem>POSTROUTING</systemitem> chain will be
+commenced on the packets in the same stream.
+     </para>
+
+
+
+    <table frame=all>
+     <title>SNAT target</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>--to-source</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -t nat -A POSTROUTING -o eth0 -j SNAT
+--to-source 194.236.50.155-194.236.50.160:1024-32000</command>
+        </entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>The <command>--to-source</command> option is used to
+specify which source the packets should use. This option, at it simplest, takes
+one IP address to which we should transform all the <command>source IP</command>
+addresses in the <command>IP header</command>. If we want to balance between
+several IP addresses we could use an range of IP addresses separated by a
+hyphen, it would then look like, for example, 194.236.50.155-194.236.50.160 as
+described in the example above. The source IP would then be set randomly for
+each stream that we open, and a single stream would always use the same IP
+address for packets within that stream. There may also be an range of ports
+specified that should only be used by <command>SNAT</command>. All the source
+ports would then be mapped to the ports specified. This would hence look as
+within the example above, :1024-32000 or something alike. iptables will always
+try to not make any port alterations if it is possible, but if two hosts tries
+to use the same ports, iptables will map one of them to another port. If no port
+range is specified, then all source ports below 512 will be mapped to other
+ports below 512 if needed. Those between source ports 512 and 1023 will be
+mapped to ports below 1024. All other ports will be mapped to 1024 or above. As
+previously stated, iptables will always try to maintain the source ports used by
+the actual workstation making the connection. Note that this has nothing to do
+with destination ports, so if a client tries to make contact with an
+<command>HTTP</command> server outside the firewall, it will not be mapped to
+the <command>FTP control</command> port.
+        </entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section>
+    <title>DNAT target</title>
+
+    <para>
+    The <command>DNAT</command> target is used to do <systemitem>Destination
+Network Address Translation</systemitem>, which means that it is used to rewrite
+the <envar>Destination IP</envar> address of a packet. If a packet is
+matched, and this is the target of the rule, the packet, and all subsequent
+packets in the same stream will be translated, and then routed on to the correct
+device, host or network. This target can be extremely useful, for example, when
+you have an host running your webserver inside a <emphasis>LAN</emphasis>, but
+no real IP to give it that will work on the internet. You could then tell the
+firewall to forward all packets going to its own <systemitem>HTTP</systemitem> port,
+on to the real webserver within the <emphasis>LAN</emphasis>. We may also
+specify a whole range of destination IP addresses, and the
+<command>DNAT</command> mechanism will choose the destination IP address at
+random for each stream. Hence, we will be able to deal with a kind of load
+balancing by doing this. </para>
+
+    <para>
+    Note that the <command>DNAT</command> target is only available within the
+<systemitem>PREROUTING</systemitem> and <systemitem>OUTPUT</systemitem> chains
+in the <systemitem>nat</systemitem> table, and any of the chains called upon from any
+of those listed chains. Note that chains containing <command>DNAT</command>
+targets may not be used from any other chains, such as the
+<systemitem>POSTROUTING</systemitem> chain.
+    </para>
+
+    <table frame=all>
+     <title>DNAT target</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>--to-destination</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -t nat -A PREROUTING -p tcp -d 15.45.23.67
+--dport 80 -j DNAT --to-destination 192.168.1.1-192.168.1.10</command>
+        </entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>The <command>--to-destination</command> option tells the
+<systemitem>DNAT</systemitem> mechanism which <systemitem>Destination
+IP</systemitem> to set in the IP header, and where to send packets that are
+matched. The above example would send on all packets destined for IP address
+15.45.23.67 to a range of <emphasis>LAN</emphasis> IP's, namely 192.168.1.1
+through 10. Note, as described previously, that a single stream will always use
+the same host, and that each stream will randomly be given an IP address that it
+will always be Destinated for, within that stream. We could also have specified
+only one IP address, in which case we would always be connected to the same
+host. Also note that we may add an port or port range to which the traffic would
+be redirected to. This is done by adding, for example, an :80 statement to the
+IP addresses to which we want to <systemitem>DNAT</systemitem> the packets. A
+rule could then look like <command>--to-destination 192.168.1.1:80</command> for
+example, or like <command>--to-destination 192.168.1.1:80-100</command> if we
+wanted to specify a port range. As you can see, the syntax is pretty much the
+same for the <command>DNAT</command> target, as for the <command>SNAT</command>
+target even though they do two totally different things. Do note that port
+specifications are only valid for rules that specify the TCP or UDP protocols
+with the <command>--protocol</command> option.
+        </entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+    <para> Since <command>DNAT</command> requires quite a lot of work to
+work properly, I have decided to add a larger explanation on how to work
+with it. Let's take a brief example on how things would be done normally.
+We want to publish our website via our internet connection. We only have
+one IP address, and the <systemitem>HTTP server</systemitem> is located on
+our internal network.  Our firewall has the external IP address
+<command>$INET_IP</command>, and our <systemitem>HTTP server</systemitem>
+has the internal IP address <command>$HTTP_IP</command> and finally the
+firewall has the internal IP address <command>$LAN_IP</command>. The first
+thing to do is to add the following simple rule to the
+<systemitem>PREROUTING</systemitem> chain in the nat table:
+    </para>
+
+    <literallayout>
+<command>
+iptables -t nat -A PREROUTING --dst $INET_IP --dport 80 -j DNAT --to-destination $HTTP_IP
+</command>
+    </literallayout>
+
+    <para> Now, all packets from the internet going to port 80 on our
+firewall are redirected (or <command>DNAT</command>'ed) to our internal
+<systemitem>HTTP</systemitem> server. If you test this from the internet,
+everything should work just perfect. So, what happens if you try
+connecting from a host on the same local network as the
+<systemitem>HTTP</systemitem> server? It will simply not work. This is a
+problem with routing really.  We start out by dissect what happens in a
+normal case. The external box has IP address <command>$EXT_BOX</command>,
+to maintain readability.
+    </para>
+
+    <orderedlist>
+
+     <listitem>
+      <para>
+     Packet leaves the connecting host going to
+<command>$INET_IP</command> and source <command>$EXT_BOX</command>.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+     Packet reaches the firewall.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+     Firewall <command>DNAT</command>'s the packet and run the packet
+through all different chains etcetera.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+     Packet leaves the firewall and travels to the $HTTP_IP.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+     Packet reaches the <systemitem>HTTP</systemitem> server, and the
+<systemitem>HTTP</systemitem> box replies back through the firewall, if
+that is the box that the routing database has entered as the gateway for
+<command>$EXT_BOX</command>. Normally, this would be the default gateway
+of the <systemitem>HTTP</systemitem> server.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+     Firewall Un-<command>DNAT</command>'s the packet again, so the packet
+looks as if it was replied to from the firewall itself.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+     Reply packet travels as usual back to the client 
+<command>$EXT_BOX</command>.
+      </para>
+     </listitem>
+
+    </orderedlist>
+
+    <para> Now, we will consider what happens if the packet was instead
+generated by a client on the same network as the
+<systemitem>HTTP</systemitem> server itself. The client has the IP address
+<command>$LAN_BOX</command>, while the rest of the machines maintain the
+same settings.
+    </para>
+
+    <orderedlist>
+
+     <listitem>
+      <para>
+     Packet leaves <command>$LAN_BOX</command>.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+     The packet reaches the firewall.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+     The packet gets <command>DNAT</command>'ed, and all other required
+actions are taken, however, the packet is not <command>SNAT</command>'ed,
+so the same source IP address is used on the packet.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+     The packet leaves the firewall and reaches the
+<systemitem>HTTP</systemitem> server.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+     The <systemitem>HTTP</systemitem> server tries to respond to the
+packet, and sees in the routing databases that the packet came from a
+local box on the same network, and hence tries to send the packet directly
+to the original <systemitem>source IP address</systemitem> (which now
+becomes the <systemitem>destination IP address</systemitem>).
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+The packet reaches the client, and the client gets confused since the 
+return packet does not come from the host that it sent the original 
+request to. Hence, the client drops the reply packet, and waits for the 
+"real" reply. 
+      </para>
+     </listitem>
+
+    </orderedlist>
+
+    <para> The simple solution to this problem is to
+<command>SNAT</command> all packets entering the firewall and leaving for
+a host or IP that we know we do <command>DNAT</command> to. For example,
+consider the above rule. We <systemitem>SNAT</systemitem> the packets
+entering our firewall that are destined for <command>$HTTP_IP</command>
+port 80 so that they look as if they came from <command>$LAN_IP</command>.
+This will force the <systemitem>HTTP</systemitem> server to send the
+packets back to our firewall, which Un-<command>DNAT</command>'s the
+packets and sends them on to the client. The rule would look something
+like this:
+    </para>
+
+    <literallayout>
+<command>
+iptables -t nat -A POSTROUTING --dst $HTTP_IP --dport 80 -j SNAT --to-source $LAN_IP
+</command>
+    </literallayout>
+
+    <para> Remember that the <systemitem>POSTROUTING</systemitem> chain is
+processed last of the chains, and hence the packet will already be
+<command>DNAT</command>'ed once it reaches that specific chain. This is
+the reason that we match the packets based on the internal address.
+    </para>
+
+    <para> You think this should be enough by now, and it really is,
+unless considering one final aspect to this whole scenario. What if the
+firewall itself tries to access the <systemitem>HTTP</systemitem> server,
+where will it go? As it looks now, it will unfortunately try to get to its
+own <systemitem>HTTP</systemitem> server, and not the server residing on
+<command>$HTTP_IP</command>. To get around this, we need to add a
+<command>DNAT</command> rule in the <systemitem>OUTPUT</systemitem> chain
+as well. Following the above example, this should look something like the
+following:
+    </para>
+
+    <literallayout>
+<command>
+iptables -t nat -A OUTPUT --dst $INET_IP --dport 80 -j DNAT --to-destination $HTTP_IP
+</command>
+    </literallayout>
+
+    <para> Adding this final rule should get everything up and running.
+All separate networks that do not sit on the same net as the
+<systemitem>HTTP</systemitem> server will run smoothly, all hosts on the
+same network as the <systemitem>HTTP</systemitem> server will be able to
+connect and finally, the firewall will be able to do proper connections as
+well. Now everything works and no problems should arise.
+    </para>
+
+   </section>
+
+   <section>
+    <title>MASQUERADE target</title>
+
+    <para>
+    The <command>MASQUERADE</command> target is used basically the same as the
+<command>SNAT</command> target, but it does not require any
+<command>--to-source</command> option. The reason for this is that the
+<command>MASQUERADE</command> target was made to work with, for example, dialup
+connections, or <systemitem>DHCP</systemitem> connections, which gets dynamic
+IP addresses when connecting to the network in question. This means that you
+should only use the <command>MASQUERADE</command> target with dynamically
+assigned IP connections, which we don't know the actual address of at all times.
+If you have a static IP connection, you should instead use the
+<command>SNAT</command> target.
+    </para>
+
+    <para>
+    When you masquerade a connection, it means that we set the IP address used
+on a specific network interface instead of the <command>--to-source</command>
+option, and the IP address is automatically grabbed from the information about
+the specific interface. The <command>MASQUERADE</command> target also has the
+effect that connections are forgotten when an interface goes down, which is
+extremely good if we, for example, kill a specific interface. If we would have
+used the <command>SNAT</command> target, we may have been left with a lot of
+old connection tracking data, which would be lying around for days, swallowing
+up worthful connection tracking memory. This is in general the correct behaviour
+when dealing with dialup lines that are probable to be assigned a different IP
+every time it is up'ed. In case we are assigned a different IP, the connection
+is lost anyways, and it is more or less idiotic to keep the entry around.
+    </para>
+
+    <para>
+    It is still possible to use the <command>MASQUERADE</command> target
+instead of <command>SNAT</command> even though you do have an static IP,
+however, it is not favorable since it will add extra overhead, and there may be
+inconsistencies in the future which will thwart your existing scripts and render
+them "unusable".
+    </para>
+
+    <para>
+    Note that the <command>MASQUERADE</command> target is only valid within the
+<systemitem>POSTROUTING</systemitem> chain in the nat table, just as the
+<command>SNAT</command> target. The <command>MASQUERADE</command> target takes
+one option specified below, which is optional.
+
+    </para>
+
+    <table frame=all>
+     <title>MASQUERADE target</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>--to-ports</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -t nat -A POSTROUTING -p TCP -j MASQUERADE
+--to-ports 1024-31000</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>The <command>--to-ports</command> option is used to set
+the source port or ports to use on outgoing packets. Either you can specify a
+single port like <command>--to-ports 1025</command> or you may specify a port
+range as <command>--to-ports 1024-3000</command>. In other words, the lower port
+range delimiter and the upper port range delimiter separated with a hyphen. This
+alters the default SNAT port-selection as described in the <link
+linkend="snattarget" endterm="snattarget.title"></link> section. The
+<command>--to-ports</command> option is only valid if the rule match section
+specifies the TCP or UDP protocols with the <command>--protocol</command> match.
+        </entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section>
+    <title>REDIRECT target</title>
+
+    <para>
+    The <command>REDIRECT</command> target is used to redirect packets and
+streams to the machine itself. This means that we could for example
+<command>REDIRECT</command> all packets destined for the
+<systemitem>HTTP</systemitem> ports to an <systemitem>HTTP proxy</systemitem>
+like squid, on our own host. Locally generated packets are mapped to the
+127.0.0.1 address. In other words, this rewrites the destination address to our
+own host for packets that are forwarded, or something alike. The
+<command>REDIRECT</command> target is extremely good to use when we want, for
+example, transparent proxying, where the <emphasis>LAN</emphasis> hosts do not
+know about the proxy at all.
+    </para>
+
+    <para>
+    Note that the <command>REDIRECT</command> target is only valid within the
+<systemitem>PREROUTING</systemitem> and <systemitem>OUTPUT</systemitem> chains
+of the nat table. It is also valid within user-defined chains that are only
+called from those chains, and nowhere else. The <command>REDIRECT</command>
+target takes only one option, as described below.
+
+    </para>
+
+    <table frame=all>
+     <title>REDIRECT target</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>--to-ports</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -t nat -A PREROUTING -p tcp --dport 80 -j
+REDIRECT --to-ports 8080</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>The <command>--to-ports</command> option specifies the
+destination port, or port range, to use. Without the
+<command>--to-ports</command> option, the destination port is never altered.
+This is specified, as above, <command>--to-ports 8080</command> in case we only
+want to specify one port. If we would want to specify an port range, we would do
+it like <command>--to-ports 8080-8090</command>, which tells the
+<command>REDIRECT</command> target to redirect the packets to the ports 8080
+through 8090. Note that this option is only available in rules specifying the
+<systemitem>TCP</systemitem> or <systemitem>UDP</systemitem> protocol with the
+<command>--protocol</command> matcher, since it wouldn't make any sense anywhere
+else.</entry>
+      </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section>
+    <title>TTL target</title>
+
+    <para>
+    The <command>TTL</command> target is used to modify the <systemitem>Time To
+Live</systemitem> field in the IP header. One useful application of this is to
+change all <systemitem>Time To Live</systemitem> values to the same value on
+all outgoing packets. One reason for doing this is if you have a bully
+<emphasis>ISP</emphasis> which don't allow you to have more than one machine
+connected to the same internet connection, and who actively pursue this. Setting
+all <command>TTL</command> values to the same value, will effectively make it a
+little bit harder for them to notify that you are doing this. We may then reset
+the <command>TTL</command> value for all outgoing packets to a standardized
+value, such as 64 as specified in Linux kernel.
+    </para>
+
+    <para>
+    For more information on how to set the default value used in
+Linux, read the <link linkend="ip-sysctltxt"
+endterm="ip-sysctltxt.title"></link>, which you may find within the <link
+linkend="otherresources" endterm="otherresources.title"></link> appendix.
+    </para>
+
+    <para>
+    The <command>TTL</command> target is only valid within the
+<systemitem>mangle</systemitem> table, and nowhere else. It takes 3 options as
+of writing this, all of them described below in the table.
+
+    </para>
+
+    <table frame=all>
+     <title>TTL target</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>--ttl-set</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -t mangle -A PREROUTING -i eth0 -j TTL
+--ttl-set 64</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>The <command>--ttl-set</command> option tells the
+<command>TTL</command> target which <systemitem>TTL</systemitem> value to set
+on the packet in question. A good value would be around 64 somewhere. It's not
+too long, and it is not too short. Do not set this value too high, since it may
+affect your network and it is a bit immoral to set this value to high, since the
+packet may start bouncing back and forth between two misconfigured routers, and
+the higher the <systemitem>TTL</systemitem>, the more bandwidth will be eaten
+unnecessary in such a case. This target could be used to limit how far 
+away our clients are. A good case of this could be DNS servers, where we 
+don't want the clients to be too far away.
+        </entry>
+       </row>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>--ttl-dec</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -t mangle -A PREROUTING -i eth0 -j TTL
+--ttl-dec 1</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>The <command>--ttl-dec</command> option tells the
+<command>TTL</command> target to decrement the Time To Live value by the
+amount specified after the <command>--ttl-dec</command>option. In other
+words, if the TTL for an incoming packet was 53 and we had set
+<command>--ttl-dec 3</command>, the packet would leave our host with a
+<systemitem>TTL value</systemitem> of 49. The reason for this is that the
+networking code will automatically decrement the <systemitem>TTL
+value</systemitem> by 1, hence the packet will be decremented by 4 steps,
+from 53 to 49. This could for example be used when we want to limit how 
+far away the people using our services are. For example, users should 
+always use a close-by DNS, and hence we could match all packets leaving 
+our DNS server and then decrease it by several steps. Of course, the 
+--set-ttl may be a better idea for this usage.
+       </entry>
+
+       </row>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>--ttl-inc</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -t mangle -A PREROUTING -i eth0 -j TTL
+--ttl-inc 1</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>The <command>--ttl-inc</command> option tells the
+<command>TTL</command> target to increment the <systemitem>Time To Live
+value</systemitem> with the value specified to the <command>--ttl-inc</command>
+option. This means that we should raise the <systemitem>TTL value</systemitem>
+with the value specified in the <command>--ttl-inc</command> option, and if we
+specified <command>--ttl-inc 4</command>, a packet entering with a
+<systemitem>TTL</systemitem> of 53 would leave the host with
+<systemitem>TTL</systemitem> 56. Note that the same thing goes here, as for the
+previous example of the <command>--ttl-dec</command> option, where the network
+code will automatically decrement the <systemitem>TTL value</systemitem> by 1,
+which it always does. This may be used to make our firewall a bit more stealthy
+to traceroutes among other things. By setting the <systemitem>TTL</systemitem>
+one value higher for all incoming packets, we effectively make the firewall
+hidden from traceroutes. Traceroutes are a loved and hated thing, since they
+provide excellent information on problems with connections and where it happens,
+but at the same time, it gives the hacker/cracker some good information about
+your upstreams if they have targeted you. For a good example on how this could
+be used, see the <ulink
+url="http://iptables-tutorial.frozentux.net/scripts/ttl-inc.txt">
+ttl-inc.txt</ulink> script.
+       </entry>
+
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section>
+    <title>ULOG target</title>
+
+    <para>
+    The <command>ULOG</command> target is used to provide userspace logging of
+matching packets. If a packet is matched and the <command>ULOG</command> target
+is set, the packet information is multicasted together with the whole packet
+through a netlink socket. One or more userspace processes may then subscribe to
+various multicast groups and receive the packet. This is in other words a more
+complete and more sophisticated logging facility that is only used by iptables
+and netfilter so far, and it contains much better facilities for logging
+packets. This target enables us to log information to
+<systemitem>MySQL</systemitem> databases, and other databases, making it much
+simpler to search for specific packets, and to group log entries. You
+can find the ULOGD userland applications at the <ulink
+url="http://www.gnumonks.org/gnumonks/projects/project_details?p_id=1">ULOGD
+project page</ulink>.
+
+
+    </para>
+
+    <table frame=all>
+     <title>ULOG target</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>--ulog-nlgroup</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A INPUT -p TCP --dport 22 -j
+ULOG --ulog-nlgroup 2</command></entry>
+
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>The <command>--ulog-nlgroup</command> option tells the
+<command>ULOG</command> target which netlink group to send the packet to. There
+are 32 netlink groups, which are simply specified as 1-32. If we would like to
+reach netlink group 5, we would simply write <command>--ulog-nlgroup
+5</command>. The default netlink groupd used is 1.
+        </entry>
+       </row>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>--ulog-prefix</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A INPUT -p TCP --dport 22 -j ULOG
+--ulog-prefix "SSH connection attempt: "</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>The <command>--ulog-prefix</command> option works just the same
+as the prefix value for the standard <command>LOG</command> target. This option
+prefixes all log entries with a userspecified log prefix. It can be 32
+characters long, and is definitely most useful to distinguish different
+logmessages and where they came from.
+        </entry>
+       </row>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>--ulog-cprange</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A INPUT -p TCP --dport 22 -j ULOG
+--ulog-cprange 100</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>The <command>--ulog-cprange</command> option tells the
+<command>ULOG</command> target how many bytes of the packet to send to the
+userspace daemon of <command>ULOG</command>. If we specify 100 as above, we
+would copy 100 bytes of the whole packet to userspace, which would include the
+whole header hopefully, plus some leading data within the actual packet. If we
+specify 0, the whole packet will be copied to userspace, regardless of the
+packets size. The default value is 0, so the whole packet will be copied to
+userspace.
+        </entry>
+       </row>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>--ulog-qthreshold</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A INPUT -p TCP --dport 22 -j ULOG
+--ulog-qthreshold 10</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>The <command>--ulog-qthreshold</command> option tells the
+<command>ULOG</command> target how many packets to queue inside the kernel
+before actually sending the data to userspace. For example, if we set the
+threshold to 10 as above, the kernel would first accumulate 10 packets inside
+the kernel, and then transmit it outside to the userspace as one single netlink
+multipart message. The default value here is 1 because of backwards
+compatibility, the userspace daemon did not know how to handle multipart
+messages previously.
+        </entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+    </section>
+
+  </section>
+ </chapter>
+

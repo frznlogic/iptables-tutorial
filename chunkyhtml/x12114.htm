@@ -1,0 +1,294 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>rc.DMZ.firewall.txt</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="Example scripts"
+HREF="c11777.htm"><LINK
+REL="PREVIOUS"
+TITLE="rc.firewall.txt"
+HREF="x12074.htm"><LINK
+REL="NEXT"
+TITLE="rc.DHCP.firewall.txt"
+HREF="x12188.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x12074.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 14. Example scripts</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x12188.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="RCDMZFIREWALLTXT"
+>rc.DMZ.firewall.txt</A
+></H1
+><P
+>     <DIV
+CLASS="MEDIAOBJECT"
+><P
+><IMG
+SRC="images/rc_DMZ_firewall.jpg"></P
+></DIV
+>
+    </P
+><P
+>The <A
+HREF="http://iptables-tutorial.frozentux.net/scripts/rc.DMZ.firewall.txt"
+TARGET="_top"
+>rc.DMZ.firewall.txt</A
+> script was written for those people out there
+that have one Trusted Internal Network, one
+De-Militarized Zone and one Internet
+Connection. The De-Militarized Zone is
+in this case 1-to-1 NATed and requires you to do some
+IP aliasing on your firewall, i.e., you must make the box recognize packets
+for more than one IP. There are several ways to get this to work, one is to
+set 1-to-1 NAT, another one if you have a whole
+subnet is to create a subnetwork, giving the firewall one IP both internally
+and externally. You could then set the IP's to the
+DMZed boxes as you wish. Do note that this will
+"steal" two IP's for you, one for the broadcast address and one for the network
+address. This is pretty much up to you to decide and to implement. This
+tutorial will give you the tools to actually accomplish the firewalling and
+NATing part, but it will not tell you exactly what
+you need to do since it is out of the scope of the tutorial.
+    </P
+><P
+>    The rc.DMZ.firewall.txt script requires these options to be compiled into
+your kernel, either statically or as modules. Without these options, at the very
+least, available in your kernel, you will not be able to use this scripts
+functionality. You may in other words get a lot of errors complaining about
+modules and targets/jumps or matches missing. If you are planning to do traffic
+control or any other things like that, you should see to it that you have all
+the required options compiled into your kernel there as well.
+    </P
+><P
+></P
+><UL
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>      CONFIG_NETFILTER
+      </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>      CONFIG_IP_NF_CONNTRACK
+      </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>      CONFIG_IP_NF_IPTABLES
+      </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>      CONFIG_IP_NF_MATCH_LIMIT
+      </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>      CONFIG_IP_NF_MATCH_STATE
+      </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>      CONFIG_IP_NF_FILTER
+      </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>      CONFIG_IP_NF_NAT
+      </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>      CONFIG_IP_NF_TARGET_LOG
+      </P
+></LI
+></UL
+><P
+>You need to have two internal networks with this script as you can see from the
+picture. One uses IP range 192.168.0.0/24 and consists of a Trusted
+Internal Network. The other one uses IP range 192.168.1.0/24 and
+consists of the De-Militarized Zone which we will do
+1-to-1 NAT to. For example, if someone from the
+Internet sends a packet to our <CODE
+CLASS="VARNAME"
+>DNS_IP</CODE
+>, then we use
+DNAT to send the packet on to our
+DNS on the DMZ network. When
+the DNS sees our packet, the packet will be destined
+for the actual DNS internal network IP, and not to our
+external DNS IP. If the packet would not have been
+translated, the DNS wouldn't have answered the packet.
+We will show a short example of how the DNAT code
+looks:
+    </P
+><PRE
+CLASS="SCREEN"
+>$IPTABLES -t nat -A PREROUTING -p TCP -i $INET_IFACE -d $DNS_IP \
+--dport 53 -j DNAT --to-destination $DMZ_DNS_IP
+    </PRE
+><P
+>First of all, DNAT can only be performed in the
+PREROUTING chain of the nat
+table. Then we look for TCP protocol on our
+<CODE
+CLASS="VARNAME"
+>$INET_IFACE</CODE
+> with destination IP that matches our
+<CODE
+CLASS="VARNAME"
+>$DNS_IP</CODE
+>, and is directed to port 53, which is the
+TCP port for zone transfers between name servers. If
+we actually get such a packet we give a target of
+DNAT. After that we specify where we want the packet 
+to go with the --to-destination option and give it the value 
+of <CODE
+CLASS="VARNAME"
+>$DMZ_DNS_IP</CODE
+>, in other words the IP of the
+DNS on our DMZ network. This
+is how basic DNAT works. When the reply to the
+DNATed packet is sent through the firewall, it
+automatically gets un-DNATed.
+    </P
+><P
+>By now you should have enough understanding of how everything works to be able
+to understand this script pretty well without any huge complications. If there
+is something you don't understand that hasn't been gone through in the rest of
+the tutorial, mail me since it is probably a fault on my side.
+    </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x12074.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x12188.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>rc.firewall.txt</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c11777.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>rc.DHCP.firewall.txt</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

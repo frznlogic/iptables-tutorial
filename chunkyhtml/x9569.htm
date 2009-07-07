@@ -1,0 +1,264 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>ECN target</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="Iptables targets and jumps"
+HREF="c8815.htm"><LINK
+REL="PREVIOUS"
+TITLE="DSCP target"
+HREF="x9488.htm"><LINK
+REL="NEXT"
+TITLE="LOG target options"
+HREF="x9620.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x9488.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 11. Iptables targets and jumps</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x9620.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="ECNTARGET"
+>ECN target</A
+></H1
+><P
+>This target can be great, used in the correct way. Simply put, the
+ECN target can be used to reset the
+ECN bits from the IPv4
+header, or to put it correctly, reset them to 0 at least. Since
+ECN is a relatively new thing on the net, there are
+problems with it. For example, it uses 2 bits that are defined in the original
+RFC for the TCP protocol to
+be 0. Some routers and other internet appliances will not forward packets that
+have these bits set to 1. If you want to make use of at least parts of the
+ECN functionality from your hosts, you could for
+example reset the ECN bits to 0 for specific networks
+that you know you are having troubles reaching because of
+ECN.
+    </P
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Please do note that it isn't possible to turn ECN on
+in the middle of a stream. It isn't allowed according to the
+RFC's, and it isn't possible anyways. Both endpoints
+of the stream must negotiate ECN. If we turn it on,
+then one of the hosts is not aware of it, and can't respond properly to the
+ECN notifications.
+      </P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.ECNTARGET"
+></A
+><P
+><B
+>Table 11-7. ECN target options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Option</TD
+><TD
+>--ecn-tcp-remove</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -t mangle -A FORWARD -p tcp --dport 80 -j 
+ECN --ecn-tcp-remove
+        </TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>The ECN target only takes one argument, the --ecn-tcp-remove 
+argument. This tells the target to remove the ECN bits inside the TCP headers. 
+Read above for more information.
+        </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Works under Linux kernel 2.5 and 2.6.
+      </P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x9488.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x9620.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>DSCP target</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c8815.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>LOG target options</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

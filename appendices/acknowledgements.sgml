@@ -1,0 +1,92 @@
+ <appendix id="acknowledgements">
+  <title id="acknowledgements.title">Acknowledgments</title>
+  <para>
+I would like to thank the following people for their help on this document:
+  </para>
+
+  <para>
+   <itemizedlist>
+    <listitem>
+     <para>
+      <ulink url="mailto:fabriceATcelestixDOTcom"><emphasis>Fabrice
+Marie</emphasis></ulink>, For major updates to my horrible grammar and spelling.
+Also a huge thanks for updating the tutorial to DocBook format with make files
+etc.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <ulink url="mailto:marc+nfATmbsiDOTca"><emphasis>Marc
+Boucher</emphasis></ulink>, For helping me out on some aspects on using the
+state matching code.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <ulink url="mailto:fenATimprobusDOTcom"><emphasis>Frode E.
+Nyboe</emphasis></ulink>, For greatly improving the
+<filename>rc.firewall</filename> rules and giving great inspiration while
+i was to rewrite the rule-set and being the one who introduced the multiple table
+traversing into the same file.
+      </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <ulink url="mailto:kakadu_crocATyahooDOTcom"><emphasis>Chapman
+Brad</emphasis></ulink>, <ulink
+url="mailto:yallaATynfonaticDOTde"><emphasis>Alexander W.
+Janssen</emphasis></ulink>, Both for making me realize I was thinking wrong
+about how packets traverse the basic NAT and filters tables and in which order
+they show up.      </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <ulink url="mailto:michielbATstackDOTnl"><emphasis>Michiel
+Brandenburg</emphasis></ulink>, <ulink
+url="mailto:mylesATpuckDOTnetherDOTnet"><emphasis>Myles
+Uyema</emphasis></ulink>, For helping me out with some of the state matching
+code and getting it to work.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <ulink url="mailto:artechATboingworldDOTcom"><emphasis>Kent `Artech'
+Stahre</emphasis></ulink>, For helping me out with the graphics. I know I suck
+at graphics, and you're better than most I know who do graphics;). Also thanks
+for checking the tutorial for errors etc.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+     <emphasis>Anders 'DeZENT' Johansson</emphasis>, For hinting me about
+strange ISPs and so on that uses reserved networks on the Internet, or at
+least on the Internet for you.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <ulink url="mailto:di99smjeATchlDOTchalmersDOTse"><emphasis>Jeremy
+`Spliffy' Smith</emphasis></ulink>, For giving me hints at stuff that might
+screw up for people and for trying it out and checking for errors in what I've
+written.
+     </para>
+    </listitem>
+   </itemizedlist>
+
+And of course everyone else I talked to and asked for comments on this file,
+sorry for not mentioning everyone.
+  </para>
+ </appendix>
+
+
+
+
+
+

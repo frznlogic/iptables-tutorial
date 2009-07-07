@@ -1,0 +1,730 @@
+ <chapter id="howaruleisbuilt">
+  <title id="howaruleisbuilt.title">How a rule is built</title>
+  <indexterm zone="howaruleisbuilt">
+    <primary>How a rule is built</primary>
+  </indexterm>
+  <indexterm zone="howaruleisbuilt">
+    <primary>Rules</primary>
+  </indexterm>
+ 
+  <para>
+This chapter and the upcoming three chapters will discuss at length how to 
+build your own rules. A rule could be described as the directions the firewall 
+will adhere to when blocking or permitting different connections and packets 
+in a specific chain. Each line you write that's inserted in a chain should be 
+considered a rule. We will also discuss the basic matches that are available, 
+and how to use them, as well as the different targets and how we can construct 
+new targets of our own (i.e.,new sub chains).
+  </para>
+  
+  <para>
+This chapter will deal with the raw basics of how a rule is created and how you 
+write it and enter it so that it will be accepted by the userspace program 
+<command>iptables</command>, the different tables, as well as the commands that 
+you can issue to iptables. After that we will in the next chapter look at all 
+the matches that are available to <command>iptables</command>, and then get 
+more into detail of each type of target and jump.
+  </para>
+
+  <section id="basics">
+   <title id="basics.title">Basics of the iptables command</title>
+    <indexterm zone="basics">
+      <primary>Iptables</primary>
+      <secondary>Basics</secondary>
+    </indexterm>
+    <indexterm zone="basics">
+      <primary>Rules</primary>
+      <secondary>Basics</secondary>
+    </indexterm>
+    <indexterm zone="basics">
+      <primary>Target</primary>
+      <secondary>Basics</secondary>
+    </indexterm>
+    <indexterm zone="basics">
+      <primary>Match</primary>
+      <secondary>Basics</secondary>
+    </indexterm>
+   
+   <para>
+As we have already explained, each rule is a line that the kernel looks at to
+find out what to do with a packet. If all the criteria - or matches - are met,
+we perform the target - or jump - instruction. Normally we would write our
+rules in a syntax that looks something like this:
+   </para>
+
+   <para>
+    <cmdsynopsis>
+     <command>iptables</command>
+     <arg>-t <replaceable>table</replaceable></arg>
+     <arg choice=plain>command</arg>
+     <arg>match</arg>
+     <arg>target/jump</arg>
+    </cmdsynopsis>
+   </para>
+
+   <para>
+There is nothing that says that the target instruction has to be the last 
+function in the line. However, you would usually adhere to this syntax to get 
+the best readability. Anyway, most of the rules you'll see are written in this 
+way. Hence, if you read someone else's script, you'll most likely recognize the
+syntax and easily understand the rule.
+   </para>
+
+   <para>
+If you want to use a table other than the standard table, you could insert
+the table specification at the point at which [table] is specified. However,
+it is not necessary to state explicitly what table to use, since by default
+<command>iptables</command> uses the <systemitem>filter</systemitem> table on
+which to implement all commands. Neither do you have to specify the table at
+just this point in the rule. It could be set pretty much anywhere along the
+line. However, it is more or less standard to put the table specification at
+the beginning.
+   </para>
+
+   <para>
+One thing to think about though: The command should always come first, or
+alternatively directly after the table specification. We use 'command' to tell
+the program what to do, for example to insert a rule or to add a rule to the
+end of the chain, or to delete a rule. We shall take a further look at this
+below.
+   </para>
+
+   <para>
+The match is the part of the rule that we send to the kernel that details the
+specific character of the packet, what makes it different from all other
+packets. Here we could specify what IP address the packet comes from, from
+which network interface, the intended IP address, port, protocol or whatever.
+There is a heap of different matches that we can use that we will look closer
+at further on in this chapter.
+   </para>
+
+   <para>
+Finally we have the target of the packet. If all the matches are met for a
+packet, we tell the kernel what to do with it. We could, for example, tell the
+kernel to send the packet to another chain that we've created ourselves, and
+which is part of this particular table. We could tell the kernel to drop the
+packet dead and do no further processing, or we could tell the kernel to send
+a specified reply to the sender. As with the rest of the content in this
+section, we'll look closer at it further on in the chapter.
+   </para>
+
+  </section>
+
+  <section id="tables">
+   <title id="tables.title">Tables</title>
+   <indexterm zone="tables">
+     <primary>Tables</primary>
+   </indexterm>
+   <indexterm zone="tables">
+     <primary>Basics</primary>
+     <secondary>Tables</secondary>
+   </indexterm>
+ 
+   <para>
+The <command>-t</command> option specifies which table to use. Per default,
+the <systemitem>filter</systemitem> table is used. We may specify one of the
+following tables with the <command>-t</command> option. Do note that this is
+an extremely brief summary of some of the contents of the <link
+linkend="traversingoftables" endterm="traversingoftables.title"></link>
+chapter.
+   </para>
+
+   <indexterm zone="table.tables">
+     <primary>Raw table</primary>
+   </indexterm>
+   <indexterm zone="table.tables">
+     <primary>Basics</primary>
+     <secondary>Raw table</secondary>
+   </indexterm>
+   <indexterm zone="table.tables">
+     <primary>Filter table</primary>
+   </indexterm>
+   <indexterm zone="table.tables">
+     <primary>Basics</primary>
+     <secondary>Filter table</secondary>
+   </indexterm>
+   <indexterm zone="table.tables">
+     <primary>Mangle table</primary>
+   </indexterm>
+   <indexterm zone="table.tables">
+     <primary>Basics</primary>
+     <secondary>Mangle table</secondary>
+   </indexterm>
+   <indexterm zone="table.tables">
+     <primary>Nat table</primary>
+   </indexterm>
+   <indexterm zone="table.tables">
+     <primary>Network address translation (NAT)</primary>
+   </indexterm>
+   <indexterm zone="table.tables">
+     <primary>Basics</primary>
+     <secondary>Nat table</secondary>
+   </indexterm>
+   <table frame=all id="table.tables">
+    <title id="table.tables.title">Tables</title>
+    <tgroup cols=2 align=left colsep=1 rowsep=1>
+    <colspec colwidth="36pt">
+    <colspec colwidth="*">
+      <thead>
+       <row>
+        <entry>Table</entry>
+        <entry>Explanation</entry>
+       </row>
+      </thead>
+      <tbody>
+       <row>
+        <entry>nat</entry>
+	<entry><para>
+The <systemitem>nat</systemitem> table is used mainly for <systemitem>Network
+Address Translation</systemitem>. "<systemitem>NAT</systemitem>"ed packets
+get their  IP  addresses  altered, according to our rules. Packets  in a
+stream only traverse this table once. We assume that the first  packet  of  a
+stream is allowed. The rest of the packets in the same  stream are
+automatically "<systemitem>NAT</systemitem>"ed or Masqueraded etc, and will be
+subject  to the same actions as the first packet. These will, in other words,
+not  go  through  this  table again, but will nevertheless be treated  like
+the first packet in the stream. This is the main reason why  you  should  not
+do  any  filtering in this table, which we will discuss at greater length
+further on. The <systemitem>PREROUTING</systemitem> chain is used to alter
+packets as soon as they get in to the firewall. The
+<systemitem>OUTPUT</systemitem> chain is used for altering locally generated
+packets (i.e., on the firewall) before they get to the routing decision.
+Finally  we have the <systemitem>POSTROUTING</systemitem> chain which is used
+to alter packets just as they are about to leave the firewall.</para></entry>
+       </row>
+       <row>
+        <entry>mangle</entry>
+        <entry><para>
+This table is used mainly for mangling packets. Among other things, we can
+change the contents of different packets and that of their headers. Examples
+of this would be to change the <command>TTL</command>, <command>TOS</command>
+or <command>MARK</command>. Note that the <command>MARK</command> is not
+really a change to the packet, but a mark value for the packet is set in
+kernel space. Other rules or programs might use this mark further along in the
+firewall to filter or do advanced routing on; tc is one example. The table
+consists of five built in chains, the <systemitem>PREROUTING</systemitem>,
+<systemitem>POSTROUTING</systemitem>, <systemitem>OUTPUT</systemitem>,
+<systemitem>INPUT</systemitem> and <systemitem>FORWARD</systemitem> chains.
+<systemitem>PREROUTING</systemitem> is used for altering packets just as they
+enter the firewall and before they hit the routing decision.
+<systemitem>POSTROUTING</systemitem> is used to mangle packets just after all
+routing decisions have been made. <systemitem>OUTPUT</systemitem> is used for
+altering locally generated packets after they enter the routing decision.
+<systemitem>INPUT</systemitem> is used to alter packets after they have been
+routed to the local computer itself, but before the user space application
+actually sees the data. <systemitem>FORWARD</systemitem> is used to mangle
+packets after they have hit the first routing decision, but before they
+actually hit the last routing decision. Note that mangle can't be used for any
+kind of <systemitem>Network Address Translation</systemitem> or
+<systemitem>Masquerading</systemitem>, the nat table was made for these kinds
+of operations.
+	 </para></entry>
+       </row>
+       <row>
+        <entry>filter</entry>
+        <entry><para>
+The <systemitem>filter</systemitem> table should be used exclusively for
+filtering packets. For example, we could <command>DROP</command>,
+<command>LOG</command>, <command>ACCEPT</command> or <command>REJECT</command>
+packets without problems, as we can in the other tables. There are three
+chains built in to this table. The first one is named
+<systemitem>FORWARD</systemitem> and is used on all non-locally generated
+packets that are not destined for our local host (the firewall, in other
+words). <systemitem>INPUT</systemitem> is used on all packets that are
+destined for our local host (the firewall) and <systemitem>OUTPUT</systemitem>
+is finally used for all locally generated packets.
+	 </para></entry>
+       </row>
+       <row>
+         <entry>raw</entry>
+	 <entry><para>
+The <systemitem>raw</systemitem> table and its chains are used before any
+other tables in netfilter. It was introduced to use the
+<command>NOTRACK</command> target. This table is rather new and is only
+available, if compiled, with late 2.6 kernels and later. The raw table
+contains two chains. The <systemitem>PREROUTING</systemitem> and
+<systemitem>OUTPUT</systemitem> chain, where they will handle packets before
+they hit any of the other netfilter subsystems. The
+<systemitem>PREROUTING</systemitem> chain can be used for all incoming packets
+to this machine, or that are forwarded, while the
+<systemitem>OUTPUT</systemitem> chain can be used to alter the locally
+generated packets before they hit any of the other netfilter subsystems. 
+	 </para></entry>
+       </row>
+     </tbody>
+     </tgroup>
+    </table>
+
+    <para>The above details should have explained the basics about the three
+different tables that are available. They should be used for totally different
+purposes, and you should know what to use each chain for. If you do not
+understand their usage, you may well dig a pit for yourself in your firewall,
+into which you will fall as soon as someone finds it and pushes you into it.
+We have already discussed the requisite tables and chains in more detail
+within the <link linkend="traversingoftables"
+endterm="traversingoftables.title"></link> chapter. If you do not understand
+this fully, I advise you to go back and read through it again.
+   </para>
+
+  </section>
+  
+  <section id="commands">
+    <title id="commands.title">Commands</title>
+    <indexterm zone="commands">
+      <primary>Commands</primary>
+    </indexterm>
+    <indexterm zone="commands">
+      <primary>Basics</primary>
+      <secondary>Commands</secondary>
+    </indexterm>
+    <indexterm zone="commands">
+      <primary>Commands</primary>
+      <secondary>--append</secondary>
+    </indexterm>
+    <indexterm zone="commands">
+      <primary>Commands</primary>
+      <secondary>--delete</secondary>
+    </indexterm>
+    <indexterm zone="commands">
+      <primary>Commands</primary>
+      <secondary>--replace</secondary>
+    </indexterm>
+    <indexterm zone="commands">
+      <primary>Commands</primary>
+      <secondary>--insert</secondary>
+    </indexterm>
+    <indexterm zone="commands">
+      <primary>Commands</primary>
+      <secondary>--list</secondary>
+    </indexterm>
+    <indexterm zone="commands">
+      <primary>Commands</primary>
+      <secondary>--zero</secondary>
+    </indexterm>
+    <indexterm zone="commands">
+      <primary>Commands</primary>
+      <secondary>--flush</secondary>
+    </indexterm>
+    <indexterm zone="commands">
+      <primary>Commands</primary>
+      <secondary>--new-chain</secondary>
+    </indexterm>
+    <indexterm zone="commands">
+      <primary>Commands</primary>
+      <secondary>--delete-chain</secondary>
+    </indexterm>
+    <indexterm zone="commands">
+      <primary>Commands</primary>
+      <secondary>--policy</secondary>
+    </indexterm>
+    <indexterm zone="commands">
+      <primary>Commands</primary>
+      <secondary>--rename-chain</secondary>
+    </indexterm>
+   
+    <para>
+In this section we will cover all the different commands and what can be done
+with them. The command tells <command>iptables</command> what to do with the
+rest of the rule that we send to the parser. Normally we would want either to
+add or delete something in some table or another. The following commands are
+available to iptables:
+   </para>
+
+   <table frame=all id="table.commands">
+    <title id="table.commands.title">Commands</title>
+    <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+     <colspec colwidth="58pt">
+     <colspec colwidth="*">
+
+      <tbody>
+       <row>
+        <entry>Command</entry>
+        <entry><command>-A</command>, <command>--append</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -A INPUT ...</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This command appends the rule to the end of the
+chain. The rule will in other words always be put last in the rule-set and
+hence be checked last, unless you append more rules later on.</entry>
+       </row>
+       <row>
+        <entry>Command</entry>
+        <entry><command>-D</command>, <command>--delete</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry>
+          <command>iptables -D INPUT --dport 80 -j DROP</command>,
+          <command>iptables -D INPUT 1</command>
+        </entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This command deletes a rule in a chain. This could be done
+in two ways; either by entering the whole rule to match (as in the first
+example), or by specifying the rule number that you want to match. If you use
+the first method, your entry must match the entry in the chain exactly. If you
+use the second method, you must match the number of the rule you want to
+delete. The rules are numbered from the top of each chain, starting with
+number 1.</entry>
+       </row>
+       <row>
+        <entry>Command</entry>
+        <entry><command>-R</command>, <command>--replace</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -R INPUT 1 -s 192.168.0.1 -j
+DROP</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This command replaces the old entry at the specified line. It
+works in the same way as the <command>--delete</command> command, but instead 
+of
+totally deleting the entry, it will replace it with a new entry. The main use
+for this might be while you're experimenting with iptables.</entry>
+       </row>
+       <row>
+        <entry>Command</entry>
+        <entry><command>-I</command>, <command>--insert</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -I INPUT 1 --dport 80 -j
+ACCEPT</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>Insert a rule somewhere in a chain. The rule is inserted as
+the actual number that we specify. In other words, the above example would be
+inserted as rule 1 in the <systemitem>INPUT</systemitem> chain, and hence from
+now on it would be the very first rule in the chain.
+</entry>
+       </row>
+       <row>
+        <entry>Command</entry>
+        <entry><command>-L</command>, <command>--list</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -L INPUT</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This command lists all the entries in the specified chain.
+In the above case, we would list all the entries in the
+<systemitem>INPUT</systemitem> chain. It's also legal to not specify any chain
+at all. In the last case, the command would list all the chains in the 
+specified table (To specify a table, see the <link linkend="tables"
+endterm="tables.title"></link> section). The exact output is affected by
+other options sent to the parser, for example the <command>-n</command> and
+<command>-v</command> options, etc.</entry>
+       </row>
+       <row>
+        <entry>Command</entry>
+        <entry><command>-F</command>, <command>--flush</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -F INPUT</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This command flushes all rules from the specified chain and is
+equivalent to deleting each rule one by one, but is quite a bit faster. The
+command can be used without options, and will then delete all rules in all
+chains within the specified table.
+
+</entry>
+       </row>
+       <row>
+        <entry>Command</entry>
+        <entry><command>-Z</command>, <command>--zero</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -Z INPUT</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This command tells the program to zero all counters in a
+specific chain, or in all chains. If you have used the <command>-v</command>
+option with the <command>-L</command> command, you have probably seen the
+packet counter at the beginning of each field. To zero this packet counter,
+use the <command>-Z</command> option. This option works the same as
+<command>-L</command>, except that <command>-Z</command> won't list the rules.
+If <command>-L</command> and <command>-Z</command> is used together (which is
+legal), the chains will first be listed, and then the packet counters are
+zeroed.</entry>
+       </row>
+       <row>
+        <entry>Command</entry>
+        <entry><command>-N</command>, <command>--new-chain</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -N allowed</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This command tells the kernel to create a new chain of the
+specified name in the specified table. In the above example we create a
+chain called <command>allowed</command>. Note that there must not already be a
+chain or target of the same name.</entry>
+       </row>
+       <row>
+        <entry>Command</entry>
+        <entry><command>-X</command>, 
+<command>--delete-chain</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -X allowed</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This command deletes the specified chain from the table. For
+this command to work, there must be no rules that refer to the chain that is
+to be deleted. In other words, you would have to replace or delete all rules
+referring to the chain before actually deleting the chain. If this command is
+used without any options, all chains but those built in to the specified table
+will be deleted.</entry>
+       </row>
+       <row>
+        <entry>Command</entry>
+        <entry><command>-P</command>, <command>--policy</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -P INPUT DROP</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This command tells the kernel to set a specified default
+target, or policy, on a chain. All packets that don't match any rule will
+then be forced to use the policy of the chain. Legal targets are
+<command>DROP</command> and <command>ACCEPT</command>
+(There might be more, mail me if so).</entry>
+       </row>
+       <row>
+        <entry>Command</entry>
+        <entry><command>-E</command>, 
+<command>--rename-chain</command></entry>
+       </row>
+       <row>
+        <entry>Example</entry>
+        <entry><command>iptables -E allowed disallowed</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>The <command>-E</command> command tells
+<command>iptables</command> to change the first name of a chain, to the second
+name. In the example above we would, in other words, change the name of the
+chain from <varname>allowed</varname> to <varname>disallowed</varname>. Note
+that this will not affect the actual way the table will work. It is, in other
+words, just a cosmetic change to the table.</entry>
+       </row>
+     </tbody>
+     </tgroup>
+    </table>
+
+    <para>
+You should always enter a complete command line, unless you just want
+to list the built-in help for <command>iptables</command> or get the version 
+of the
+command. To get the version, use the <command>-v</command> option and to get 
+the help
+message, use the <command>-h</command> option. As usual, in other words. Next
+comes a few options that can be used with various different commands. Note
+that we tell you with which commands the options can be used and what effect
+they will have. Also note that we do not include any options here that
+affect rules or matches. Instead, we'll take a look at matches and
+targets in a later section of this chapter.
+    </para>
+
+    <indexterm zone="table.options">
+      <primary>Options</primary>
+      <secondary>--verbose</secondary>
+    </indexterm>
+    <indexterm zone="table.options">
+      <primary>Options</primary>
+      <secondary>--exact</secondary>
+    </indexterm>
+    <indexterm zone="table.options">
+      <primary>Options</primary>
+      <secondary>--numeric</secondary>
+    </indexterm>
+    <indexterm zone="table.options">
+      <primary>Options</primary>
+      <secondary>--line-numbers</secondary>
+    </indexterm>
+    <indexterm zone="table.options">
+      <primary>Options</primary>
+      <secondary>--set-counters</secondary>
+    </indexterm>
+    <indexterm zone="table.options">
+      <primary>Options</primary>
+      <secondary>--modprobe</secondary>
+    </indexterm>
+    <table frame=all id="table.options">
+     <title id="table.options.title">Options</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="58pt">
+      <colspec colwidth="*">
+
+      <tbody>
+       <row>
+        <entry>Option</entry>
+        <entry><command>-v</command>, <command>--verbose</command></entry>
+       </row>
+       <row>
+        <entry>Commands used with</entry>
+        <entry><command>--list</command>, <command>--append</command>,
+<command>--insert</command>, <command>--delete</command>,
+<command>--replace</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This command gives verbose output and is mainly
+used together with the <command>--list</command> command. If used together 
+with
+the <command>--list</command> command, it outputs the interface address, rule
+options and TOS masks. The <command>--list</command> command will also include
+a bytes and packet counter for each rule, if the <command>--verbose</command>
+option is set. These counters uses the K (x1000), M (x1,000,000) and G
+(x1,000,000,000) multipliers. To overrule this and get exact output, you
+can use the <command>-x</command> option, described later. If this option is
+used with the <command>--append</command>, <command>--insert</command>,
+<command>--delete</command> or <command>--replace</command> commands, the
+program will output detailed information on how the rule was interpreted and
+whether it was inserted correctly, etc.</entry>
+       </row>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>-x</command>, <command>--exact</command></entry>
+       </row>
+       <row>
+        <entry>Commands used with</entry>
+        <entry><command>--list</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This option expands the numerics. The output from
+<command>--list</command> will in other words not contain the K, M or G
+multipliers. Instead we will get an exact output from the packet and byte
+counters of how many packets and bytes that have matched the rule in question.
+Note that this option is only usable in the <command>--list</command> command
+and isn't really relevant for any of the other commands.
+</entry>
+       </row>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>-n</command>, <command>--numeric</command></entry>
+       </row>
+       <row>
+        <entry>Commands used with</entry>
+        <entry><command>--list</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This option tells iptables to output numerical
+values. IP addresses and port numbers will be printed by using their
+numerical values and not host-names, network names or application names.
+This option is only applicable to the <command>--list</command> command. This
+option overrides the default of resolving all numerics to hosts and names,
+where this is possible.</entry>
+       </row>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>--line-numbers</command></entry>
+       </row>
+       <row>
+        <entry>Commands used with</entry>
+        <entry><command>--list</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>The <command>--line-numbers</command> command, together with
+the <command>--list</command> command, is used to output line numbers. Using
+this option, each rule is output with its number. It could be convenient to
+know which rule has which number when inserting rules. This option only works
+with the <command>--list</command> command.</entry>
+       </row>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>-c</command>, 
+<command>--set-counters</command></entry>
+       </row>
+       <row>
+        <entry>Commands used with</entry>
+        <entry><command>--insert</command>, <command>--append</command>,
+<command>--replace</command></entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>This option is used when creating a rule or modifying it in
+some way. We can then use the option to initialize the packet and byte
+counters for the rule. The syntax would be something like
+<command>--set-counters 20 4000</command>, which would tell the kernel to set
+the packet counter to 20 and byte counter to 4000.</entry>
+       </row>
+
+       <row>
+        <entry>Option</entry>
+        <entry><command>--modprobe</command></entry>
+       </row>
+       <row>
+        <entry>Commands used with</entry>
+        <entry>All</entry>
+       </row>
+       <row>
+        <entry>Explanation</entry>
+        <entry>The <command>--modprobe</command> option is used to tell
+<command>iptables</command> which module to use when probing for modules or
+adding them to the kernel. It could be used if your
+<command>modprobe</command> command is not somewhere in the search path etc.
+In such cases, it might be necessary to specify this option so the program
+knows what to do in case a needed module is not loaded. This option can be
+used with all commands.</entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+  </section>
+
+  <section>
+    <title>What's next?</title>
+
+    <para>
+This chapter has discussed some of the basic commands for iptables and the
+tables very briefly that can be used in netfilter. The commands makes it
+possible to do quite a lot of different operations on the netfilter package
+loaded inside kernel as you have seen.
+    </para>
+
+    <para>
+The next chapter will discuss all the available matches in iptables and
+netfilter. This is a very heavy and long chapter, and I humbly suggest that
+you don't need to actually learn every single match available in any detail,
+except the ones that you are going to use. A good idea might be to get a brief
+understanding of what each match does, and then get a better grasp on them as
+you need them.
+    </para>
+
+  </section>
+  
+</chapter>
+

@@ -1,0 +1,57 @@
+table.CALSTABLE
+{
+	width: 900px;
+        border: medium solid #000000;
+	border-spacing: 0;
+	text-align: center;
+}
+
+th
+{
+	border: none;
+}
+
+.firsttr
+{
+	background-color: #bbbbbb;
+	text-align: center;
+}
+
+.firsttr0
+{
+	background-color: #bbbbbb;
+	border-left: medium solid #000000;
+	border-bottom: none;
+	text-align: center;
+}
+
+.secondtrstartth
+{
+	background-color: #bbbbbb;
+	border-left: none;
+	border-bottom: medium solid #000000;
+}
+
+.secondtr0
+{
+	background-color: #bbbbbb;
+	border-left: medium solid #000000;
+	border-bottom: medium solid #000000;
+}
+
+.secondtr
+{
+	background-color: #bbbbbb;
+	border-left: thin solid #000000;
+	border-bottom: medium solid #000000;
+}
+
+td
+{
+	border: none;
+	border-top: none;
+	border-right: none;
+        border-bottom: thin solid #000000;
+        border-left: thin solid #000000;
+}
+

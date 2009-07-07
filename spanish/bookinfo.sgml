@@ -1,0 +1,222 @@
+ <bookinfo>
+  <title>Tutorial de IPtables 1.1.19es</title>
+
+  <author>
+   <firstname>Oskar</firstname>
+   <surname>Andreasson</surname>
+   <affiliation>
+    <address>
+     <email>blueflux@koffein.net</email>
+    </address>
+   </affiliation>
+  </author>
+
+  <copyright>
+   <year>2001-2003</year>
+   <holder>Oskar Andreasson</holder>
+  </copyright>
+
+  <legalnotice>
+   <para> 
+Se concede permiso para copiar, distribuir y/o modificar este documento según
+las condiciones de la Licencia de Libre Documentación de GNU (GNU Free Documentation
+License), Versión 1.1; siendo las Secciones Invariables (Invariant Sections) la
+"Introducción" y todos sus sub-apartados, con la Portada indicando "Autor
+Original: Oskar Andreasson" y sin texto en la Contraportada. Una copia
+de esta licencia en castellano se incluye en el apartado "GNU Free Documentation
+License" (también se incluye la versión oficial en inglés).
+   </para>
+
+   <para>
+Todos los "scripts" del presente tutorial quedan cubiertos por la Licencia
+Pública General de GNU (GNU General Public License). Los "scripts" son de código
+libre (free source); puedes redistribuirlos y/o modificarlos siguiendo las
+condiciones de la Licencia Pública General de GNU (GNU General Public License)
+publicada por la Fundación del Software de Libre Distribución (Free Software
+Foundation), versión 2 de la Licencia.
+   </para>
+
+   <para>
+Los "scripts" se ofrecen con la esperanza de que sean útiles, pero SIN NINGUNA
+GARANTíA; ni siquiera garantía implícita por COMPRA-VENTA o ADECUACIóN A UN
+PROPóSITO PARTICULAR. Para más detalles, referirse a la Licencia Pública General
+de GNU (GNU General Public License) [se incluye la versión en castellano].
+   </para>
+
+   <para>
+Deberías haber recibido una copia de la Licencia Pública General de GNU (GNU
+General Public License) con este tutorial, en la sección titulada "GNU General
+Public License" (en inglés y en castellano); si no es así, comunícalo a la Free
+Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+   </para>
+  </legalnotice>
+ </bookinfo>
+
+ <dedication>
+  <title>Dedicatorias</title>
+
+  <para>
+Por encima de todo quiero dedicar este documento a mi maravillosa novia Ninel.
+Nunca podré apoyarte tanto como tú me has apoyado a mí. Deseo hacerte al menos
+tan feliz como tú me has hecho a mí.
+  </para>
+
+  <para>
+También quiero dedicar este trabajo a todos los programadores y encargados del
+mantenimiento de Linux por su trabajo tan increíblemente duro. Gracias a éllos se
+hace posible éste maravilloso sistema operativo.
+  </para>
+ </dedication>
+
+  <preface>
+    <title>Notas de la traducción</title>
+
+    <para>
+Quiero expresar mi agradecimiento a Oskar Andreasson por este tutorial. Gracias
+a él todos aquellos que deseamos conocer los secretos de IPtables y por ende los
+cortafuegos, tenemos una buena guía para empezar y adquirir un nivel bastante
+aceptable. Asímismo quiero dar las gracias a mis compañeros de traducción, por
+la paciencia y tesón demostrados. Por último, me atrevo a pedir a todo aquél que
+lea esta traducción que sea condescendiente con nosotros: hemos traducido el
+tutorial de la mejor manera que hemos sabido, pero pueden haber fallos y
+agradeceríamos vuestras sugerencias y correcciones.
+    </para>
+
+    <para>
+<ulink url="mailto:webdev@arrakis.es">Xavier Bartol</ulink>
+    </para>
+
+  </preface>
+
+ <preface>
+   <title>Acerca del autor</title>
+
+   <para>
+Soy alguien con demasiados ordenadores viejos en sus manos. Tengo mi propia red
+de área local (<systemitem>LAN</systemitem>) y deseo que todas las máquinas
+puedan conectarse a Internet, al tiempo que la red interna permanece
+suficientemente segura. En este sentido, iptables es una buena mejora del
+antiguo ipchains. Con ipchains puedes construir una red medianamente segura
+desechando cualquier paquete entrante (de Internet) no destinado a unos puertos
+determinados. Sin embargo hay temas, como el <systemitem>FTP</systemitem> pasivo,
+o <systemitem>DCC</systemitem> saliente en <systemitem>IRC</systemitem>, que
+plantean problemas. Estos servicios asignan puertos en el servidor, informan al
+cliente sobre ellos y entonces esperan a que el cliente conecte. Al principio
+tuve algunos problemas con el código de iptables y de alguna manera pensé que no
+estaba listo para publicarlo y utilizarlo en entornos productivos. Sin embargo,
+ahora recomendaría actualizarse a cualquiera que esté utilizando ipchains (o
+incluso el antiguo ipfwadm), a menos que sea feliz con los resultados que está
+obteniendo y no necesite ninguna de las características adicionales que ofrece
+iptables.
+   </para>
+  </preface>
+
+  <preface id="howtoread">
+   <title>Cómo leer este tutorial</title>
+
+   <para>
+Este documento se ha escrito únicamente para empezar a conocer el maravilloso
+mundo de iptables. Nunca se planteó para albergar información sobre fallos de
+seguridad específicos en iptables o Netfilter. Si encuentras fallos o
+comportamientos extraños en iptables o cualquiera de sus componentes, debes
+contactar con la lista de correo de Netfilter y comentarles el problema. Éllos
+podrán decirte si en realidad es un fallo o si ya está corregido. Aunque son muy raros los
+fallos de seguridad encontrados en iptables o en Netfilter, todavía se cuelan
+uno o dos de vez en cuando y se detallan convenientemente en la
+<ulink url="http://www.netfilter.org">página principal de Netfilter</ulink>,
+que es donde debes ir para encontrar información sobre estos temas.
+   </para>
+
+   <para>
+Lo anterior también implica que los conjuntos de reglas (rule-sets) disponibles
+en este tutorial no se han escrito para remediar fallos en Netfilter. Su
+finalidad principal es mostrar cómo crear reglas fácilmente que solucionen todos
+los problemas con que nos podamos encontrar. Por ejemplo, este tutorial no
+explica cómo cerrar el puerto HTTP simplemente porque el servidor web Apache sea
+vulnerable en su versión 1.2.12 (en realidad veremos cómo cerrarlo, pero no por
+este motivo).
+   </para>
+
+   <para>
+Este documento se ha escrito simplemente para ofrecer un manual bueno y sencillo
+sobre cómo empezar con iptables, pero siendo al mismo tiempo lo más completo
+posible. No contiene ningún objetivo o regla de concordancia que estén en el
+"patch-o-matic" (la sección de la web de Netfilter que se encarga de ofrecer
+los últimos desarrollos aplicables al núcleo de iptables), simplemente porque
+requeriría demasiado esfuerzo mantener actualizada una lista así. Si necesitas
+información sobre estas actualizaciones, deberías leer (y entender al 100%) los
+comentarios que acompañan a cada parche y cualquier otro documento disponible en
+<ulink url="http://www.netfilter.org">la web de Netfilter</ulink>.
+   </para>
+  </preface>
+
+
+  <preface>
+   <title>Requisitos previos</title>
+   <para>
+Este documento requiere algunos conocimientos sobre Linux/Unix, programación
+en consola (shell scripting), algunos conocimientos básicos sobre las
+interioridades del núcleo, así como saber compilar tu propio núcleo.
+   </para>
+
+   <para>
+He intentado por todos los medios eliminar todos los requisitos previos para
+aprovechar al máximo este documento, pero ciertamente es casi imposible no
+necesitar ciertos conocimientos previos.
+   </para>
+  </preface>
+
+  <preface>
+   <title>Convenciones tipográficas</title>
+
+   <para>
+Para hacer referencia a comandos, archivos y otras informaciones específicas se
+emplean las siguientes convenciones tipográficas.
+   </para>
+
+   <itemizedlist mark=bullet>
+
+    <listitem>
+     <para>
+Los ejemplos de código y los resultados de los comandos (las salidas en pantalla) se muestran con
+tipografía de <screen>ancho fijo</screen> (tipo Courier), mientras que los
+comandos escritos por el usuario se muestran en <screen><command>ancho fijo y
+negrita</command></screen>:
+     </para>
+
+     <screen>
+[blueflux@work1 neigh]$ <command>ls</command>
+default  eth0  lo
+[blueflux@work1 neigh]$
+     </screen
+    </listitem>
+
+    <listitem>
+     <para>
+Todos los comandos y nombres de programa se muestran en <command>negrita</command>.
+     </para>
+    </listitem>
+
+    <listitem>
+    <para>
+Todo aquello referente al sistema como el hardware (la máquina en sí), las
+interioridades del núcleo (kernel) o entes abstractos como la interfaz de bucle
+local (loopback interface) se muestran en <systemitem>cursiva</systemitem>.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+La respuesta del ordenador <computeroutput>se muestra así</computeroutput> en
+el texto.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+Los archivos y las rutas de acceso se muestran así:
+<filename>/usr/local/bin/iptables</filename>.
+     </para>
+    </listitem>
+   </itemizedlist>
+ </preface>

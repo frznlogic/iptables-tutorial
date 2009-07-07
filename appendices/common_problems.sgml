@@ -1,0 +1,404 @@
+<appendix id="commonproblems">
+<title id="commonproblems.title">Common problems and questions</title>
+<indexterm zone="commonproblems">
+  <primary>Common problems</primary>
+</indexterm>
+<indexterm zone="commonproblems">
+  <primary>Debugging</primary>
+  <secondary>Common problems</secondary>
+</indexterm>
+
+<section id="moduleproblems">
+<title id="moduleproblems.title">Problems loading modules</title>
+<indexterm zone="moduleproblems">
+  <primary>Common problems</primary>
+  <secondary>Modules</secondary>
+</indexterm>
+<indexterm zone="moduleproblems">
+  <primary>Debugging</primary>
+  <secondary>Modules</secondary>
+</indexterm>
+
+<para>
+You may run into a few problems with loading modules. For example, you could
+get errors claiming that there is no module by such a name and so on. This may,
+for example look like the following.
+</para>
+
+<screen>
+insmod: iptable_filter: no module by that name found
+</screen>
+
+   <para>
+   This is no reason for concern yet. This or these modules may possibly
+have been statically compiled into your kernel. This is the first thing you
+should look at when trying to solve this problem. The simplest way to see if
+these modules have been loaded already or if they are statically compiled into
+the kernel, is to simply try and run a command that uses the specific
+functionality. In the above case, we could not load the
+<systemitem>filter</systemitem> table. If this functionality is not there, we
+should be unable to use the <systemitem>filter</systemitem> table at all. To
+check if the <systemitem>filter</systemitem> table is there, we do the
+following.
+   </para>
+
+   <screen>
+<command>
+iptables -t filter -L
+</command>
+   </screen>
+
+   <para>
+   This should either output all of the chains in the
+<systemitem>filter</systemitem> table properly, or it should fail. If everything
+is o.k., then it should look something like this depending on if you have
+rules inserted or not.
+   </para>
+
+    <screen>
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination
+
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination
+    </screen>
+
+   <para>
+   If you do not have the <systemitem>filter</systemitem> table loaded, you
+would get an error that looks something like this instead.
+   </para>
+
+    <screen>
+iptables v1.2.5: can't initialize iptables table `filter': Table \
+     does not exist (do you need to insmod?)
+Perhaps iptables or your kernel needs to be upgraded.
+    </screen>
+
+    <para>
+This is a bit more serious since it points out that we, first of all, do not
+have the functionality compiled into the kernel, and second, that the module is
+not possible to find in our normal module paths. This may either mean that you
+have forgotten to install your modules, you have forgotten to run
+<command>depmod -a</command> to update your module databases, or you have not
+compiled the functionality as either module or statically into the kernel. 
+There may of course be other reasons for the module not to be loaded, but these 
+are the main reasons. Most of these problems are easily solved. The first 
+problem would simply be solved by running <command>make 
+modules_install</command> in the kernel source directory (if the source has 
+already been compiled and the modules have already been built). The second 
+problem is solved by simply running <command>depmod -a</command> once and see 
+if it works afterward. The third problem is a bit out of the league for this 
+explanation, and you are more or less left to your own wits here. You will most 
+probably find more information about this on the <link linkend="tldp" 
+endterm="tldp.title"></link> homepage.
+   </para>
+
+   <para>
+Another error that you may get when running iptables is the following error.
+   </para>
+
+   <screen>
+iptables: No chain/target/match by that name
+   </screen>
+
+   <para>
+   This error tells us that there is no such chain, target or match. This could
+depend upon a huge set of factors, the most common being that you have
+misspelled the chain, target or match in question. Also, this could be
+generated in case you are trying to use a match that is not available, either
+because you did not load the proper module, it was not compiled into the 
+kernel, or iptables failed to automatically load the module. In general, you 
+should look for all of the above solutions but also look for misspelled targets 
+of some sort or another in your rule.
+   </para>
+
+  </section>
+
+  <section id="newnotsyn">
+   <title id="newnotsyn.title">State NEW packets but no SYN bit set</title>
+   <indexterm zone="newnotsyn">
+     <primary>Common problems</primary>
+     <secondary>NEW not SYN</secondary>
+   </indexterm>
+   <indexterm zone="newnotsyn">
+     <primary>Debugging</primary>
+     <secondary>NEW not SYN</secondary>
+   </indexterm>
+
+   <para>
+   There is a certain <emphasis>feature</emphasis> in
+<command>iptables</command> that is not so well documented and may therefore be
+overlooked by a lot of people (yes, including me). If you use state
+<command>NEW</command>, packets with the <systemitem>SYN</systemitem> bit unset
+will get through your firewall. This feature is there because in certain cases
+we want to consider that a packet may be part of an already
+<command>ESTABLISHED</command> connection on, for instance, another firewall.
+This feature makes it possible to have two or more firewalls, and for one of the
+firewalls to go down without any loss of data. The firewalling of the subnet
+could then be taken over by our secondary firewall. This does however lead to
+the fact that state <command>NEW</command> will allow pretty much any kind of
+TCP connection, regardless if this is the initial 3-way handshake or not. To
+take care of this problem we add the following rules to our firewalls
+<systemitem>INPUT</systemitem>, <systemitem>OUTPUT</systemitem> and
+<systemitem>FORWARD</systemitem> chain:
+   </para>
+
+    <screen>
+<command>
+$IPTABLES -A INPUT -p tcp ! --syn -m state --state NEW -j LOG \
+     --log-prefix "New not syn:"
+$IPTABLES -A INPUT -p tcp ! --syn -m state --state NEW -j DROP
+</command>
+    </screen>
+
+   <caution>
+    <para>
+    The above rules will take care of this problem. This is a badly documented
+behavior of the <command>Netfilter</command>/<command>iptables</command>
+project and should definitely be more highlighted. In other words, a huge
+warning is in its place for this kind of behavior on your firewall.
+    </para>
+   </caution>
+
+
+   <para>
+Note that there are some troubles with the above rules and bad Microsoft TCP/IP
+implementations. The above rules will lead to certain conditions where packets
+generated by Microsoft product gets labeled as state <command>NEW</command>
+and hence get logged and dropped. It will however not lead to broken
+connections to my knowledge. The problem occurs when a connection gets closed,
+the final <systemitem>FIN</systemitem>/<systemitem>ACK</systemitem> is
+sent, the state machine of <command>Netfilter</command> closes
+the connection and it is no longer in the conntrack table. At this point the
+faulty Microsoft implementation sends another packet which is considered as
+state <command>NEW</command> but lacks the <systemitem>SYN</systemitem> bit
+and hence gets matched by the above rules. In other words, don't worry to much
+about this rule, or if you are worried anyways, set the
+<command>--log-headers</command> option to the rule and log the headers too
+and you'll get a better look at what the packet looks like.
+
+   </para>
+
+   <para>
+There is one more known problem with these rules. If someone is currently
+connected to the firewall, let's say from the <systemitem>LAN</systemitem>,
+and you have the script set to be activated when running a
+<systemitem>PPP</systemitem> connection. In this case, when you start the
+<systemitem>PPP</systemitem> connection, the person previously connected through
+the <systemitem>LAN</systemitem> will be more or less killed. This only applies
+when you are running with the conntrack and nat code bases as modules, and the
+modules are loaded and unloaded each time you run the script. Another way to get
+this problem is to run the <filename>rc.firewall.txt</filename> script from a
+telnet connection from a host not on the actual firewall. To put it simply, you
+connect with <command>telnet</command> or some other stream connection. Start
+the connection tracking modules, then load the <command>NEW</command> not
+<systemitem>SYN</systemitem> packet rules. Finally, the <command>telnet
+client</command> or <command>daemon</command> tries to send something. the
+connection tracking code will not recognize this connection as a legal
+connection since it has not seen packets in any direction on this connection
+before, also there will be no <systemitem>SYN</systemitem> bits set since it is
+not actually the first packet in the connection. Hence, the packet will match to
+the rules and be logged and after-wards dropped to the ground.
+   </para>
+  </section>
+
+  <section id="synackandnew">
+   <title id="synackandnew.title">SYN/ACK and NEW packets</title>
+   <indexterm zone="synackandnew">
+     <primary>Common problems</primary>
+     <secondary>SYN/ACK and NEW</secondary>
+   </indexterm>
+   <indexterm zone="synackandnew">
+     <primary>Debugging</primary>
+     <secondary>SYN/ACK and NEW</secondary>
+   </indexterm>
+   <indexterm zone="synackandnew">
+     <primary>SYN</primary>
+   </indexterm>
+   <indexterm zone="synackandnew">
+     <primary>Spoofing</primary>
+   </indexterm>
+
+   <para>
+Certain <systemitem>TCP</systemitem> spoofing attacks uses a technique called
+Sequence Number Prediction. In this type of attack, the attacker spoofs some
+other hosts <systemitem>IP</systemitem> address, while  attacking someone, and
+tries to predict the Sequence number used by that host. 
+   </para>
+
+   <para>
+Let's look on typical <systemitem>TCP</systemitem> spoofing by sequence number
+prediction. Players: "attacker" [A], trying to send packets to a "victim" [V],
+pretending to be some "other host" [O].
+   </para>
+
+   <orderedlist>
+<listitem><para>[A] sends SYN to [V] with source IP of [O].</para></listitem>
+<listitem><para>[V] replies to [O] by SYN/ACK.</para></listitem>
+<listitem><para>now [O] should reply to an unknown SYN/ACK by RST and the
+attack is unsuccesful, but let's assume [O] is down (flooded, turned off or
+behind firewall that has dropped the packets).</para></listitem>
+<listitem><para>if [O] didn't mess it up, [A] now can talk to [V] pretending
+to be [O] as long as it predicts correct sequence numbers.</para></listitem>
+   </orderedlist>
+
+   <para>
+As long as we do not send the <systemitem>RST</systemitem> packet to the
+unknown <systemitem>SYN/ACK</systemitem> in step 3, we will allow [V] to be
+attacked, and ourselves to be incriminated. Common courtesy, would hence be to
+send the <systemitem>RST</systemitem> to [V] in a proper way. If we use the
+<systemitem>NEW</systemitem> not <systemitem>SYN</systemitem> rules specified
+in the ruleset, <systemitem>SYN/ACK</systemitem> packets will be dropped.
+Hence, we have the following rules in the
+<systemitem>bad_tcp_packets</systemitem> chain, just above the NEW not SYN
+rules:
+   </para>
+
+   <screen>
+<command>
+iptables -A bad_tcp_packets -p tcp --tcp-flags SYN,ACK SYN,ACK \
+-m state --state NEW -j REJECT --reject-with tcp-reset
+</command>
+   </screen>
+
+   <para>
+The chance of being [O] in this scenario should be relatively small, but these 
+rules should be safe in almost all cases. Except when you run several redundant 
+firewalls which will often take over packets or streams from each other. In such
+case, some connections may be blocked, even though they are legit. This rule 
+may actually also allow a few portscans to see our firewall as well, but they 
+should not be able to tell much more than that.
+   </para>
+
+  </section>
+
+  <section id="ispwhouseassignedip">
+   <title id="ispwhouseassignedip.title">Internet Service Providers who use assigned IP addresses</title>
+   <indexterm zone="ispwhouseassignedip">
+     <primary>Common problems</primary>
+     <secondary>ISP using private IP's</secondary>
+   </indexterm>
+   <indexterm zone="ispwhouseassignedip">
+     <primary>Debugging</primary>
+     <secondary>ISP using private IP's</secondary>
+   </indexterm>
+
+   <para>
+   I have added this since a friend of mine told me something I have
+totally forgotten. Certain stupid Internet Service Providers use
+IP addresses assigned by <emphasis>IANA</emphasis> for their local
+networks on which you connect to. For example, the Swedish Internet Service
+Provider and phone monopoly Telia uses this approach for example on their
+<systemitem>DNS</systemitem> servers, which uses the 10.x.x.x IP address range.
+A common problem that you may run into when writing your scripts, is that you 
+do not allow connections from any IP addresses in the 10.x.x.x range to 
+yourself, because of spoofing possibilities. Well, here is unfortunately an 
+example where you actually might have to lift a bit on those rules. You might 
+just insert an <command>ACCEPT</command> rule above the spoof
+section to allow traffic from those <systemitem>DNS</systemitem> servers, or
+you could just comment out that part of the script. This is how it might look:
+   </para>
+
+   <screen>
+<command>
+/usr/local/sbin/iptables -t nat -I PREROUTING -i eth1 -s \
+     10.0.0.1/32 -j ACCEPT
+</command>
+   </screen>
+
+   <para> I would like to take my moment to bitch at these Internet Service
+Providers. These IP address ranges are not assigned for you to use for dumb
+stuff like this, at least not to my knowledge. For large corporate sites it is
+more than o.k., or your own home network, but you are not supposed to force us
+to open up ourselves just because of some whim of yours. You are large Internet 
+providers, and if you can't afford buying some 3-4 IP addresses for your 
+<systemitem>DNS</systemitem> servers, I have a very hard time trusting you. 
+   </para>
+
+  </section>
+
+  <section id="lettingdhcprequests">
+   <title id="lettingdhcprequests.title">Letting DHCP requests through iptables</title>
+   <indexterm zone="lettingdhcprequests">
+     <primary>Common problems</primary>
+     <secondary>DHCP</secondary>
+   </indexterm>
+   <indexterm zone="lettingdhcprequests">
+     <primary>Debugging</primary>
+     <secondary>DHCP</secondary>
+   </indexterm>
+
+   <para>
+   This is a fairly simple task really, once you get to know how
+<systemitem>DHCP</systemitem> works, however, you must be a little bit cautious
+with what you do let in and what you do not let in. First of all, we should know
+that <systemitem>DHCP</systemitem> works over the <systemitem>UDP</systemitem>
+protocol. Hence, this is the first thing to look for. Second, we should check
+which interface we get and send the request from. For example, if our
+<systemitem>eth0</systemitem> interface is set up with
+<systemitem>DHCP</systemitem>, we should not allow <systemitem>DHCP</systemitem>
+requests on <systemitem>eth1</systemitem>. To make the rule a bit more specific,
+we only allow the actual <systemitem>UDP</systemitem> ports used by
+<systemitem>DHCP</systemitem>, which should be ports 67 and 68.  These are the
+criteria that we choose to match packets on, and that we allow. The rule would
+now look like this:
+   </para>
+
+   <screen>
+<command>
+$IPTABLES  -I INPUT -i $LAN_IFACE -p udp --dport 67:68 --sport \
+     67:68 -j ACCEPT
+</command>
+   </screen>
+
+   <para>
+   Do note that we allow all traffic to and from <systemitem>UDP</systemitem>
+port 67 and 68 now, however, this should not be such a huge problem since it
+only allows requests from hosts doing the connection from port 67 or 68 as well.
+This rule could, of course, be even more restrictive, but it should be enough to
+actually accept all <systemitem>DHCP</systemitem> requests and updates without
+opening up too large of holes. If you are concerned, this rule could of course 
+be made even more restrictive.
+   </para>
+  </section>
+
+  <section id="mircdcc">
+   <title id="mircdcc.title">mIRC DCC problems</title>
+   <indexterm zone="mircdcc">
+     <primary>Common problems</primary>
+     <secondary>IRC DCC</secondary>
+   </indexterm>
+   <indexterm zone="mircdcc">
+     <primary>Debugging</primary>
+     <secondary>IRC DCC</secondary>
+   </indexterm>
+
+   <para>
+   mIRC uses a special setting which allows it to connect through a firewall and
+to make DCC connections work properly without the firewall knowing about it. If
+this option is used together with iptables and specifically the ip_conntrack_irc
+and ip_nat_irc modules, it will simply not work. The problem is that mIRC will
+automatically NAT the inside of the packets for you, and when the packet reaches
+the firewall, the firewall will simply not know how and what to do with it.
+mIRC does not expect the firewall to be smart enough to take care of this by
+itself by simply querying the IRC server for its IP address and sending DCC
+requests with that address instead.
+   </para>
+
+   <para>
+   Turning on the "I am behind a firewall" configuration option and using the
+ip_conntrack_irc and ip_nat_irc modules will result in Netfilter creating log
+entries with the following content "Forged DCC send packet".
+   </para>
+
+   <para>
+   The simplest possible solution is to just uncheck that configuration option
+in mIRC and let iptables do the work. This means, that you should tell mIRC
+specifically that it is <emphasis>not</emphasis> behind a firewall.
+   </para>
+  </section>
+
+ </appendix>

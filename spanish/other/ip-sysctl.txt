@@ -1,0 +1,569 @@
+Variables /proc/sys/net/ipv4/* :
+================================
+
+
+**************************************************************
+[NOTA:	este documento no lo ha escrito Oskar Andreasson, pero
+	consideramos conveniente traducirlo al castellano]
+**************************************************************
+
+
+ip_forward - BOOLEAN [variable de tipo verdadero/falso]
+	0 - desactivado (valor por defecto)
+	no 0 - activado
+
+	Envía (forward) paquetes entre interfaces.
+
+	Esta variable es especial, su cambio reinicia todos los
+	parámetros de configuración a su valor por defecto (RFC1122
+	para los hosts, RFC1812 para los enrutadores).
+
+ip_default_ttl - INTEGER [número entero]
+	valor por defecto: 64
+
+ip_no_pmtu_disc - BOOLEAN [variable de tipo verdadero/falso]
+	Desactiva el descubrimiento de la ruta MTU.
+	valor por defecto: FALSE [falso]
+
+
+FRAGMENTACIÓN IP:
+
+  ipfrag_high_thresh - INTEGER [número entero]
+	Máxima memoria empleada en el reensamblaje de los fragmentos
+	IP. Cuando se reservan "ipfrag_high_thresh" bytes de memoria
+	para este propósito, el gestor de fragmentos enviará paquetes
+	hasta que se alcance el límite impuesto por ipfrag_low_thresh.
+
+  ipfrag_low_thresh - INTEGER [número entero]
+	Ver ipfrag_high_thresh	
+
+  ipfrag_time - INTEGER [número entero]
+	Tiempo en segundos que se mantendrá un fragmento IP en memoria.
+
+
+ALMACENAMIENTO DE NODOS DE INET:
+
+inet_peer_threshold - INTEGER [número entero]
+	El tamaño aproximado de almacenamiento. A partir de este límite, las
+	entradas empezarán a eliminarse de una forma agresiva. Este límite
+	también define el tiempo de vida de las entradas y los intervalos de
+	tiempo entre "rondas de recogida de basura". A mayor número de
+	entradas, menor tiempo de vida y menor intervalo entre "rondas".
+
+inet_peer_minttl - INTEGER [número entero]
+	Tiempo de vida mínimo de las entradas. Debe ser suficiente para
+	abarcar el tiempo de vida de los fragmentos en la fase de
+	reensamblaje. Este tiempo mínimo está garantizado si el tamaño
+	de la memoria caché compartida (memory pool) es menor que el
+	inet_peer_threshold. Se mide en "jiffies" (habitualmente un "jiffy"
+	equivale a una centésima de segundo, ó 1/100 seg.)
+
+inet_peer_maxttl - INTEGER [número entero]
+	Tiempo de vida máximo para cada entrada. Aquellas entradas que no
+	se usen expirarán tras este periodo de tiempo, siempre que no
+	exista presión en la memoria caché, es decir, cuando hay muy pocas
+	entradas en la memoria caché y en consecuencia no hay una elevada
+	demanda de memoria caché. Se mide en "jiffies".
+
+inet_peer_gc_mintime - INTEGER [número entero]
+	Intervalo mínimo entre "rondas de recogida de basura". Este intervalo
+	actúa bajo elevadas demandas de memoria caché. Se mide en "jiffies".
+
+inet_peer_gc_maxtime - INTEGER [número entero]
+	Intervalo máximo entre "rondas de recogida de basura". Al contrario
+	que la anterior variable, este intervalo actúa cuando exista una
+	pequeña (o  inexistente) presión sobre la memoria caché. Se mide en
+	"jiffies".
+
+
+VARIABLES TCP: 
+
+tcp_syn_retries - INTEGER [número entero]
+	Número de reintentos a la hora de crear una conexión TCP activa,
+	es decir, las veces que se enviarán paquetes SYN. No debe ser
+	mayor de 255. El valor por defecto es 5, que equivale a unos
+	180 segundos.
+
+tcp_synack_retries - INTEGER [número entero]
+	Número de reintentos a la hora de crear una conexión TCP pasiva,
+	es decir, las veces que se enviarán paquetes SYNACK. No debe ser
+	mayor de 255. El valor por defecto es 5, que equivale a unos
+	180 segundos.
+
+tcp_keepalive_time - INTEGER [número entero]
+	Cada cuánto tiempo se enviarán mensajes para mantener la conexión
+	(keepalive messages), siempre que esta funcionalidad esté activa.
+	Valor por defecto: 2 horas.
+
+tcp_keepalive_probes - INTEGER [número entero]
+	Número de sondas/mensajes "keepalive" enviadas, hasta que TCP
+	considere que la conexión se ha perdido. Valor por defecto: 9.
+
+tcp_keepalive_interval - INTEGER [número entero]
+	Frecuencia de envío de las sondas/mensajes "keepalive". Este valor
+	multiplicado por tcp_keepalive_probes resulta en el tiempo
+	transcurrido desde el envío de la primera sonda, hasta que se
+	considera la conexión como perdida y se elimina. Valor por defecto:
+	75 segundos (es decir, con 9 sondas se tardará unos 11 minutos y
+	medio hasta considerar terminada la conexión).
+
+tcp_retries1 - INTEGER [número entero]
+	Número de reintentos antes de considerar que algo anda mal y es
+	necesario informar de esta sospecha a la capa de red. El valor
+	RFC mínimo es 3, que es el valor por defecto, lo cual equivale
+	a algún valor entre 3 segundos y 8 minutos, dependiendo del RTO
+	(Retransmission TimeOut, tiempo límite de retransmisión).
+
+tcp_retries2 - INTEGER [número entero]
+	Número de reintentos antes de eliminar una conexión TCP establecida.
+	El RFC1122 indica que este límite no debe ser mayor a 100 segundos.
+	Este valor es demasiado pequeño. El valor por defecto es 15 y
+	equivale a unos 13-30 minutos, dependiendo del RTO.
+
+tcp_orphan_retries - INTEGER [número entero]
+	Número de reintentos antes de eliminar una conexión TCP, cerrada
+	por nosotros. El valor por defecto es 7, que equivale entre unos
+	50 segundos y unos 16 minutos, dependiendo del RTO. Si tu máquina
+	trabaja como servidor Web, deberías pensar en rebajar este valor,
+	pues las conexiones (sockets) pueden consumir una cantidad 
+	considerable de recursos. Léete tcp_max_orphans.
+
+tcp_fin_timeout - INTEGER [número entero]
+	Tiempo que se debe mantener la conexión (socket) en el estado
+	FIN-WAIT-2, si la cerramos nosotros. El nodo puede que no funcione
+	correctamente, o hasta puede que se haya "colgado" inesperadamente.
+	El valor por defecto es de 60 segundos. El valor usual en el
+	núcleo 2.2 era 180 segundos y puedes cambiar a ese valor, pero
+	recuerda que si tu máquina es un servidor Web, aunque soporte una
+	baja carga de transacciones, corres el riesgo de sobrecargar la
+	memoria con "tropecientas" mil conexiones "muertas". Si bien las
+	conexiones FIN-WAIT-2 son menos peligrosas que las FIN-WAIT-1
+	(puesto que consumen un máximo de 1,5K de memoria cada una), la
+	verdad es que tienden a "vivir" durante más tiempo. Léete
+	tcp_max_orphans.
+
+tcp_max_tw_buckets - INTEGER [número entero]
+	Cantidad máxima de conexiones en estado de espera (time-wait sockets)
+	a mantener simultáneamente por el sistema. Si este número se excede
+	las conexiones en espera son inmediatamente eliminadas y se muestra
+	una alarma. Este límite sólo existe para prevenir ataques DoS simples
+	(ataques de denegación de servicio), por lo que no debes reducir
+	artificialmente este límite, sinó más bien incrementarlo
+	(probablemente tras aumentar la memoria física instalada en el equipo)
+	siempre que las condiciones de la red exijan un valor más elevado que
+	el valor por defecto.
+
+tcp_tw_recycle - BOOLEAN [variable de tipo verdadero/falso]
+	Activa la renovación rápida de las conexiones en estado de espera. El
+	valor por defecto es 1. No debería cambiarse sin preguntar/recomendación
+	de técnicos experimentados.
+
+tcp_max_orphans - INTEGER [número entero]
+	Cantidad máxima de conexiones TCP no asignadas a ningún gestor de
+	fichero de usuario y mantenidas por el sistema. Si se excede este
+	número las conexiones huérfanas se reinician automáticamente y se
+	muestra una alarma. Este límite sólo existe para prevenir ataques
+	DoS simples, así que no debes reducir artificialmente este límite,
+	sinó más bien incrementarlo (probablemente tras aumentar la
+	memoria física instalada en el equipo) siempre que las condiciones
+	de la red exijan un valor más elevado que el valor por defecto.
+	Además es muy conveniente ajustar los servicios de red que deban
+	mantenerse al tiempo que se eliminan las conexiones inútiles de
+	manera más agresiva. Permíteme insistir en la idea: cada conexión
+	huérfana consume hasta unos 64K de memoria no intercambiable.
+
+tcp_abort_on_overflow - BOOLEAN [variable de tipo verdadero/falso]
+	Cuando el servicio que se encuentra "en escucha" (esperando
+	conexiones a través de un puerto) es demasiado lento para aceptar
+	nuevas conexiones, las reinicia. El estado por defecto es FALSE
+	(falso), lo cual significa que si sobreviene un desbordamiento
+	debido a una ráfaga de conexiones, la conexión se recuperará.
+	Activa esta opción ÚNICAMENTE si estás completamente seguro que
+	el demonio "en escucha" no se puede configurar para aceptar
+	conexiones más rápidamente. Activando esta opción puedes perjudicar
+	a los clientes de tu servidor.
+
+tcp_syncookies - BOOLEAN [variable de tipo verdadero/falso]
+	Sólamente es válido si el núcleo fué compilado con CONFIG_SYNCOOKIES.
+	[Nota: las SynCookies son un tipo especial de "cookies" empleadas
+	para evitar los efectos de ciertos ataques de denegación de servicios
+	(DoS)]. Con esta opción activada se envían "syncookies" cuando los
+	paquetes Syn se acumulan en la cola de una conexión (socket) y ésta
+	se desborda. Como ya se ha indicado, de esta forma se evita el ataque
+	por inundación de paquetes Syn (Syn flood attack). El valor por
+	defecto es FALSE (falso).
+
+	Nota: las "syncookies" son una utilidad para emergencias. NO DEBEN
+	usarse para ayudar a mantener el servicio de conexiones legales a
+	servidores con una carga elevada. Si observas alarmas de "synflood"
+	en los registros (logs), pero investigando llegas a la conclusión
+	de que son debidos a una sobrecarga de conexiones legales, lo que
+	debes hacer es ajustar otros parámetros hasta que estas alarmas
+	desaparezcan. Léete: tcp_max_syn_backlog, tcp_synack_retries,
+	tcp_abort_on_overflow.
+
+	Las "syncookies" efectúan una seria violación del protocolo TCP,
+	no permiten emplear extensiones TCP, pueden generar una fuerte
+	degradación de algunos servicios (por ej. el "SMTP relaying", o
+	sea, algo así como un servidor de correo abierto a cualquiera
+	que desee utilizarlo, sea usuario o no de la red a la que pertenece
+	el propio servidor de correo), efectos no visibles por tí mismo,
+	aunque perfectamente apreciables por tus clientes y aquellos que
+	utilicen tus servicios cada vez que contacten contigo. Mientras
+	tú ves alarmas de "synflood" en los registros sin estar realmente
+	desbordado, la realidad es que tu servidor está realmente mal
+	configurado.
+
+tcp_stdurg - BOOLEAN [variable de tipo verdadero/falso]
+	Utiliza la interpretación de requerimientos de Host del campo "TCP
+	urg" (paquete urgente). Muchos hosts utilizan la antigua interpretación
+	de BSD, así que si activas esta opción es posible que Linux no pueda
+	comunicarse correctamente con éllos. Valor por defecto: FALSE (falso).
+	
+tcp_max_syn_backlog - INTEGER [número entero]
+	Número máximo de peticiones de conexión recordadas que todavía
+	no han recibido el reconocimiento del cliente conectado. El valor por
+	defecto es 1024 para máquinas con más de 128 MB de memoria y 128 para
+	máquinas con poca memoria. Si el servidor padece de sobrecarga, prueba
+	a incrementar este número. ¡Atención! Si vas ha hacerlo mayor a 1024,
+	sería mejor cambiar TCP_SYNQ_HSIZE en include/net/tcp.h de forma que
+	se mantenga la relación TCP_SYNQ_HSIZE*16<=tcp_max_syn_backlog y además
+	recompilar el núcleo.
+
+tcp_window_scaling - BOOLEAN [variable de tipo verdadero/falso]
+	Activa el escalado de ventanas tal como se define en el RFC1323.
+
+tcp_timestamps - BOOLEAN [variable de tipo verdadero/falso]
+	Activa las "marcas de tiempo" (timestamps) tal como se definen en RFC1323.
+
+tcp_sack - BOOLEAN [variable de tipo verdadero/falso]
+	Activa la Selección de "Acuse de recibo" (acknowledgment)
+	(abreviado: SACK).
+
+tcp_fack - BOOLEAN [variable de tipo verdadero/falso]
+	Activa el sistema para evitar las congestiones FACK y la retransmisión
+	rápida. Este valor no se usa si tcp_sack no está activo.
+
+tcp_dsack - BOOLEAN [variable de tipo verdadero/falso]
+	Permite que TCP envíe SACKs "duplicados".
+
+tcp_ecn - BOOLEAN [variable de tipo verdadero/falso]
+	Activa la Notificación de Congestión Explícita en TCP.
+
+tcp_reordering - INTEGER [número entero]
+	Reordenación máxima de los paquetes en un flujo TCP. Por defecto: 3.
+
+tcp_retrans_collapse - BOOLEAN [variable de tipo verdadero/falso]
+	Compatibilidad "fallo por fallo" (bug-to-bug) con algunas impresoras
+	con drivers defectuosos. Al retransmitir intenta enviar paquetes más
+	grandes para evitar errores en ciertas pilas TCP.
+
+tcp_wmem - vector con 3 ENTEROs: min, default, max
+	min: cantidad de memoria reservada para los "buffers" de salida (de
+	envío) en la conexión TCP. Cada conexión TCP tiene derechos para
+	usarla debido al hecho de su creación. Por defecto: 4K.
+
+	default: cantidad de memoria permitida por defecto para los "buffers"
+	de salida en la conexión TCP. Este valor tiene prioridad sobre el
+	usado en net.core.wmem_default por otros protocolos; normalmente es
+	un valor más pequeño que el de net.core.wmem_default. Por defecto:16K.
+
+	max: cantidad de memoria máxima permitida para los "buffers" de envío
+	seleccionados automáticamente para la conexión TCP. Este valor no es
+	prioritario sobre el existente en net.core.wmem_max; la selección
+	"estática" mediante SO_SNDBUF no emplea esta opción. Por defecto: 128K.
+
+tcp_rmem - vector con 3 ENTEROs: min, default, max
+	min: tamaño mínimo del "buffer" de entrada (de recepción) utilizado
+	por las conexiones TCP. Está garantizado para cada conexión TCP, incluso
+	bajo cargas moderadas de memoria. Por defecto: 8K.
+
+	default: tamaño por defecto del "buffer" de entrada utilizado por las
+	conexiones TCP. Este valor tiene prioridad sobre el usado en
+	net.core.rmem_default por otros protocolos. Valor por defecto: 87380 bytes.
+	Este valor implica una "ventana" de 65535 al emplearlo junto con el valor
+	por defecto de tcp_adv_win_scale y el valor tcp_app_win=0; sin embargo
+	esta "ventana" es un poco menor cuando se utiliza el valor por defecto de
+	tcp_app_win. Léete un poco más abajo la explicación de estas variables.
+
+	max: tamaño máximo permitido de los "buffers" de entrada seleccionados
+	automáticamente para la conexión TCP. Este valor no es prioritario sobre
+	el existente en net.core.rmem_max; la selección "estática"
+	mediante SO_RCVBUF no emplea esta opción. Por defecto: 87380*2 bytes.
+
+tcp_mem - vector con 3 ENTEROs: min, pressure, max
+	low: por debajo de este número de páginas nadie molesta a TCP por su
+	apetito de memoria.
+
+	pressure: cuando la cantidad de memoria asignada por TCP excede este
+	número de páginas, TCP modera su consumo de memoria y entra en el
+	modo de memoria "bajo presión" (en carga), saliendo de este modo cuando
+	el consumo de memoria alcanza un nivel por debajo del valor "low".
+
+	high: número de páginas permitidas para poner procesos en cola por todas
+	las conexiones TCP.
+
+	Los valores por defecto se calculan al arrancar el sistema basándose en
+	la cantidad de memoria disponible.
+
+tcp_app_win - INTEGER [número entero]
+	Reserva una "ventana" cuyo valor es el máximo de
+	(window/2^tcp_app_win, mss) para el "buffer" de aplicación. El valor 0
+	es especial, pues significa que no se reserva nada. Valor por defecto: 31.
+
+tcp_adv_win_scale - INTEGER [número entero]
+	Establece el coste de emplear "buffers" mediante las expresiones
+	bytes/2^tcp_adv_win_scale [si tcp_adv_win_scale > 0] ó
+	bytes-bytes/2^(-tcp_adv_win_scale) [si es <= 0].
+	Por defecto: 2
+
+tcp_rfc1337 - BOOLEAN [variable de tipo verdadero/falso]
+	Si se activa, la pila TCP actúa conforme al RFC1337. Si no se
+	activa, no funcionamos conforme al RFC, pero evitamos la "muerte"
+	del TCP TIME_WAIT. Por defecto:0
+
+ip_local_port_range - 2 INTEGERS [2 números enteros]
+	Define el rango de puertos locales que los protocolos TCP y UDP pueden
+	escoger. El primer número es el primer puerto que pueden escoger,
+	mientras que el segundo es el último puerto que pueden seleccionar.
+	El valor por defecto depende de la cantidad de memoria disponible en
+	el sistema:
+		> 128Mb 32768-61000
+		< 128Mb 1024-4999 o incluso un rango menor.
+	Este número define el número de conexiones activas a las que el sistema
+	puede servir simultáneamente en conexiones con sistemas que no soporten
+	las extensiones TCP (timestamps). Con tcp_tw_recycle activado (es decir,
+	con el valor por defecto) el rango 1024-4999 es suficiente para mantener
+	hasta 2000 conexiones por segundo con sistemas que soporten los
+	"timestamps".
+
+ip_nonlocal_bind - BOOLEAN [variable de tipo verdadero/falso]
+	Si está activado, permite a los procesos ligarse (enlazarse) a
+	direcciones IP que no sean locales, lo cual puede ser bastante
+	útil (aunque puede "colgar" algunas aplicaciones). Valor por
+	defecto: 0.
+
+ip_dynaddr - BOOLEAN [variable de tipo verdadero/falso]
+	Si se establece como distinto a cero, activa el soporte para
+	direcciones dinámicas. Si se establece con un valor superior a
+	1, se mostrará un mensaje de registro del núcleo cada vez que
+	se reescriba la dirección dinámica. Por defecto: 0.
+
+icmp_echo_ignore_all - BOOLEAN [variable de tipo verdadero/falso]
+icmp_echo_ignore_broadcasts - BOOLEAN [variable de tipo verdadero/falso]
+	Si alguna de estas variables están activas (establecidas como
+	"verdadero"), entonces el núcleo ignorará todas las peticiones
+	ICMP ECHO que se le envíen, o bien sólamente aquellas peticiones
+	dirigidas a direcciones de difusión/multidifusión, según la opción
+	activa.
+
+icmp_destunreach_rate - INTEGER [número entero]
+icmp_paramprob_rate - INTEGER [número entero]
+icmp_timeexceed_rate - INTEGER [número entero]
+icmp_echoreply_rate - INTEGER [número entero] (not enabled per default)
+	Limita las frecuencias máximas de envío de paquetes ICMP a destinos
+	específicos. 0 (cero) para desactivar cualquier limitación; cualquier
+	otro número para establecer la frecuencia máxima en "jiffies"(1).
+
+icmp_ignore_bogus_error_responses - BOOLEAN [variable de tipo verdadero/falso]
+	Algunos enrutadores violan el RFC1122 enviando falsas respuestas a los
+	fragmentos de paquetes de difusión (broadcast frames). Estas violaciones
+	se registran normalmente mediante un aviso del núcleo. Si se establece
+	como TURE (VERDADERO), el núcleo no ofrecerá este tipo de avisos, lo
+	cual evitará un registro confuso. Por defecto: FALSE (FALSO).
+
+(1) "Jiffie": unidad interna de tiempo usada por el núcleo. En los PCs Intel y
+clónicos (i386) este valor es de 1/100 segundo, mientras que en los Alpha es
+de 1/1024 segundo. Busca la definición de HZ en /usr/include/asm/param.h para
+saber el valor exacto en tu sistema.
+
+igmp_max_memberships - INTEGER [número entero]
+	Cambia el valor máximo de grupos de multidifusión a los que podemos
+	subscribirnos. Valor por defecto: 20.
+
+conf/interface/*: 
+conf/all/* es especial y cambia los ajustes en todas las interfases.
+	Cambia ajustes especiales para la interfaz especificada.
+
+log_martians - BOOLEAN [variable de tipo verdadero/falso]
+	Registra los paquetes con direcciones imposibles en el registro del
+	núcleo.
+
+accept_redirects - BOOLEAN [variable de tipo verdadero/falso]
+	Acepta mensajes de redirección ICMP. Por defecto TRUE (en el host),
+	FALSE (en el enrutador).
+
+forwarding - BOOLEAN [variable de tipo verdadero/falso]
+	Activa el reenvío IP en esta interfaz.
+
+mc_forwarding - BOOLEAN [variable de tipo verdadero/falso]
+	Efectúa un enrutado de multidifusión. El núcleo necesita ser compilado
+	con CONFIG_MROUTE, además de ser necesario un demonio de enrutado de
+	multidifusión.
+
+proxy_arp - BOOLEAN [variable de tipo verdadero/falso]
+	Hace de proxy "arp" [Address Resolution Protocol: es un método para
+	hallar la dirección Ethernet conociendo la dirección de Internet, o sea,
+	conociendo la dirección IP deseada el host envía un paquete a todos los
+	demás hosts y espera a que uno de éllos le devuelva la dirección física
+	de su tarjeta Ethernet].
+
+shared_media - BOOLEAN [variable de tipo verdadero/falso]
+	Envía (enrutador) o acepta (host) redirecciones de medios compartidos
+	según el RFC1620. Anula a ip_secure_redirects. Por defecto: TRUE.
+
+secure_redirects - BOOLEAN [variable de tipo verdadero/falso]
+	Acepta mensajes de redirección ICMP sólamente para aquellas pasarelas
+	(gateways) indicadas en el listado de pasarelas por defecto. Valor por
+	defecto: TRUE.
+
+send_redirects - BOOLEAN [variable de tipo verdadero/falso]
+	Envía redirecciones, si es un enrutador. Por defecto: TRUE.
+
+bootp_relay - BOOLEAN [variable de tipo verdadero/falso]
+	Acepta paquetes con una dirección de origen del tipo 0.b.c.d no
+	destinados como locales a este host. Se supone que el demonio "repetidor"
+	BOOTP captará y reenviará este tipo de paquetes. Por defecto: FALSE.
+	Todavía no está implementado.
+
+accept_source_route - BOOLEAN [variable de tipo verdadero/falso]
+	Acepta paquetes con la opción SRR. Por defecto: TRUE (enrutador), FALSE
+	(host).
+
+rp_filter - BOOLEAN [variable de tipo verdadero/falso]
+	1 - efectúa una comprobación del origen mediante la ruta invertida, tal
+	    como se especifica en el RFC1812. Es la opción recomendada para hosts
+	    domésticos aislados y para enrutadores de la intranet (que sólo
+	    gestionen el tráfico interno de la red local). Puede causar problemas
+	    en redes complicadas (con anillos) ejecutando un protocolo lento y
+	    poco seguro (al estilo del RIP, Routing Information Protocol), o que
+	    utilice rutas estáticas.
+	0 - no se comprueba el origen.
+
+	El valor por defecto es 0. Ten en cuenta que algunas distribuciones lo
+	activan en los scripts de inicio.
+
+Alexey Kuznetsov.
+kuznet@ms2.inr.ac.ru
+
+Actualizado por:
+Andi Kleen
+ak@muc.de
+
+
+
+
+
+
+Variables /proc/sys/net/ipv6/* :
+================================
+
+
+El protocolo IPv6 no tiene variables globales como puedan ser tcp_*.
+Los valores de configuración de tcp_* existentes en IPv4 (ver el bloque
+anterior) también son aplicables en IPv6 [XXX?].
+
+conf/default/*:
+	Cambia la configuración por defecto específica de la interfaz.
+
+conf/all/*:
+	Cambia toda la configuración específica de la interfaz.
+
+	[XXX:  ¿otras características especiales aparte del reenvío?]
+
+conf/all/forwarding - BOOLEAN [variable de tipo verdadero/falso]
+	Activa el reenvío global de IPv6 entre todas las interfases.
+
+	Los protocolos IPv4 e IPv6 funcionan diferente en este sentido;
+	por ejemplo, se debe utilizar netfilter para controlar qué
+	interfases pueden reenviar paquetes y cuáles no.
+
+	Con éllo también establecemos al valor especificado la
+	configuración de "reenvío" Host/Enrutador para todas las
+	interfases. Mira más abajo para más detalles.
+
+	A ésto se le denomina reenvío global.
+
+conf/interface/*:
+	Cambia configuraciones especiales para cada interfaz.
+
+	El comportamiento funcional de ciertos valores de configuración
+	es diferente según esté activo o no el reenvío local.
+
+accept_ra - BOOLEAN [variable de tipo verdadero/falso]
+	Acepta Anuncios de Enrutador; se autoconfigura utilizándolos.
+
+	Función por defecto: activado si el reenvío local está desactivado.
+			     desactivado si el reenvío local está activado.
+
+accept_redirects - BOOLEAN [variable de tipo verdadero/falso]
+	Acepta redireccionamientos.
+
+	Función por defecto: activado si el reenvío local está desactivado.
+			     desactivado si el reenvío local está activado.
+
+autoconf - BOOLEAN [variable de tipo verdadero/falso]
+	Configura los vínculos a direcciones locales utilizando direcciones
+	hardware de nivel 2 (L2). Por defecto: TRUE.
+
+dad_transmits - INTEGER [número entero]
+	La cantidad de sondas de "Detección de Dirección Duplicada" (Duplicate
+	Address Detection) que se pueden enviar. Por defecto: 1
+
+forwarding - BOOLEAN [variable de tipo verdadero/falso]
+	Configura el comportamiento interfaz-Host/Enrutador específico.
+
+	Nota: es recomendable tener los mismos valores en todas las interfases;
+	los escenarios con enrutadores/host mixtos son muy poco comunes.
+
+	FALSE:
+
+	Por defecto, se asume el comportamiento de Host. Ésto significa:
+
+	1. La bandera IsRouter no se establece en los Avisos de Vecino (Neighbour
+	   Advertisements).
+	2. Las Solicitudes de Enrutador (Router Solicitations) se envían cuando
+	   son necesarias.
+	3. Si accept_ra es TRUE (valor por defecto), acepta los Avisos de Enrutador
+	   (y efectúa una autoconfiguración).
+	4. Si accept_redirects es TRUE (valor por defecto), acepta las Redirecciones.
+
+	TRUE:
+
+	Si el reenvío local está activado, se asume el comportamiento de Enrutador.
+	Ésto significa exactamente lo contrario que en el caso anterior:
+
+	1. La bandera IsRouter se establece en los Avisos de Vecino.
+	2. Las Solicitudes de Enrutador no se envían.
+	3. Los Avisos de Enrutador se ignoran.
+	4. Las Redirecciones se ignoran.
+
+
+	Por defecto: FALSE si el reenvío global está desactivado (valor por defecto);
+		     en cualquier otro caso, TRUE.
+
+hop_limit - INTEGER [número entero]
+	Valor por defecto a establecer en los paquetes en cuanto al número máximo de
+	"saltos" entre hosts (hops). Por defecto: 64.
+
+mtu - INTEGER [número entero]
+	MTU (Maximum Transfer Unit) por defecto. Valor por defecto: 1280 (valor mínimo
+	exigido por IPv6).
+
+router_solicitation_delay - INTEGER [número entero]
+	Número de segundos de espera desde el inicio de la interfaz antes de enviar
+	Solicitaciones de Enrutador. Por defecto: 1.
+
+router_solicitation_interval - INTEGER [número entero]
+	Número de segundos de espera entre Solicitaciones de Enrutador. Por defecto: 4.
+
+router_solicitations - INTEGER [número entero]
+	Número de Solicitaciones de Enrutador a enviar antes de asumir que no hay
+	enrutadores presentes. Por defecto: 3.
+
+
+Actualización a IPv6 por:
+Pekka Savola
+pekkas@netcore.fi
+
+$Id: ip-sysctl.txt,v 1.5 2002/08/19 13:34:26 blueflux Exp $

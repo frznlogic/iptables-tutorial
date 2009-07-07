@@ -1,0 +1,141 @@
+ <appendix id="history">
+  <title id="history.title">Historial</title>
+  <para>
+   <literallayout>
+Versión 1.1.19 (21 Mayo 2003)
+http://iptables-tutorial.frozentux.net
+Por: Oskar Andreasson
+Colaboradores: Peter van Kampen, Xavier Bartol, Jon Anderson, Thorsten Bremer
+y el Equipo de Traducción al Español
+
+Version 1.1.18 (24 Abril 2003)
+http://iptables-tutorial.frozentux.net
+Por: Oskar Andreasson
+Colaboradores: Stuart Clark, Robert P. J. Day, Mark Orenstein and Edmond Shwayri.
+
+Versión 1.1.17 (6 Abril 2003)
+http://iptables-tutorial.frozentux.net
+Por: Oskar Andreasson
+Colaboradores: Geraldo Amaral Filho, Ondrej Suchy, Dino Conti, Robert P. J. Day,
+Velev Dimo, Spencer Rouser, Daveonos, Amanda Hickman, Olle Jonsson y
+Bengt Aspvall.
+
+Versión 1.1.16 (16 Diciembre 2002)
+http://iptables-tutorial.frozentux.net
+Por: Oskar Andreasson
+Colaboradores: Clemens Schwaighower, Uwe Dippel y Dave Wreski.
+
+Versión 1.1.15 (13 Noviembre 2002)
+http://iptables-tutorial.frozentux.net
+Por: Oskar Andreasson
+Colaboradores: Mark Sonarte, A. Lester Buck, Robert P. J. Day, Togan Muftuoglu,
+Antony Stone, Matthew F. Barnes y Otto Matejka.
+
+Versión 1.1.14 (14 Octubre 2002)
+http://iptables-tutorial.frozentux.net
+Por: Oskar Andreasson
+Colaboradores: Carol Anne, Manuel Minzoni, Yves Soun, Miernik, Uwe Dippel,
+Dave Klipec y Eddy L O Jansson.
+
+Versión 1.1.13 (22 Agosto 2002)
+http://iptables-tutorial.haringstad.com
+Por: Oskar Andreasson
+Colaboradores: Un montón de gente informándome de una mala versión HTML.
+
+Versión 1.1.12 (19 Agosto 2002)
+http://www.netfilter.org/tutorial/
+Por: Oskar Andreasson
+Colaboradores: Peter Schubnell, Stephen J. Lawrence, Uwe Dippel, Bradley
+Dilger, Vegard Engen, Clifford Kite, Alessandro Oliveira, Tony Earnshaw, 
+Harald Welte, Nick Andrew y Stepan Kasal.
+
+Versión 1.1.11 (27 Mayo 2002)
+http://www.netfilter.org/tutorial/
+Por: Oskar Andreasson
+Colaboradores: Steve Hnizdur, Lonni Friedman, Jelle Kalf, Harald Welte,
+Valentina Barrios y Tony Earnshaw.
+
+Versión 1.1.10 (12 Abril 2002)
+http://www.boingworld.com/workshops/linux/iptables-tutorial/
+Por: Oskar Andreasson
+Colaboradores: Jelle Kalf, Theodore Alexandrov, Paul Corbett, Rodrigo
+Rubira Branco, Alistair Tonner, Matthew G. Marsh, Uwe Dippel, Evan 
+Nemerson y Marcel J.E. Mol.
+
+Versión 1.1.9 (21 Marzo 2002)
+http://www.boingworld.com/workshops/linux/iptables-tutorial/
+Por: Oskar Andreasson
+Colaboradores: Vince Herried, Togan Muftuoglu, Galen Johnson, Kelly Ashe, Janne
+Johansson, Thomas Smets, Peter Horst, Mitch Landers, Neil Jolly, Jelle Kalf,
+Jason Lam y Evan Nemerson.
+
+Versión 1.1.8 (5 Marzo 2002)
+http://www.boingworld.com/workshops/linux/iptables-tutorial/
+Por: Oskar Andreasson
+
+Versión 1.1.7 (4 Febrero 2002)
+http://www.boingworld.com/workshops/linux/iptables-tutorial/
+Por: Oskar Andreasson
+Colaboradores: Parimi Ravi, Phil Schultz, Steven McClintoc, Bill Dossett,
+Dave Wreski, Erik Sjölund, Adam Mansbridge, Vasoo Veerapen, Aladdin y
+Rusty Russell.
+
+Versión 1.1.6 (7 Diciembre 2001)
+http://people.unix-fu.org/andreasson/
+Por: Oskar Andreasson
+Colaboradores: Jim Ramsey, Phil Schultz, Göran Båge, Doug Monroe, Jasper
+Aikema, Kurt Lieber, Chris Tallon, Chris Martin, Jonas Pasche, Jan
+Labanowski, Rodrigo R. Branco, Jacco van Koll y Dave Wreski.
+
+Versión 1.1.5 (14 Noviembre 2001)
+http://people.unix-fu.org/andreasson/
+Por: Oskar Andreasson
+Colaboradores: Fabrice Marie, Merijn Schering y Kurt Lieber.
+
+Versión 1.1.4 (6 Noviembre 2001)
+http://people.unix-fu.org/andreasson
+Por: Oskar Andreasson
+Colaboradores: Stig W. Jensen, Steve Hnizdur, Chris Pluta y Kurt Lieber.
+
+Versión 1.1.3 (9 Octubre 2001)
+http://people.unix-fu.org/andreasson
+Por: Oskar Andreasson
+Colaboradores: Joni Chu, N.Emile Akabi-Davis y Jelle Kalf.
+
+Versión 1.1.2 (29 Septiembre 2001)
+http://people.unix-fu.org/andreasson
+Por: Oskar Andreasson
+
+Versión 1.1.1 (26 Septiembre 2001)
+http://people.unix-fu.org/andreasson
+Por: Oskar Andreasson
+Colaboradores: Dave Richardson.
+
+Versión 1.1.0 (15 Septiembre 2001)
+http://people.unix-fu.org/andreasson
+Por: Oskar Andreasson
+
+Versión 1.0.9 (9 Septiembre 2001)
+http://people.unix-fu.org/andreasson
+Por: Oskar Andreasson
+
+Versión 1.0.8 (7 Septiembre 2001)
+http://people.unix-fu.org/andreasson
+Por: Oskar Andreasson
+
+Versión 1.0.7 (23 Agosto 2001)
+http://people.unix-fu.org/andreasson
+Por: Oskar Andreasson
+Colaboradores: Fabrice Marie.
+
+Versión 1.0.6
+http://people.unix-fu.org/andreasson
+Por: Oskar Andreasson
+
+Versión 1.0.5
+http://people.unix-fu.org/andreasson
+Por: Oskar Andreasson
+Colaboradores: Fabrice Marie.
+   </literallayout>
+  </para>
+ </appendix>

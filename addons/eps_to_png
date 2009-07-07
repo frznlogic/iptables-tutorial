@@ -1,0 +1,5 @@
+#!/bin/bash
+echo "changing all eps to png for file $1"
+cat $1 | sed -e s/\\.eps/\\.png/g > $1.tmp
+cat $1.tmp | sed -e s/eps\}/png\}/g > $1
+rm -f $1.tmp

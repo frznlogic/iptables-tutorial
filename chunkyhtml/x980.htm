@@ -1,0 +1,197 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>UDP headers</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="TCP/IP repetition"
+HREF="c171.htm"><LINK
+REL="PREVIOUS"
+TITLE="UDP characteristics"
+HREF="x956.htm"><LINK
+REL="NEXT"
+TITLE="ICMP characteristics"
+HREF="x1030.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x956.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 2. TCP/IP repetition</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x1030.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="UDPHEADERS"
+>UDP headers</A
+></H1
+><P
+>The UDP header can be said to contain a very basic
+and simplified TCP header. It contains
+destination-, source-ports,
+header length and a checksum
+as seen in the image below.
+      </P
+><P
+>        <DIV
+CLASS="MEDIAOBJECT"
+><P
+><IMG
+SRC="images/udp-headers.jpg"></P
+></DIV
+>
+      </P
+><P
+>Source 
+ port - bit 0-15. This is
+the source port of the packet, describing where a
+reply packet should be sent. This can actually be set to zero if it doesn't
+apply. For example, sometimes we don't require a reply packet, and the packet
+can then be set to source port zero. In most
+implementations, it is set to some port number.
+      </P
+><P
+>Destination 
+ port - bit 16-31.
+The destination port of the packet. This is required
+for all packets, as opposed to the source port of a
+packet. 
+      </P
+><P
+>Length 
+ - bit 32-47. The
+length field specifies the length of the whole packet
+in octets, including header and data portions. The shortest possible packet
+can be 8 octets long. 
+      </P
+><P
+>Checksum 
+ - bit 48-63. The
+checksum is the same kind of
+checksum as used in the TCP
+header, except that it contains a different set of data. In other words, it is
+a one's complement of the one's complement sum of parts of the
+IP header, the whole UDP
+header, theUDP data and padded with zeroes at the end
+when necessary.
+      </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x956.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x1030.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>UDP characteristics</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c171.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>ICMP characteristics</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

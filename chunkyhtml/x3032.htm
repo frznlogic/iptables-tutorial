@@ -1,0 +1,373 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>How to plan an IP filter</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="IP filtering introduction"
+HREF="c2873.htm"><LINK
+REL="PREVIOUS"
+TITLE="IP filtering terms and 
+expressions"
+HREF="x2940.htm"><LINK
+REL="NEXT"
+TITLE="What's next?"
+HREF="x3144.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x2940.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 3. IP filtering introduction</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x3144.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="HOWTOPLANANIPFILTER"
+>How to plan an IP filter</A
+></H1
+><P
+>One of the first steps to think about when planning the firewall is their 
+placement. This should be a fairly simple step since mostly your networks 
+should be fairly well segmented anyway. One of the first places that comes to 
+mind is the gateway between your local network(s) and the Internet. This is a 
+place where there should be fairly tight security. Also, in larger networks it 
+may be a good idea to separate different divisions from each other via 
+firewalls. For example, why should the development team have access to the 
+human resources network, or why not protect the economic department from other 
+networks? Simply put, you don't want an angry employee with the pink slip 
+tampering with the salary databases.
+      </P
+><P
+>Simply put, the above means that you should plan your networks as well as 
+possible, and plan them to be segregated. Especially if the network is 
+medium- to big-sized (100 workstations or more, based on different aspects of 
+the network). In between these smaller networks, try to put firewalls that will 
+only allow the kind of traffic that you would like.
+      </P
+><P
+>It may also be a good idea to create a De-Militarized Zone
+(DMZ) in your 
+network in case you have servers that are reached from the Internet. A DMZ is 
+a small physical network with servers, which is closed down to the extreme. 
+This lessens the risk of anyone actually getting in to the machines in the 
+DMZ, and it lessens the risk of anyone actually getting in and downloading any 
+trojans etc. from the outside. The reason that they are called de-militarized 
+zones is that they must be reachable from both the inside and the outside, and 
+hence they are a kind of grey zone (DMZ simply put).
+      </P
+><P
+>There are a couple of ways to set up the policies and default behaviours in a 
+firewall, and this section will discuss the actual theory that you should think 
+about before actually starting to implement your firewall, and helping you to 
+think through your decisions to the fullest extent.
+      </P
+><P
+>Before we start, you should understand that most firewalls have default 
+behaviours. For example, if no rule in a specific chain matches, it can be 
+either dropped or accepted per default. Unfortunately, there is only one
+policy per chain, but this is
+often easy to get around if we want to have different policies per network
+interface etc.
+      </P
+><P
+>There are two basic policies that we normally use. Either we drop everything 
+except that which we specify, or we accept everything except that which we 
+specifically drop. Most of the time, we are mostly interested in the drop 
+policy, and then accepting everything that we want to allow specifically. This 
+means that the firewall is more secure per default, but it may also mean that 
+you will have much more work in front of you to simply get the firewall to 
+operate properly. 
+      </P
+><P
+>Your first decision to make is to simply figure out which type of firewall you 
+should use. How big are the security concerns? What kind of applications must 
+be able to get through the firewall? Certain applications are horrible to 
+firewalls for the simple reason that they negotiate
+ports
+
+to use for data streams inside a control session. This makes it extremely hard
+for the firewall to know which ports to open up. The most common applications
+works with iptables, but the more rare ones do not work to this day,
+unfortunately. 
+      </P
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>There are also some applications that work partially, such as
+ICQ.
+Normal ICQ usage works perfectly, but not the chat or
+file sending functions, since they require specific code to handle the
+protocol. Since the ICQ
+protocols are not standardized (they are proprietary and may be changed at any
+time) most IP filters have chosen to either keep the
+ICQ protocol handlers out, or as patches that can be
+applied to the firewalls. Iptables have chosen to keep them as separate
+patches.
+        </P
+></TD
+></TR
+></TABLE
+></DIV
+><P
+>It may also be a good idea to apply
+layered
+security measures, which we have actually already discussed partially so far.
+What we mean with this, is that you should use as many security measures as
+possible at the same time, and don't rely on any one single security concept.
+Having this as a basic concept for your security will increase security
+tenfold at least. For an example, let's look at this.
+      </P
+><P
+>        <DIV
+CLASS="MEDIAOBJECT"
+><P
+><IMG
+SRC="images/cisco-pix-dmz-lan.jpg"></P
+></DIV
+>
+      </P
+><P
+>As you can see, in this example I have in this example chosen to place a
+Cisco PIX firewall at the
+perimeter of all three network connections. It may
+NAT the
+internal
+LAN, as
+well as the DMZ if necessary. It may also block all
+outgoing traffic except http return traffic as well as
+ftp and ssh traffic. It can
+allow incoming http traffic from both the LAN and the
+Internet, and ftp and
+ssh traffic from the LAN. On
+top of this, we note that each webserver is based on Linux, and can hence
+throw iptables and netfilter on each of the machines as well and add the same
+basic policies on these. This way, if someone manages to break the
+Cisco PIX, we can still rely on the netfilter
+firewalls locally on each machine, and vice versa. This allows for so called
+layered security.
+      </P
+><P
+>On top of this, we may add <A
+HREF="a13413.htm#SNORTNIDS"
+><I
+>Snort</I
+></A
+>
+ on each of the machines.
+Snort is an excellent open source network
+intrusion detection system 
+(NIDS)
+which looks for signatures in the packets that it sees, and if it sees a
+signature of some kind of attack or breakin it can either
+e-mail the
+administrator and notify him about it, or even make active responses to the
+attack such as blocking the IP from which the attack
+originated. It should be noted that active responses should not be used
+lightly since snort has a bad behaviour of reporting lots of false positives
+(e.g., reporting an attack which is not really an attack).
+      </P
+><P
+>It could also be a good idea to throw in an proxy
+ in front of the webservers to
+catch some of the bad packets as well, which could also be a possibility to
+throw in for all of the locally generated webconnections. With a
+webproxy you can narrow down on traffic used by
+webtraffic from your employees, as well as restrict their
+webusage to some extent. As for a
+webproxy to your own
+webservers, you can use it to block some of the most
+obvious connections to get through. A good proxy that
+may be worth using is the <A
+HREF="a13413.htm#SQUIDPROXY"
+><I
+>Squid</I
+></A
+>.
+      </P
+><P
+>Another precaution that one
+can take is to install <A
+HREF="a13413.htm#TRIPWIREIDS"
+><I
+>Tripwire</I
+></A
+>. This is an excellent last line of defense
+kind of application, it is generally considered to be a Host
+Intrusion Detection System. What
+it does is to make checksums of all the files  specified in a configuration
+file, and then it is run from cron
+ once in a while to see that all
+of the specified files are the same as before, or have not changed in an
+illegit way. This program will in other words be able to find out if anyone
+has actually been able to get through and tampered with the system. A
+suggestion is to run this on all of the webservers.
+      </P
+><P
+>One last thing to note is that it is always a good thing to follow standards,
+as we know. As you have already seen with the ICQ
+example, if you don't use standardized
+ systems, things can go
+terribly wrong. For your own environments, this can be ignored to some extent,
+but if you are running a broadband service or modempool, it gets all the more
+important. People who connect through you must always be able to rely on your
+standardization, and you can't expect everyone to run the specific operating
+system of your choice. Some people want to run
+Windows, some want to run
+Linux or even VMS and so on.
+If you base your security on proprietary systems, you are in for some
+trouble.
+
+      </P
+><P
+>A good example of this is certain broadband services that have popped up in 
+Sweden who base lots of security on Microsoft network logon. This may sound 
+like a great idea to begin with, but once we start considering other operating 
+systems and so on, this is no longer such a good idea. How will someone running 
+Linux get online? Or
+VAX/VMS? Or HP/UX? With Linux it can be done of course, if 
+it wasn't for the fact that the network administrator refuses anyone to use the 
+broadband service if they are running linux by simply blocking them in such 
+case. However, this book is not a theological discussion of what is best, so 
+let's leave it as an example of why it is a bad idea to use
+non-standards.
+      </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x2940.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x3144.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>IP filtering terms and 
+expressions</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c2873.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>What's next?</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

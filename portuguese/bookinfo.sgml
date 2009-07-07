@@ -1,0 +1,53 @@
+ <bookinfo>
+  <title>Iptables Tutorial 1.1.11</title>
+
+  <author>
+   <firstname>Oskar</firstname>
+   <surname>Andreasson</surname>
+   <affiliation>
+    <address>
+     <email>blueflux@koffein.net</email>
+    </address>
+   </affiliation>
+  </author>
+
+  <copyright>
+   <year>2001</year>
+   <holder>Oskar Andreasson</holder>
+  </copyright>
+
+  <legalnotice>
+   <para> 
+É concedida a permissão para copiar, distribuir e/ou modificar este 
+documento sob os termos da GNU Free Documentation Licence, Versão 1.1;
+com as Seções Invariantes sendo "Introdução" e todas as sub-seções, com 
+os textos da Capa da Frente contendo "Autor Original: Oskar Andreasson", 
+e sem textos na Capa de Trás. A cópia desta licença está inclusa na seção
+entitulada de "GNU Free Documentation Licence".
+	</para>
+   <para>
+Todos os scripts neste tutorial são protegidos pela GNU General Public 
+Licence. Os scripts são código aberto; você pode redistribuí-los e/ou 
+modificá-los sob os termos da GNU General Public Licence como publicados
+pela Free Software Foundation, versão 2 da Licença.
+   </para>
+   <para> 
+Estes scripts são distribuidos com o intuito de serem úteis, mas SEM 
+QUALQUER GARANTIA; sem mesmo a implícita garantia de VIABILIDADE COMERCIAL
+ou PARA UM DETERMINADO PROPÓSITO. Veja a GNU General Public Licence para 
+maiores detalhes.
+   </para>
+   <para> 
+Você deverá ter recebido uma cópia da GNU General Public Licence juntamente
+com este tutorial, sob a seção intitulada de "GNU General Public Licence";
+senão, escreva para a Free Software Foundation, Inc., 59 Temple Place,
+Suite 330, Boston, MA 02111-1307 USA
+   </para>
+  </legalnotice>
+ </bookinfo>
+
+
+
+
+
+

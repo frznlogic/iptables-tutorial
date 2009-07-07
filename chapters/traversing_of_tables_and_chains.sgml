@@ -1,0 +1,835 @@
+ <chapter id="traversingoftables">
+  <title id="traversingoftables.title">Traversing of tables and chains</title>
+  <indexterm zone="traversingoftables">
+    <primary>Table</primary>
+    <secondary>Traversing</secondary>
+  </indexterm>
+  <indexterm zone="traversingoftables">
+    <primary>Chain</primary>
+    <secondary>Traversing</secondary>
+  </indexterm>
+  <indexterm zone="traversingoftables">
+    <primary>Traversing of tables and chains</primary>
+  </indexterm>
+
+  <para>In this chapter we'll discuss how packets traverse the different
+chains, and in which order. We will also discuss the order in which the
+tables are traversed. We'll see how valuable this is later on, when we
+write our own specific rules. We will also look at the points which
+certain other components, that also are kernel dependent, enter into the
+picture. Which is to say the different routing decisions and so on. This
+is especially necessary if we want to write <command>iptables</command>
+rules that could change routing patterns/rules for packets; i.e. why and
+how the packets get routed, good examples of this are 
+<command>DNAT</command> and <command>SNAT</command>. Not to be forgotten
+are, of course, the <systemitem>TOS</systemitem> bits.
+  </para>
+
+  <section id="traversinggeneral">
+   <title id="traversinggeneral.title">General</title>
+   <indexterm zone="traversinggeneral">
+     <primary>Traversing of tables and chains</primary>
+     <secondary>General</secondary>
+   </indexterm>
+
+   <para> When a packet first enters the firewall, it hits the hardware
+and then gets passed on to the proper device driver in the kernel. Then
+the packet starts to go through a series of steps in the kernel, before it
+is either sent to the correct application (locally), or forwarded to
+another host - or whatever happens to it.
+    </para>
+
+    <para>
+    First, let us have a look at a packet that is destined for our
+own local host. It would pass through the following steps before actually
+being delivered to our application that receives it:
+   </para>
+
+<indexterm zone="tabledestinationlocalhost">
+  <primary>Table</primary>
+  <secondary>Raw</secondary>
+</indexterm>
+<indexterm zone="tabledestinationlocalhost">
+  <primary>Table</primary>
+  <secondary>Mangle</secondary>
+</indexterm>
+<indexterm zone="tabledestinationlocalhost">
+  <primary>Table</primary>
+  <secondary>Nat</secondary>
+</indexterm>
+<indexterm zone="tabledestinationlocalhost">
+  <primary>Table</primary>
+  <secondary>Filter</secondary>
+</indexterm>
+<indexterm zone="tabledestinationlocalhost">
+  <primary>Chain</primary>
+  <secondary>PREROUTING</secondary>
+</indexterm>
+<indexterm zone="tabledestinationlocalhost">
+  <primary>Chain</primary>
+  <secondary>INPUT</secondary>
+</indexterm>
+
+   <table frame=all id="tabledestinationlocalhost">
+    <title id="table.destinationlocalhost.title">Destination local host (our own
+machine)</title>
+    <tgroup cols=4 align=left colsep=1 rowsep=1>
+    <colspec colwidth="30pt">
+    <colspec colwidth="36pt">
+    <colspec colwidth="76pt">
+    <colspec colwidth="*">
+      <thead>
+       <row>
+        <entry>Step</entry>
+        <entry>Table</entry>
+        <entry>Chain</entry>
+        <entry>Comment</entry>
+       </row>
+      </thead>
+      <tbody>
+
+       <row>
+        <entry>1</entry>
+        <entry></entry>
+        <entry></entry>
+        <entry>On the wire (e.g., Internet)</entry>
+       </row>
+
+       <row>
+        <entry>2</entry>
+        <entry></entry>
+        <entry></entry>
+        <entry>Comes in on the interface (e.g., eth0)</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>raw</entry>
+        <entry>PREROUTING</entry>
+        <entry>This chain is used to handle packets before the connection 
+tracking takes place. It can be used to set a specific connection not to be 
+handled by the connection tracking code for example.</entry>
+       </row>
+
+       <row>
+        <entry>4</entry>
+        <entry></entry>
+        <entry></entry>
+        <entry>This is when the connection tracking code takes place as 
+discussed in the <link linkend="statemachine" 
+endterm="statemachine.title"></link> chapter.</entry>
+       </row>
+
+       <row>
+        <entry>5</entry>
+        <entry>mangle</entry>
+        <entry>PREROUTING</entry>
+        <entry>This chain is normally used for mangling packets, i.e.,
+changing <systemitem>TOS</systemitem> and so on.</entry>
+       </row>
+
+       <row>
+        <entry>6</entry>
+        <entry>nat</entry>
+        <entry>PREROUTING</entry>
+        <entry>This chain is used for <systemitem>DNAT</systemitem> mainly. 
+Avoid filtering in this chain since it will be bypassed in certain cases.</entry>
+       </row>
+
+       <row>
+        <entry>7</entry>
+        <entry></entry>
+        <entry></entry>
+        <entry>Routing decision, i.e., is the packet destined for our
+local host or to be forwarded and where.</entry>
+       </row>
+
+       <row>
+        <entry>8</entry>
+        <entry>mangle</entry>
+        <entry>INPUT</entry>
+        <entry>At this point, the mangle <systemitem>INPUT</systemitem> chain 
+is hit. We use this chain to mangle packets, after they have been routed, but 
+before they are actually sent to the process on the machine.</entry>
+       </row>
+
+       <row>
+        <entry>9</entry>
+        <entry>filter</entry>
+        <entry>INPUT</entry>
+        <entry>This is where we do filtering for all incoming traffic
+destined for our local host. Note that all incoming packets destined for this
+host pass through this chain, no matter what interface or in which direction
+they came from.</entry>
+       </row>
+
+       <row>
+        <entry>10</entry>
+        <entry></entry>
+        <entry></entry>
+        <entry><para>
+Local process or application (i.e., server or client program).
+	</para></entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+    <para>
+Note that this time the packet was passed through the
+<systemitem>INPUT</systemitem> chain instead of the
+<systemitem>FORWARD</systemitem> chain. Quite logical. Most probably the only
+thing that's really logical about the traversing of tables and chains in your
+eyes in the beginning, but if you continue to think about it, you'll find
+it will get clearer in time.
+    </para>
+
+    <para>
+Now we look at the outgoing packets from our own local host and what steps they
+go through.
+    </para>
+<indexterm zone="tablesourcelocalhost">
+  <primary>Chain</primary>
+  <secondary>OUTPUT</secondary>
+</indexterm>
+<indexterm zone="tablesourcelocalhost">
+  <primary>Chain</primary>
+  <secondary>POSTROUTING</secondary>
+</indexterm>
+
+   <table frame=all id="tablesourcelocalhost">
+    <title id="table.sourcelocalhost.title">Source local host (our own
+machine)</title>
+    <tgroup cols=4 align=left colsep=1 rowsep=1>
+    <colspec colwidth="30pt">
+    <colspec colwidth="36pt">
+    <colspec colwidth="76pt">
+    <colspec colwidth="*">
+      <thead>
+       <row>
+        <entry>Step</entry>
+        <entry>Table</entry>
+        <entry>Chain</entry>
+        <entry>Comment</entry>
+       </row>
+      </thead>
+      <tbody>
+
+       <row>
+        <entry>1</entry>
+        <entry></entry>
+        <entry></entry>
+        <entry>Local process/application (i.e., server/client
+program)</entry>
+       </row>
+
+       <row>
+        <entry>2</entry>
+        <entry></entry>
+        <entry></entry>
+        <entry>Routing decision. What source address to use, what outgoing
+interface to use, and other necessary information that needs to be
+gathered.</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>raw</entry>
+        <entry>OUTPUT</entry>
+        <entry>This is where you do work before the connection tracking has 
+taken place for locally generated packets. You can mark connections so that 
+they will not be tracked for example.</entry>
+       </row>
+
+       <row>
+        <entry>4</entry>
+        <entry></entry>
+        <entry></entry>
+        <entry>This is where the connection tracking takes place for locally 
+generated packets, for example state changes et cetera. This is discussed in 
+more detail in the <link linkend="statemachine" 
+endterm="statemachine.title"></link> chapter.</entry>
+       </row>
+
+       <row>
+        <entry>5</entry>
+        <entry>mangle</entry>
+        <entry>OUTPUT</entry>
+        <entry>This is where we mangle packets, it is suggested that you do
+not filter in this chain since it can have side effects.</entry>
+       </row>
+
+       <row>
+        <entry>6</entry>
+        <entry>nat</entry>
+        <entry>OUTPUT</entry>
+        <entry>This chain can be used to NAT outgoing packets from the
+firewall itself.</entry>
+       </row>
+
+       <row>
+        <entry>7</entry>
+        <entry></entry>
+        <entry></entry>
+        <entry>Routing decision, since the previous mangle and nat changes may 
+have changed how the packet should be routed.</entry>
+       </row>
+
+       <row>
+        <entry>8</entry>
+        <entry>filter</entry>
+        <entry>OUTPUT</entry>
+        <entry>This is where we filter packets going out from the local
+host.</entry>
+       </row>
+
+       <row>
+        <entry>9</entry>
+        <entry>mangle</entry>
+        <entry>POSTROUTING</entry>
+        <entry>The <systemitem>POSTROUTING</systemitem> chain in the
+mangle table is mainly used when we want to do mangling on packets before they
+leave our host, but after the actual routing decisions. This chain will be hit
+by both packets just traversing the firewall, as well as packets created by
+the firewall itself.</entry>
+       </row>
+
+       <row>
+        <entry>10</entry>
+        <entry>nat</entry>
+        <entry>POSTROUTING</entry>
+        <entry>This is where we do <systemitem>SNAT</systemitem> as described 
+        earlier. It is suggested that you don't do filtering here since it can 
+        have side effects, and certain packets might slip through even though 
+        you set a default policy of <command>DROP</command>.</entry>
+       </row>
+
+       <row>
+        <entry>11</entry>
+        <entry></entry>
+        <entry></entry>
+        <entry>Goes out on some interface (e.g., eth0)</entry>
+       </row>
+
+       <row>
+        <entry>12</entry>
+        <entry></entry>
+        <entry></entry>
+        <entry>On the wire (e.g., Internet)</entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+    <para>
+In this example, we're assuming that the packet is destined for another host on
+another network. The packet goes through the different steps in the following
+fashion:
+   </para>
+<indexterm zone="tableforwardedpackets">
+  <primary>Chain</primary>
+  <secondary>FORWARD</secondary>
+</indexterm>
+
+   <table frame=all id="tableforwardedpackets">
+    <title id="table.forwardedpackets.title">Forwarded packets</title>
+    <tgroup cols=4 align=left colsep=1 rowsep=1>
+    <colspec colwidth="30pt">
+    <colspec colwidth="36pt">
+    <colspec colwidth="76pt">
+    <colspec colwidth="*">
+      <thead>
+       <row>
+        <entry>Step</entry>
+        <entry>Table</entry>
+        <entry>Chain</entry>
+        <entry>Comment</entry>
+       </row>
+      </thead>
+      <tbody>
+       <row>
+        <entry>1</entry>
+        <entry></entry>
+        <entry></entry>
+        <entry>On the wire (i.e., Internet)</entry>
+       </row>
+
+       <row>
+       <entry>2</entry>
+       <entry></entry>
+       <entry></entry>
+       <entry>Comes in on the interface (i.e., eth0)</entry>
+       </row>
+
+       <row>
+       <entry>3</entry>
+       <entry>raw</entry>
+       <entry>PREROUTING</entry>
+       <entry>Here you can set a connection to not be handled by the 
+connection tracking system.</entry>
+       </row>
+
+       <row>
+       <entry>4</entry>
+       <entry></entry>
+       <entry></entry>
+       <entry>This is where the non-locally generated connection tracking 
+takes place, and is also discussed more in detail in the <link 
+linkend="statemachine" endterm="statemachine.title"></link> chapter.</entry>
+       </row>
+
+       <row>
+        <entry>5</entry>
+        <entry>mangle</entry>
+        <entry>PREROUTING</entry>
+        <entry>This chain is normally used for mangling packets, i.e.,
+changing <systemitem>TOS</systemitem> and so on.</entry>
+       </row>
+
+       <row>
+        <entry>6</entry>
+        <entry>nat</entry>
+        <entry>PREROUTING</entry>
+        <entry>This chain is used for <systemitem>DNAT</systemitem> mainly. 
+        <systemitem>SNAT</systemitem> is done further on. Avoid filtering in 
+        this chain since it will be bypassed in certain cases.</entry>
+       </row>
+
+       <row>
+        <entry>7</entry>
+        <entry></entry>
+        <entry></entry>
+        <entry>Routing decision, i.e., is the packet destined for our
+local host or to be forwarded and where.</entry>
+       </row>
+
+       <row>
+        <entry>8</entry>
+        <entry>mangle</entry>
+        <entry>FORWARD</entry>
+        <entry>The packet is then sent on to the
+<systemitem>FORWARD</systemitem> chain of the mangle table. This can be used
+for very specific needs, where we want to mangle the packets after the initial
+routing decision, but before the last routing decision made just before the
+packet is sent out.</entry>
+       </row>
+
+       <row>
+        <entry>9</entry>
+        <entry>filter</entry>
+        <entry>FORWARD</entry>
+        <entry>The packet gets routed onto the
+<systemitem>FORWARD</systemitem> chain. Only forwarded packets go through
+here, and here we do all the filtering. Note that all traffic that's
+forwarded goes through here (not only in one direction), so you need to
+think about it when writing your rule-set.</entry>
+       </row>
+
+       <row>
+        <entry>10</entry>
+        <entry>mangle</entry>
+        <entry>POSTROUTING</entry>
+        <entry>This chain is used for specific types of packet
+mangling that we wish to take place after all kinds of routing decisions have 
+been done, but still on this machine.</entry>
+       </row>
+
+       <row>
+        <entry>11</entry>
+        <entry>nat</entry>
+        <entry>POSTROUTING</entry>
+        <entry>This chain should first and foremost be used for
+<systemitem>SNAT</systemitem>. Avoid doing
+filtering here, since certain packets might pass this chain without ever
+hitting it. This is also where Masquerading is done.</entry>
+       </row>
+
+       <row>
+        <entry>12</entry>
+        <entry></entry>
+        <entry></entry>
+        <entry>Goes out on the outgoing interface (i.e., eth1).</entry>
+       </row>
+
+       <row>
+        <entry>13</entry>
+        <entry></entry>
+        <entry></entry>
+        <entry>Out on the wire again (i.e., LAN).</entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+    <para> As you can see, there are quite a lot of steps to pass through.
+The packet can be stopped at any of the <command>iptables</command>
+chains, or anywhere else if it is malformed; however, we are mainly
+interested in the <command>iptables</command> aspect of this lot. Do note
+that there are no specific chains or tables for different interfaces or
+anything like that. <systemitem>FORWARD</systemitem> is always passed by
+all packets that are forwarded over this firewall/router.
+    </para>
+
+    <caution>
+     <para>
+Do not use the <systemitem>INPUT</systemitem> chain to filter on in the previous
+scenario! <systemitem>INPUT</systemitem> is meant solely for packets to our 
+local host that do not get routed to any other destination.
+     </para>
+    </caution>
+
+    <para>
+We have now seen how the different chains are traversed in three separate
+scenarios. If we were to figure out a good map of all this, it would look
+something like this:
+    </para>
+
+    <para>
+    <mediaobject>
+     <imageobject>
+      <imagedata fileref="images/tables_traverse.eps" format=eps>
+     </imageobject>
+     <imageobject>
+      <imagedata fileref="images/tables_traverse.jpg" format=jpg>
+     </imageobject>
+    </mediaobject>
+   </para>
+
+   <para>
+To clarify this image, consider this. If we get a packet into the first
+routing decision that is not destined for the local machine itself, it will be
+routed through the <systemitem>FORWARD</systemitem> chain. If the packet is,
+on the other hand, destined for an <systemitem>IP address</systemitem> that
+the local machine is listening to, we would send the packet through the
+<systemitem>INPUT</systemitem> chain and to the local machine.
+   </para>
+
+   <para>
+Also worth a note, is the fact that packets may be destined for the local
+machine, but the destination address may be changed within the
+<systemitem>PREROUTING</systemitem> chain by doing
+<systemitem>NAT</systemitem>. Since this takes place before the first routing
+decision, the packet will be looked upon after this change. Because of this,
+the routing may be changed before the routing decision is done. Do note, that
+<emphasis>all</emphasis> packets will be going through one or the other path
+in this image. If you <systemitem>DNAT</systemitem><indexterm>
+<primary>DNAT target</primary> </indexterm> a packet back to the same network
+that it came from, it will still travel through the rest of the chains until
+it is back out on the network.
+   </para>
+
+   <tip>
+    <para>
+If you feel that you want more information, you could use the <link
+linkend="rctest-iptablestxt" endterm="rctest-iptablestxt.title"></link>
+script. This test script should give you the necessary rules to test how the
+tables and chains are traversed.
+    </para>
+   </tip>
+
+  </section>
+
+  <section id="mangletable">
+   <title id="mangletable.title">Mangle table</title>
+<indexterm zone="mangletable">
+  <primary>Table</primary>
+  <secondary>Mangle</secondary>
+</indexterm>
+   <para>
+This table should as we've already noted mainly be used for mangling packets.
+In other words, you may freely use the mangle targets within this table, to 
+change <systemitem>TOS</systemitem> <indexterm> <primary>TOS</primary>
+</indexterm>(Type Of Service) fields and the like.
+   </para>
+
+   <caution>
+    <para> You are strongly advised not to use this table for any
+filtering; nor will any <command>DNAT</command>, <command>SNAT</command>
+or <command>Masquerading</command> work in this table.
+    </para>
+   </caution>
+
+   <para>
+The following targets are only valid in the mangle table. They can not be used 
+outside the mangle table.
+   </para>
+
+   <itemizedlist mark="opencircle">
+    <listitem><para>TOS</para></listitem>
+    <listitem><para>TTL</para></listitem>
+    <listitem><para>MARK</para></listitem>
+    <listitem><para>SECMARK</para></listitem>
+    <listitem><para>CONNSECMARK</para></listitem>
+   </itemizedlist>
+
+   <para>The <command>TOS</command> target is used to set and/or change
+the <systemitem>Type of Service field</systemitem> in the packet. This
+could be used for setting up policies on the network regarding how a
+packet should be routed and so on. Note that this has not been perfected
+and is not really implemented on the Internet and most of the routers
+don't care about the value in this field, and sometimes, they act faulty
+on what they get. Don't set this in other words for packets going to the
+Internet unless you want to make routing decisions on it, with iproute2.
+   </para>
+
+   <para> 
+The <command>TTL</command> <indexterm> <primary>TTL target</primary>
+</indexterm> target is used to change the <systemitem>TTL</systemitem> (Time
+To Live) field of the packet. We could tell packets to only have a specific
+<systemitem>TTL</systemitem> and so on. One good reason for this could be that
+we don't want to give ourself away to nosy Internet Service Providers. Some
+Internet Service Providers do not like users running multiple computers on one
+single connection, and there are some Internet Service Providers known to look
+for a single host generating different <systemitem>TTL</systemitem> values,
+and take this as one of many signs of multiple computers connected to a single
+connection.
+   </para>
+
+   <para>
+The <command>MARK</command> <indexterm> <primary>MARK target</primary>
+</indexterm>target is used to set special <systemitem>mark</systemitem> values
+to the packet. These marks could then be recognized by the
+<command>iproute2</command> programs to do different routing on the packet
+depending on what <systemitem>mark</systemitem> they have, or if they don't
+have any. We could also do bandwidth limiting and Class Based Queuing based on
+these marks.
+    </para>
+
+    <para>
+The <command>SECMARK</command><indexterm> <primary>SECMARK target</primary>
+</indexterm> target can be used to set security context marks on single
+packets for usage in <systemitem>SELinux</systemitem> and other security
+systems that are able to handle these marks. This is then used for very fine
+grained security on what subsystems of the system can touch what packets et
+cetera. The <command>SECMARK</command> can also be set on a whole connection
+with the <command>CONNSECMARK</command> target. 
+    </para>
+
+    <para>
+<command>CONNSECMARK</command> <indexterm> <primary>CONNSECMARK
+target</primary> </indexterm> is used to copy a security context to or from a
+single packet from or to the whole connection. This is then used by the
+<systemitem>SELinux</systemitem> and other security systems to do more
+fine-grained security on a connection level. 
+    </para>
+
+  </section>
+
+  <section id="nattable">
+   <title id="nattable.title">Nat table</title>
+<indexterm zone="nattable">
+  <primary>Table</primary>
+  <secondary>Nat</secondary>
+</indexterm>
+
+   <para>This table should only be used for <systemitem>NAT</systemitem>
+(Network Address Translation) on different packets. In other words, it should
+only be used to translate the packet's source field or destination field. 
+Note that,
+as we have said before, only the first packet in a stream will hit this table.
+After this, the rest of the packets will automatically have the same
+action taken on them as the first packet. The actual targets that do
+these kind of things are:
+   </para>
+
+   <itemizedlist mark="opencircle">
+    <listitem><para>DNAT</para></listitem>
+    <listitem><para>SNAT</para></listitem>
+    <listitem><para>MASQUERADE</para></listitem>
+    <listitem><para>REDIRECT</para></listitem>
+   </itemizedlist>
+
+   <para>
+The <command>DNAT</command><indexterm> <primary>DNAT target</primary>
+</indexterm> target is mainly used in cases where you have a public IP and
+want to redirect accesses to the firewall to some other host (on a
+<systemitem>DMZ</systemitem> for example). In other words, we change the
+destination address of the packet and reroute it to the host.
+   </para>
+
+   <para>
+<command>SNAT</command> <indexterm> <primary>SNAT target</primary>
+</indexterm> is mainly used for changing the source address of packets. For
+the most part you'll hide your local networks or <systemitem>DMZ</systemitem>,
+etc. A very good example would be that of a firewall of which we know outside
+IP address, but need to substitute our local network's IP numbers with that of
+our firewall. With this target the firewall will automatically
+<command>SNAT</command> and <command>De-SNAT</command> the packets, hence
+making it possible to make connections from the <systemitem>LAN</systemitem>
+to the Internet. If your network uses 192.168.0.0/netmask for example, the
+packets would never get back from the Internet, because IANA has regulated
+these networks (among others) as private and only for use in isolated
+<systemitem>LAN</systemitem>s.
+</para>
+
+   <para>
+The <command>MASQUERADE</command> <indexterm> <primary>MASQUERADE
+target</primary> </indexterm> target is used in exactly the same way as
+<command>SNAT</command>, but the <command>MASQUERADE</command> target takes a
+little bit more overhead to compute. The reason for this, is that each time
+that the <command>MASQUERADE</command> target gets hit by a packet, it
+automatically checks for the IP address to use, instead of doing as the
+<command>SNAT</command> target does - just using the single configured IP
+address. The <command>MASQUERADE</command> target makes it possible to work
+properly with Dynamic <systemitem>DHCP</systemitem> IP addresses that your ISP
+might provide for your <systemitem>PPP</systemitem>,
+<systemitem>PPPoE</systemitem> or <systemitem>SLIP</systemitem> connections to
+the Internet.
+   </para>
+
+  </section>
+
+  <section id="rawtable">
+   <title id="rawtable.title">Raw table</title>
+<indexterm zone="rawtable">
+  <primary>Table</primary>
+  <secondary>Raw</secondary>
+</indexterm>
+
+   <para>
+The <systemitem>raw</systemitem> table is mainly only used for one thing, and 
+that is to set a mark on packets that they should not be handled by the 
+connection tracking system. This is done by using the 
+<command>NOTRACK</command> <indexterm> <primary>NOTRACK target</primary>
+</indexterm> target on the packet. If a connection is hit with 
+the <command>NOTRACK</command> target, then conntrack will simply not track 
+the connection. This has been impossible to solve without adding a new table, 
+since none of the other tables are called until after conntrack has actually 
+been run on the packets, and been added to the conntrack tables, or matched 
+against an already available connection. You can read more about this in the 
+<link linkend="statemachine" endterm="statemachine.title"></link> chapter.
+   </para>
+
+   <para>
+This table only has the <systemitem>PREROUTING</systemitem> <indexterm>
+<primary>Chain</primary> <secondary>PREROUTING</secondary> </indexterm> and
+<systemitem>OUTPUT</systemitem> <indexterm> <primary>Chain</primary>
+<secondary>OUTPUT</secondary> </indexterm> chains. No other chains are
+required since these are the only places that you can deal with packets before
+they actually hit the connection tracking.
+   </para>
+
+   <note>
+    <para>
+For this table to work, the <systemitem>iptable_raw</systemitem> module must 
+be loaded. It will be loaded automatically if iptables is run with the 
+<command>-t raw</command> keywords, and if the module is available.
+    </para>
+   </note>
+
+   <note>
+    <para>
+The raw table is a relatively new addition to iptables and the kernel. It might 
+not be available in early 2.6 and 2.4 kernels unless patched.
+    </para>
+   </note>
+  </section>
+
+
+   <section id="filtertable">
+     <title id="filtertable.title">Filter table</title>
+<indexterm zone="filtertable">
+  <primary>Table</primary>
+  <secondary>Filter</secondary>
+</indexterm>
+
+     <para>
+The <systemitem>filter</systemitem> table is mainly used for filtering
+packets. We can match packets and filter them in whatever way we want. This is
+the place that we actually take action against packets and look at what they
+contain and <command>DROP</command> or /<command>ACCEPT</command> them,
+depending on their content. Of course we may also do prior filtering; however,
+this particular table is the place for which filtering was designed. Almost
+all targets are usable in this table. We will be more prolific about the
+filter table here; however you now know that this table is the right place to
+do your main filtering. 
+     </para>
+   </section>
+
+   <section id="usertables">
+     <title id="usertables.title">User specified chains</title>
+<indexterm zone="usertables">
+  <primary>Chain</primary>
+  <secondary>User specified</secondary>
+</indexterm>
+<indexterm zone="usertables">
+  <primary>User specified chains</primary>
+</indexterm>
+
+     <para>
+If a packet enters a chain such as the <systemitem>INPUT</systemitem> chain in
+the filter table, we can specify a jump rule to a different chain within the
+same table. The new chain must be userspecified, it may not be a built-in
+chain such as the <systemitem>INPUT</systemitem> or
+<systemitem>FORWARD</systemitem> chain for example. If we consider a pointer
+pointing at the rule in the chain to execute, the pointer will go down from
+rule to rule, from top to bottom until the chain traversal is either ended by
+a target or the main chain (I.e., <systemitem>FORWARD</systemitem>,
+<systemitem>INPUT</systemitem>, et cetera) ends. Once this happens, the
+default policy of the built-in chain will be applied. 
+     </para>
+     
+     <para>
+       <mediaobject>
+         <imageobject>
+           <imagedata fileref="images/table_subtraverse.eps" format=eps>
+         </imageobject>
+         <imageobject>
+           <imagedata fileref="images/table_subtraverse.jpg" format=jpg>
+         </imageobject>
+       </mediaobject>
+     </para>
+
+     <para>
+If one of the rules that matches points to another userspecified chain in the
+jump specification, the pointer will jump over to this chain and then start
+traversing that chain from the top to bottom. For example, see how the rule
+execution jumps from rule number 3 to chain 2 in the above image. The packet
+matched the matches contained in rule 3, and the jump/target specification was
+set to send the packet on for further examination in chain 2.
+     </para>
+
+     <note>
+       <para>
+Userspecified chains can not have a default policy at the end of the chain.
+Only built in chains can have this. This can be circumvented by appending a
+single rule at the end of the chain that has no matches, and hence it will
+behave as a default policy. If no rule is matched in a userspecified chain,
+the default behaviour is to jump back to the originating chain. As seen in the
+image above, the rule execution jumps from chain 2 and back to chain 1 rule 4,
+below the rule that sent the rule execution into chain 2 to begin with.
+       </para>
+     </note>
+
+     <para>
+Each and every rule in the user specified chain is traversed until either one
+of the rules matches -- then the target specifies if the traversing should end
+or continue -- or the end of the chain is reached. If the end of the user
+specified chain is reached, the packet is sent back to the invoking chain. The
+invoking chain can be either a user specified chain or a built-in chain. 
+     </para>
+
+   </section>
+
+   <section>
+     <title>What's next?</title>
+
+     <para>
+In this chapter we have discussed several of the chains and tables and how
+they are traversed, including the standard built-in chains and userspecified
+chains. This is a very important area to understand. It may be simple, but
+unless fully understood, fatal mistakes can be equally easily.
+     </para>
+
+     <para>
+The next chapter will deal in depth with the state machine of netfilter, and
+how states are traversed and set on packets in a connection tracking machine.
+The next chapter is in other words just as important as this chapter has been. 
+     </para>
+
+   </section>
+
+ </chapter>

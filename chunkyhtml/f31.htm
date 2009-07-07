@@ -1,0 +1,191 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>How to read</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="PREVIOUS"
+TITLE="About the author"
+HREF="f23.htm"><LINK
+REL="NEXT"
+TITLE="Prerequisites"
+HREF="f40.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="PREFACE"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="f23.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="f40.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="PREFACE"
+><H1
+><A
+NAME="HOWTOREAD"
+></A
+>How to read</H1
+><P
+>This document could either be read as a reference or from start to end. It was 
+originally written as a small introduction to iptables and to some extent 
+netfilter, but this focus has changed over the years. It aims at being an as 
+complete reference as possibly to iptables and netfilter and to at least give 
+a basic and fast primer or repetition to the areas that you might need to 
+understand. It should be noted that this document will not, nor will it be 
+able to, deal with specific bugs inside or outside the scope of iptables and 
+netfilter, nor does it really deal with how to get around bugs like this. 
+   </P
+><P
+>If you find peculiar bugs or behaviors in iptables or any of the subcomponents, 
+you should contact the Netfilter mailing lists and tell them about the problem 
+and they can tell you if this is a real bug or if it has already been fixed.
+There are security related bugs found in iptables and Netfilter, 
+one or two do slip by once in a while, it's inevitable. These are properly 
+shown on the front page of the <A
+HREF="http://www.netfilter.org"
+TARGET="_top"
+>Netfilter 
+main page</A
+>, and that is where you should go to get information on such 
+topics.
+   </P
+><P
+>The above also implies that the rule-sets available with this tutorial are
+not written to deal with actual bugs inside Netfilter. The main goal of
+them is to simply show how to set up rules in a nice simple fashion that
+deals with all problems we may run into. For example, this tutorial will
+not cover how we would close down the HTTP port for the simple reason that
+Apache happens to be vulnerable in version 1.2.12 (This is covered really,
+though not for that reason).
+   </P
+><P
+>This document was written to give everyone a good and simple primer
+at how to get started with iptables, but at the same time it was created
+to be as complete as possible. It does not contain any targets or matches
+that are in patch-o-matic for the simple reason that it would require too
+much effort to keep such a list updated. If you need information about
+the patch-o-matic updates, you should read the info that comes with it in
+patch-o-matic as well as the other documentations available on the <A
+HREF="http://www.netfilter.org"
+TARGET="_top"
+>Netfilter main page</A
+>.
+   </P
+><P
+>If you have any suggestions on additions or if you think you find any problems 
+around the area of iptables and netfilter not covered in this document feel 
+free to contact me about this. I will be more than happy to take a look at it 
+and possibly add what might be missing. 
+   </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="f23.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="f40.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>About the author</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Prerequisites</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

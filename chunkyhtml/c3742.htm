@@ -1,0 +1,866 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Traversing of tables and chains</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="PREVIOUS"
+TITLE="What's next?"
+HREF="x3738.htm"><LINK
+REL="NEXT"
+TITLE="Mangle table"
+HREF="x4058.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x3738.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x4058.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="TRAVERSINGOFTABLES"
+></A
+>Chapter 6. Traversing of tables and chains</H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Table of Contents</B
+></DT
+><DT
+><A
+HREF="c3742.htm#TRAVERSINGGENERAL"
+>General</A
+></DT
+><DT
+><A
+HREF="x4058.htm"
+>Mangle table</A
+></DT
+><DT
+><A
+HREF="x4113.htm"
+>Nat table</A
+></DT
+><DT
+><A
+HREF="x4156.htm"
+>Raw table</A
+></DT
+><DT
+><A
+HREF="x4183.htm"
+>Filter table</A
+></DT
+><DT
+><A
+HREF="x4192.htm"
+>User specified chains</A
+></DT
+><DT
+><A
+HREF="x4215.htm"
+>What's next?</A
+></DT
+></DL
+></DIV
+><P
+>In this chapter we'll discuss how packets traverse the different
+chains, and in which order. We will also discuss the order in which the
+tables are traversed. We'll see how valuable this is later on, when we
+write our own specific rules. We will also look at the points which
+certain other components, that also are kernel dependent, enter into the
+picture. Which is to say the different routing decisions and so on. This
+is especially necessary if we want to write iptables
+rules that could change routing patterns/rules for packets; i.e. why and
+how the packets get routed, good examples of this are 
+DNAT and SNAT. Not to be forgotten
+are, of course, the TOS bits.
+  </P
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="TRAVERSINGGENERAL"
+>General</A
+></H1
+><P
+> When a packet first enters the firewall, it hits the hardware
+and then gets passed on to the proper device driver in the kernel. Then
+the packet starts to go through a series of steps in the kernel, before it
+is either sent to the correct application (locally), or forwarded to
+another host - or whatever happens to it.
+    </P
+><P
+>    First, let us have a look at a packet that is destined for our
+own local host. It would pass through the following steps before actually
+being delivered to our application that receives it:
+   </P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLEDESTINATIONLOCALHOST"
+></A
+><P
+><B
+>Table 6-1. Destination local host (our own
+machine)</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="40"><COL
+WIDTH="48"><COL
+WIDTH="101"><COL
+WIDTH="1*"><THEAD
+><TR
+><TH
+>Step</TH
+><TH
+>Table</TH
+><TH
+>Chain</TH
+><TH
+>Comment</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>1</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>On the wire (e.g., Internet)</TD
+></TR
+><TR
+><TD
+>2</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>Comes in on the interface (e.g., eth0)</TD
+></TR
+><TR
+><TD
+>3</TD
+><TD
+>raw</TD
+><TD
+>PREROUTING</TD
+><TD
+>This chain is used to handle packets before the connection 
+tracking takes place. It can be used to set a specific connection not to be 
+handled by the connection tracking code for example.</TD
+></TR
+><TR
+><TD
+>4</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>This is when the connection tracking code takes place as 
+discussed in the <A
+HREF="c4219.htm"
+><I
+>The state machine</I
+></A
+> chapter.</TD
+></TR
+><TR
+><TD
+>5</TD
+><TD
+>mangle</TD
+><TD
+>PREROUTING</TD
+><TD
+>This chain is normally used for mangling packets, i.e.,
+changing TOS and so on.</TD
+></TR
+><TR
+><TD
+>6</TD
+><TD
+>nat</TD
+><TD
+>PREROUTING</TD
+><TD
+>This chain is used for DNAT mainly. 
+Avoid filtering in this chain since it will be bypassed in certain cases.</TD
+></TR
+><TR
+><TD
+>7</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>Routing decision, i.e., is the packet destined for our
+local host or to be forwarded and where.</TD
+></TR
+><TR
+><TD
+>8</TD
+><TD
+>mangle</TD
+><TD
+>INPUT</TD
+><TD
+>At this point, the mangle INPUT chain 
+is hit. We use this chain to mangle packets, after they have been routed, but 
+before they are actually sent to the process on the machine.</TD
+></TR
+><TR
+><TD
+>9</TD
+><TD
+>filter</TD
+><TD
+>INPUT</TD
+><TD
+>This is where we do filtering for all incoming traffic
+destined for our local host. Note that all incoming packets destined for this
+host pass through this chain, no matter what interface or in which direction
+they came from.</TD
+></TR
+><TR
+><TD
+>10</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+><P
+>Local process or application (i.e., server or client program).
+	</P
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Note that this time the packet was passed through the
+INPUT chain instead of the
+FORWARD chain. Quite logical. Most probably the only
+thing that's really logical about the traversing of tables and chains in your
+eyes in the beginning, but if you continue to think about it, you'll find
+it will get clearer in time.
+    </P
+><P
+>Now we look at the outgoing packets from our own local host and what steps they
+go through.
+    </P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLESOURCELOCALHOST"
+></A
+><P
+><B
+>Table 6-2. Source local host (our own
+machine)</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="40"><COL
+WIDTH="48"><COL
+WIDTH="101"><COL
+WIDTH="1*"><THEAD
+><TR
+><TH
+>Step</TH
+><TH
+>Table</TH
+><TH
+>Chain</TH
+><TH
+>Comment</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>1</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>Local process/application (i.e., server/client
+program)</TD
+></TR
+><TR
+><TD
+>2</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>Routing decision. What source address to use, what outgoing
+interface to use, and other necessary information that needs to be
+gathered.</TD
+></TR
+><TR
+><TD
+>3</TD
+><TD
+>raw</TD
+><TD
+>OUTPUT</TD
+><TD
+>This is where you do work before the connection tracking has 
+taken place for locally generated packets. You can mark connections so that 
+they will not be tracked for example.</TD
+></TR
+><TR
+><TD
+>4</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>This is where the connection tracking takes place for locally 
+generated packets, for example state changes et cetera. This is discussed in 
+more detail in the <A
+HREF="c4219.htm"
+><I
+>The state machine</I
+></A
+> chapter.</TD
+></TR
+><TR
+><TD
+>5</TD
+><TD
+>mangle</TD
+><TD
+>OUTPUT</TD
+><TD
+>This is where we mangle packets, it is suggested that you do
+not filter in this chain since it can have side effects.</TD
+></TR
+><TR
+><TD
+>6</TD
+><TD
+>nat</TD
+><TD
+>OUTPUT</TD
+><TD
+>This chain can be used to NAT outgoing packets from the
+firewall itself.</TD
+></TR
+><TR
+><TD
+>7</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>Routing decision, since the previous mangle and nat changes may 
+have changed how the packet should be routed.</TD
+></TR
+><TR
+><TD
+>8</TD
+><TD
+>filter</TD
+><TD
+>OUTPUT</TD
+><TD
+>This is where we filter packets going out from the local
+host.</TD
+></TR
+><TR
+><TD
+>9</TD
+><TD
+>mangle</TD
+><TD
+>POSTROUTING</TD
+><TD
+>The POSTROUTING chain in the
+mangle table is mainly used when we want to do mangling on packets before they
+leave our host, but after the actual routing decisions. This chain will be hit
+by both packets just traversing the firewall, as well as packets created by
+the firewall itself.</TD
+></TR
+><TR
+><TD
+>10</TD
+><TD
+>nat</TD
+><TD
+>POSTROUTING</TD
+><TD
+>This is where we do SNAT as described 
+        earlier. It is suggested that you don't do filtering here since it can 
+        have side effects, and certain packets might slip through even though 
+        you set a default policy of DROP.</TD
+></TR
+><TR
+><TD
+>11</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>Goes out on some interface (e.g., eth0)</TD
+></TR
+><TR
+><TD
+>12</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>On the wire (e.g., Internet)</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>In this example, we're assuming that the packet is destined for another host on
+another network. The packet goes through the different steps in the following
+fashion:
+   </P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLEFORWARDEDPACKETS"
+></A
+><P
+><B
+>Table 6-3. Forwarded packets</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="40"><COL
+WIDTH="48"><COL
+WIDTH="101"><COL
+WIDTH="1*"><THEAD
+><TR
+><TH
+>Step</TH
+><TH
+>Table</TH
+><TH
+>Chain</TH
+><TH
+>Comment</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>1</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>On the wire (i.e., Internet)</TD
+></TR
+><TR
+><TD
+>2</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>Comes in on the interface (i.e., eth0)</TD
+></TR
+><TR
+><TD
+>3</TD
+><TD
+>raw</TD
+><TD
+>PREROUTING</TD
+><TD
+>Here you can set a connection to not be handled by the 
+connection tracking system.</TD
+></TR
+><TR
+><TD
+>4</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>This is where the non-locally generated connection tracking 
+takes place, and is also discussed more in detail in the <A
+HREF="c4219.htm"
+><I
+>The state machine</I
+></A
+> chapter.</TD
+></TR
+><TR
+><TD
+>5</TD
+><TD
+>mangle</TD
+><TD
+>PREROUTING</TD
+><TD
+>This chain is normally used for mangling packets, i.e.,
+changing TOS and so on.</TD
+></TR
+><TR
+><TD
+>6</TD
+><TD
+>nat</TD
+><TD
+>PREROUTING</TD
+><TD
+>This chain is used for DNAT mainly. 
+        SNAT is done further on. Avoid filtering in 
+        this chain since it will be bypassed in certain cases.</TD
+></TR
+><TR
+><TD
+>7</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>Routing decision, i.e., is the packet destined for our
+local host or to be forwarded and where.</TD
+></TR
+><TR
+><TD
+>8</TD
+><TD
+>mangle</TD
+><TD
+>FORWARD</TD
+><TD
+>The packet is then sent on to the
+FORWARD chain of the mangle table. This can be used
+for very specific needs, where we want to mangle the packets after the initial
+routing decision, but before the last routing decision made just before the
+packet is sent out.</TD
+></TR
+><TR
+><TD
+>9</TD
+><TD
+>filter</TD
+><TD
+>FORWARD</TD
+><TD
+>The packet gets routed onto the
+FORWARD chain. Only forwarded packets go through
+here, and here we do all the filtering. Note that all traffic that's
+forwarded goes through here (not only in one direction), so you need to
+think about it when writing your rule-set.</TD
+></TR
+><TR
+><TD
+>10</TD
+><TD
+>mangle</TD
+><TD
+>POSTROUTING</TD
+><TD
+>This chain is used for specific types of packet
+mangling that we wish to take place after all kinds of routing decisions have 
+been done, but still on this machine.</TD
+></TR
+><TR
+><TD
+>11</TD
+><TD
+>nat</TD
+><TD
+>POSTROUTING</TD
+><TD
+>This chain should first and foremost be used for
+SNAT. Avoid doing
+filtering here, since certain packets might pass this chain without ever
+hitting it. This is also where Masquerading is done.</TD
+></TR
+><TR
+><TD
+>12</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>Goes out on the outgoing interface (i.e., eth1).</TD
+></TR
+><TR
+><TD
+>13</TD
+><TD
+>&nbsp;</TD
+><TD
+>&nbsp;</TD
+><TD
+>Out on the wire again (i.e., LAN).</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+> As you can see, there are quite a lot of steps to pass through.
+The packet can be stopped at any of the iptables
+chains, or anywhere else if it is malformed; however, we are mainly
+interested in the iptables aspect of this lot. Do note
+that there are no specific chains or tables for different interfaces or
+anything like that. FORWARD is always passed by
+all packets that are forwarded over this firewall/router.
+    </P
+><DIV
+CLASS="CAUTION"
+><P
+></P
+><TABLE
+CLASS="CAUTION"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/caution.gif"
+HSPACE="5"
+ALT="Caution"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Do not use the INPUT chain to filter on in the previous
+scenario! INPUT is meant solely for packets to our 
+local host that do not get routed to any other destination.
+     </P
+></TD
+></TR
+></TABLE
+></DIV
+><P
+>We have now seen how the different chains are traversed in three separate
+scenarios. If we were to figure out a good map of all this, it would look
+something like this:
+    </P
+><P
+>    <DIV
+CLASS="MEDIAOBJECT"
+><P
+><IMG
+SRC="images/tables_traverse.jpg"></P
+></DIV
+>
+   </P
+><P
+>To clarify this image, consider this. If we get a packet into the first
+routing decision that is not destined for the local machine itself, it will be
+routed through the FORWARD chain. If the packet is,
+on the other hand, destined for an IP address that
+the local machine is listening to, we would send the packet through the
+INPUT chain and to the local machine.
+   </P
+><P
+>Also worth a note, is the fact that packets may be destined for the local
+machine, but the destination address may be changed within the
+PREROUTING chain by doing
+NAT. Since this takes place before the first routing
+decision, the packet will be looked upon after this change. Because of this,
+the routing may be changed before the routing decision is done. Do note, that
+<SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>all</I
+></SPAN
+> packets will be going through one or the other path
+in this image. If you DNAT a packet back to the same network
+that it came from, it will still travel through the rest of the chains until
+it is back out on the network.
+   </P
+><DIV
+CLASS="TIP"
+><P
+></P
+><TABLE
+CLASS="TIP"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/tip.gif"
+HSPACE="5"
+ALT="Tip"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>If you feel that you want more information, you could use the <A
+HREF="x12321.htm"
+><I
+>rc.test-iptables.txt</I
+></A
+>
+script. This test script should give you the necessary rules to test how the
+tables and chains are traversed.
+    </P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x3738.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x4058.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>What's next?</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Mangle table</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

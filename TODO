@@ -1,0 +1,13 @@
+* tcp-window-tracking - real TCP window tracking according to [ROOIJ]
+* nf-log??
+* Add section about VPN and iptables (ie, private incoming traffic to netfilter 
+box with public iface and vpn iface on top). including routing. nat'ed ipsec, 
+openvpn. filtering ipsec, openvpn. 
+* French translation needs to be done in DocBook SGML, please? Should fix
+problem with wrong charset encoding.
+* Rewrite rc_firewall.sgml chapter to be more "writing directions".
+
+More installation notes
+* Separate installation notes for 2.6 kernels and 2.4 kernels.
+* POM-NG!!!
+

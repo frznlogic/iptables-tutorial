@@ -1,0 +1,551 @@
+ <appendix id="otherresources">
+  <title id="otherresources.title">Other resources and links</title>
+   <indexterm zone="otherresources">
+     <primary>Other resources</primary>
+   </indexterm>
+
+  <para>
+Here is a list of links to resources and where I have gotten information
+from, etc :
+  </para>
+
+  <para>
+   <itemizedlist>
+   
+    <listitem id="ip-sysctltxt">
+     <para>
+      <ulink
+url="http://iptables-tutorial.frozentux.net/other/ip-sysctl.txt"
+id="ip-sysctltxt.title">ip-sysctl.txt</ulink> - from the 2.4.14 kernel. A
+little bit short but a good reference for the IP networking controls and what
+they do to the kernel.
+     </para>
+    </listitem>
+
+    <listitem id="ingate">
+     <para>
+<ulink url="http://www.ingate.com" id="ingate.title">InGate</ulink> - InGate 
+is a commercial firewall producer that uses Linux as the base for their 
+firewall products. Their productrange goes from basic firewalls to SIP gateways 
+and QoS machines. 
+     </para>
+    </listitem>
+
+    <listitem id="rfc768">
+     <para>
+<ulink url="http://iptables-tutorial.frozentux.net/other/rfc768.txt"
+id="rfc768.title">RFC 768 - User Datagram Protocol</ulink> - This is the 
+official RFC describing how the UDP protocol should be used, in detail, and all 
+of it's headers.
+     </para>
+    </listitem>
+
+    <listitem id="rfc791">
+     <para>
+<ulink url="http://iptables-tutorial.frozentux.net/other/rfc791.txt"
+id="rfc791.title">RFC 791 - Internet Protocol</ulink> - The IP specification 
+as still used on the Internet, with additions and updates. The basic is still 
+the same for IPv4.
+     </para>
+    </listitem>
+
+    <listitem id="rfc792">
+     <para>
+<ulink url="http://iptables-tutorial.frozentux.net/other/rfc792.txt"
+id="rfc792.title">RFC 792 - Internet Control Message Protocol</ulink> -
+The definitive resource for all information about ICMP packets. Whatever
+technical information you need about the ICMP protocol, this is where you
+should turn first. Written by J. Postel.
+     </para>
+    </listitem>
+    
+    <listitem id="rfc793">
+     <para> 
+     <ulink url="http://iptables-tutorial.frozentux.net/other/rfc793.txt"
+id="rfc793.title">RFC 793 - Transmission Control Protocol</ulink> - This is the 
+original resource on how TCP should behave on all hosts. This document has been 
+the standard on how TCP should work since 1981 and forward. Extremely technical, 
+but a must read for anyone who wants to learn TCP in every detail. This was 
+originally a Department of Defense standard written by J. Postel.
+     </para>
+    </listitem>
+
+    <listitem id="rfc1122">
+     <para>
+     <ulink url="http://iptables-tutorial.frozentux.net/other/rfc1122.txt" 
+id="rfc1122.title">RFC 1122 - Requirements for Internet Hosts - Communication 
+Layers</ulink> - This RFC defines the requirements of the software running on 
+a Internet host, specifically the communication layers.
+
+     </para>
+    </listitem>
+
+    <listitem id="rfc1349">
+     <para>
+     <ulink url="http://iptables-tutorial.frozentux.net/other/rfc1349.txt" 
+id="rfc1349.title">RFC 1349 - Type of Service in the Internet Protocol 
+Suite</ulink> - RFC describing some changes and clarifications of the TOS 
+field in the IP header.
+     </para>
+    </listitem>
+
+    <listitem id="rfc1812">
+     <para>
+     <ulink url="http://iptables-tutorial.frozentux.net/other/rfc1812.txt" 
+id="rfc1812.title">RFC 1812 - Requirements for IP Version 4 Routers</ulink> -
+This RFC specifies how routers on the Internet should behave and how they are
+expected to handle different situations. Very interesting reading.
+     </para>
+    </listitem>
+
+    <listitem id="rfc2401">
+     <para> 
+     <ulink url="http://iptables-tutorial.frozentux.net/other/rfc2401.txt"
+id="rfc2401.title">RFC 2401 - Security Architecture for the Internet 
+Protocol</ulink> - This is an RFC talking about the IPSEC implementation and 
+standardisation. Well worth reading if you are working with IPSEC.
+     </para>
+    </listitem>
+
+    
+    <listitem id="rfc2474">
+     <para> 
+     <ulink url="http://iptables-tutorial.frozentux.net/other/rfc2474.txt"
+id="rfc2474.title">RFC 2474 - Definition of the Differentiated Services Field 
+(DS Field) in the IPv4 and IPv6 Headers</ulink> - In this document you will 
+find out how the DiffServ works, and you will find much needed information 
+about the TCP/IP protocol additions/changes needed for the DiffServ protocol 
+to work.
+         </para>
+    </listitem>
+
+    <listitem id="rfc2638">
+     <para> 
+     <ulink url="http://iptables-tutorial.frozentux.net/other/rfc2638.txt"
+id="rfc2638.title">RFC 2638 - A Two-bit Differentiated Services Architecture 
+for the Internet</ulink> - This RFC describes a method of implementing two 
+different differentiated service architecture into one. Both where described 
+originally by D. Clark and van Jacobsen at the Munich IETH meeting 1997. 
+         </para>
+    </listitem>
+
+    <listitem id="rfc2960">
+     <para>
+<ulink url="http://iptables-tutorial.frozentux.net/other/rfc2960.txt" 
+id="rfc2960.title">RFC 2960 - Stream Control Transmission Protocol</ulink> - 
+This is a relatively new protocol developed by several large telecoms companies 
+to complement UDP and TCP as a layer 3 protocol with higher reliability and 
+resilience.
+     </para>
+    </listitem>
+
+    <listitem id="rfc3168">
+     <para> 
+     <ulink url="http://iptables-tutorial.frozentux.net/other/rfc3168.txt"
+id="rfc3168.title">RFC 3168 - The Addition of Explicit Congestion Notification 
+(ECN) to IP</ulink> - This RFC defines how ECN is to be used on a technical 
+level and how it should be implemented in the TCP and IP protocols. Written by 
+K. Ramakrishnan, S. Floyd and D. Black.
+     </para>
+    </listitem>
+
+    <listitem id="rfc3260">
+     <para> 
+     <ulink url="http://iptables-tutorial.frozentux.net/other/rfc3260.txt"
+id="rfc3260.title">RFC 3260 - New Terminology and Clarifications for 
+Diffserv</ulink> - This memo captures Diffserv working group agreements 
+concerning new and improved terminology, and provides minor technical 
+clarifications.
+     </para>
+    </listitem>
+
+    <listitem id="rfc3286">
+     <para>
+<ulink url="http://iptables-tutorial.frozentux.net/other/rfc3286.txt" 
+id="rfc3286.title">RFC 3286 - An Introduction to the Stream Control 
+Transmission Protocol</ulink> - RFC introducing the Stream Control Transmission 
+Protocol, a relatively new layer 3 protocol in the TCP/IP stack. Developed by 
+several large telecom companies.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <ulink
+url="http://iptables-tutorial.frozentux.net/other/ip_dynaddr.txt">
+ip_dynaddr.txt</ulink> - from the 2.4.14 kernel. A really short
+reference to the ip_dynaddr settings available via sysctl and the proc
+file system.
+     </para>
+    </listitem>
+    
+    <listitem>
+     <para>
+      <ulink
+url="http://iptables-tutorial.frozentux.net/other/iptables.html">
+iptables.8</ulink> - The iptables 1.3.1 man page. This is an HTMLized
+version of the man page which is an excellent reference when reading/writing
+iptables rule-sets. Always have it at hand.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <ulink url="http://ipsysctl-tutorial.frozentux.net">Ipsysctl 
+tutorial</ulink> - Another tutorial I have written about the IP System Control 
+in Linux. A try to make a complete listing of all the IP variables that can be 
+set on the fly in Linux. 
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+<ulink url="http://www.policyrouting.org/PolicyRoutingBook/">Policy Routing 
+Using Linux</ulink> - This is an excellent book that has now been opened up on 
+the Internet regarding Policy routing in Linux. It is well written and most 
+definitely worth buying. Written by Matthew G. Marsh.
+     </para>
+    </listitem>
+
+    <listitem id="selinux">
+      <para>
+        <ulink url="http://www.nsa.gov/selinux/"
+id="selinux.title">Security-Enhanced Linux</ulink> - The official site
+of the Security-Enhanced Linux (SELinux) system developed as a proof of
+concept by the National Security Agency (NSA). SELinux is a fine grained
+Mandatory Access Control system, which lets you have a much higher control on
+who can do what and what processes has what privileges, et cetera. 
+      </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <ulink
+url="http://iptables-tutorial.frozentux.net/other/firewall_rules_table_final.pdf">
+Firewall rules table</ulink> - A small PDF document gracefully given to this
+project by Stuart Clark, which gives a reference form where you can write all of
+the information needed for your firewall, in a simple manner.
+     </para>
+    </listitem>
+
+    <listitem id="l7-filter">
+     <para>
+      <ulink id="l7-filter.title"
+url="http://l7-filter.sourceforge.net/">http://l7-filter.sourceforge.net/</ulink> 
+- The l7-filter project is basically a set of patches and files to make 
+iptables and netfilter able to handle layer 7 filtering, mainly for QoS and
+traffic accounting. It works less reliably for filtering however, since it
+will allow the first couple of packets through before actually blocking
+traffic. 
+     </para>
+    </listitem>
+ 
+    <listitem id="netfilter.org">
+     <para>
+      <ulink id="netfilter.org.title"
+url="http://www.netfilter.org/">http://www.netfilter.org/</ulink>
+ - The official <command>Netfilter</command> and <command>iptables</command>
+site. It is a must for everyone wanting to set up <command>iptables</command>
+and <command>Netfilter</command> in linux.
+     </para>
+    </listitem>
+    
+    <listitem id="nmap">
+     <para>
+      <ulink id="nmap.title"
+url="http://www.insecure.org/nmap/">http://www.insecure.org/nmap/</ulink>
+ - Nmap is one of the best, and most known, port scanners available. It 
+is very useful when debugging your firewall scripts. Take a closer look at it.
+     </para>
+    </listitem>
+
+    <listitem id="netfilter.org.faq">
+     <para>
+      <ulink id="netfilter.org.faq.title"
+url="http://www.netfilter.org/documentation/index.html#FAQ">http://www.netfilter.org/documentation/index.html#FAQ</ulink>
+- The official <command>Netfilter</command> <emphasis>Frequently Asked
+Questions</emphasis>. Also a good place to start at when wondering what
+<command>iptables</command> and <command>Netfilter</command> is about.
+     </para>
+    </listitem>
+    
+    <listitem>
+     <para>
+      <ulink
+url="http://www.netfilter.org/unreliable-guides/packet-filtering-HOWTO/index.html">http://www.netfilter.org/unreliable-guides/packet-filtering-HOWTO/index.html</ulink>
+- Rusty Russells Unreliable Guide to packet filtering. Excellent documentation
+about basic packet filtering with <command>iptables</command> written by one of
+the core developers of <command>iptables</command> and
+<command>Netfilter</command>.
+     </para>
+    </listitem>
+    
+    <listitem>
+     <para>
+      <ulink
+url="http://www.netfilter.org/unreliable-guides/NAT-HOWTO/index.html">http://www.netfilter.org/unreliable-guides/NAT-HOWTO/index.html</ulink>
+- Rusty Russells Unreliable Guide to Network Address Translation. Excellent
+documentation about <systemitem>Network Address Translation</systemitem> in
+<command>iptables</command> and <command>Netfilter</command> written by one of
+the core developers, Rusty Russell.
+     </para>
+    </listitem>
+    
+    <listitem id="netfilterhackinghowto">
+     <para>
+      <ulink
+url="http://www.netfilter.org/unreliable-guides/netfilter-hacking-HOWTO/index.html">http://www.netfilter.org/unreliable-guides/netfilter-hacking-HOWTO/index.html</ulink>
+- Rusty Russells Unreliable Netfilter Hacking HOW-TO. One of the few
+documentations on how to write code in the <command>Netfilter</command> and
+<command>iptables</command> user-space and kernel space code-base. This was also
+written by Rusty Russell.
+     </para>
+    </listitem>
+    
+    <listitem>
+     <para>
+      <ulink
+url="http://www.linuxguruz.org/iptables/">http://www.linuxguruz.org/iptables/</ulink>
+ - Excellent link-page with links to most of the pages on the Internet
+about <command>iptables</command> and <command>Netfilter</command>. Also
+maintains a list of <systemitem>iptables scripts</systemitem> for
+different purposes.
+     </para>
+    </listitem>
+
+    <listitem id="policyrouting">
+      <para>
+<ulink url="http://www.policyrouting.org" id="policyrouting.title">Policy 
+Routing using Linux</ulink> - The best book I have ever read on Policy routing 
+nad linux. This is an absolute must when it comes to routing in linux. Written 
+by Matthew G. Marsh.
+      </para>
+    </listitem>
+
+    <listitem id="ciscodscp">
+     <para>
+      <ulink url="http://www.cisco.com/warp/public/105/dscpvalues.html" 
+id="ciscodscp.title">Implementing Quality of Service Policies with DSCP</ulink> 
+- A link about the cisco implementation of DSCP. This shows some classes used in 
+DSCP, and so on.
+     </para>
+    </listitem>
+    
+    <listitem id="sip">
+      <para>
+        <ulink url="http://www.ietf.org/html.charters/sip-charter.html" 
+id="sip.title">IETF SIP Working Group</ulink> - SIP is one of the "next big
+things" it seems. Basically it is the defacto standards for Internet telephony
+today. It is horribly complex as you can see from the amount of documentation
+on the working groups homepage, and should hopefully be able to cope with pretty 
+much any needs of session initiation in the future. It is used mainly to setup
+peer to peer connections between known users, for example to connect to
+user@example.org and setup a phone connection to that user. This is the IETF
+Working group handling all SIP work.
+      </para> 
+    </listitem>
+
+    <listitem id="tls">
+      <para>
+        <ulink url="http://www.ietf.org/html.charters/tls-charter.html" 
+id="tls.title">IETF TLS Working Group</ulink> - TLS is a transport layer security 
+model that is one of the most common host to server based security mechanisms.
+The current version is running is 1.1 and work is ongoing to get 1.2 out the door 
+with support for newer and better cryptos as of this writing. This is a  
+standardized way of sending and receiving public keys for servers and handling
+trusted certificate agents etc. For more information, read the RFC's on this page.
+      </para> 
+    </listitem>
+
+    
+    <listitem id="ipsec-howto">
+     <para>
+      <ulink url="http://www.ipsec-howto.org" 
+id="ipsec-howto.title">IPSEC Howto</ulink> - This is the official IPSEC howto 
+for Linux 2.6 kernels. It describes how IPSEC works in the 2.6 kernels and up, 
+however, it is not the place to find out exactly how the Linux 2.2 and 2.4 
+kernels worked when it comes to IPSEC. Go to the <link linkend="freeswan" 
+endterm="freeswan.title"></link> site for that information.
+      </para>
+    </listitem>
+    
+    <listitem id="freeswan">
+     <para>
+      <ulink url="http://www.freeswan.org" 
+id="freeswan.title">FreeS/WAN</ulink> - This is the official site for FreeS/WAN, 
+an IPSEC implementation for the Linux 2.2 and 2.4 kernel series. This site 
+contains documentation and all necessary downloads for the IPSEC implementation. 
+This effort has been discontinued due to several reasons discussed on the page, 
+but efforts will still be put into bugfixes, documentation and the forums. For 
+an IPSEC implementation for Linux 2.6 kernels, please look at the <link 
+linkend="ipsec-howto" endterm="ipsec-howto.title"></link> site and the 
+information there.
+      </para>
+    </listitem>
+    
+    <listitem>
+     <para>
+      <ulink 
+url="http://www.islandsoft.net/veerapen.html">http://www.islandsoft.net/veerapen
+.html</ulink> -Excellent discussion on automatic hardening of 
+<command>iptables</command> and how to make small changes that will make your 
+computer automatically add hostile sites to a special ban list in 
+<command>iptables</command>
+.     </para>
+    </listitem>
+
+
+    <listitem id="protocolstxt">
+     <para>
+<ulink url="http://iptables-tutorial.frozentux.net/other/protocols.txt" 
+id="protocolstxt.title"><filename>/etc/protocols</filename></ulink> - An example 
+protocols file taken from the Slackware distribution. This can be used to find out
+what protocol number different protocols have, such as the IP, ICMP or TCP 
+protocols have.
+     </para>
+    </listitem>
+
+    <listitem id="servicestxt">
+     <para>
+<ulink url="http://iptables-tutorial.frozentux.net/other/services.txt"
+id="servicestxt.title"><filename>/etc/services</filename></ulink> - An example 
+services file taken from the Slackware distribution. This is extremely good to
+get used to reading once in a while, specifically if you want to get a basic look
+at what protocols runs on different ports.
+     </para>
+    </listitem>
+    
+    <listitem id="iana.org">
+     <para>
+<ulink url="http://www.iana.org" id="iana.org.title">Internet Assigned 
+Numbers Authority</ulink> - The IANA is the organisation that is responsible for 
+fixing all numbers in the different protocols in an orderly fashion. If anyone 
+has a specific addition to make to a protocol (for example, adding a new TCP 
+option), they need to contact the IANA, which will assign the numbers requested. 
+In other words, extremely important site to keep an eye on.
+     </para>
+    </listitem>
+    
+    <listitem id="rfceditor.org">
+      <para>
+<ulink url="http://www.rfc-editor.org" 
+id="rfceditor.org.title">RFC-editor.org</ulink> - This is an excellent site for 
+finding RFC documents in a fast and orderly way. Functions for searching RFC 
+documents, and general information about the RFC community (I.e., errata, news, 
+et cetera).
+      </para>
+    </listitem>
+    
+    <listitem id="ietf">
+     <para>
+<ulink url="http://www.ietf.org" id="ietf.title">Internet Engineering Task 
+Force</ulink> - This is one of the biggest groups when it comes to setting and 
+maintaining Internet standards. They are the ones maintaining the RFC 
+repository, and consist of a large group of companies and individuals that work 
+together to ensure the interoperability of the Internet.
+     </para>
+    </listitem>
+                 
+   <listitem id="lartc">
+    <para>
+<ulink url="http://www.lartc.org" id="lartc.title">Linux Advanced Routing 
+and Traffic Control HOW-TO</ulink> - This site hosts the Linux 
+Advanced Routing and Traffic Control HOWTO. It is one of the biggest and best 
+documents regarding Linux advanced routing. Maintained by Bert Hubert.
+    </para>
+   </listitem>
+                 
+   <listitem id="paksecured">
+    <para>
+<ulink url="http://www.paksecured.com/patches/" id="paksecured.title">Paksecured 
+Linux Kernel patches</ulink> - A site containing all of the kernel patches 
+written by Matthew G. Marsh. Among others, the FTOS patch is available here.
+    </para>
+   </listitem>
+  
+   <listitem id="ulogdsite">
+    <para>
+<ulink url="http://www.gnumonks.org/gnumonks/projects/project_details?p_id=1" 
+id="ulogdsite.title">ULOGD project page</ulink> - The homepage of the ULOGD 
+site.
+    </para>
+   </listitem>
+
+   <listitem id="tldp">
+      <para>
+The <ulink url="http://www.linuxdoc.org" id="tldp.title">Linux Documentation Project</ulink> 
+is a great site for documentation. Most big documents for Linux is available 
+here, and if not in the TLDP, you will have to search the net very 
+carefully. If there is anything you want to know more about, check this site 
+out.
+      </para>
+    </listitem>
+
+    <listitem id="snortnids">
+      <para>
+<ulink url="http://www.snort.org" id="snortnids.title">Snort</ulink> - this is 
+an excellent open source "network intrusion detection system" (NIDS) which looks 
+for signatures in the packets that it sees, and if it sees a signature of some 
+kind of attack or break-in it can do different actions that can be defined 
+(notifying the administrator, or take action, or simply logging it).
+      </para>
+    </listitem>
+
+    <listitem id="tripwireids">
+      <para>
+<ulink url="http://www.tripwire.org" id="tripwireids.title">Tripwire</ulink> - 
+tripwire is an excellent security tool which can be used to find out about 
+host intrusions. It makes checksums of all the files specified in a 
+configuration file, and then it tells the administrator about any files that has 
+been tampered with in an illegit way every time it is run.
+      </para>
+    </listitem>
+
+    <listitem id="squidproxy">
+      <para>
+<ulink url="http://www.squid.org" id="squidproxy.title">Squid</ulink> - This is 
+one of the most known webproxies available on the market. It is open source, and 
+free. It can do several of the filtering tasks that should be done before the 
+traffic actually hits your webserver, as well as doing the standard webcaching 
+functions for your networks. 
+      </para>
+    </listitem>
+        
+    <listitem>
+     <para>
+      <ulink
+url="http://kalamazoolinux.org/presentations/20010417/conntrack.html">
+http://kalamazoolinux.org/presentations/20010417/conntrack.html</ulink> - This
+presentation contains an excellent explanation of the conntrack modules and
+their work in Netfilter. If you are interested in more documentation on
+conntrack, this is a "must read".
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <ulink url="http://www.docum.org">http://www.docum.org</ulink> -
+Excellent information about the <systemitem>CBQ</systemitem>,
+<command>tc</command> and the <command>ip</command> commands in Linux. One of
+the few sites that has any information at all about these programs. Maintained
+by Stef Coene.
+     </para>
+    </listitem>
+
+    <listitem id="netfilterlist">
+     <para>
+      <ulink
+url="http://lists.samba.org/mailman/listinfo/netfilter">http://lists.samba.org/m
+ailman/listinfo/netfilter</ulink>- The official Netfilter mailing-list. 
+Extremely useful in case you have questions about something not covered in this 
+document or any of the other links here.
+      </para>
+    </listitem>       
+  </itemizedlist>  
+  </para>
+  
+  <para>
+And of course the <command>iptables</command> source, documentation and 
+individuals who helped me.  
+  </para> 
+</appendix>

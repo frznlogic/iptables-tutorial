@@ -1,0 +1,190 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>ICMP characteristics</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="TCP/IP repetition"
+HREF="c171.htm"><LINK
+REL="PREVIOUS"
+TITLE="UDP headers"
+HREF="x980.htm"><LINK
+REL="NEXT"
+TITLE="ICMP headers"
+HREF="x1078.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x980.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 2. TCP/IP repetition</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x1078.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="ICMPCHARACTERISTICS"
+>ICMP characteristics</A
+></H1
+><P
+>ICMP messages are used for a basic kind of error
+reporting between host to host, or host to gateway. Between gateway to
+gateway, a protocol called Gateway to Gateway
+protocol
+(GGP) should normally be used
+for error reporting. As we have already discussed, the
+IP protocol is not designed for perfect error
+handling, but ICMP messages solves some parts of
+these problems. The big problem from one standpoint is that the headers of the
+ICMP messages are rather complicated, and differ a
+little bit from message to message. However, this will not be a big problem
+from a filtering standpoint most of the time.
+      </P
+><P
+>The basic form is that the message contains the standard
+IP header, type, 
+code and a checksum. All
+ICMP messages contains these fields. The
+type specifies what kind of error or reply message
+this packet is, such as for example destination
+unreachable, echo, echo
+reply, or redirect message. The
+code field specifies more information, if necessary.
+If the packet is of type destination
+unreachable, there are several possible values on this
+code field such as network
+unreachable, host unreachable, or
+port unreachable. The
+checksum is simply a checksum for the whole packet.
+      </P
+><P
+>As you may have noticed, I mentioned the IP header
+explicitly for the ICMP packet. This was done since
+the actual IP header is an integral part of the
+ICMP packet, and the ICMP
+protocol lives on the same level as the IP protocol
+in a sense. ICMP does use the
+IP protocol as if it where a higher level protocol,
+but at the same time not. ICMP is an integral part of
+IP, and ICMP must be
+implemented in every IP implementation.
+      </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x980.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x1078.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>UDP headers</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c171.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>ICMP headers</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

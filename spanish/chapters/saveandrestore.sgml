@@ -1,0 +1,315 @@
+ <chapter id="saveandrestore">
+  <title id="saveandrestore.title">Salvando y restaurando grandes conjuntos de
+  reglas</title>
+
+  <para>
+El paquete <command>iptables</command> tiene dos herramientas muy útiles,
+especialmente cuando te enfrentas a conjuntos de reglas muy grandes. Estas
+herramientas son <command>iptables-save</command> e <command>iptables-restore</command>,
+y se usan respectivamente para salvar y restaurar conjuntos de reglas en un formato de fichero
+específico, que parece bastante diferente del código del intérprete de comandos
+(shell) estándar que puedes ver en el resto del tutorial.
+  </para>
+
+  <section id="speedconsiderations">
+   <title id="speedconsiderations.title">Considerando la velocidad</title>
+
+   <para>
+Una de las razones más convincentes para utilizar los comandos
+<command>iptables-save</command> e <command>iptables-restore</command> es que
+aceleran considerablemente la carga y la copia de los conjuntos de reglas más
+grandes. El principal problema al ejecutar un script en la línea de comandos
+que contenga reglas de <command>iptables</command>, es que cada vez que se
+invoca a <command>iptables</command> en el script se procede en primer lugar
+a extraer el conjunto de reglas completo del espacio del núcleo de Netfilter,
+para a continuación insertar, añadir o efectuar el cambio que sea necesario por
+el comando específico. Por último, devolverá el conjunto de reglas desde su
+propia memoria al espacio del núcleo. Utilizando un script, estas operaciones
+se ejecutan en cada una de las reglas que queramos insertar y consecuentemente
+cada vez cuesta más extraer e insertar el conjunto de reglas, pues cada vez
+hay más reglas en el conjunto.
+   </para>
+
+   <para>
+Para resolver este problema se han creado los comandos <command>iptables-save</command>
+e <command>iptables-restore</command>. El primero (<command>iptables-save</command>)
+se usa para guardar el conjunto de reglas en un fichero de texto con un formato
+especial, mientras que <command>iptables-restore</command> carga ese fichero
+de texto de nuevo en el núcleo. Lo mejor de todo ésto es que cargan y guardan
+el conjunto de reglas mediante una sóla petición: <command>iptables-save</command>
+captará el conjunto de reglas completo del núcleo y lo guardará en un fichero
+en un sólo paso; <command>iptables-restore</command> cargará en el núcleo un
+conjunto de reglas específico en un paso por cada tabla. O sea, en vez de copiar
+el conjunto de reglas desde el núcleo, que en un ejemplo grande podría significar repetir el proceso 30.000
+veces (si hubieran 30.000 reglas) y después volverlo a cargar en el núcleo otras tantas veces, podremos
+copiar desde el núcleo de una vez y volver a cargar en el núcleo en 3 pasos
+(suponiendo que hayan sólo 3 tablas).
+   </para>
+
+   <para>
+Como puedes comprender, estas herramientas son exactamente lo que necesitas si
+estás trabajando con una gran cantidad de reglas y debes insertarlas en el
+conjunto de reglas. Sin embargo tienen sus inconvenientes, como discutiremos a
+continuación.
+   </para>
+
+  </section>
+
+  <section id="drawbackswithrestore">
+   <title id="drawbackswithrestore.title">Inconvenientes con la restauración</title>
+
+   <para>
+Es posible que te estés preguntando si <command>iptables-restore</command>
+soporta de alguna manera los scripts. Y la respuesta es que de momento no, y
+lo más probable es que nunca lo haga. Este es el principal problema derivado
+del uso de <command>iptables-restore</command>, puesto que no podrás hacer una
+gran cantidad de tareas con estos ficheros. Por ejemplo: ¿qué ocurre cuando
+tienes una conexión a la que se le asigna dinamicamente su dirección IP y
+quieres captar esta dirección cada vez que el ordenador arranca para utilizarla
+en tus scripts? Con <command>iptables-restore</command>, ésto es prácticamente
+imposible.
+   </para>
+
+   <para>
+Una posibilidad de conseguirlo es crear un pequeño script que primero capte los valores
+que quieres usar en las reglas, después busque ciertas claves en el fichero creado por
+<command>iptables-save</command> y las sustituya por los valores captados anteriormente.
+Una vez llegados a este punto, puedes salvar el fichero modificado en un fichero temporal y utilizar
+el comando <command>iptables-restore</command> para cargar los nuevos valores.
+Sin embargo ésta manera de proceder causa un montón
+de problemas y no podrás utilizar correctamente <command>iptables-save</command>,
+pues probablemente eliminará los valores añadidos manualmente (por el script).
+En definitiva es una solución, cuando menos, poco acertada.
+   </para>
+
+   <para>
+Otra posible solución sería cargar los ficheros con <command>iptables-restore</command>
+y a continuación ejecutar un script que inserte reglas más dinámicas en los
+lugares adecuados. Por descontado, esta manera de proceder es tan poco acertada
+como la anterior. La cuestión de fondo es que <command>iptables-restore</command>
+no está adaptado para aquellas configuraciones dónde las direcciones IP se
+asignan al cortafuegos dinámicamente, o dónde deseas diferentes comportamientos
+dependiendo de los valores de determinadas opciones de configuración.
+   </para>
+
+   <para>
+Otro inconveniente de <command>iptables-restore</command> e <command>iptables-save</command>
+es que de momento no son plenamente funcionales. El problema radica en los
+pocos usuarios que utilizan estos comandos y por tanto son pocos los que buscan
+fallos, de forma que es posible que algunas comparaciones y objetivos se
+inserten mal, y ésto lleve a comportamientos extraños o no esperados. A pesar de
+todo, aunque existen estos problemas, recomendaría encarecidamente utilizar
+estas herramientas, ya que deberían funcionar perfectamente bien para la mayoría
+de conjuntos de reglas, siempre que no contengan algunos de los nuevos objetivos
+o comparaciones que no sabe cómo manejar convenientemente. En un par de frases: si tus
+conjuntos de reglas no están absolutamente "a la última", estas herramientas
+funcionan como caídas del cielo.
+   </para>
+
+  </section>
+
+  <section id="iptables-save">
+   <title id="iptables-save.title">iptables-save</title>
+
+   <para>
+El comando <command>iptables-save</command> es una herramienta para guardar el
+conjunto de reglas existente en iptables a un fichero que puede utilizar
+<command>iptables-restore</command>. Este comando es bastante fácil de usar y
+sólo tiene dos argumentos. Échale un vistazo al siguiente ejemplo para entender
+la sintaxis apropiada del comando.
+   </para>
+
+   <para>
+    <cmdsynopsis>
+     <command>iptables-save</command>
+     <arg choice="opt">-c</arg>
+     <arg choice="opt">-t <replaceable>tabla</replaceable></arg>
+    </cmdsynopsis>
+   </para>
+
+   <para>
+La opción <command>-c</command> le indica a <command>iptables-save</command>
+que guarde también los valores existentes en los contadores de bytes y de paquetes.
+Ésto puede ser útil si queremos reiniciar el cortafuegos sin perder los valores
+de estos contadores, que servirán, por ejemplo, para continuar con nuestras
+rutinas estadísticas sin problemas. Por supuesto el valor por defecto es no
+conservar los datos de los contadores.
+   </para>
+
+   <para>
+La opción <command>-t</command> indica a <command>iptables-save</command> qué
+tablas guardar. Sin este argumento el comando guardará en el fichero todas las
+tablas disponibles. A continuación tienes un ejemplo de la salida que puedes
+esperar del comando <command>iptables-save</command> si no tienes ningún
+conjunto de reglas cargado (lógicamente la salida es en inglés).
+   </para>
+
+<para>
+<programlisting>
+# Generated by iptables-save v1.2.6a on Wed Apr 24 10:19:17 2002
+*filter
+:INPUT ACCEPT [404:19766]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [530:43376]
+COMMIT
+# Completed on Wed Apr 24 10:19:17 2002
+# Generated by iptables-save v1.2.6a on Wed Apr 24 10:19:17 2002
+*mangle
+:PREROUTING ACCEPT [451:22060]
+:INPUT ACCEPT [451:22060]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [594:47151]
+:POSTROUTING ACCEPT [594:47151]
+COMMIT
+# Completed on Wed Apr 24 10:19:17 2002
+# Generated by iptables-save v1.2.6a on Wed Apr 24 10:19:17 2002
+*nat
+:PREROUTING ACCEPT [0:0]
+:POSTROUTING ACCEPT [3:450]
+:OUTPUT ACCEPT [3:450]
+COMMIT
+# Completed on Wed Apr 24 10:19:17 2002
+</programlisting>
+</para>
+
+   <para>
+Como puedes ver los comentarios comienzan con el signo #. Cada tabla se marca
+así: *&lt;nombre-tabla&gt;, como por ejemplo <computeroutput>*mangle</computeroutput>.
+A continuación, dentro de cada tabla se encuentran las especificaciones de las
+cadenas y las reglas. Una especificación de cadena es similar a:
+:&lt;nombre-cadena&gt; &lt;política-cadena&gt; [&lt;contador-paquetes&gt;:&lt;contador-bytes&gt;].
+El <computeroutput>nombre de cadena</computeroutput> puede ser, por ej.,
+<systemitem>PREROUTING</systemitem>, la política ya se ha descrito antes y puede
+ser <systemitem>ACCEPT</systemitem>. Por otra parte, los contadores de paquetes
+y de bytes son los mismos que obtenemos con <command>iptables -L -v</command>.
+Por último, cada declaración de tabla finaliza con la clave <computeroutput>COMMIT</computeroutput>.
+Esta clave nos indica que en ese punto debemos enviar al núcleo todas las reglas
+que se han ido leyendo.
+   </para>
+
+   <para>
+El ejemplo anterior es bastante básico y por éllo considero que es apropiado
+mostrar un breve ejemplo que contiene un pequeño <link
+linkend="iptsave-ruleset" endterm="iptsave-ruleset.title"></link>. 
+Si quisiéramos ejecutar
+<command>iptables-save</command> con éste conjunto de reglas cargado en el
+núcleo, la salida sería algo similar a (otra vez, en inglés):
+   </para>
+
+<para>
+<programlisting>
+# Generated by iptables-save v1.2.6a on Wed Apr 24 10:19:55 2002
+*filter
+:INPUT DROP [1:229]
+:FORWARD DROP [0:0]
+:OUTPUT DROP [0:0]
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT 
+-A FORWARD -i eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT 
+-A FORWARD -i eth1 -m state --state NEW,RELATED,ESTABLISHED -j ACCEPT 
+-A OUTPUT -m state --state NEW,RELATED,ESTABLISHED -j ACCEPT 
+COMMIT
+# Completed on Wed Apr 24 10:19:55 2002
+# Generated by iptables-save v1.2.6a on Wed Apr 24 10:19:55 2002
+*mangle
+:PREROUTING ACCEPT [658:32445]
+:INPUT ACCEPT [658:32445]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [891:68234]
+:POSTROUTING ACCEPT [891:68234]
+COMMIT
+# Completed on Wed Apr 24 10:19:55 2002
+# Generated by iptables-save v1.2.6a on Wed Apr 24 10:19:55 2002
+*nat
+:PREROUTING ACCEPT [1:229]
+:POSTROUTING ACCEPT [3:450]
+:OUTPUT ACCEPT [3:450]
+-A POSTROUTING -o eth0 -j SNAT --to-source 195.233.192.1 
+COMMIT
+# Completed on Wed Apr 24 10:19:55 2002
+</programlisting>
+</para>
+
+   <para>
+Como puedes ver, a cada comando se le ha añadido como prefijo los contadores
+de bytes y paquetes, puesto que se ha empleado la opción <command>-c</command>
+en el comando. Excepto éste detalle, la línea de comandos es casi igual al
+script. El único problema ahora es cómo guardar la salida del comando en un
+fichero, aunque la solución es bastante simple y ya deberías conocerla si has
+trabajado con Linux antes: sólo se trata de dirigir la salida del comando hacia
+un fichero con el nombre que desees. Ésto puede parecerse a:
+   </para>
+
+   <para>
+    <command>iptables-save -c > /etc/iptables-save</command>
+   </para>
+
+   <para>
+El comando anterior guardará el conjunto de reglas con los valores de sus
+contadores en un fichero llamado <filename>/etc/iptables-save</filename>.
+   </para>
+
+  </section>
+
+  <section id="iptables-restore">
+   <title id="iptables-restore.title">iptables-restore</title>
+
+   <para>
+El comando <command>iptables-restore</command> se emplea para volver a cargar
+en el núcleo el conjunto de reglas guardado con <command>iptables-save</command>.
+Sin embargo, por ahora carga toda la información desde la entrada estándar y no desde un
+fichero. La sintaxis es:
+   </para>
+
+   <para>
+    <cmdsynopsis>
+     <command>iptables-restore</command>
+     <arg choice="opt">-c</arg>
+     <arg choice="opt">-n</arg>
+    </cmdsynopsis>
+   </para>
+
+   <para>
+El argumento <command>-c</command> reestablece los contadores de bytes y
+paquetes y es la opción que debes usar cuando quieras volver a cargar los
+valores guardados con <command>iptables-save</command> de estos contadores. La
+opción también puede escribirse en su forma extendida: <command>--counters</command>.
+   </para>
+
+   <para>
+El argumento <command>-n</command> le indica a <command>iptables-restore</command>
+que no sobreescriba las reglas existentes en la tabla o tablas en que esté
+escribiendo. El comportamiento por defecto de <command>iptables-restore</command>
+es eliminar cualquier regla preexistente. La opción en su "versión larga" sería:
+<command>--noflush</command>.
+   </para>
+
+   <para>
+Para cargar conjuntos de reglas con el comando <command>iptables-restore</command>
+tenemos varias alternativas, aunque veremos la más simple y más utilizada.
+   </para>
+
+   <para>
+    <command>cat /etc/iptables-save | iptables-restore -c</command>
+   </para>
+
+   <para>
+Simplificando: con éllo imprimiremos en la salida estándar (la pantalla) el
+contenido del conjunto de reglas existente en el fichero<filename>/etc/iptables-save</filename>
+y a continuación esa salida se dirigirá al comando <command>iptables-restore</command>,
+que captará el conjunto de reglas y lo cargará en el núcleo, incluyendo los
+valores de los contadores de bytes y paquetes. Ésta es la forma más sencilla de
+comenzar a usar el comando, aunque el ejemplo anterior se puede modificar hasta
+la saciedad, con diferentes posibilidades de redireccionamiento de la salida.
+Sin embargo, ésto se sale del objetivo de éste capítulo y prefiero dejar al
+lector que experimente por su cuenta.
+   </para>
+
+   <para>
+El conjunto de reglas debería ahora estar cargado correctamente en el núcleo y
+todo debería funcionar. Si no es así, probablemente has cometido algún fallo
+al escribir los comandos, o habrás encontrado un "bug".
+   </para>
+
+  </section>
+
+ </chapter>

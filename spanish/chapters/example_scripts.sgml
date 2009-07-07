@@ -1,0 +1,702 @@
+ <chapter id="examplescripts">
+  <title id="examplescripts.title">Scripts de ejemplo</title>
+
+  <para>
+El objetivo de este capítulo es dar una explicación sucinta de cada script
+disponible con este tutorial, así como un vistazo general de los scripts y
+los servicios que ofrecen. Los scripts no son en modo alguno perfectos y es
+posible que no se ajusten exactamente a tus necesidades. En otras palabras:
+eres tú el que debes ajustar los scripts a tus necesidades. El resto del
+tutorial debería ayudarte a efectuar los cambios necesarios. La primera
+sección del tutorial versa acerca de la estructura establecida en cada script,
+con lo cual debería ser más fácil entender cada apartado de los scripts.
+  </para>
+
+  &scriptexplanation;
+
+   <section id="rcfirewalltxt">
+    <title id="rcfirewalltxt.title">rc.firewall.txt</title>
+
+     <para> 
+     <mediaobject>
+      <imageobject>
+       <imagedata fileref="images/rc_firewall.eps" format="eps">
+      </imageobject>
+      <imageobject>
+       <imagedata fileref="images/rc_firewall.jpg" format="jpg">
+      </imageobject>
+     </mediaobject>
+    </para>
+
+    <para>
+El script <ulink url="http://iptables-tutorial.frozentux.net/scripts/rc.firewall.txt">
+rc.firewall.txt</ulink> es el "centro neurálgico" en el que se basan el resto de
+scripts. El capítulo <link linkend="rcfirewallfile" endterm="rcfirewallfile.title"></link>
+debería explicar detenidamente cada detalle del script. Principalmente se ha
+escrito para una red local casera dual, como por ejemplo cuando
+tienes una red local y una conexión a Internet. Este script también asume que
+tienes una dirección IP estática para la conexión a Internet, por lo que no usa
+ni <systemitem>DHCP</systemitem>, ni <systemitem>PPP</systemitem>, ni
+<systemitem>SLIP</systemitem>, ni ningún otro protocolo que te asigne
+automáticamente una dirección IP. Si lo que buscas es un script que funcione
+con esas configuraciones, mejor échale un vistazo al script <link
+linkend="rcDHCPfirewalltxt" endterm="rcDHCPfirewalltxt.title"></link>.
+    </para>
+
+    <para>
+El script <filename>rc.firewall.txt</filename> necesita que las siguientes
+opciones sea compiladas estáticamente en el núcleo, o bien compiladas como
+módulos. Sin alguna de éllas quedará penalizado en mayor o menor medida, puesto
+que habrán funcionalidades requeridas, necesarias en el script, que quedarán
+inutilizables. Asímismo, conforme vayas cambiando el script para adaptártelo,
+posiblemente necesitarás más opciones compiladas en el núcleo (dependiendo
+siempre de lo que quieras utilizar).
+    </para>
+
+    <itemizedlist mark="opencircle">
+     <listitem>
+      <para>
+      CONFIG_NETFILTER
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_CONNTRACK
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_IPTABLES
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_MATCH_LIMIT
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_MATCH_STATE
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_FILTER
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_NAT
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_TARGET_LOG
+      </para>
+     </listitem>
+    </itemizedlist>
+
+   </section>
+
+   <section id="rcdmzfirewalltxt">
+     <title id="rcdmzfirewalltxt.title">rc.DMZ.firewall.txt</title>
+
+     <para>
+     <mediaobject>
+      <imageobject>
+       <imagedata fileref="images/rc_DMZ_firewall.eps" format="eps">
+      </imageobject>
+      <imageobject>
+       <imagedata fileref="images/rc_DMZ_firewall.jpg" format="jpg">
+      </imageobject>
+     </mediaobject>
+    </para>
+
+    <para>
+El script <ulink url="http://iptables-tutorial.frozentux.net/scripts/rc.DMZ.firewall.txt">
+rc.DMZ.firewall.txt</ulink> va destinado a aquellos que tienen una
+<systemitem>Red Interna de Confianza</systemitem>
+(<systemitem>Trusted Internal Network</systemitem>), una
+<systemitem>Zona "Desmilitarizada"</systemitem> (<systemitem>De-Militarized Zone</systemitem>)
+y una <systemitem>Conexión a Internet</systemitem> (<systemitem>Internet
+Connection</systemitem>). La <systemitem>Zona Desmilitarizada</systemitem>
+en este caso es "<systemitem>NAT</systemitem>-eada" 1-a-1 y requiere que hagas
+algo de solapamiento (aliasing) en tu cortafuegos, ésto es, debes conseguir que
+la máquina reconozca paquetes de más de una IP. Hay varias formas de conseguirlo:
+una es establecer la traducción <systemitem>NAT</systemitem> de 1 a 1; si dispones de una
+subred completa, otra forma sería crear una subred, dándole al cortafuegos una
+IP a la vez interna y externa. A partir de aquí, puedes establecer las IPs en
+las máquinas de la zona <systemitem>DMZ</systemitem> tal como desees. Sin
+embargo, ten encuenta que este sistema te "robará" dos IPs: una para la
+dirección de difusión (broadcast) y otra más para la dirección de red. Al final
+es decisión tuya qué implementar, pero este tutorial sólo te dará las
+herramientas para conseguir configurar la parte del cortafuegos y del
+<systemitem>NAT</systemitem>, siendo el resto tarea tuya, puesto que no te
+indicará qué debes hacer a partir de ahí (ésto se sale fuera de la intención
+del tutorial).
+    </para>
+
+    <para>
+El script rc.DMZ.firewall.txt requiere las siguientes opciones compiladas en el
+núcleo, bien de forma estática, bien en forma de módulos. Sin estas opciones
+al menos disponibles en el núcleo, no serás capaz de utilizar la
+funcionalidad del script. O sea, que obtendrás un montón de errores respecto
+a módulos, objetivos/saltos o comparaciones no encontrados. Si tienes en mente
+efectuar un control del tráfico o algo similar, debes asegurarte que también
+tienes todas las opciones necesarias compiladas en el núcleo.
+    </para>
+
+    <itemizedlist mark="opencircle">
+     <listitem>
+      <para>
+      CONFIG_NETFILTER
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_CONNTRACK
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_IPTABLES
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_MATCH_LIMIT
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_MATCH_STATE
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_FILTER
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_NAT
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_TARGET_LOG
+      </para>
+     </listitem>
+    </itemizedlist>
+
+    <para>
+Como puedes ver en la imagen, necesitas tener dos redes internas con este script.
+Una utiliza el rango IP 192.168.0.0/24 y se trata de una <systemitem>Red Interna
+de Confianza</systemitem>. La otra utiliza el rango IP 192.168.1.0/24,
+tratándose de la <systemitem>Zona Desmilitarizada</systemitem> a la que le
+efectuaremos la traducción <systemitem>NAT</systemitem> 1-a-1. Por ejemplo, si
+alguien desde Internet envía un paquete a nuestra <varname>DNS_IP</varname>,
+utilizaremos <systemitem>DNAT</systemitem> para enviar el paquete a nuestro
+<systemitem>DNS</systemitem> en la red <systemitem>DMZ</systemitem>. Cuando el
+<systemitem>DNS</systemitem> comprueba el paquete, lo envía a la dirección IP
+del <systemitem>DNS</systemitem> de la red interna y no a la IP del
+<systemitem>DNS</systemitem> externo. Si el paquete no hubiera sido traducido,
+el <systemitem>DNS</systemitem> nunca hubiera respondido al paquete. Veamos
+a continuación un pequeño ejemplo del aspecto del código <systemitem>DNAT</systemitem>:
+    </para>
+
+    <screen>
+<command>
+$IPTABLES -t nat -A PREROUTING -p TCP -i $INET_IFACE -d $DNS_IP \
+--dport 53 -j DNAT --to-destination $DMZ_DNS_IP
+</command>
+    </screen>
+
+    <para>
+Ésto viene a significar los siguiente: para empezar, la traducción
+<systemitem>DNAT</systemitem> sólo se puede efectuar en la cadena
+<systemitem>PREROUTING</systemitem> de la tabla <systemitem>nat</systemitem>.
+Después, buscamos el protocolo <systemitem>TCP</systemitem>
+en nuestra interfaz <varname>$INET_IFACE</varname> con la IP de destino que
+coincida con nuestra <varname>$DNS_IP</varname> y que esté dirigido al puerto
+53, que es el puerto <systemitem>TCP</systemitem> para las transferencias de
+zona entre servidores de nombres. Si tenemos un paquete con estas
+características, hacemos que efectúe un salto <systemitem>DNAT</systemitem>. En
+resumen, efectuamos un <systemitem>DNAT</systemitem>. Después de ésto
+especificamos dónde queremos que vaya el paquete mediante la opción
+<command>--to-destination</command> y le damos el valor <varname>$DMZ_DNS_IP</varname>
+(la IP del <systemitem>DNS</systemitem> de nuestra red <systemitem>DMZ</systemitem>).
+Así es como trabaja básicamente el <systemitem>DNAT</systemitem>. Cuando la
+respuesta al paquete "<systemitem>DNAT</systemitem>eado" se envía a través del
+cortafuegos, automáticamente se "des-DNATea".
+    </para>
+
+    <para>
+Llegados a este punto, deberías comprender suficientemente bien cómo funciona
+todo, de manera que no te suponga ningún problema importante comprender bastante
+bien este script. Si hay algo que no entiendes y no ha sido tratado en el resto
+del tutorial, envíame un correo, pues probablemente sea un fallo por mi parte.
+    </para>
+
+   </section>
+
+   <section id="rcDHCPfirewalltxt">
+    <title id="rcDHCPfirewalltxt.title">rc.DHCP.firewall.txt</title>
+
+     <para> 
+     <mediaobject>
+      <imageobject>
+       <imagedata fileref="images/rc_DHCP_firewall.eps" format="eps">
+      </imageobject>
+      <imageobject>
+       <imagedata fileref="images/rc_DHCP_firewall.jpg" format="jpg">
+      </imageobject>
+     </mediaobject>
+    </para>
+
+    <para>
+El script <ulink url="http://iptables-tutorial.frozentux.net/scripts/rc.DHCP.firewall.txt">
+rc.DHCP.firewall.txt</ulink> es casi idéntico al original
+(<link linkend="rcfirewalltxt" endterm="rcfirewalltxt.title"></link>). Sin
+embargo, en este caso no se usa la variable <command>STATIC_IP</command>, lo
+cual es la mayor diferencia con el script original (rc.firewall.txt). La razón
+es que no funcionaría en una conexión con IP dinámica. Los cambios necesarios
+en el script original son mínimos, pero ha habido gente que me ha preguntado
+cómo solventar el problema de las IPs dinámicas, así que este script será una
+buena solución para todos los que tengan las mismas dudas. Este script es válido
+para todos aquellos que utilicen conexiones <systemitem>DHCP</systemitem>,
+<systemitem>PPP</systemitem> y <systemitem>SLIP</systemitem> para acceder a
+Internet.
+</para>
+
+    <para>
+El script <filename>rc.DHCP.firewall.txt</filename> requiere las siguientes
+opciones compiladas estáticamente en el núcleo, o al menos como módulos, para
+funcionar correctamente.
+    </para>
+
+    <itemizedlist mark="opencircle">
+     <listitem>
+      <para>
+      CONFIG_NETFILTER
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_CONNTRACK
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_IPTABLES
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_MATCH_LIMIT
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_MATCH_STATE
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_FILTER
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_NAT
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_TARGET_MASQUERADE
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_TARGET_LOG
+      </para>
+     </listitem>
+    </itemizedlist>
+
+    <para>
+Los cambios principales efectuados al script consisten en la supresión de la
+variable <varname>STATIC_IP</varname>, como ya he dicho, y de todas las
+referencias a élla. En lugar de utilizarla, el script ejecuta la mayor parte del
+filtrado a través de la variable <varname>INET_IFACE</varname>. Es decir,
+se ha cambiado <command>-d $STATIC_IP</command> por <command>-i $INET_IFACE</command>.
+Básicamente éstos son los únicos cambios necesarios.
+    </para>
+
+    <para>
+De todas formas, hay algunas cosas más en las que debemos pensar. Ya no podemos
+filtrar en la cadena <systemitem>INPUT</systemitem> en función de, por ejemplo,
+<command>--in-interface $LAN_IFACE --dst $INET_IP</command>. Ésto nos obliga a
+filtrar únicamente basándonos en interfases en aquellos casos dónde las máquinas
+internas deben acceder a la IP direccionable de Internet. Un buen ejemplo es
+cuando ejecutamos un servidor <systemitem>HTTP</systemitem> en nuestro
+cortafuegos: si nos dirigimos a la página principal, la cual contiene enlaces
+estáticos a su mismo host (que puede tener alguna solución de dns dinámico, o
+dyndns), nos encontraremos con un problema realmente peliagudo. La máquina
+"<systemitem>NAT</systemitem>eada" le preguntará al <systemitem>DNS</systemitem>
+por la IP del servidor <systemitem>HTTP</systemitem>, para luego intentar
+acceder a esa IP. Si filtrásemos basándonos en la interfaz y en la IP, la
+máquina "<systemitem>NAT</systemitem>eada" sería incapaz de llegar al servidor
+<systemitem>HTTP</systemitem>, puesto que la cadena <systemitem>INPUT</systemitem>
+simplemente desecharía los paquetes. Ésto también puede aplicarse de alguna forma
+en el caso de que tengamos una IP estática, pero aquí tenemos la oportunidad de
+evitar el problema añadiendo reglas que chequeen si hay paquetes destinados a
+la <varname>INET_IP</varname> que provengan de la interfaz <systemitem>LAN</systemitem>,
+en cuyo caso los aceptará.
+    </para>
+
+    <para>
+Como puedes observar, puede ser una buena idea conseguir un script (o escribirlo)
+que gestione más razonablemente las IPs dinámicas. Así, por ejemplo podemos
+escribir un script que capte la IP a través de <command>ifconfig</command> y la
+asigne a una variable, tras el arranque inicial de la conexión a Internet. Una
+buena forma de conseguirlo sería emplear los scripts <filename>ip-up</filename>
+que ofrece <command>pppd</command>, entre otros programas. Un buen sitio para
+buscar scripts es la página web sobre iptables "linuxguruz.org", dónde podrás
+encontrar y descargar montones de éllos. Encontrarás el enlace en el apéndice
+<link linkend="otherresources" endterm="otherresources.title"></link>.
+    </para>
+
+    <note>
+     <para>
+El script <filename>rc.DHCP.firewall.txt</filename> puede ser un poco
+más inseguro que el <filename>rc.firewall.txt</filename>, por lo que te sugiero
+que utilices éste último al no ser tan susceptible a ataques desde el exterior.
+     </para>
+    </note>
+
+    <para>
+Además, existe la posibilidad de añadir algo parecido a lo siguiente en tus
+scripts:
+    </para>
+
+    <screen>
+<command>
+INET_IP=`ifconfig $INET_IFACE | grep inet | cut -d : -f 2 | \
+cut -d ' ' -f 1`
+</command>
+    </screen>
+
+    <para>
+Con éllo se captaría automáticamente la <systemitem>dirección IP</systemitem>
+de la variable <command>$INET_IFACE</command>, buscando la línea que contuviera
+la <systemitem>dirección IP</systemitem> y eliminando todo lo innecesario hasta
+obtener una dirección manejable. Para hacer todo ésto de una manera más
+elaborada, puedes aplicar las porciones de código disponibles en el script
+<ulink url="scripts/retrieveip.txt">retreiveip.txt</ulink>, que captarán
+automáticamente tu dirección IP de Internet al ejecutarlo. Ten en cuenta que,
+en cambio, con éllo se pueden obtener comportamientos algo extraños,
+como conexiones ralentizadas desde y hacia el cortafuegos en la parte interna.
+Los comportamientos extraños más comunes se describen en la siguiente lista:
+    </para>
+
+
+    <orderedlist numeration="arabic">
+     <listitem>
+      <para>
+Si el script se ejecuta desde otro script, que a su vez es ejecutado por,
+por ejemplo, el <systemitem>demonio PPP</systemitem>, todas las conexiones
+activas en ese momento se "colgarán", debido a las reglas "NEW not SYN"
+(léete el capítulo <link linkend="newnotsyn" endterm="newnotsyn.title"></link>).
+Es posible evitarlo si, por ejemplo, eliminas las reglas <systemitem>NEW
+not SYN</systemitem>, aunque esta solución es cuestionable.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+Si tienes reglas que son estáticas y siempre tienen que estar activas, es
+bastante difícil añadir y borrar reglas contínuamente sin dañar las ya
+existentes. Por ejemplo, si quieres bloquear todos los intentos de conexión
+al cortafuegos provenientes de los hosts de tu <systemitem>LAN</systemitem> y,
+al mismo tiempo, ejecutar un script desde el <systemitem>demonio PPP</systemitem>,
+¿cómo lo consigues sin borrar las reglas activas que están bloqueando tu
+<systemitem>LAN</systemitem>?
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+Puede complicarse innecesariamente, tal como se ha visto, lo cual puede llevar
+a comprometer la seguridad. Si el script se mantiene simple, es más fácil
+descubrir problemas y mantener un orden.
+      </para>
+     </listitem>
+    </orderedlist>
+
+   </section>
+
+   <section id="rcutinfirewalltxt">
+    <title id="rcutinfirewalltxt.title">rc.UTIN.firewall.txt</title>
+
+     <para>
+     <mediaobject>
+      <imageobject>
+       <imagedata fileref="images/rc_UTIN_firewall.eps" format="eps">
+      </imageobject>
+      <imageobject>
+       <imagedata fileref="images/rc_UTIN_firewall.jpg" format="jpg">
+      </imageobject>
+     </mediaobject>
+    </para>
+
+    <para>
+El script <ulink url="http://iptables-tutorial.frozentux.net/scripts/rc.UTIN.firewall.txt">
+rc.UTIN.firewall.txt</ulink>, al contrario que el resto de scripts, bloqueará
+la red local (<systemitem>LAN</systemitem>) que haya por detrás nuestro. Es
+decir, que no nos fiaremos de nadie en ninguna red a la que estemos conectados.
+Además tampoco permitiremos a aquellos que estén en nuestra <systemitem>LAN</systemitem>
+que puedan hacer nada excepto tareas específicas en Internet. Lo único que
+permitiremos será el acceso a los servicios <systemitem>POP3</systemitem>,
+<systemitem>HTTP</systemitem> y <systemitem>FTP</systemitem> de Internet.
+Tampoco permitimos el acceso al cortafuegos a los usuarios internos en mayor
+medida que los usuarios desde Internet.
+    </para>
+
+    <para>
+El script <filename>rc.UTIN.firewall.txt</filename> requiere que las opciones
+listadas más abajo se compilen estáticamente, o como módulos, en el núcleo. Sin
+una o más de éllas, tendrá un comportamiento defectuoso puesto que habrán
+funcionalidades necesarias que no podrán emplearse. Además, conforme vayas
+modificando el script según tus necesidades, posiblemente necesites más
+opciones compiladas en el núcleo.
+    </para>
+
+    <itemizedlist mark="opencircle">
+     <listitem>
+      <para>
+      CONFIG_NETFILTER
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_CONNTRACK
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_IPTABLES
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_MATCH_LIMIT
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_MATCH_STATE
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_FILTER
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_NAT
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_TARGET_LOG
+      </para>
+     </listitem>
+    </itemizedlist>
+
+    <para>
+El script sigue la regla de oro de no fiarse de nadie, ni siquiera de tus
+propios empleados [en muchas ocasiones, aún menos de éllos]. Es una triste
+realidad, pero una gran parte de los "hacks" y "cracks" (accesos ilícitos) que sufre una compañía
+son debidos a personal de la propia plantilla. Quizá este script te sugiera
+algunas pistas sobre qué puedes hacer con tu cortafuegos para hacerlo más
+invulnerable. No es demasiado diferente al script <filename>rc.firewall.txt</filename>,
+pero ofrece algunas ideas sobre lo que normalmente dejaríamos pasar, ...
+    </para>
+   </section>
+
+   <section id="rctest-iptablestxt">
+    <title id="rctest-iptablestxt.title">rc.test-iptables.txt</title>
+
+    <para>
+El script <ulink url="http://iptables-tutorial.frozentux.net/scripts/rc.test-iptables.txt">
+rc.test-iptables.txt</ulink> se puede utilizar para chequear las diferentes
+cadenas, aunque puede necesitar algún ajuste que otro en función de tu
+configuración, como activar el <command>ip_forwarding</command>, configurar el
+<systemitem>enmascaramiento</systemitem> (masquerading), etc. Prácticamente le
+irá bien a todo aquél que tenga la configuración básica y las tablas básicas
+cargadas en el núcleo. Lo que hace es establecer algunos objetivos <command>LOG</command>,
+que registrarán las peticiones y respuestas a los ping. De esta forma obtendrás
+información sobre qué cadenas han sido atravesadas y en qué orden. Por ejemplo,
+ejecuta el script y después lanza el siguiente comando en la shell:
+    </para>
+
+    <screen>
+<command>
+ping -c 1 un.host.de.internet
+</command>
+    </screen>
+
+    <para>
+Y <command>tail -n 0 -f /var/log/messages</command> mientras se está ejecutando
+el primer comando. De esta forma deberías ver las diferentes cadenas empleadas
+y en qué orden, a no ser que las entradas del registro se trastoquen por algún
+motivo.
+    </para>
+
+    <note>
+     <para>
+Este script se escribió únicamente para tareas de chequeo. O sea, no es una
+buena idea tener reglas de este estilo que lo registren todo, puesto que las
+particiones que tengas asignadas para los ficheros de registro pueden llenarse rápidamente
+y éllo podría convertirse en un ataque de Denegación de Servicios (DoS) muy
+efectivo contra tí, pudiendo conducir a ataques reales que no serían registrados
+tras el ataque DoS inicial.
+     </para>
+    </note>
+
+   </section>
+
+   <section id="rcflush-iptablestxt">
+    <title id="rcflush-iptablestxt.title">rc.flush-iptables.txt</title>
+
+    <para>
+El script <ulink url="http://iptables-tutorial.frozentux.net/scripts/rc.flush-iptables.txt">
+rc.flush-iptables.txt</ulink> en realidad no se debería llamar un script en sí
+mismo. Lo que hará es reiniciar y "lavarle la cara" a todas tus tablas y cadenas.
+El script comienza por establecer la política por defecto a <command>ACCEPT</command>
+en las cadenas <systemitem>INPUT</systemitem>, <systemitem>OUTPUT</systemitem> y
+<systemitem>FORWARD</systemitem> de la tabla <systemitem>filter</systemitem>.
+Tras ésto, reiniciará las políticas por defecto de las cadenas <systemitem>PREROUTING</systemitem>,
+<systemitem>POSTROUTING</systemitem> y <systemitem>OUTPUT</systemitem> de la
+tabla <systemitem>nat</systemitem>. Se hace todo ésto en primer lugar para no
+tener que preocuparnos de conexiones cerradas y paquetes que no pueden entrar.
+El script está pensado para configurar y depurar errores en tu cortafuegos,
+por lo que sólo tenemos en cuenta el trabajo de abrir el cortafuegos y reiniciar todo a
+sus valores por defecto.
+    </para>
+
+    <para>
+Tras éllo se limpian todas las cadenas, en primer lugar en la tabla
+<systemitem>filter</systemitem> y a continuación en la tabla <systemitem>NAT</systemitem>.
+De esta forma nos aseguramos que no hay reglas redundantes escondidas por
+cualquier sitio. Cuando ya se ha conseguido ésto, se salta a la siguiente
+sección, dónde borraremos todas las cadenas especificadas por el usuario en las
+tablas <systemitem>NAT</systemitem> y <systemitem>filter</systemitem>. Tras
+este paso se considera ejecutado el script. Sin embargo, puedes considerar
+necesario añadir reglas para limpiar la tabla <systemitem>mangle</systemitem>,
+si es que la utilizas.
+    </para>
+
+    <note>
+     <para>
+Un apunte final: determinadas personas me han escrito pidiéndome que añada este
+script en el script original rc.firewall utilizando la sintaxis de Red Hat Linux,
+de forma que escribas algo parecido a "rc.firewall start" y el script se ejecute.
+Sin embargo no lo voy a hacer ya que éste es un tutorial y debería ser entendido
+principalmente como un lugar dónde encontrar ideas, por lo que no debería
+llenarse de scripts de shell [línea de comandos] y sintaxis extrañas. Añadir
+tales funcionalidades haría los scripts difíciles de leer desde el punto de
+vista que me he propuesto, ya que el tutorial se ha escrito con la legibilidad
+como pilar fundamental y así seguirá siendo.
+     </para>
+    </note>
+   </section>
+
+   <section id="limit-matchtxt">
+    <title id="limit-matchtxt.title">Limit-match.txt</title>
+
+     <para>
+El script <ulink url="http://iptables-tutorial.frozentux.net/scripts/limit-match.txt">
+limit-match.txt</ulink> es un test de chequeo de menor importancia que te permitirá
+comprobar la comparación límite (limit match) y ver cómo funciona. Carga el
+script y empieza a enviar paquetes ping a diferentes intervalos para ver
+cuáles atraviesan el cortafuegos y con qué frecuencia lo consiguen. Todas las
+<systemitem>echo replies</systemitem> (respuestas de eco) serán bloqueadas hasta
+que se alcance de nuevo el umbral del "burst limit".
+     </para>
+   </section>
+
+   <section id="pid-ownertxt">
+    <title id="pid-ownertxt.title">Pid-owner.txt</title>
+
+    <para>
+El script <ulink url="http://iptables-tutorial.frozentux.net/scripts/pid-owner.txt">
+pid-owner.txt</ulink> es un pequeño ejemplo que muestra cómo podemos usar la
+comparación "PID owner" [propietario del número de identificación de proceso].
+No hace nada útil, pero deberías ser capaz de ejecutarlo y ver en la salida
+de <command>iptables -L -v</command> que la regla está funcionando.
+    </para>
+   </section>
+
+   <section id="sid-ownertxt">
+    <title id="sid-ownertxt.title">Sid-owner.txt</title>
+    <para>
+El script <ulink url="http://iptables-tutorial.frozentux.net/scripts/sid-owner.txt">
+sid-owner.txt</ulink> es otro pequeño ejemplo, que en este caso muestra cómo
+podemos usar la comparación "SID owner". No hace nada útil, pero deberías ser
+capaz de ejecutarlo y ver en la salida de <command>iptables -L -v</command> que
+la regla está funcionando.
+    </para>
+   </section>
+
+   <section id="ttl-inctxt">
+    <title id="ttl-inctxt.title">Ttl-inc.txt</title>
+    <para>
+Un pequeño script de ejemplo: <ulink url="http://iptables-tutorial.frozentux.nert/scripts/ttl-inc.txt">
+ttl-inc.txt</ulink>. Este script muestra cómo hacer invisible al
+cortafuegos/enrutador frente a trazadores de ruta (traceroutes), que de otra
+forma ofrecerían bastante información a posibles atacantes.
+    </para>
+   </section>
+
+   <section id="iptsave-ruleset">
+    <title id="iptsave-ruleset.title">Iptables-save</title>
+    <para>
+Un pequeño script de ejemplo utilizado en el capítulo <link linkend="saveandrestore" 
+endterm="saveandrestore.title"></link> y que ilustra cómo se puede usar el comando iptables-save.
+Este script no es funcional, por lo que no debería usarse para otra cosa
+distinta a tenerlo como referencia.
+    </para>
+   </section>
+
+ </chapter>

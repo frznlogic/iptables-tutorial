@@ -1,0 +1,455 @@
+<section id="firewalltxtscriptstructure">
+ <title id="rcfirewalltxtscriptstructure.title">Estructura del script
+ rc.firewall.txt</title>
+ <para>
+ Todos los scripts de este tutorial se han escrito basados en una 
+ estructura específica. La razón es que deben estar bastante parejos
+ y ser fácilmente diferenciables entre ellos.
+ Dicha estructura debería estar suficientemente documentada en este
+ breve capítulo, dónde se intenta proporcionar una
+ pequeña explicación de por qué se han escrito todos los scripts de la
+ manera en que se ha hecho y por qué se ha escogido esa estructura.
+ </para>
+
+ <note>
+  <para>
+  A pesar de que ésta es la estructura elegida, ten presente que quizá
+  no es la estructura que más te conviene para tus scripts.
+  Es simplemente la estructura que yo he escogido, ya que se ajusta a la
+  necesidad de que sea fácil de leer y de seguir, de acuerdo con mi lógica.
+  </para>
+ </note>
+
+ <section id="thestructure">
+  <title id="thestructure.title">La estructura</title>
+  <para>
+  Esta es la estructura que todos los scripts de este tutorial deberían
+  seguir. Si difieren en algo será probablemente un error por mi parte,
+  a no ser que se diga específicamente el por qué se ha abandonado
+  la estructura.
+  </para>
+
+  <orderedlist numeration="arabic" inheritnum="inherit">
+
+   <listitem>
+    <para><emphasis>Configuración</emphasis> - En primer lugar nos 
+	 encontramos con las opciones de configuración que todos los scripts
+	 deben usar. Las opciones de configuración deben ser casi
+	 siempre lo primero en cualquier script en línea de comandos (shell-script).
+    </para>
+
+    <orderedlist numeration="arabic" inheritnum="inherit">
+
+     <listitem>
+      <para><emphasis>Internet</emphasis> - Este es el apartado de 
+		configuración referente a la conexión a Internet. 
+		Puedes saltarte este apartado si no tienes ninguna conexión
+		a Internet. Ten en cuenta que podría haber más subsecciones
+		que las listadas aquí, pero sólo aquéllas referentes a
+		nuestra conexión a Internet.
+      </para>
+
+      <orderedlist numeration="arabic" inheritnum="inherit">
+
+       <listitem>
+        <para><emphasis>DHCP</emphasis> - Si se requieren opciones
+		  específicas para DHCP en el script, las configuraremos
+		  aquí.
+        </para>
+       </listitem>
+
+       <listitem>
+        <para><emphasis>PPPoE</emphasis> - Si existe la posibilidad de que
+		  el usuario quiera usar este script en concreto y por cualquier 
+		  motivo resulta que está usando una conexión PPPoE, añadiremos
+		  las opciones específicas aquí.
+        </para>
+       </listitem>
+
+      </orderedlist>
+
+     </listitem>
+
+     <listitem>
+      <para><emphasis>LAN</emphasis> - Si hay una LAN habilitada detrás 
+		del cortafuegos (firewall), añadiremos las opciones pertinentes
+		en esta sección. Ésto será lo más probable, de aquí que esta
+		sección esté casi siempre habilitada.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para><emphasis>DMZ</emphasis> - Si hay alguna razón para éllo,
+		añadiremos las opciones de configuración de una DMZ ("Zona Desmilitarizada") en este
+		punto. La mayor parte de los scripts carecen de esta sección,
+		principalmente porque ninguna red casera normal o pequeña red
+		de empresa tendrá DMZs.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para><emphasis>Localhost</emphasis> - Estas opciones pertenecen
+		a nuestro host local. Es muy improbable que estos valores cambien,
+		pero los hemos puesto como variables de todas formas. En principio
+		no debería haber motivos para hacer cambios en estas variables.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para><emphasis>iptables</emphasis> - Esta sección contiene la 
+		configuración específica de iptables. En la mayoría de scripts
+		y situaciones, sólo se requiere una variable que indique
+		dónde está ubicado el archivo binario (ejecutable) "iptables".
+      </para>
+     </listitem>
+
+     <listitem>
+      <para><emphasis>Otras</emphasis> - Si existe cualquier otra opción o
+		variable concreta debe ser incluida, antes que en cualquier otro sitio, en su
+		subsección (si pertenecen a la conexión a Internet, deben 
+		colocarse en dicha subsección, etc). Si no van en ninguna,
+		entonces deben colocarse directamente en algún lugar entre las opciones de configuración.
+      </para>
+     </listitem>
+    </orderedlist>
+
+   </listitem>
+
+   <listitem>
+    <para><emphasis>Carga de módulos</emphasis> - Esta sección del script
+	 debe albergar una lista de módulos. La primera parte debe contener
+	 los módulos requeridos (necesarios), mientras que la segunda contendrá los
+	 no requeridos.
+    </para>
+
+    <note>
+     <para>
+Ten en cuenta que algunos modulos que permiten aumentar la seguridad o añadir
+determinados servicios o posibilidades, se pueden haber añadido aunque no estén estrictamente requeridos.
+Cuando así suceda, normalmente se mencionará expresamente en los scripts de
+ejemplo.
+     </para>
+    </note>
+
+    <orderedlist numeration="arabic" inheritnum="inherit">
+
+     <listitem>
+      <para><emphasis>Modulos requeridos</emphasis> - Esta sección debería
+		contener los módulos requeridos y, posiblemente, los módulos que
+		mejoren la seguridad o añadan servicios especiales al administrador o a 
+		los clientes.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para><emphasis>Modulos No requeridos</emphasis> - Esta sección
+		contendrá los módulos que no son requeridos para operaciones
+		normales. Todos estos modulos aparecen por defecto como si fueran comentarios,
+		por lo que si quieres añadir el servicio que proporcionan, deberás eliminar
+		el símbolo de comentario (#).
+      </para>
+     </listitem>
+
+    </orderedlist>
+   </listitem>
+
+   <listitem>
+    <para><emphasis>Configuración proc</emphasis> - Esta sección tratará cualquier
+	 configuración especial que necesite el "sistema de ficheros proc" (éste es un sistema virtual creado bajo
+	 demanda que permite interactuar con el núcleo y los procesos que se ejecutan en él). Si algunas opciones son requeridas, serán listadas como
+	 tales, pero si no es así se escribirán por defecto como comentarios y se listarán bajo las
+	 configuraciones no-requeridas de proc. La mayoría de las configuraciones
+	 proc útiles serán listadas aquí, pero ni mucho menos se incluirán todas.
+     </para>
+
+    <orderedlist numeration="arabic" inheritnum="inherit">
+
+     <listitem>
+      <para><emphasis>Configuración proc requerida</emphasis> - Esta sección
+		debe contener todas las configuraciones proc requeridas por el 
+		script en cuestión. También podría contener posiblemente 
+		configuraciones que aumenten la seguridad o que pueden añadir servicios
+		o posibilidades especiales para el administrador o los clientes.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para><emphasis>Configuración proc no-requerida</emphasis> - Esta
+		sección debe contener las configuraciones proc no-requeridas que
+		podrían resultar utiles. Todas ellas se escriben como si fueran comentarios porque no
+		son necesarias para que el script trabaje. Esta lista está lejos 
+		de contener todas las configuraciones de proc. 
+      </para>
+     </listitem>
+
+    </orderedlist>
+   </listitem>
+
+   <listitem>
+    <para><emphasis>Escritura de las reglas</emphasis> - Después de todo lo anterior, el script ya
+	 debe estar listo para que se inserte el conjunto de reglas.
+	 He decidido clasificar todas las reglas tras la tabla y los
+	 nombres de las cadenas. Todas las cadenas específicas de usuario 
+	 se crean antes de que hagamos nada en las
+	 cadenas por defecto del sistema. También he decidido organizar las cadenas y
+	 sus reglas específicas en el mismo orden en que son mostradas con
+	 el comando <command>iptables -L</command>.
+    </para>
+
+    <orderedlist numeration="arabic" inheritnum="inherit">
+
+     <listitem>
+      <para><emphasis>Tabla Filter</emphasis> - Antes que nada vamos 
+		directos a la tabla filter y a su contenido. En primer lugar debemos
+		configurar las políticas de la tabla. 
+      </para>
+
+      <orderedlist numeration="arabic" inheritnum="inherit">
+       <listitem>
+       <para><emphasis>Configuración de las políticas</emphasis> -  empezamos por
+		 configurar todas las políticas por defecto para las cadenas
+		 del sistema. Normalmente pondré la política DROP por defecto en 
+		 las cadenas de la tabla filter y específicamente usaré la 
+		 política ACCEPT para los servicios y flujos que yo quiera 
+		 permitir. De esta manera podremos evitar que la gente
+		 use puertos que no queremos que estén disponibles.
+       </para>
+       </listitem>
+
+       <listitem>
+       <para><emphasis>Creación de las cadenas específicas del usuario</emphasis> -
+		 en este punto creamos todas las cadenas propias que queremos usar más tarde
+		 en esta tabla. No podremos referirnos a estas cadenas en las
+		 del sistema si no están ya creadas, por lo que debemos llegar a éllas
+		 lo antes posible. 
+       </para>
+       </listitem>
+
+       <listitem>
+       <para><emphasis>Crear los contenidos de las cadenas creadas por el
+		 usuario</emphasis> - después de crear las cadenas específicas de
+		 usuario, podemos escribir todas las reglas que llevarán esas cadenas.
+		 La única razón que tengo para escribir estos datos en este punto
+		 es por tener las cadenas propias y sus reglas lo más juntas posible.
+		 Sin embargo puedes ponerlas más adelante en el script, es decisión tuya.
+       </para>
+       </listitem>
+
+       <listitem>
+       <para><emphasis>Cadena INPUT</emphasis> - llegados aquí ya no
+		 nos quedan muchas más cosas que hacer en la tabla filter, así que
+		 nos adentramos en la cadena INPUT. Ahora es cuando debemos añadir
+		 todas las reglas a la cadena INPUT.
+       </para>
+
+       <note>
+        <para>
+        Es en este momento cuando empezamos a seguir la salida del comando
+		  <command>iptables -L</command>, como podrás combrobar. No hay razón
+		  para que continúes con esta estructura, pero no obstante, trata de
+		  evitar mezclar datos de diferentes tablas y cadenas, ya que puede
+		  hacerse muy duro leer y comprender el conjunto de reglas, así como encontrar
+		  la solución a posibles problemas. 
+        </para>
+       </note>
+       </listitem>
+
+       <listitem>
+       <para><emphasis>Cadena FORWARD</emphasis> - vamos
+		 a añadir las reglas a la cadena FORWARD. Ningún comentario acerca de
+		 esta decisión. 
+       </para>
+       </listitem>
+
+       <listitem>
+       <para><emphasis>Cadena OUTPUT</emphasis> - lo último que queda por hacer en la
+		 tabla filter es añadir las reglas que van en la cadena OUTPUT.
+		 En principio no debería haber mucho por hacer en esta cadena.
+       </para>
+       </listitem>
+      </orderedlist>
+
+     </listitem>
+
+     <listitem>
+      <para><emphasis>Tabla nat</emphasis> - después de la tabla anterior,
+		centramos nuestra atención en la tabla nat. Abordamos esta tabla después
+		de la tabla filter debido a varias razones referentes a estos scripts:
+		para empezar no queremos activar todo el mecanismo
+		de reenvío (forwarding) y la función NAT en una etapa demasiado temprana,
+		pues posiblemente podría dejar pasar los paquetes a través del cortafuegos
+		en un momento erróneo (es decir, cuando el NAT se activa, pero ninguna
+		regla de filtrado ha arrancado todavía). Además, veo la tabla nat como una especie
+		de capa que está por encima de la tabla filter y que la rodea
+		de alguna manera.  Así pues la tabla filter debería ser el núcleo,
+		mientras que la tabla nat actuaría como una capa que la recubre y
+		por último la tabla mangle rodearía a la tabla nat como una
+		segunda capa. Ésto puede ser erróneo desde algún punto de vista,
+		pero no está demasiado lejos de la realidad.
+      </para>
+
+      <orderedlist numeration="arabic" inheritnum="inherit">
+       <listitem>
+       <para><emphasis>Configurar las políticas</emphasis> - antes que nada
+		 establecemos las políticas por defecto en la tabla nat. Normalmente
+		 estoy satisfecho con la política por defecto que hemos establecido al principio,
+		 es decir, ACCEPT. Esta tabla no debe ser usada para filtrar y no
+		 debemos bloquear los paquetes aquí, ya que pueden ocurrir algunas
+		 cosas realmente feas en dichos casos debido a 
+		 nuestras presunciones. Dejo estas cadenas configuradas como
+		 ACCEPT puesto que no hay razón para no hacerlo. 
+       </para>
+       </listitem>
+
+       <listitem>
+       <para><emphasis>Creación de las cadenas específicas del usuario</emphasis>
+		 - ahora crearemos cualquier cadena específica del usuario
+		 que queramos añadir a la tabla nat. Normalmente no tengo ninguna,
+		 pero he añadido esta sección de todas formas, sólo por si acaso. Ten en cuenta que las
+		 cadenas específicas del usuario deben ser creadas antes de que
+		 puedan ser usadas en las cadenas del sistema.
+       </para>
+       </listitem>
+
+       <listitem>
+       <para><emphasis>Creación del contenido de las cadenas específicas 
+		 del usuario</emphasis> - ahora es el momento de añadir las reglas
+		 a las cadenas que irán en la tabla nat. Podemos decir lo mismo que
+		 con las cadenas específicas del usuario en la tabla filter. 
+		 Añadimos estas reglas aquí, ya que no veo razón alguna para no hacerlo.
+       </para>
+       </listitem>
+
+       <listitem>
+       <para><emphasis>Cadena PREROUTING</emphasis> - La cadena 
+		 PREROUTING es la usada para hacer DNAT a los paquetes en caso de
+		 que tengamos la necesidad de hacerlo. En la mayoría de los scripts
+		 esta característica no se usa, o como mínimo está en forma de comentario;
+		 ésto es así para no abrir enormes agujeros hacia nuestra red
+		 local sin tener conocimiento de éllos. En algunos scripts tenemos
+		 esta cadena habilitada por defecto, ya que el único propósito de dichos
+		 scripts es proveer de tales servicios.
+        </para>
+       </listitem>
+
+       <listitem>
+       <para><emphasis>Cadena POSTROUTING</emphasis> - la cadena
+		 POSTROUTING se usa bastante a menudo en los scripts que he
+		 escrito, puesto que la mayor parte de éllos se basan en el hecho
+		 de que tienes una o más redes locales que quieres defender 
+		 de Internet mediante un cortafuegos. Principalmente intentaremos
+		 usar el objetivo SNAT pero en ciertos casos estaremos forzados
+		 a usar el objetivo MASQUERADE en su lugar. 
+       </para>
+       </listitem>
+
+       <listitem>
+       <para><emphasis>Cadena OUTPUT</emphasis> - la cadena OUTPUT 
+		 es escasamente usada en algún script. Aunque lo parezca,
+		 no es que no funcione, pero no he sido capaz de encontrar un buena razón para
+		 usar esta cadena. Si alguien encuentra una razón para usarla,
+		 que me envíe unas líneas y añadiré esta cadena en el tutorial.
+       </para>
+       </listitem>
+      </orderedlist>
+
+     </listitem>
+
+     <listitem>
+      <para><emphasis>Tabla mangle</emphasis> - la última tabla
+		en la que hacer algo es la tabla mangle. Normalmente no usaré esta
+		tabla, y no debería usarla nadie, a no ser que
+		se tengan necesidades específicas como por ejemplo enmascarar
+		todos los paquetes para que usen el mismo TTL o para cambiar
+		el campo TOS, etc. En otras palabras, me decanto por dejar
+		estas partes de los scripts más o menos en blanco, con unas pocas 
+		excepciones dónde añado unos cuantos ejemplos acerca de para qué se puede
+		usar. 
+      </para>
+
+      <orderedlist numeration="arabic" inheritnum="inherit">
+       <listitem>
+       <para><emphasis>Configurar las políticas</emphasis> - configurar
+		 las políticas por defecto de la cadena. Ocurre prácticamente lo
+		 mismo que en la tabla nat: esta tabla no está hecha para filtrar y
+		 de ahí que debas evitar hacerlo. Yo no he configurado ninguna
+		 política en la tabla mangle en ninguno de los scripts y te recomiendo que
+		 tú tampoco lo hagas.
+       </para>
+       </listitem>
+
+       <listitem>
+       <para><emphasis>Crear cadenas específicas del usuario</emphasis> - 
+		 crear todas las cadenas específicas del usuario. Ya que apenas
+		 uso la tabla mangle en los scripts, no he creado ninguna cadena
+		 aquí, puesto que es claramente inservible si no hay datos en los que emplearlas.
+		 Sin embargo, esta sección fue añadida por si hay alguien que la
+		 necesite en un futuro.
+       </para>
+       </listitem>
+
+       <listitem>
+       <para><emphasis>Crear el contenido de las cadenas específicas del
+		 usuario</emphasis> - si tienes alguna cadena dentro de esta tabla
+		 debes añadirle las reglas en este momento. 
+       </para>
+       </listitem>
+
+       <listitem>
+       <para><emphasis>PREROUTING</emphasis> - hasta este momento apenas
+		 hay información en ningún script de este tutorial que contenga
+		 reglas aquí.
+       </para>
+       </listitem>
+
+       <listitem>
+       <para><emphasis>Cadena INPUT</emphasis> - hasta este momento apenas
+		 hay información en ningún script de este tutorial que contenga
+		 reglas aquí.
+		 </para>
+       </listitem>
+
+       <listitem>
+       <para><emphasis>FORWARD chain</emphasis> - hasta este momento apenas
+		 hay información en ningún script de este tutorial que contenga
+		 reglas aquí.
+       </para>
+       </listitem>
+
+       <listitem>
+       <para><emphasis>OUTPUT chain</emphasis> - hasta este momento apenas
+		 hay información en ningún script de este tutorial que contenga
+		 reglas aquí.
+       </para>
+       </listitem>
+
+       <listitem>
+       <para><emphasis>POSTROUTING chain</emphasis> - hasta este momento apenas
+		 hay información en ningún script de este tutorial que contenga
+		 reglas aquí.
+       </para>
+       </listitem>
+      </orderedlist>
+
+     </listitem>
+    </orderedlist>
+
+   </listitem>
+  </orderedlist>
+
+  <para>
+  Esperemos que todo ésto ayude a entender mejor cómo está estructurado
+  cada script y por qué está estructurado de dicha manera. 
+  </para>
+
+  <caution>
+   <para>Ten en cuenta que estas descripciones son extremadamente 
+	breves, y principalmente deben ser vistas exclusivamente como una breve
+	explicación de cómo y por qué los scripts han sido divididos como
+	se ha hecho. Nadie dice que ésta sea la única y mejor
+	manera de hacerlo. 
+   </para>
+  </caution>
+
+ </section>
+</section>

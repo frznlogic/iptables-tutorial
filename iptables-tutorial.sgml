@@ -1,0 +1,111 @@
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook V4.1//EN" [
+<!ENTITY bookinfo SYSTEM "bookinfo.sgml">
+
+<!ENTITY introduction SYSTEM "chapters/introduction.sgml">
+<!ENTITY tcpiprepetition SYSTEM "chapters/tcp_ip_repetition.sgml">
+<!ENTITY ipfilteringintro SYSTEM "chapters/ip_filtering_introduction.sgml">
+<!ENTITY natintro SYSTEM "chapters/nat_introduction.sgml">
+<!ENTITY preparations SYSTEM "chapters/preparations.sgml">
+<!ENTITY traversingoftablesandchains SYSTEM "chapters/traversing_of_tables_and_chains.sgml">
+<!ENTITY howaruleisbuilt SYSTEM "chapters/how_a_rule_is_built.sgml">
+<!ENTITY iptablesmatches SYSTEM "chapters/iptables_matches.sgml">
+<!ENTITY iptablestargets SYSTEM "chapters/iptables_targets.sgml">
+<!ENTITY statemachinesgml SYSTEM "chapters/statemachine.sgml">
+<!ENTITY saveandrestoresgml SYSTEM "chapters/saveandrestore.sgml">
+<!ENTITY debuggingsgml SYSTEM "chapters/debugging.sgml">
+<!ENTITY rcfirewallsgml SYSTEM "chapters/rc_firewall.sgml">
+<!ENTITY examplescripts SYSTEM "chapters/example_scripts.sgml">
+<!ENTITY scriptexplanation SYSTEM "chapters/firewall_explanation.sgml">
+<!ENTITY guissgml SYSTEM "chapters/guis.sgml">
+<!ENTITY commercialproducts SYSTEM "chapters/commercial_products.sgml">
+
+<!ENTITY detailedexplanations SYSTEM "appendices/detailed_explanations.sgml">
+<!ENTITY commonproblems SYSTEM "appendices/common_problems.sgml">
+<!ENTITY ICMPtypes SYSTEM "appendices/ICMP_types.sgml">
+<!ENTITY TCPoptions SYSTEM "appendices/tcpoptions.sgml">
+<!ENTITY otherresources SYSTEM "appendices/other_resources.sgml">
+<!ENTITY acknowledgements SYSTEM "appendices/acknowledgements.sgml">
+<!ENTITY history SYSTEM "appendices/history.sgml">
+<!ENTITY scriptcodebase SYSTEM "appendices/script_codebase.sgml">
+
+<!ENTITY rcfirewall SYSTEM "scripts/rc.firewall.txt">
+<!ENTITY testtables SYSTEM "scripts/rc.test-iptables.txt">
+<!ENTITY flushtables SYSTEM "scripts/rc.flush-iptables.txt">
+<!ENTITY rcdmzfirewall SYSTEM "scripts/rc.DMZ.firewall.txt">
+<!ENTITY rcutinfirewall SYSTEM "scripts/rc.UTIN.firewall.txt">
+<!ENTITY rcdhcpfirewall SYSTEM "scripts/rc.DHCP.firewall.txt">
+
+<!ENTITY gfdl SYSTEM "licensing/fdl.sgml">
+<!ENTITY gpl SYSTEM "licensing/gpl.sgml">
+
+<!ENTITY index SYSTEM "iptables-tutorial-index.sgml">
+]>
+
+<book id="iptables-tutorial">
+
+&bookinfo;
+
+ <toc></toc>
+
+&introduction;
+
+&tcpiprepetition;
+
+&ipfilteringintro;
+
+&natintro;
+
+&preparations;
+
+&traversingoftablesandchains;
+
+&statemachinesgml;
+
+&saveandrestoresgml;
+
+&howaruleisbuilt;
+
+&iptablesmatches;
+
+&iptablestargets;
+
+&debuggingsgml;
+
+&rcfirewallsgml;
+
+&examplescripts;
+
+&guissgml;
+
+&commercialproducts;
+
+&detailedexplanations;
+
+&commonproblems;
+
+&ICMPtypes;
+
+&TCPoptions;
+
+&otherresources;
+
+&acknowledgements;
+
+&history;
+
+&gfdl;
+
+&gpl;
+
+&scriptcodebase;
+
+&index;
+
+</book>
+
+<!-- Local Variables: -->
+<!-- mono-font-family: Courier New -->
+<!-- body-font-family: Courier New -->
+<!-- sgml-indent-step: 1 -->
+<!-- sgml-indent-data: 1 -->
+<!-- End: -->

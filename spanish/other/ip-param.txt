@@ -1,0 +1,232 @@
+NÚMEROS DE OPCIÓN DE IP
+
+
+
+(última revisión 29 enero 2001)
+
+El Protocolo de Internet (IP, Internet Protocol) ofrece campos de
+cabecera opcionales identificados por un campo de tipo de opción.
+Las opciones 0 y 1 tienen exactamente un octeto, que es su campo
+de tipo. Todas las demás opciones comienzan con un campo de tipo 
+de un octeto, seguido de un campo de longitud de un octeto, seguido
+de datos opcionales con un tamaño de dos octetos. El campo de tipo
+de opción se subdivide en una marca/bandera copiada de un bit, un
+campo de clase de dos bits y un número de opción de 5 bits. Todo
+éllo unido conforma un valor de ocho bits con el que se define el
+campo de tipo de opción. Las opciones IP normalmente se identifican
+con este valor.
+
+
+Copia Clase Número Valor Nombre                               Referencia
+----- ----- ------ ----- ---------------------------------- ------------
+    0     0      0     0 EOOL   - End of Options List       [RFC791,JBP]
+                                  (final de la lista de opciones)
+    0     0      1     1 NOP    - No Operation              [RFC791,JBP]
+                                  (ninguna operación)
+    1     0      2   130 SEC    - Security                     [RFC1108]
+                                  (seguridad)
+    1     0      3   131 LSR    - Loose Source Route        [RFC791,JBP]
+                                  (ruta de origen laxa)
+    0     2      4    68 TS     - Time Stamp                [RFC791,JBP]
+                                  (hora)                                  
+    1     0      5   133 E-SEC  - Extended Security            [RFC1108]
+                                  (seguridad mejorada)
+    1     0      6   134 CIPSO  - Commercial Security              [???]
+                                  (seguridad comercial)
+    0     0      7     7 RR     - Record Route              [RFC791,JBP]
+                                  (grabar la ruta)
+    1     0      8   136 SID    - Stream ID                 [RFC791,JBP]
+                                  (identidad/nombre del flujo)
+    1     0      9   137 SSR    - Strict Source Route       [RFC791,JBP]
+                                  (ruta de origen estricta)
+    0     0     10    10 ZSU    - Experimental Measurement         [ZSu]
+                                  (medida experimental)
+    0     0     11    11 MTUP   - MTU Probe                    [RFC1191]*
+                                  (prueba de MTU)
+    0     0     12    12 MTUR   - MTU Reply                    [RFC1191]*
+                                  (respuesta de MTU)
+    1     2     13   205 FINN   - Experimental Flow Control       [Finn]
+                                  (control de flujo experimental)
+    1     0     14   142 VISA   - Expermental Access Control    [Estrin]
+                                  (control de acceso experimental)
+    0     0     15    15 ENCODE - ???                         [VerSteeg]
+
+    1     0     16   144 IMITD  - IMI Traffic Descriptor           [Lee]
+                                  (descriptor de tráfico IMI)
+    1     0     17   145 EIP    - Extended Internet Protocol   [RFC1385]
+                                  (protocolo de Internet extendido)
+    0     2     18    82 TR     - Traceroute                   [RFC1393]
+                                  (trazador de ruta)
+    1     0     19   147 ADDEXT - Address Extension       [Ullmann IPv7]	
+                                  (extensión de dirección)
+    1     0     20   148 RTRALT - Router Alert                 [RFC2113]
+                                  (alerta de enrutador)
+    1     0     21   149 SDB    - Selective Directed Broadcast   [Graff]
+                                  (difusión dirigida selectivamente)
+    1     0     22   150 NSAPA  - NSAP Addresses             [Carpenter]
+                                  (direcciones NSAP)
+    1     0     23   151 DPS    - Dynamic Packet State           [Malis]
+                                  (estado de paquete dinámico)
+    1     0     24   152 UMP    - Upstream Multicast Pkt.    [Farinacci]
+                                  (paquete de multidifusión de subida)
+
+[Nota: un asterisco (*) indica un Número de Opción IP obsoleto]
+
+
+PARÁMETRO DE TIEMPO DE VIDA (TTL) DE IP
+
+En la actualidad el tiempo de vida (ttl) recomendado para el Protocolo
+de Internet (IP) es 64 [RFC791, RFC1122].
+
+
+PARÁMETROS TOS DE IP
+
+A continuación se enumeran los Tipos de Servicio (TOS) recomendados para
+los protocolos más importantes de Internet.
+
+Valor TOS         Descripción                         Referencia
+---------         -----------------------             -----------------------
+  0000          Valor por defecto                      [Obsoleto por RFC2474]
+  0001          Minimizar Coste Monetario              [Obsoleto por RFC2474]
+  0010          Maximizar Fiabilidad                   [Obsoleto por RFC2474]
+  0100          Maximizar Rendimiento                  [Obsoleto por RFC2474]
+  1000          Minimizar Retraso                      [Obsoleto por RFC2474]
+  1111          Maximizar Seguridad                    [Obsoleto por RFC2474]
+
+El valor TOS se emplea para indicar la "mejor" forma de manejar
+los datos. Sólo se puede pedir un valor o propiedad TOS por cada
+datagrama IP.
+
+En general, los protocolos que están relacionados con la 
+interacción humana deberían pedir un retraso corto, mientras que
+las transferencias que comprendan grandes bloques de datos
+necesitan un gran rendimiento. Por último, la máxima fiabilidad
+es lo más importante cuando se trata de funciones de gestión
+de Internet basadas en datagramas.
+
+Los protocolos de aplicación no incluídos en estas tablas deberían
+ser capaces de efectuar la selección adecuada entre un retraso
+corto (8 decimal, 1000 binario) o un elevado rendimiento (4 decimal,
+0100 binario).
+
+A continuación se presentan los valores TOS recomendados:
+
+
+       ----- Valor del Tipo-de-Servicio (TOS) -----
+
+Protocolo                Valor TOS
+-----------------------  --------------------------------------------------
+
+TELNET (1)                 1000                 (minimizar retraso)
+
+FTP
+  Control                  1000                 (minimizar retraso)
+  Datos (2)                0100                 (maximizar rendimiento)
+
+TFTP                       1000                 (minimizar retraso)
+
+SMTP (3)
+  Fase de Comando          1000                 (minimizar retraso)
+  Fase de DATOS            0100                 (maximizar rendimiento)
+
+Servicio de Nombres de Dominio (Domain Name Service - DNS)
+  Pregunta UDP             1000                 (minimizar retraso)
+  Pregunta TCP             0000
+  Transferencia de Zona    0100                 (maximizar rendimiento)
+
+NNTP                       0001                 (minimizar coste monetario)
+
+ICMP
+  Errores                  0000
+  Peticiones               0000 (4)
+  Respuestas               <igual que peticiones> (4)
+
+Cualquier IGP              0010                 (maximizar fiabilidad)
+
+EGP                        0000
+
+SNMP                       0010                 (maximizar fiabilidad)
+
+BOOTP                      0000
+
+Notas:
+
+(1) Incluye todos los protocolos interactivos de usuario
+    (por ej., rlogin).
+
+(2) Incluye todos los protocolos de transferencia en masa
+    de datos (por ej., rcp).
+
+(3) Si la implementación no tiene soporte para el cambio
+    de TOS durante el tiempo de vida de la conexión, el
+    valor recomendados para TOS al abrir la conexión es
+    el valor por defecto (0000).
+
+(4) Si bien los mensajes de petición ICMP normalmente se
+    envían con el valor TOS por defecto, a veces existen
+    buenas razones para enviarlos con otros valores TOS.
+    Las respuestas ICMP siempre utilizan el mismo valor
+    TOS empleado en los mensajes de petición ICMP.
+
+Las aplicaciones pueden (a petición del usuario) sustituir
+0001 (minimizar coste monetario) por cualquiera de los
+valores anteriores.
+
+
+REFERENCIAS
+-----------
+
+[RFC791]  Postel, J., "Internet Protocol - DARPA Internet Program
+          Protocol Specification", STD 5, RFC 791, DARPA, Septiembre
+          1981.
+
+[RFC1108] Kent, S., "U.S. Department of Defense Security Options for
+          the Internet Protocol", RFC 1108, BBN Communications,
+          Noviembre 1991.
+
+[RFC1122] R. Braden, Ed., "Requirements for Internet Hosts --
+          Communication Layers," IETF Host Requirements Working Group,
+          RFC-1122, Octubre 1989.
+
+[RFC1191] Mogul, J., and S. Deering, "Path MTU Discovery", RFC 1191,
+          DECWRL, Stanford University, Noviembre 1990.
+
+[RFC1349] Almquist, P., "Type of Service in the Internet Protocol
+          Suite", RFC 1349, Consultant, Julio 1992. 
+
+[RFC1385] Wang, Z., "EIP: The Extended Internet Protocol", RFC 1385,
+	  University College London, Noviembre 1992.
+
+[RFC1393] Malkin, G., "Traceroute Using an IP Option", RFC 1393,
+          Xylogics, Inc., Enero 1993.
+
+[RFC1455] Eastlake, D., "Physical Link Security Type of Service",
+          RFC 1455, Digital Equipment Corporation, Mayo 1993.
+
+[Ullmann IPv7]
+
+[RFC2113] Katz, D., "IP Router Alert Option", RFC 2113, Cisco Systems,
+          Febrero 1997.
+
+GENTE
+-----
+
+[Carpenter] Brian Carpenter, <brian@dxcoms.cern.ch>, Junio 1995.
+
+[Estrin] Deborah Estrin, <Estrin@usc.edu>, Octubre 1994.
+
+[Farinacci] Dino Farinacci, <dino@cisco.com>, Mayo 1999.
+
+[Finn] Greg Finn, <Finn@isi.edu>, Octubre 1994.
+
+[Graff] Charles "Bud" Graff, <bud@fotlan.army.mil>, Marzo 1995.
+
+[Katz] Dave Katz, <dkatz@cisco.com>, Noviembre 1994.
+
+[JBP] Jon Postel, <postel@isi.edu>, Octubre 1994.
+
+[Malis] Andy Malis, <malis@casc.com>, Abril 1999.
+
+[Ullmann] Robert Ullmann, <ariel@world.std.com> 
+
+[]

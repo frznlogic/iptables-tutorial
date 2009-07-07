@@ -1,0 +1,266 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>REJECT target</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="Iptables targets and jumps"
+HREF="c8815.htm"><LINK
+REL="PREVIOUS"
+TITLE="REDIRECT target"
+HREF="x10065.htm"><LINK
+REL="NEXT"
+TITLE="RETURN target"
+HREF="x10192.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x10065.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 11. Iptables targets and jumps</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x10192.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="REJECTTARGET"
+>REJECT target</A
+></H1
+><P
+>The REJECT target works basically the same as the 
+DROP target, but it also sends back an error message to the 
+host sending the packet that was blocked. The REJECT target 
+is as of today only valid in the INPUT, 
+FORWARD and OUTPUT chains or 
+their sub chains. After all, these would be the only chains in which it would 
+make any sense to put this target. Note that all chains that use the 
+REJECT target may only be called by the 
+INPUT, FORWARD, and 
+OUTPUT chains, else they won't work. There is 
+currently only one option which controls the nature of how this target works, 
+though this may in turn take a huge set of variables. Most of them are fairly 
+easy to understand, if you have a basic knowledge of 
+TCP/IP.
+     </P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.REJECTTARGET"
+></A
+><P
+><B
+>Table 11-14. REJECT target options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Option</TD
+><TD
+>--reject-with</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A FORWARD -p TCP --dport 22 -j REJECT
+--reject-with
+tcp-reset</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This option tells the REJECT target what
+response to send to the host that sent the packet that we are rejecting. Once
+we get a packet that matches a rule in which we have specified this target,
+our host will first of all send the associated reply, and the packet will then
+be dropped dead, just as the DROP target would drop it. The
+following reject types are currently valid:
+icmp-net-unreachable,
+icmp-host-unreachable,
+icmp-port-unreachable,
+icmp-proto-unreachable,
+icmp-net-prohibited and
+icmp-host-prohibited. The default error
+message is to send a port-unreachable to the host. All of
+the above are ICMP error messages and may be set as
+you wish. You can find further information on their various purposes in the
+appendix <A
+HREF="a12854.htm"
+><I
+>ICMP types</I
+></A
+>. Finally, 
+there is one more option called
+tcp-reset, which may only be used together with the
+TCP protocol. The tcp-reset option
+will tell REJECT to send a TCP
+RST packet in reply to the sending host. TCP
+RST packets are used to close open TCP
+connections gracefully. For more information about the TCP
+RST read <A
+HREF="a13413.htm#RFC793"
+><I
+>RFC 793 - Transmission Control Protocol</I
+></A
+>. As stated in the iptables man page, this is mainly 
+useful for blocking ident probes which frequently occur when sending mail to 
+broken mail hosts, that won't otherwise accept your mail.
+        </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Works under Linux kernel 2.3, 2.4, 2.5 and 2.6.
+      </P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x10065.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x10192.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>REDIRECT target</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c8815.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>RETURN target</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

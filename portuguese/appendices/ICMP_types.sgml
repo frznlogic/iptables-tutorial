@@ -1,0 +1,309 @@
+ <appendix id="icmptypes">
+  <title id="icmptypes.title">ICMP types</title>
+    <para>
+     This is a complete listing of all ICMP types:
+    </para>
+
+    <table frame=all><title>ICMP types</title>
+     <tgroup cols=5 align=left colsep=1 rowsep=1>
+      <colspec colwidth="1*" align="center">
+      <colspec colwidth="1*" align="center">
+      <colspec colwidth="5*" align="left">
+      <colspec colwidth="1*" align="center">
+      <colspec colwidth="1*" align="center">
+      <thead>
+       <row>
+        <entry>TYPE</entry>
+        <entry>CODE</entry>
+        <entry>Description</entry>
+        <entry>Query</entry>
+        <entry>Error</entry>
+       </row>
+      </thead>
+      <tbody>
+
+       <row>
+        <entry>0</entry>
+        <entry>0</entry>
+        <entry>Echo Reply</entry>
+        <entry>x</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>0</entry>
+        <entry>Network Unreachable</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>1</entry>
+        <entry>Host Unreachable</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>2</entry>
+        <entry>Protocol Unreachable</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>3</entry>
+        <entry>Port Unreachable</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>4</entry>
+        <entry>Fragmentation needed but no frag. bit set</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>5</entry>
+        <entry>Source routing failed</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>6</entry>
+        <entry>Destination network unknown</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>7</entry>
+        <entry>Destination host unknown</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+       <entry>3</entry>
+       <entry>8</entry>
+       <entry>Source host isolated (obsolete)</entry>
+       <entry>&nbsp;</entry>
+       <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>9</entry>
+        <entry>Destination network administratively prohibited</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>10</entry>
+        <entry>Destination host administratively prohibited</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>11</entry>
+        <entry>Network unreachable for TOS</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>12</entry>
+        <entry>Host unreachable for TOS</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>13</entry>
+        <entry>Communication administratively prohibited by filtering</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>14</entry>
+        <entry>Host precedence violation</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>15</entry>
+        <entry>Precedence cutoff in effect</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>4</entry>
+        <entry>0</entry>
+        <entry>Source quench</entry>
+        <entry>&nbsp;</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>5</entry>
+        <entry>0</entry>
+        <entry>Redirect for network</entry>
+        <entry>&nbsp;</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>5</entry>
+        <entry>1</entry>
+        <entry>Redirect for host</entry>
+        <entry>&nbsp;</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>5</entry>
+        <entry>2</entry>
+        <entry>Redirect for TOS and network</entry>
+        <entry>&nbsp;</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>5</entry>
+        <entry>3</entry>
+        <entry>Redirect for TOS and host</entry>
+        <entry>&nbsp;</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>8</entry>
+        <entry>0</entry>
+        <entry>Echo request</entry>
+        <entry>x</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>9</entry>
+        <entry>0</entry>
+        <entry>Router advertisement</entry>
+        <entry>&nbsp;</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>10</entry>
+        <entry>0</entry>
+        <entry>Route sollicitation</entry>
+        <entry>&nbsp;</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>11</entry>
+        <entry>0</entry>
+        <entry>TTL equals 0 during transit</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>11</entry>
+        <entry>1</entry>
+        <entry>TTL equals 0 during reassembly</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>12</entry>
+        <entry>0</entry>
+        <entry>IP header bad (catchall error)</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>12</entry>
+        <entry>1</entry>
+        <entry>Required options missing</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>13</entry>
+        <entry>0</entry>
+        <entry>Timestamp request (obsolete)</entry>
+        <entry>x</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>14</entry>
+        <entry></entry>
+        <entry>Timestamp reply (obsolete)</entry>
+        <entry>x</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>15</entry>
+        <entry>0</entry>
+        <entry>Information request (obsolete)</entry>
+        <entry>x</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>16</entry>
+        <entry>0</entry>
+        <entry>Information reply (obsolete)</entry>
+        <entry>x</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>17</entry>
+        <entry>0</entry>
+        <entry>Address mask request</entry>
+        <entry>x</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>18</entry>
+        <entry>0</entry>
+        <entry>Address mask reply</entry>
+        <entry>x</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+      </tbody>
+     </tgroup>
+    </table>
+
+ </appendix>

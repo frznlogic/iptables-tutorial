@@ -1,0 +1,202 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>rc.test-iptables.txt</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="Example scripts"
+HREF="c11777.htm"><LINK
+REL="PREVIOUS"
+TITLE="rc.UTIN.firewall.txt"
+HREF="x12280.htm"><LINK
+REL="NEXT"
+TITLE="rc.flush-iptables.txt"
+HREF="x12339.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x12280.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 14. Example scripts</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x12339.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="RCTEST-IPTABLESTXT"
+>rc.test-iptables.txt</A
+></H1
+><P
+>The <A
+HREF="http://iptables-tutorial.frozentux.net/scripts/rc.test-iptables.txt"
+TARGET="_top"
+>rc.test-iptables.txt</A
+> script can be used to test all the different
+chains, but it might need some tweaking depending on your configuration, such
+as turning on ip_forwarding, and setting up
+masquerading etc. It will work for most everyone 
+who has all the basic set up and all the basic tables loaded into kernel.
+All it really does is set some LOG targets which will log
+ping replies and ping requests. This way, you will get information on which
+chain was traversed and in which order. For example, run this script and then
+do:
+    </P
+><PRE
+CLASS="SCREEN"
+>ping -c 1 host.on.the.internet
+    </PRE
+><P
+>And tail -n 0 -f /var/log/messages while doing the first
+command. This should show you all the different chains used, and in which order,
+unless the log entries are swapped around for some reason.
+    </P
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>This script was written for testing purposes only. In other words,
+it's not a good idea to have rules like this that log everything of one sort
+since your log partitions might get filled up quickly and it would be an
+effective Denial of Service attack against you and might lead to real attacks on
+you that would be unlogged after the initial Denial of Service attack.
+     </P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x12280.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x12339.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>rc.UTIN.firewall.txt</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c11777.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>rc.flush-iptables.txt</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

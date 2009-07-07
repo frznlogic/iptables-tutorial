@@ -1,0 +1,98 @@
+ <appendix id="examplecode">
+  <title id="examplecode.title">Example scripts code-base</title>
+   <indexterm zone="examplecode">
+     <primary>Example scripts</primary>
+   </indexterm>
+
+  <section id="includercfirewall">
+   <title id="include.rcfirewall.title">Example rc.firewall script</title>
+   <indexterm zone="includercfirewall">
+     <primary>Example scripts</primary>
+     <secondary>rc.firewall.txt</secondary>
+   </indexterm>
+
+   <para>
+    <programlisting>
+&rcfirewall;
+    </programlisting>
+   </para>
+
+  </section>
+
+  <section id="includercdmzfirewall">
+   <title id="include.rcdmzfirewall.title">Example rc.DMZ.firewall script</title>
+   <indexterm zone="includercdmzfirewall">
+     <primary>Example scripts</primary>
+     <secondary>rc.DMZ.firewall.txt</secondary>
+   </indexterm>
+   <para>
+    <programlisting>
+&rcdmzfirewall;
+    </programlisting>
+   </para>
+
+  </section>
+
+  <section id="includercutinfirewall">
+   <title id="include.rcutinfirewall.title">Example rc.UTIN.firewall script</title>
+   <indexterm zone="includercutinfirewall">
+     <primary>Example scripts</primary>
+     <secondary>rc.UTIN.firewall.txt</secondary>
+   </indexterm>
+
+   <para>
+    <programlisting>
+&rcutinfirewall;
+    </programlisting>
+   </para>
+
+  </section>
+
+  <section id="includercdhcpfirewall">
+   <title id="include.rcdhcpfirewall.title">Example rc.DHCP.firewall script</title>
+   <indexterm zone="includercdhcpfirewall">
+     <primary>Example scripts</primary>
+     <secondary>rc.DHCP.firewall.txt</secondary>
+   </indexterm>
+
+   <para>
+    <programlisting>
+&rcdhcpfirewall;
+    </programlisting>
+   </para>
+
+  </section>
+
+  <section id="includeflushiptables">
+   <title id="include.flushiptables.title">Example rc.flush-iptables script</title>
+   <indexterm zone="includeflushiptables">
+     <primary>Example scripts</primary>
+     <secondary>rc.flush-iptables.txt</secondary>
+   </indexterm>
+
+   <para>
+    <programlisting>
+&flushtables;
+    </programlisting>
+   </para>
+
+  </section>
+
+  <section id="includetesttables">
+   <title id="include.testtables.title">Example rc.test-iptables script</title>
+   <indexterm zone="includetesttables">
+     <primary>Example scripts</primary>
+     <secondary>rc.test-iptables.txt</secondary>
+   </indexterm>
+
+   <para>
+    <programlisting>
+&testtables;
+    </programlisting>
+   </para>
+
+  </section>
+ </appendix>
+
+
+

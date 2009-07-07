@@ -1,0 +1,385 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Example NAT machine in theory</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="Network Address Translation Introduction"
+HREF="c3163.htm"><LINK
+REL="PREVIOUS"
+TITLE="Caveats using NAT"
+HREF="x3236.htm"><LINK
+REL="NEXT"
+TITLE="What's next?"
+HREF="x3376.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x3236.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 4. Network Address Translation Introduction</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x3376.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="EXAMPLENATMACHINE"
+>Example NAT machine in theory</A
+></H1
+><P
+>This is a small theoretical scenario where we want a
+NAT server between 2 different networks and an
+Internet connection. What we want to do is to connect 2 networks to each
+other, and both networks should have access to each other and the Internet. We
+will discuss the hardware questions you should take into consideration, as
+well as other theory you should think about before actually starting to
+implement the NAT machine.
+    </P
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="WHATISNEEDEDTOBUILDNAT"
+>What is needed to build a 
+NAT machine</A
+></H2
+><P
+>Before we discuss anything further, we should start by looking at what kind of
+hardware is needed to build a Linux machine doing
+NAT. For most smaller networks, this should be no
+problem, but if you are starting to look at larger networks, it can actually
+become one. The biggest problem with NAT is that it
+eats resources quite fast. For a small private network with possibly 1-10
+users, a <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>486</I
+></SPAN
+> with <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>32 MB</I
+></SPAN
+> of ram will
+do more than enough. However, if you are starting to get up around 100 or more
+users, you should start considering what kind of hardware you should look at.
+Of course, it is also a good idea to consider bandwidth usage, and how many
+connections will be open at the same time. Generally, spare computers will do
+very well however, and this is one of the big pros of using a Linux based
+firewall. You can use old scrap hardware that you have left over, and hence
+the firewall will be very cheap in comparison to other firewalls.
+      </P
+><P
+>You will also need to consider network cards. How many separate networks will
+connect to your NAT/filter machine? Most of the time
+it is simply enough to connect one network to an Internet connection. If you
+connect to the Internet via ethernet, you should generally have 2
+ethernet cards, etcetera. It can be a good idea to
+choose 10/100 mbit/s network cards of relatively good brands for this for
+scalability, but most any kinds of cards will do as long as they have drivers
+in the Linux kernel. A note on this matter: avoid using or getting network
+cards that don't have drivers actually in the Linux kernel distribution. I
+have on several occasions found network cards/brands that have separately
+distributed drivers on discs that work dismally. They are generally not very
+well maintained, and if you get them to work on your kernel of choice to begin
+with, the chance that they will actually work on the next major Linux kernel
+upgrade is very small. This will most of the time mean that you may have to
+get a little bit more costly network cards, but in the end it is worth it.
+      </P
+><P
+>As a note, if you are going to build your firewall on really old hardware, it
+is suggested that you at least try to use PCI buses
+or better as far as possible. First of all, the network cards will hopefully
+be possible to use in the future when you upgrade. Also,
+ISA buses are extremely slow and heavy on the
+CPU usage. This means that putting a lot of load onto
+ISA network cards can next to kill your machine.
+      </P
+><P
+>Finally, one thing more to consider is how much memory you put into the 
+NAT/firewall machine. It is a good idea to put in at
+least more than <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>64 MB</I
+></SPAN
+> of memory if possible, even if it
+is possible run it on <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>32MB</I
+></SPAN
+> of memory.
+NAT isn't extremely huge on memory consumption, but
+it may be wise to add as much as possible just in case you will get more
+traffic than expected. 
+      </P
+><P
+>As you can see, there is quite a lot to think about when it comes to hardware. 
+But, to be completely honest, in most cases you don't need to think about these 
+points at all, unless you are building a NAT machine
+for a large network or company. Most home users need not think about this, but
+may more or less use whatever hardware they have handy. There are no complete
+comparisons and tests on this topic, but you should fare rather well with just
+a little bit of common sense.
+      </P
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="NATPLACEMENT"
+>Placement of NAT machines</A
+></H2
+><P
+>This should look fairly simple, however, it may be harder than you originally
+thought in large networks. In general, the NAT
+machine should be placed on the perimeter of the network, just like any
+filtering machine out there. This, most of the time,
+means that the NAT and
+filtering machines are the same machine, of course.
+Also worth a thought, if you have very large networks, it may be worth
+splitting the network into smaller networks and assign a
+NAT/filtering machine for each of these networks.
+Since NAT takes quite a lot of processing power, this
+will definitely help keep round trip time (RTT, the
+time it takes for a packet to reach a destination and the return packet to get
+back) down.
+      </P
+><P
+>In our example network as we described above, with two networks and an
+Internet connection we should, in other words, look at how large the two
+networks are. If we can consider them to be small and depending on what
+requirements the clients have, a couple of hundred clients should be no
+problem on a decent NAT machine. Otherwise, we could
+have split up the load over several machines by setting public IP's on smaller
+NAT machines, each handling their own smaller segment
+of the network and then let the traffic congregate over a specific routing
+only machine. This of course takes into consideration that you must have
+enough public IP's for all of your NAT machines, and
+that they are routed through your routing machine. 
+      </P
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="NATPROXIES"
+>How to place proxies</A
+></H2
+><P
+>Proxies are a general problem when it comes to NAT in
+most cases unfortunately, especially transparent proxies. Normal proxies
+should not cause too much trouble, but creating a transparent proxy is a dog
+to get to work, especially on larger networks. The first problem is that
+proxies take quite a lot of processing power, just the same as
+NAT does. To put both of these on the same machine is
+not advisable if you are going to handle large network traffic. The second
+problem is that if you NAT the source IP as well as
+the destination IP, the proxy will not be able to know what hosts to contact.
+E.g., which server is the client trying to contact? Since all that information
+is lost during the NAT translation since the packets can't contain that
+information as well if they are NAT'ed, it's a
+problem. Locally, this has been solved by adding the information in the
+internal data structures that are created for the packets, and hence proxies
+such as squid can get the information. 
+      </P
+><P
+>As you can see, the problem is that you don't have much of a choice if 
+you are going to run a transparent proxy. There are,
+of course, possibilities, but they are not advisable really. One possibility
+is to create a proxy outside the firewall and create
+a routing entry that routes all web traffic through that machine, and then
+locally on the proxy machine NAT the packets to the
+proper ports for the proxy. This way, the information
+is preserved all the way to the proxy machine and is
+still available on it.
+      </P
+><P
+>The second possibility is to simply create a proxy
+outside the firewall, and then block all webtraffic except the traffic going
+to the proxy. This way, you will force all users to
+actually use the proxy. It's a crude way of doing it,
+but it will hopefully work.
+      </P
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="NATFINALSTAGE"
+>The final stage of our NAT machine</A
+></H2
+><P
+>As a final step, we should bring all of this information together, and see how
+we would solve the NAT machine then. Let's take a
+look at a picture of the networks and how it looks. We have decided to put a
+proxy just outside the NAT/filtering machine as
+described above, but inside counting from the router. This area could be
+counted upon as an DMZ in a sense, with the
+NAT/filter machine being a router between the
+DMZ and the two company networks. You can see the
+exact layout we are discussing in the image below.
+      </P
+><P
+>        <DIV
+CLASS="MEDIAOBJECT"
+><P
+><IMG
+SRC="images/nat-machine.jpg"></P
+></DIV
+>
+      </P
+><P
+>All the normal traffic from the NAT'ed networks will
+be sent through the DMZ directly to the router, which
+will send the traffic on out to the internet. Except, yes, you guessed it,
+webtraffic which is instead marked inside the netfilter part of the
+NAT machine, and then routed based on the mark and to
+the proxy machine. Let's take a look at what I am talking about. Say a
+http packet is seen by the
+NAT machine. The mangle table can then be used to
+mark the packet with a netfilter mark (also known as
+nfmark). Even later when we should route the packets to our router, we will be
+able to check for the nfmark within the routing
+tables, and based on this mark, we can choose to route the http packets to the
+proxy server. The proxy server will then do it's work
+on the packets. We will touch these subjects to some extent later on in the
+document, even though much of the routing based part is happening inside the
+advanced routing topics. 
+      </P
+><P
+>The NAT machine has a public IP available over the
+internet, as well as the router and any other machines that may be available
+on the Internet. All of the machines inside the
+NAT'ed networks will be using private IP's, hence
+saving both a lot of cash, and the Internet address space.
+      </P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x3236.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x3376.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Caveats using NAT</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c3163.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>What's next?</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

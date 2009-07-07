@@ -1,0 +1,597 @@
+  <chapter id="ipfiltering">
+    <title id="ipfiltering.title">IP filtering introduction</title>
+    <indexterm zone="ipfiltering">
+      <primary>IP filtering</primary>
+    </indexterm>
+    <indexterm zone="ipfiltering">
+      <primary>Filtering</primary>
+      <secondary>Introduction</secondary>
+    </indexterm>
+ 
+    <para>
+This chapter will discuss the theoretical details about an
+<systemitem>IP filter</systemitem>, what it 
+is, how it works and basic things such as where to place firewalls, policies, 
+etcetera.
+    </para>
+    
+    <para>
+Questions for this chapter may be, where to actually put the firewall? In most
+cases, this is a simple question, but in large corporate environments it may
+get trickier. What should the policies be? Who should have access where? What
+is actually an <systemitem>IP filter</systemitem>? All of these questions
+should be fairly well answered later on in this chapter.
+    </para>
+    
+    <section id="whatisanipfilter">
+      <title id="whatisanipfilter.title">What is an IP filter</title>
+      
+      <para>
+It is important to fully understand what an IP filter is. Iptables is an IP 
+filter, and if you don't fully understand this, you will get serious problems 
+when designing your firewalls in the future. 
+      </para>
+      
+      <para>
+An <systemitem>IP filter</systemitem> operates mainly in layer 2, of the
+<systemitem>TCP/IP</systemitem> reference stack. Iptables however has the
+ability to also work in layer 3, which actually most <systemitem>IP
+filters</systemitem> of today have. But per definition an <systemitem>IP
+filter</systemitem> works in the second layer.
+      </para>
+      
+      <para>
+If the <systemitem>IP filter</systemitem> implementation is strictly following
+the definition, it would 
+in other words only be able to filter packets based on their
+<systemitem>IP headers</systemitem>
+(Source and Destionation address, <systemitem>TOS/DSCP/ECN</systemitem>,
+<systemitem>TTL</systemitem>, <systemitem>Protocol</systemitem>, etc. Things 
+that are actually in the IP header.) However, since the Iptables implementation 
+is not perfectly strict around this definition, it is also able to filter 
+packets based on other headers that lie deeper into the packet
+(<systemitem>TCP</systemitem>, <systemitem>UDP</systemitem>, 
+etc), and shallower (<systemitem>MAC</systemitem> source address).
+      </para>
+      
+      <para>
+There is one thing however, that iptables is rather strict about these days.
+It does not "follow" streams or puzzle data together. This would simply be too
+processor- and memoryconsuming . The implications of this will be discussed a
+little bit more  further on. It does keep track of packets and see if they are
+of the same stream (via <systemitem>sequence numbers</systemitem>,
+<systemitem>port numbers</systemitem>, etc.) almost exactly the same way as
+the real <systemitem>TCP/IP</systemitem> stack. This is called connection
+tracking, and thanks to this we can do things such as
+<systemitem>Destination</systemitem> and <systemitem>Source Network Address
+Translation</systemitem> (generally called
+<systemitem>DNAT</systemitem><indexterm><primary>DNAT</primary></indexterm>
+and <systemitem>SNAT</systemitem>),
+<indexterm><primary>SNAT</primary></indexterm> as well as state matching of
+packets.
+      </para>
+      
+      <para>
+As I implied above, iptables can not connect data from different packets to 
+each other (per default), and hence you can never be fully certain that you
+will see the complete data at all times. I am specifically mentioning this
+since there are constantly at least a couple of questions about this on the
+different mailing lists pertaining to netfilter and iptables and how to do
+things that are generally considered a really bad idea. For example, every
+time there is a new windows based virus, there are a couple of different
+persons asking how to drop all streams containing a specific string. The bad
+idea about this is that it is so easily circumvented. For example if we match
+for something like this:
+      </para>
+      
+      <para><command>cmd.exe</command></para><indexterm><primary>cmd.exe</primary></indexterm>
+      
+      <para>
+Now, what happens if the virus/exploit writer is smart enough to make the 
+packet size so small that <command>cmd</command> winds up in one packet, and 
+<command>.exe</command> winds up in the next packet? Or what if the packet has 
+to travel through a network that has this small a packet size on its own? Yes, 
+since these string matching functions is unable to work across packet 
+boundaries, the packet will get through anyway.
+      </para>
+      
+      <para>
+Some of you may now be asking yourself, why don't we simply make it possible 
+for the string matches, etcetera to read across packet boundaries? It is 
+actually fairly simple. It would be too costly on processor time. Connection 
+tracking is already taking way to much processor time to be totally 
+comforting. To add another extra layer of complexity to connection tracking, 
+such as this, would probably kill more firewalls than anyone of us could 
+expect. Not to think of how much memory would be used for this simple task on 
+each machine.
+      </para>
+      
+      <para>
+There is also a second reason for this functionality not being developed.
+There  is a technology called proxies.
+Proxies<indexterm><primary>Proxy</primary></indexterm>
+<indexterm><primary>Squid</primary></indexterm> were developed to handle
+traffic in  the higher layers, and are hence much better at fullfilling these
+requirements. Proxies were originally developed to handle downloads and often
+used pages and to help you get the most out of slow Internet connections. For
+example, <link linkend="squidproxy" endterm="squidproxy.title"></link> is a
+webproxy.<indexterm><primary>Webproxy</primary><seealso>Proxy</seealso></indexterm> A
+person who wants to download a page sends the request, the proxy either grabs
+the request or receives the request and opens the connection to the web
+browser, and then connects to the webserver and downloads the file, and when
+it has downloaded the file or page, it sends it to the client. Now, if a
+second browser wants to read the same page again, the file or page is already
+downloaded to the proxy, and can be sent directly, and saves bandwidth for
+us.
+      </para>
+      
+      <para>
+As you may understand, proxies also have quite a lot of functionality to go in 
+and look at the actual content of the files that it downloads. Because of 
+this, they are much better at looking inside the whole streams, files, pages 
+etc.
+      </para>
+
+      <indexterm zone="l7filtering">
+        <primary>Filtering</primary>
+        <secondary>Layer 7</secondary>
+      </indexterm>
+      <para id="l7filtering">
+Now, after warning you about the inherent problems of doing level 7 filtering
+in iptables and netfilter, there is actually a set of patches that has
+attacked these problems. This is called <link linkend="l7-filter"
+endterm="l7-filter.title"></link>. It can be used to match on a lot of layer
+7 protocols but is mainly to be used together with
+<systemitem>QoS</systemitem> and <systemitem>traffic accounting</systemitem>,
+even though it can be used for pure filtering as well. The
+<systemitem>l7-filter</systemitem> is still
+experimental and developed outside the kernel and netfilter coreteam, and
+hence you will not hear more about it here.
+      </para>
+     
+    </section>
+    
+    <section id="ipfiltergeneralterms">
+      <title id="ipfiltergeneralterms.title">IP filtering terms and 
+expressions</title>
+            
+      <para>
+To fully understand the upcoming chapters there are a few general terms and 
+expressions that one must understand, including a lot of details regarding the 
+<systemitem>TCP/IP</systemitem> chapter. This is a listing of the most common
+terms used in <systemitem>IP</systemitem> filtering.
+      </para>
+      
+      <itemizedlist mark="opencircle">
+        <listitem>
+          <para>
+<systemitem>Drop/Deny</systemitem><indexterm><primary>Drop</primary>
+</indexterm><indexterm><primary>Deny</primary></indexterm> - When a packet is
+dropped or denied, it is simply deleted, and no further actions are taken. No
+reply to tell the host it was dropped, nor is the receiving host of the packet
+notified in any way. The packet simply disappears.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+<systemitem>Reject</systemitem>
+<indexterm><primary>Reject</primary></indexterm> - This is basically the same
+as a drop or deny target or policy, except that we also send a reply to the
+host sending the packet that was dropped. The reply may be specified, or
+automatically calculated to some value. (To this date, there is unfortunately
+no iptables functionality to also send a packet notifying the receiving host
+of the rejected packet what happened (ie, doing the reverse of the Reject
+target). This would be very good in certain circumstances, since the receiving
+host has no ability to stop Denial of Service attacks from happening.)
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+<systemitem>State</systemitem>
+<indexterm><primary>State match</primary></indexterm> - A specific state of a
+packet in comparison to a whole stream of packets. For example, if the packet
+is the first that the firewall sees or knows about, it is considered new (the
+<systemitem>SYN</systemitem> packet in a <systemitem>TCP</systemitem>
+connection), or if it is part of an already established connection that the
+firewall knows about, it is considered to be established. States are known
+through the connection tracking system, which keeps track of all the
+sessions.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+<systemitem>Chain</systemitem>
+<indexterm><primary>Chain</primary></indexterm> - A chain contains a ruleset
+of rules that are applied on packets that traverses the chain. Each chain has
+a specific purpose (e.g., which table it is connected to, which specifies what
+this chain is able to do), as well as a specific application area (e.g., only
+forwarded packets, or only packets destined for this host). In iptables, there
+are several different chains, which will be discussed in depth in later
+chapters.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+<systemitem>Table</systemitem>
+<indexterm><primary>Table</primary></indexterm> - Each table has a specific
+purpose, and in iptables there are 4 tables. The <systemitem>raw</systemitem>,
+<systemitem>nat</systemitem>, <systemitem>mangle</systemitem> and
+<systemitem>filter</systemitem> tables. For example, the
+<systemitem>filter</systemitem> table is specifically designed to filter
+packets, while the <systemitem>nat</systemitem> table is specifically designed
+to <systemitem>NAT</systemitem> (<systemitem>Network Address
+Translation</systemitem>) packets.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+<systemitem>Match</systemitem>
+<indexterm><primary>Match</primary></indexterm> - This word can have two
+different meanings when it comes to <systemitem>IP</systemitem> filtering. The
+first meaning would be a single match that tells a rule that 
+this header must contain this and this information. For example, the
+<command>--source</command> match tells us that the source address must be a
+specific network range or host address. The second meaning is if a whole rule
+is a match. If the packet matches the whole rule, the jump or target
+instructions will be carried out (e.g., the packet will be dropped.)
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+<systemitem>Target</systemitem>
+<indexterm><primary>Target</primary></indexterm> - There is generally a target
+set for each rule in a ruleset. If the rule has matched fully, the target
+specification tells us what to do with the packet. For example, if we should
+drop or accept it, or NAT it, etc. There is also something called a jump
+specification, for more information see the jump description in this list. As
+a last note, there might not be a target or jump for each rule, but there may
+be.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+<systemitem>Rule</systemitem>
+<indexterm><primary>Rule</primary></indexterm> - A rule is a set of a match or
+several matches together with a single target in most implementations of
+<systemitem>IP</systemitem> filters, including the iptables implementation.
+There are some implementations which let you use several targets/actions per
+rule.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+<systemitem>Ruleset</systemitem>
+<indexterm><primary>Ruleset</primary></indexterm> - A ruleset is the complete
+set of rules that are put into a whole <systemitem>IP filter</systemitem>
+implementation. In the case of <systemitem>iptables</systemitem>, this
+includes all of the rules set in the <systemitem>filter</systemitem>,
+<systemitem>nat</systemitem>, <systemitem>raw</systemitem> and
+<systemitem>mangle</systemitem> tables, and in all of the subsequent chains.
+Most of the time, they are written down in a configuration file of some sort.
+	  </para>
+        </listitem>
+        <listitem>
+          <para>
+<systemitem>Jump</systemitem>
+<indexterm><primary>Jump</primary></indexterm> - The jump instruction is
+closely related to a target. A jump instruction is written exactly the same as
+a target in iptables, with the exception that instead of writing a target
+name, you write the name of another chain. If the rule matches, the packet
+will hence be sent to this second chain and be processed as usual in that
+chain.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+<systemitem>Connection tracking</systemitem><indexterm><primary>Connection
+tracking</primary></indexterm> - A firewall which implements connection
+tracking is able to track connections/streams simply put. The ability to do so
+is often done at the impact of lots of processor and memory usage. This is
+unfortunately true in iptables as well, but much work has been done to work on
+this. However, the good side is that the firewall will be much more secure
+with connection tracking properly used by the implementer of the firewall
+policies. 
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+<systemitem>Accept</systemitem>
+<indexterm><primary>Accept</primary></indexterm> - To accept a packet and to
+let it through the firewall rules. This is the opposite of the drop or deny
+targets, as well as the reject target.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+<systemitem>Policy</systemitem>
+<indexterm><primary>Policy</primary></indexterm> - There are two kinds of
+policies that we speak about most of the time when implementing a firewall.
+First we have the chain policies, which tells the firewall implementation the
+default behaviour to take on a packet if there was no rule that matched it.
+This is the main usage of the word that we will use in this book. The second
+type of policy is the security policy that we may have written documentation
+on, for example for the whole company or for this specific network segment.
+Security policies are very good documents to have thought through properly and
+to study properly before starting to actually implement the firewall. 
+         </para>
+       </listitem>
+      </itemizedlist>
+    
+    </section>
+    
+    <section id="howtoplananipfilter">
+      <title id="howtoplananipfilter.title">How to plan an IP filter</title>
+      <indexterm zone="howtoplananipfilter">
+        <primary>IP filtering</primary>
+	<secondary>Planning</secondary>
+      </indexterm>
+      <indexterm zone="howtoplananipfilter">
+        <primary>Planning</primary>
+	<secondary>IP filters</secondary>
+      </indexterm>
+      
+      <para>
+One of the first steps to think about when planning the firewall is their 
+placement. This should be a fairly simple step since mostly your networks 
+should be fairly well segmented anyway. One of the first places that comes to 
+mind is the gateway between your local network(s) and the Internet. This is a 
+place where there should be fairly tight security. Also, in larger networks it 
+may be a good idea to separate different divisions from each other via 
+firewalls. For example, why should the development team have access to the 
+human resources network, or why not protect the economic department from other 
+networks? Simply put, you don't want an angry employee with the pink slip 
+tampering with the salary databases.
+      </para>
+      
+      <para>
+Simply put, the above means that you should plan your networks as well as 
+possible, and plan them to be segregated. Especially if the network is 
+medium- to big-sized (100 workstations or more, based on different aspects of 
+the network). In between these smaller networks, try to put firewalls that will 
+only allow the kind of traffic that you would like.
+      </para>
+      
+      <para>
+It may also be a good idea to create a De-Militarized Zone
+(DMZ)<indexterm><primary>DMZ</primary></indexterm> in your 
+network in case you have servers that are reached from the Internet. A DMZ is 
+a small physical network with servers, which is closed down to the extreme. 
+This lessens the risk of anyone actually getting in to the machines in the 
+DMZ, and it lessens the risk of anyone actually getting in and downloading any 
+trojans etc. from the outside. The reason that they are called de-militarized 
+zones is that they must be reachable from both the inside and the outside, and 
+hence they are a kind of grey zone (DMZ simply put).
+      </para>
+
+      <para>
+There are a couple of ways to set up the policies and default behaviours in a 
+firewall, and this section will discuss the actual theory that you should think 
+about before actually starting to implement your firewall, and helping you to 
+think through your decisions to the fullest extent.
+      </para>
+    
+      <para>
+Before we start, you should understand that most firewalls have default 
+behaviours. For example, if no rule in a specific chain matches, it can be 
+either dropped or accepted per default. Unfortunately, there is only one
+policy<indexterm><primary>Policy</primary></indexterm> per chain, but this is
+often easy to get around if we want to have different policies per network
+interface etc.
+      </para>
+      
+      <para>
+There are two basic policies that we normally use. Either we drop everything 
+except that which we specify, or we accept everything except that which we 
+specifically drop. Most of the time, we are mostly interested in the drop 
+policy, and then accepting everything that we want to allow specifically. This 
+means that the firewall is more secure per default, but it may also mean that 
+you will have much more work in front of you to simply get the firewall to 
+operate properly. 
+      </para>
+      
+      <para>
+Your first decision to make is to simply figure out which type of firewall you 
+should use. How big are the security concerns? What kind of applications must 
+be able to get through the firewall? Certain applications are horrible to 
+firewalls for the simple reason that they negotiate
+ports<indexterm><primary>Negotiated ports</primary></indexterm>
+<indexterm><primary>Port</primary><secondary>Negotiated</secondary></indexterm>
+to use for data streams inside a control session. This makes it extremely hard
+for the firewall to know which ports to open up. The most common applications
+works with iptables, but the more rare ones do not work to this day,
+unfortunately. 
+      </para>
+      
+      <note>
+        <para>
+There are also some applications that work partially, such as
+<systemitem>ICQ</systemitem>.<indexterm><primary>ICQ</primary></indexterm>
+Normal <systemitem>ICQ</systemitem> usage works perfectly, but not the chat or
+file sending functions, since they require specific code to handle the
+<systemitem>protocol</systemitem>. Since the <systemitem>ICQ</systemitem>
+protocols are not standardized (they are proprietary and may be changed at any
+time) most <systemitem>IP filters</systemitem> have chosen to either keep the
+<systemitem>ICQ</systemitem> protocol handlers out, or as patches that can be
+applied to the firewalls. Iptables have chosen to keep them as separate
+patches.
+        </para>
+      </note>
+    
+      <para>
+It may also be a good idea to apply
+layered<indexterm><primary>layered security</primary></indexterm>
+security measures, which we have actually already discussed partially so far.
+What we mean with this, is that you should use as many security measures as
+possible at the same time, and don't rely on any one single security concept.
+Having this as a basic concept for your security will increase security
+tenfold at least. For an example, let's look at this.
+      </para>
+
+      <para>
+        <mediaobject id="cisco-pix-dmz-lan">
+          <imageobject>
+            <imagedata
+fileref="images/cisco-pix-dmz-lan.eps"  format=eps>
+          </imageobject>
+          <imageobject>
+            <imagedata
+fileref="images/cisco-pix-dmz-lan.jpg"  format=jpg>
+          </imageobject>
+        </mediaobject>
+      </para>
+
+      <para>
+As you can see, in this example I have in this example chosen to place a
+Cisco<indexterm><primary>Cisco PIX</primary></indexterm> PIX firewall at the
+perimeter of all three network connections. It may
+<systemitem>NAT</systemitem><indexterm><primary>NAT</primary></indexterm> the
+internal
+<systemitem>LAN</systemitem>,<indexterm><primary>LAN</primary></indexterm> as
+well as the <systemitem>DMZ</systemitem> if necessary. It may also block all
+outgoing traffic except http return traffic as well as
+<systemitem>ftp</systemitem> and <systemitem>ssh</systemitem> traffic. It can
+allow incoming http traffic from both the <systemitem>LAN</systemitem> and the
+<systemitem>Internet</systemitem>, and <systemitem>ftp</systemitem> and
+<systemitem>ssh</systemitem> traffic from the <systemitem>LAN</systemitem>. On
+top of this, we note that each webserver is based on Linux, and can hence
+throw iptables and netfilter on each of the machines as well and add the same
+basic policies on these. This way, if someone manages to break the
+<systemitem>Cisco PIX</systemitem>, we can still rely on the netfilter
+firewalls locally on each machine, and vice versa. This allows for so called
+layered security.
+      </para>
+
+      <para>
+On top of this, we may add <link linkend="snortnids" 
+endterm="snortnids.title"></link>
+<indexterm><primary>Snort</primary></indexterm> on each of the machines.
+<systemitem>Snort</systemitem> is an excellent open source <systemitem>network
+intrusion detection system</systemitem> <indexterm><primary>Intrusion
+detection system</primary><secondary>Network</secondary></indexterm>
+(<systemitem>NIDS</systemitem>)<indexterm><primary>NIDS</primary></indexterm>
+which looks for signatures in the packets that it sees, and if it sees a
+signature of some kind of attack or breakin it can either
+e-mail<indexterm><primary>e-mail</primary></indexterm> the
+administrator and notify him about it, or even make active responses to the
+attack such as blocking the <systemitem>IP</systemitem> from which the attack
+originated. It should be noted that active responses should not be used
+lightly since snort has a bad behaviour of reporting lots of false positives
+(e.g., reporting an attack which is not really an attack).
+      </para>
+      
+      <para>
+It could also be a good idea to throw in an <systemitem>proxy</systemitem>
+<indexterm><primary>Proxy</primary></indexterm> in front of the webservers to
+catch some of the bad packets as well, which could also be a possibility to
+throw in for all of the locally generated webconnections. With a
+<systemitem>webproxy</systemitem> you can narrow down on traffic used by
+webtraffic from your employees, as well as restrict their
+<systemitem>webusage</systemitem> to some extent. As for a
+<systemitem>webproxy</systemitem> to your own
+<systemitem>webservers</systemitem>, you can use it to block some of the most
+obvious connections to get through. A good <systemitem>proxy</systemitem> that
+may be worth using is the<indexterm><primary>Squid</primary></indexterm> <link
+linkend="squidproxy" endterm="squidproxy.title"></link>.
+      </para>
+      
+      <para>
+Another<indexterm><primary>Tripwire</primary></indexterm> precaution that one
+can take is to install <link linkend="tripwireids"
+endterm="tripwireids.title"></link>. This is an excellent last line of defense
+kind of application, it is generally considered to be a <systemitem>Host
+Intrusion Detection System</systemitem>.<indexterm><primary>Intrusion
+detection system</primary><secondary>Host-based</secondary></indexterm> What
+it does is to make checksums of all the files  specified in a configuration
+file, and then it is run from <systemitem>cron</systemitem>
+<indexterm><primary>cron</primary></indexterm> once in a while to see that all
+of the specified files are the same as before, or have not changed in an
+illegit way. This program will in other words be able to find out if anyone
+has actually been able to get through and tampered with the system. A
+suggestion is to run this on all of the webservers.
+      </para>
+      
+      <para>
+One last thing to note is that it is always a good thing to follow standards,
+as we know. As you have already seen with the <systemitem>ICQ</systemitem>
+example, if you don't use standardized
+<indexterm><primary>Standardized</primary></indexterm> systems, things can go
+terribly wrong. For your own environments, this can be ignored to some extent,
+but if you are running a broadband service or modempool, it gets all the more
+important. People who connect through you must always be able to rely on your
+standardization, and you can't expect everyone to run the specific operating
+system of your choice. Some people want to run
+<systemitem>Windows</systemitem>, some want to run
+<systemitem>Linux</systemitem> or even <systemitem>VMS</systemitem> and so on.
+If you base your security on proprietary systems, you are in for some
+trouble.
+
+      </para>
+      
+      <para>
+A good example of this is certain broadband services that have popped up in 
+Sweden who base lots of security on Microsoft network logon. This may sound 
+like a great idea to begin with, but once we start considering other operating 
+systems and so on, this is no longer such a good idea. How will someone running 
+<systemitem>Linux</systemitem> get online? Or
+<systemitem>VAX/VMS</systemitem>? Or <systemitem>HP/UX</systemitem>? With Linux it can be done of course, if 
+it wasn't for the fact that the network administrator refuses anyone to use the 
+broadband service if they are running linux by simply blocking them in such 
+case. However, this book is not a theological discussion of what is best, so 
+let's leave it as an example of why it is a bad idea to use
+non-standards.<indexterm><primary>non-standards</primary></indexterm>
+      </para>
+    </section>
+
+    <section>
+      <title>What's next?</title>
+      
+      <para>
+This chapter has gone through several of the basic IP filtering and security 
+measures that you can take to secure your networks, workstations and servers. 
+The following subjects have been brought up:
+      </para>
+      
+      <itemizedlist mark=opencircle>
+        <listitem>
+          <para>
+IP filtering usage
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+IP filtering policies
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+Network planning
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+Firewall planning
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+Layered security techniques
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+Network segmentation
+          </para>
+        </listitem>
+      </itemizedlist>
+      
+      <para>
+In the next chapter we will take a quick look at what
+<systemitem>Network Address Translation</systemitem>
+(<systemitem>NAT</systemitem>) is, and after that we will start looking closer
+at Iptables and it's functionality and actually start getting hands on with
+the beast.
+      </para>
+      
+    </section>  
+
+  </chapter>

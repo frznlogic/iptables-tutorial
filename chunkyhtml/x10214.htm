@@ -1,0 +1,250 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>SAME target</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="Iptables targets and jumps"
+HREF="c8815.htm"><LINK
+REL="PREVIOUS"
+TITLE="RETURN target"
+HREF="x10192.htm"><LINK
+REL="NEXT"
+TITLE="SECMARK target"
+HREF="x10272.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x10192.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 11. Iptables targets and jumps</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x10272.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="SAMETARGET"
+>SAME target</A
+></H1
+><P
+>The SAME target works almost in the same fashion as the 
+SNAT target, but it still differs. Basically, the 
+SAME target will try to always use the same outgoing IP 
+address for all connections initiated by a single host on your network. For 
+example, say you have one /24 network (192.168.1.0) and 3 IP addresses 
+(10.5.6.7-9). Now, if 192.168.1.20 went out through the .7 address the first 
+time, the firewall will try to keep that machine always going out through that 
+IP address.
+    </P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.SAMETARGET"
+></A
+><P
+><B
+>Table 11-15. SAME target options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Option</TD
+><TD
+>--to</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -t mangle -A PREROUTING -s 192.168.1.0/24 -j
+SAME --to 10.5.6.7-10.5.6.9</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>As you can see, the --to argument takes 2 IP addresses bound together by a - 
+sign. These IP addresses, and all in between, are the IP addresses that we NAT 
+to using the SAME algorithm. 
+        </TD
+></TR
+><TR
+><TD
+>Option</TD
+><TD
+>--nodst</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -t mangle -A PREROUTING -s 192.168.1.0/24 -j
+SAME --to 10.5.6.7-10.5.6.9 --nodst</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>Under normal action, the SAME target is calculating the 
+followup connections based on both destination and source IP addresses. Using 
+the --nodst option, it uses only the source IP address to find out which 
+outgoing IP the NAT function should use for the specific connection. Without 
+this argument, it uses a combination of the destination and source IP address.
+        </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Works under Linux kernel 2.5 and 2.6.
+      </P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x10192.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x10272.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>RETURN target</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c8815.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>SECMARK target</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

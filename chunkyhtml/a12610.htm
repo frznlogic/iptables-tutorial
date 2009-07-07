@@ -1,0 +1,236 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Detailed explanations of special commands</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="PREVIOUS"
+TITLE="What's next?"
+HREF="x12606.htm"><LINK
+REL="NEXT"
+TITLE="Updating and flushing your tables"
+HREF="x12650.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="APPENDIX"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x12606.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x12650.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="APPENDIX"
+><H1
+><A
+NAME="DETAILEDEXPLANATIONS"
+></A
+>Appendix A. Detailed explanations of special commands</H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Table of Contents</B
+></DT
+><DT
+><A
+HREF="a12610.htm#LISTINGRULESET"
+>Listing your active rule-set</A
+></DT
+><DT
+><A
+HREF="x12650.htm"
+>Updating and flushing your tables</A
+></DT
+></DL
+></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="LISTINGRULESET"
+>Listing your active rule-set</A
+></H1
+><P
+>To list your currently active rule-set you run a special option to the
+iptables command, which we have discussed briefly previously
+in the <A
+HREF="c5106.htm"
+><I
+>How a rule is built</I
+></A
+> chapter. This would look like the
+following:
+   </P
+><P
+>    iptables -L
+   </P
+><P
+>This command should list your currently active rule-set, and translate
+everything possible to a more readable form. For example, it will
+translate all the different ports according to the
+<TT
+CLASS="FILENAME"
+>/etc/services</TT
+> file as well as DNS
+all the IP addresses to get DNS records instead. The
+latter can be a bit of a problem though. For example, it will try to resolve
+LAN IP addresses, i.e.
+192.168.1.1, to something useful.
+192.168.0.0/16 is a private range though and
+should not resolve to anything and the command will seem to hang while resolving
+the IP. To get around this problem we would do something like the following:
+
+   </P
+><P
+>    iptables -L -n
+   </P
+><P
+>Another thing that might be interesting is to see a few statistics about
+each policy, rule and chain. We could get this by adding the verbose
+flag. It would then look something like this:
+   </P
+><P
+>    iptables -L -n -v
+   </P
+><P
+>Don't forget that it is also possible to list the nat and mangle tables. This 
+is done with the -t switch, like this:
+   </P
+><P
+>    iptables -L -t nat
+   </P
+><P
+>There are also a few files that might be interesting to look at in the
+<TT
+CLASS="FILENAME"
+>/proc</TT
+> file system. For example, it might be interesting
+to know what connections are currently in the conntrack table. This table
+contains all the different connections currently tracked and serves as a basic
+table so we always know what state a connection currently is in. This table
+can't be edited and even if it was possible, it would be a bad idea. To
+see the table you can run the following command:
+
+   </P
+><P
+>    cat /proc/net/ip_conntrack | less
+   </P
+><P
+>The above command will show all currently tracked connections even though
+it might be a bit hard to understand everything.
+   </P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x12606.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x12650.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>What's next?</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Updating and flushing your tables</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

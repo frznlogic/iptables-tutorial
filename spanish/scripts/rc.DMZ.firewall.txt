@@ -1,0 +1,445 @@
+#!/bin/sh
+#
+# rc.DMZ.firewall - Script de cortafuegos para la IP de la DMZ en
+#                   Linux 2.4.x con iptables
+#
+# Copyright (C) 2001  Oskar Andreasson &lt;bluefluxATkoffeinDOTnet&gt;
+#
+# Este programa es software libre; puedes redistribuirlo y/o modificarlo
+# bajo los términos expresados en la "GNU General Public License", tal como
+# lo publica la Free Software Foundation; versión 2 de la Licencia.
+#
+# Este programa se distribuye con el deseo de que sea útil, pero
+# SIN NINGUNA GARANTÍA; incluso sin garantía implícita de COMPRA-VENTA
+# o ADECUACIÓN A PROPÓSITO PARTICULAR. Para más detalles, referirse a la
+# GNU General Public License.
+#
+# Deberías haber recibido una copia de la GNU General Public License
+# junto a este programa o desde el sitio web de dónde lo bajaste;
+# si no es así, escribe a la Free Software Foundation, Inc., 59 Temple
+# Place, Suite 330, Boston, MA  02111-1307   USA
+#
+#
+##############################################################################
+#
+# 1. Opciones de Configuración.
+#
+
+#
+# 1.1 Configuración de Internet.
+#
+
+INET_IP="194.236.50.152"
+HTTP_IP="194.236.50.153"
+DNS_IP="194.236.50.154"
+INET_IFACE="eth0"
+
+#
+# 1.1.1 DHCP
+#
+
+#
+# 1.1.2 PPPoE
+#
+
+#
+# 1.2 Configuración de la Red Local (Local Area Network).
+#
+# el rango de IPs de tu LAN y la IP de tu host. El valor \24 significa
+# que sólo se usarán los primeros 24 de los 32 bits de una dirección IP.
+# Es lo mismo que la máscara de red 255.255.255.0
+#
+
+LAN_IP="192.168.0.2"
+LAN_IFACE="eth1"
+
+#
+# 1.3 Configuración DMZ.
+#
+
+DMZ_HTTP_IP="192.168.1.2"
+DMZ_DNS_IP="192.168.1.3"
+DMZ_IP="192.168.1.1"
+DMZ_IFACE="eth2"
+
+#
+# 1.4 Configuración del host local.
+#
+
+LO_IFACE="lo"
+LO_IP="127.0.0.1"
+
+#
+# 1.5 Configuración de IPTables.
+#
+
+IPTABLES="/usr/sbin/iptables"
+
+#
+# 1.6 Otra configuración.
+#
+
+###########################################################################
+#
+# 2. Carga de módulos.
+#
+
+#
+# Necesario para la carga inicial de módulos.
+#
+/sbin/depmod -a
+
+#
+# 2.1 Módulos requeridos.
+#
+
+/sbin/modprobe ip_tables
+/sbin/modprobe ip_conntrack
+/sbin/modprobe iptable_filter
+/sbin/modprobe iptable_mangle
+/sbin/modprobe iptable_nat
+/sbin/modprobe ipt_LOG
+/sbin/modprobe ipt_limit
+/sbin/modprobe ipt_state
+
+#
+# 2.2 Módulos no-requeridos.
+#
+
+#/sbin/modprobe ipt_owner
+#/sbin/modprobe ipt_REJECT
+#/sbin/modprobe ipt_MASQUERADE
+#/sbin/modprobe ip_conntrack_ftp
+#/sbin/modprobe ip_conntrack_irc
+#/sbin/modprobe ip_nat_ftp
+#/sbin/modprobe ip_nat_irc
+
+###########################################################################
+#
+# 3. Configuración de /proc.
+#
+
+#
+# 3.1 Configuración requerida de proc.
+#
+
+echo "1" > /proc/sys/net/ipv4/ip_forward
+
+#
+# 3.2 Configuración no-requerida de proc.
+#
+
+#echo "1" > /proc/sys/net/ipv4/conf/all/rp_filter
+#echo "1" > /proc/sys/net/ipv4/conf/all/proxy_arp
+#echo "1" > /proc/sys/net/ipv4/ip_dynaddr
+
+###########################################################################
+#
+# 4. Configuración de las reglas.
+#
+
+######
+# 4.1 Tabla Filter.
+#
+
+#
+# 4.1.1 Establecimiento de políticas.
+#
+
+$IPTABLES -P INPUT DROP
+$IPTABLES -P OUTPUT DROP
+$IPTABLES -P FORWARD DROP
+
+#
+# 4.1.2 Creación de cadenas de usuario.
+#
+
+#
+# Creación de una cadena para paquetes TCP incorrectos.
+#
+
+$IPTABLES -N bad_tcp_packets
+
+#
+# Creación de cadenas separadas para los paquetes ICMP, TCP y UDP.
+#
+
+$IPTABLES -N allowed
+$IPTABLES -N icmp_packets
+
+#
+# 4.1.3 Creación de contenido en las cadenas de usuario.
+#
+
+#
+# Cadena bad_tcp_packets.
+#
+
+$IPTABLES -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j LOG \
+--log-prefix "New not syn:"
+$IPTABLES -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
+
+#
+# Cadena de "permitidos".
+#
+
+$IPTABLES -A allowed -p TCP --syn -j ACCEPT
+$IPTABLES -A allowed -p TCP -m state --state ESTABLISHED,RELATED -j ACCEPT
+$IPTABLES -A allowed -p TCP -j DROP
+
+#
+# Reglas ICMP.
+#
+
+# Changed rules totally
+$IPTABLES -A icmp_packets -p ICMP -s 0/0 --icmp-type 8 -j ACCEPT
+$IPTABLES -A icmp_packets -p ICMP -s 0/0 --icmp-type 11 -j ACCEPT
+
+#
+# 4.1.4 Cadena INPUT.
+#
+
+#
+# Paquetes TCP incorrectos que no deseamos.
+#
+
+$IPTABLES -A INPUT -p tcp -j bad_tcp_packets
+
+#
+# Paquetes desde Internet hacia este equipo.
+#
+
+$IPTABLES -A INPUT -p ICMP -i $INET_IFACE -j icmp_packets
+
+#
+# Paquetes desde la red local (LAN), DMZ o el host local.
+#
+
+#
+# Desde la interfaz DMZ hacia la IP del cortafuegos de la zona DMZ.
+#
+
+$IPTABLES -A INPUT -p ALL -i $DMZ_IFACE -d $DMZ_IP -j ACCEPT
+
+#
+# Desde la interfaz de la red local hacia la IP del cortafuegos de la red local.
+#
+
+$IPTABLES -A INPUT -p ALL -i $LAN_IFACE -d $LAN_IP -j ACCEPT
+$IPTABLES -A INPUT -p ALL -i $LAN_IFACE -d $LAN_BROADCAST_ADDRESS -j ACCEPT
+
+#
+# Desde la interfaz del host local hacia la IP del host local.
+#
+
+$IPTABLES -A INPUT -p ALL -i $LO_IFACE -s $LO_IP -j ACCEPT
+$IPTABLES -A INPUT -p ALL -i $LO_IFACE -s $LAN_IP -j ACCEPT
+$IPTABLES -A INPUT -p ALL -i $LO_IFACE -s $INET_IP -j ACCEPT
+
+#
+# Regla especial para peticiones DHCP desde la red local, que de otra forma
+# no serían gestionadas correctamente.
+#
+
+$IPTABLES -A INPUT -p UDP -i $LAN_IFACE --dport 67 --sport 68 -j ACCEPT
+
+#
+# Todos los paquetes que han establecido una conexión y todos los que
+# dependen de éllos, provenientes de Internet hacia el cortafuegos.
+#
+
+$IPTABLES -A INPUT -p ALL -d $INET_IP -m state --state ESTABLISHED,RELATED \
+-j ACCEPT
+
+#
+# En Redes Microsoft te verás inundado por difusiones de paquetes
+# (broadcasts). Con las siguientes líneas evitarás que aparezcan en
+# los registros.
+#
+
+#$IPTABLES -A INPUT -p UDP -i $INET_IFACE -d $INET_BROADCAST \
+#--destination-port 135:139 -j DROP
+
+#
+# Si recibimos peticiones DHCP desde el exterior de nuestra red, nuestros
+# registros también resultarán inundados. Con esta regla evitaremos
+# que queden registrados.
+#
+
+#$IPTABLES -A INPUT -p UDP -i $INET_IFACE -d 255.255.255.255 \
+#--destination-port 67:68 -j DROP
+
+#
+# Si dispones de una Red Microsoft fuera de tu cortafuegos, también puedes
+# verte inundado por multidifusiones (multicasts). Desechamos estos paquetes
+# para no desbordar los registros.
+#
+
+#$IPTABLES -A INPUT -i $INET_IFACE -d 224.0.0.0/8 -j DROP
+
+#
+# Registra paquetes extraños que no concuerdan con lo anterior.
+#
+
+$IPTABLES -A INPUT -m limit --limit 3/minute --limit-burst 3 -j LOG \
+--log-level DEBUG --log-prefix "IPT INPUT packet died: "
+
+#
+# 4.1.5 Cadena FORWARD.
+#
+
+#
+# Paquetes TCP incorrectos que no queremos.
+#
+
+$IPTABLES -A FORWARD -p tcp -j bad_tcp_packets
+
+#
+# Sección DMZ.
+#
+# Reglas generales.
+#
+
+$IPTABLES -A FORWARD -i $DMZ_IFACE -o $INET_IFACE -j ACCEPT
+$IPTABLES -A FORWARD -i $INET_IFACE -o $DMZ_IFACE -m state \
+--state ESTABLISHED,RELATED -j ACCEPT
+$IPTABLES -A FORWARD -i $LAN_IFACE -o $DMZ_IFACE -j ACCEPT
+$IPTABLES -A FORWARD -i $DMZ_IFACE -o $LAN_IFACE -m state \
+--state ESTABLISHED,RELATED -j ACCEPT
+
+#
+# Servidor HTTP.
+#
+
+$IPTABLES -A FORWARD -p TCP -i $INET_IFACE -o $DMZ_IFACE -d $DMZ_HTTP_IP \
+--dport 80 -j allowed
+$IPTABLES -A FORWARD -p ICMP -i $INET_IFACE -o $DMZ_IFACE -d $DMZ_HTTP_IP \
+-j icmp_packets
+
+#
+# Servidor DNS.
+#
+
+$IPTABLES -A FORWARD -p TCP -i $INET_IFACE -o $DMZ_IFACE -d $DMZ_DNS_IP \
+--dport 53 -j allowed
+$IPTABLES -A FORWARD -p UDP -i $INET_IFACE -o $DMZ_IFACE -d $DMZ_DNS_IP \
+--dport 53 -j ACCEPT
+$IPTABLES -A FORWARD -p ICMP -i $INET_IFACE -o $DMZ_IFACE -d $DMZ_DNS_IP \
+-j icmp_packets
+
+#
+# Sección LAN (red local).
+#
+
+$IPTABLES -A FORWARD -i $LAN_IFACE -j ACCEPT
+$IPTABLES -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+#
+# Registra paquetes extraños que no concuerdan con lo anterior.
+#
+
+$IPTABLES -A FORWARD -m limit --limit 3/minute --limit-burst 3 -j LOG \
+--log-level DEBUG --log-prefix "IPT FORWARD packet died: "
+
+#
+# 4.1.6 Cadena OUTPUT.
+#
+
+#
+# Paquetes TCP incorrectos que no queremos.
+#
+
+$IPTABLES -A OUTPUT -p tcp -j bad_tcp_packets
+
+#
+# Reglas especiales de la cadena OUTPUT para decidir qué direcciones IP
+# están permitidas.
+#
+
+$IPTABLES -A OUTPUT -p ALL -s $LO_IP -j ACCEPT
+$IPTABLES -A OUTPUT -p ALL -s $LAN_IP -j ACCEPT
+$IPTABLES -A OUTPUT -p ALL -s $INET_IP -j ACCEPT
+
+#
+# Registra paquetes extraños que no concuerdan con lo anterior.
+#
+
+$IPTABLES -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG \
+--log-level DEBUG --log-prefix "IPT OUTPUT packet died: "
+
+######
+# 4.2 Tabla Nat.
+#
+
+#
+# 4.2.1 Establecimiento de políticas.
+#
+
+#
+# 4.2.2 Creación de cadenas de usuario.
+#
+
+#
+# 4.2.3 Creación de contenido en las cadenas de usuario.
+#
+
+#
+# 4.2.4 Cadena PREROUTING.
+#
+
+$IPTABLES -t nat -A PREROUTING -p TCP -i $INET_IFACE -d $HTTP_IP --dport 80 \
+-j DNAT --to-destination $DMZ_HTTP_IP
+$IPTABLES -t nat -A PREROUTING -p TCP -i $INET_IFACE -d $DNS_IP --dport 53 \
+-j DNAT --to-destination $DMZ_DNS_IP
+$IPTABLES -t nat -A PREROUTING -p UDP -i $INET_IFACE -d $DNS_IP --dport 53 \
+-j DNAT --to-destination $DMZ_DNS_IP
+
+#
+# 4.2.5 Cadena POSTROUTING.
+#
+
+#
+# Activación del Reenvío IP simple y la Traducción de Dirección de Red (NAT).
+#
+
+$IPTABLES -t nat -A POSTROUTING -o $INET_IFACE -j SNAT --to-source $INET_IP
+
+#
+# 4.2.6 Cadena OUTPUT.
+#
+
+######
+# 4.3 Tabla Mangle.
+#
+
+#
+# 4.3.1 Establecimiento de políticas.
+#
+
+#
+# 4.3.2 Creación de cadenas de usuario.
+#
+
+#
+# 4.3.3 Creación de contenido en las cadenas de usuario.
+#
+
+#
+# 4.3.4 Cadena PREROUTING.
+#
+
+#
+# 4.3.5 Cadena INPUT.
+#
+
+#
+# 4.3.6 Cadena FORWARD.
+#
+
+#
+# 4.3.7 Cadena OUTPUT.
+#
+
+#
+# 4.3.8 Cadena POSTROUTING.
+#

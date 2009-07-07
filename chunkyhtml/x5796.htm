@@ -1,0 +1,1070 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Implicit matches</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="Iptables matches"
+HREF="c5572.htm"><LINK
+REL="PREVIOUS"
+TITLE="Iptables matches"
+HREF="c5572.htm"><LINK
+REL="NEXT"
+TITLE="Explicit matches"
+HREF="x6330.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c5572.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 10. Iptables matches</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x6330.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="IMPLICITMATCHES"
+>Implicit matches</A
+></H1
+><P
+>This section will describe the matches that are loaded
+implicitly. <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>Implicit matches</I
+></SPAN
+> are implied, taken for
+granted, automatic. For example when we match on --protocol
+tcp without any further criteria. There are currently three types of
+implicit matches for three different protocols. These are <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>TCP
+matches</I
+></SPAN
+>, <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>UDP matches</I
+></SPAN
+> and <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>ICMP
+matches</I
+></SPAN
+>. The TCP based matches contain a
+set of unique criteria that are available only for
+TCP packets. UDP based
+matches contain another set of criteria that are available only for
+UDP packets. And the same thing for
+ICMP packets. On the other hand, there can be
+explicit matches that are loaded explicitly. <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>Explicit
+matches</I
+></SPAN
+> are not implied or automatic, you have to specify them
+specifically. For these you use the -m or
+--match option, which we will discuss in the next section.
+   </P
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="TCPMATCHES"
+>TCP matches</A
+></H2
+><P
+> These matches are protocol specific and are only available when
+working with TCP packets and streams. To use these
+matches, you need to specify --protocol tcp on the command
+line before trying to use them. Note that the --protocol
+tcp match must be to the left of the protocol specific matches.
+These matches are loaded implicitly in a sense, just as the
+<SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>UDP</I
+></SPAN
+> and <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>ICMP matches</I
+></SPAN
+> are loaded
+implicitly. The other matches will be looked over in the continuation of this
+section, after the <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>TCP match</I
+></SPAN
+> section.
+    </P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.TCPMATCHES"
+></A
+><P
+><B
+>Table 10-2. TCP matches</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--sport,
+--source-port</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.3, 2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp --sport 22</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>The --source-port match is used to match
+packets based on their source port. Without it, we imply all source ports.
+This match can either take a service name or a port number. If you specify a
+service name, the service name must be in the <A
+HREF="a13413.htm#SERVICESTXT"
+><I
+><I
+>/etc/services</I
+></I
+></A
+> file, since
+iptables uses this file in which to find. If you specify
+the port by its number, the rule will load slightly faster, since
+iptables don't have to check up the service name. However,
+the match might be a little bit harder to read than if you use the service
+name. If you are writing a rule-set consisting of a 200 rules or more, you
+should definitely use port numbers, since the difference is really
+noticeable. (On a slow box, this could make as much as 10 seconds'
+difference, if you have configured a large rule-set containing 1000
+rules or so). You can also use the --source-port match to
+match any range of ports, --source-port 22:80 for example.
+This example would match all source ports between 22 and 80. If you omit
+specifying the first port, port 0 is assumed (is implicit).
+--source-port :80 would then match port 0 through 80. And
+if the last port specification is omitted, port 65535 is assumed. If you were
+to write --source-port 22:, you would have specified a
+match for all ports from port 22 through port 65535. If you invert the port
+range, iptables automatically reverses your inversion. If you write
+--source-port 80:22, it is simply interpreted as
+--source-port 22:80. You can also invert a match by adding
+a ! sign. For example, --source-port !
+22 means that you want to match all ports but port 22. The inversion
+could also be used together with a port range and would then look like
+--source-port ! 22:80, which in turn would mean that you
+want to match all ports but ports 22 through 80. Note that this match does not
+handle multiple separated ports and port ranges. For more information about
+those, look at the multiport match extension.</TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--dport,
+--destination-port</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.3, 2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp --dport 22</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This match is used to match TCP
+packets, according to their destination port. It uses exactly the same syntax
+as the --source-port match. It understands port and port
+range specifications, as well as inversions. It also reverses high and low
+ports in port range specifications, as above. The match will also assume
+values of 0 and 65535 if the high or low port is left out in a port range
+specification. In other words, exactly the same as the
+--source-port syntax. Note that this match does not handle
+multiple separated ports and port ranges. For more information about those,
+look at the multiport match extension.</TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--tcp-flags</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.3, 2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -p tcp --tcp-flags SYN,FIN,ACK
+SYN</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This match is used to match on the
+TCP flags in a packet. First of all, the match
+takes a list of flags to compare (a mask) and secondly it takes list of
+flags that should be set to 1, or turned on. Both lists should be
+comma-delimited. The match knows about the SYN,
+ACK, FIN,
+RST, URG,
+PSH flags, and it also recognizes the words ALL
+and NONE. ALL and NONE is pretty much self describing: ALL means to use
+all flags and NONE means to use no flags for the option.
+--tcp-flags ALL NONE would in other words mean to check
+all of the TCP flags and match if none of the
+flags are set. This option can also be inverted with the
+! sign. For example, if we specify
+! SYN,FIN,ACK SYN, we would get a match that would match
+packets that had the ACK and
+FIN bits set, but not the
+SYN bit. Also note that the comma delimitation
+should not include spaces. You can see the correct syntax in the example
+above.</TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--syn</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.3, 2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -p tcp --syn</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>The --syn match is more or less an old relic
+from the ipchains days and is still there for backward compatibility and for
+and to make transition one to the other easier. It is used to match packets if
+they have the SYN bit set and the
+ACK and RST bits unset. This
+command would in other words be exactly the same as the --tcp-flags
+SYN,RST,ACK SYN match. Such packets are mainly used to request
+new TCP connections from a server. If you block these
+packets, you should have effectively blocked all incoming connection attempts.
+However, you will not have blocked the outgoing connections, which a lot of
+exploits today use (for example, hacking a legitimate service and then
+installing a program or suchlike that enables initiating an existing
+connection to your host, instead of opening up a new port on it). This match
+can also be inverted with the ! sign in this, !
+--syn, way. This would match all packets with the
+RST or the ACK bits set, in
+other words packets in an already established connection.</TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--tcp-option</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.3, 2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -p tcp --tcp-option 16</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This match is used to match packets depending on
+their TCP options. A TCP
+Option is a specific part of the header. This part consists of 3
+different fields. The first one is 8 bits long and tells us which Options are
+used in this stream, the second one is also 8 bits long and tells us how long
+the options field is. The reason for this length field is that
+TCP options are, well, optional. To be compliant with
+the standards, we do not need to implement all options, but instead we can
+just look at what kind of option it is, and if we do not support it, we just
+look at the length field and can then jump over this data. This match is used
+to match different TCP options depending on their
+decimal values. It may also be inverted with the ! flag, so
+that the match matches all TCP options but the option
+given to the match. For a complete list of all options, take a closer look at
+the <A
+HREF="a13413.htm#IETF"
+><I
+>Internet Engineering Task 
+Force</I
+></A
+>
+who maintains a list of all the standard numbers used on the Internet.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="UDPMATCHES"
+>UDP matches</A
+></H2
+><P
+> This section describes matches that will only work together
+with UDP packets. These matches are implicitly
+loaded when you specify the --protocol UDP match and
+will be available after this specification. Note that
+UDP packets are not connection oriented, and
+hence there is no such thing as different flags to set in the packet to
+give data on what the datagram is supposed to do, such as open or closing
+a connection, or if they are just simply supposed to send data.
+UDP packets do not require any kind of
+acknowledgment either. If they are lost, they are simply lost (Not taking
+ICMP error messaging etc into account). This
+means that there are quite a lot less matches to work with on a
+UDP packet than there is on
+TCP packets. Note that the state machine will
+work on all kinds of packets even though UDP or
+ICMP packets are counted as connectionless
+protocols. The state machine works pretty much the same on
+UDP packets as on TCP
+packets.
+    </P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.UDPMATCHES"
+></A
+><P
+><B
+>Table 10-3. UDP matches</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--sport,
+--source-port</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.3, 2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p udp --sport 53</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This match works exactly the same as its
+TCP counterpart. It is used to perform matches on
+packets based on their source UDP ports. It has 
+support
+for port ranges, single ports and port inversions with the same syntax. To
+specify a UDP port range, you could use 22:80 which
+would match UDP ports 22 through 80. If the first
+value is omitted, port 0 is assumed. If the last port is omitted, port 65535
+is assumed. If the high port comes before the low port, the ports switch place
+with each other automatically. Single UDP port
+matches look as in the example above. To invert the port match, add a
+! sign, --source-port ! 53. This would
+match all ports but port 53. The match can understand service names, as long
+as they are available in the <A
+HREF="a13413.htm#SERVICESTXT"
+><I
+><I
+>/etc/services</I
+></I
+></A
+> file. Note that this match does not
+handle multiple separated ports and port ranges. For more information about
+this, look at the multiport match extension.</TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--dport,
+--destination-port</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.3, 2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p udp --dport 53</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>The same goes for this match as for
+--source-port above. It is exactly the same as for the
+equivalent TCP match, but here it applies to
+UDP packets. It matches packets based on their
+UDP destination port. The match handles port ranges,
+single ports and inversions. To match a single port you use, for example,
+--destination-port 53, to invert this you would use
+--destination-port ! 53. The first would match all
+UDP packets going to port 53 while the second would
+match packets but those going to the destination port 53. To specify a port
+range, you would, for example, use --destination-port 9:19.
+This example would match all packets destined for UDP
+port 9 through 19. If the first port is omitted, port 0 is assumed. If the
+second port is omitted, port 65535 is assumed. If the high port is placed
+before the low port, they automatically switch place, so the low port winds up
+before the high port. Note that this match does not handle multiple ports and
+port ranges. For more information about this, look at the multiport match
+extension. </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="ICMPMATCHES"
+>ICMP matches</A
+></H2
+><P
+> These are the <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>ICMP matches</I
+></SPAN
+>. These packets are
+even more ephemeral, that is to say short lived, than
+UDP packets, in the sense that they are
+connectionless. The ICMP protocol is mainly used for
+error reporting and for connection controlling and suchlike.
+ICMP is not a protocol subordinated to the IP
+protocol,
+but more of a protocol that augments the IP protocol and helps in handling
+errors. The headers of ICMP packets are very similar
+to those of the IP headers, but differ in a number of ways. The main feature
+of this protocol is the type header, that tells us what the packet is for. One
+example is, if we try to access an unaccessible IP address, we would normally
+get an ICMP host unreachable in return. For a
+complete listing of ICMP types, see the <A
+HREF="a12854.htm"
+><I
+>ICMP types</I
+></A
+> appendix. There is only
+one ICMP specific match available for
+ICMP packets, and hopefully this should suffice. This
+match is implicitly loaded when we use the --protocol ICMP
+match and we get access to it automatically. Note that all the generic matches
+can also be used, so that among other things we can match on the source and
+destination addresses.
+    </P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.ICMPMATCHES"
+></A
+><P
+><B
+>Table 10-4. ICMP matches</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--icmp-type</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.3, 2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p icmp --icmp-type
+8</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>This match is used to specify the ICMP
+type to match. ICMP types can be
+specified either by their numeric values or by their names. Numerical values 
+are specified in RFC 792. To find a complete listing of the 
+ICMP name values, do an iptables --protocol 
+icmp --help, or check the <A
+HREF="a12854.htm"
+><I
+>ICMP types</I
+></A
+> appendix. This match can also be inverted 
+with the ! sign in this, --icmp-type ! 
+8, fashion. Note that some ICMP types are 
+obsolete, and others again may be "dangerous" for an unprotected host since 
+they may, among other things, redirect packets to the
+wrong places. The type and code may also be specified by their typename, 
+numeric type, and type/code as well. For example --icmp-type 
+network-redirect, --icmp-type 8 or 
+--icmp-type 8/0. For a complete listing of the names, 
+type iptables -p icmp --help.</P
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Please note 
+that netfilter uses ICMP type 255 to match all ICMP types. If you try to match 
+this ICMP type, you will wind up with matching all ICMP types.</P
+></TD
+></TR
+></TABLE
+></DIV
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="SCTPMATCHES"
+>SCTP matches</A
+></H2
+><P
+>SCTP or Stream Control Transmission
+Protocol is a relatively new occurence in the networking domain
+in comparison to the TCP and
+UDP protocols. The <A
+HREF="x1535.htm"
+><I
+>SCTP Characteristics</I
+></A
+>
+chapter explains the protocol more in detail. The implicit
+SCTP matches are loaded through adding the
+-p sctp match to the command line of iptables. 
+     </P
+><P
+>The SCTP protocol was developed by some of the larger
+telecom and switch/network manufacturers out there, and the protocol is
+specifically well suited for large simultaneous transactions with high
+reliability and high throughput. 
+     </P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.SCTPMATCHES"
+></A
+><P
+><B
+>Table 10-5. SCTP matches</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--source-port, 
+	  --sport</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p sctp --source-port 
+	  80</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>The --source-port match is used to match an
+SCTP packet based on the source port in the
+SCTP packet header. The port can either be a single
+port, as in the example above, or a range of ports specified as
+--source-port 20:100, or it can also be inverted with the
+!-sign. This looks, for example, like
+--source-port ! 25. The source port is an unsigned 16 bit
+integer, so the maximum value is 65535 and the lowest value is 0. </P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--destination-port, 
+	  --dport</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p sctp --destination-port 
+	  80</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>This match is used for the destination port of the
+SCTP packets. All SCTP
+packets contain a destination port, just as it does a source port, in the
+headers. The port can be either specified as in the example above, or with a
+port range such as --destination-port 6660:6670. The
+command can also be inverted with the !-sign, for example,
+--destination-port ! 80. This example would match all
+packets but those to port 80. The same applies for destination ports as for
+source ports, the highest port is 65535 and the lowest is 0.</P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--chunk-types</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p sctp --chunk-types any 
+	  INIT,INIT_ACK</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>This matches the chunk type of the SCTP packet. 
+Currently there are a host of different chunk types available. For a complete 
+list, see below. The match begins with the --chunk-types 
+keyword, and then continues with a flag noting if we are to match 
+all, any or none. 
+After this, you specify the SCTP Chunk Types to match 
+for. The Chunk Types are available in the separate list below.</P
+><P
+>Additionally, the flags can take some Chunk Flags as 
+well. This is done for example in the form --chunk-types any 
+DATA:Be. The flags are specific for each SCTP Chunk type and  must 
+be valid according to the separate list after this table.</P
+><P
+>If an upper case letter is used, the flag must be set, and if a lower case 
+flag is set it must be unset to match. The whole match can be inversed by 
+using an ! sign just after the 
+--chunk-types keyword. For example, --chunk-types 
+! any DATA:Be would match anything but this pattern.</P
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>Below is the list of chunk types that the --chunk-types
+match will recognize. The list is quite extensive as you can see, but the
+mostly used packets are DATA and
+SACK packets. The rest are mostly used for
+controlling the association.
+    </P
+><P
+></P
+><P
+><B
+>SCTP Chunk types as used in --chunk-types</B
+></P
+><UL
+><LI
+><P
+>ABORT
+	    </P
+></LI
+><LI
+><P
+>ASCONF
+	    </P
+></LI
+><LI
+><P
+>ASCONF_ACK
+	    </P
+></LI
+><LI
+><P
+>COOKIE_ACK
+	    </P
+></LI
+><LI
+><P
+>COOKIE_ECHO
+	    </P
+></LI
+><LI
+><P
+>DATA
+	    </P
+></LI
+><LI
+><P
+>ECN_CWR
+	    </P
+></LI
+><LI
+><P
+>ECN_ECNE
+	    </P
+></LI
+><LI
+><P
+>ERROR
+	    </P
+></LI
+><LI
+><P
+>HEARTBEAT
+	    </P
+></LI
+><LI
+><P
+>HEARTBEAT_ACK
+	    </P
+></LI
+><LI
+><P
+>INIT
+	    </P
+></LI
+><LI
+><P
+>INIT_ACK
+	    </P
+></LI
+><LI
+><P
+>SACK
+	    </P
+></LI
+><LI
+><P
+>SHUTDOWN
+	    </P
+></LI
+><LI
+><P
+>SHUTDOWN_ACK
+	    </P
+></LI
+><LI
+><P
+>SHUTDOWN_COMPLETE
+	    </P
+></LI
+></UL
+><P
+>The following flags can be used with the --chunk-types
+match as seen above. According to the <A
+HREF="a13413.htm#RFC2960"
+><I
+>RFC 2960 - Stream Control Transmission Protocol</I
+></A
+> all the rest of the flags are reserved or not
+in use, and must be set to 0. Iptables does currently not contain any measures
+to enforce this, fortunately, since it begs to become another problem such as
+the one previously experienced when ECN was
+implemented in the IP protocol. 
+	</P
+><P
+></P
+><P
+><B
+>SCTP Chunk flags as used in --chunk-types</B
+></P
+><UL
+><LI
+><P
+>DATA - U or u for <A
+HREF="x1736.htm#SCTPHEADERDATA"
+>Unordered bit</A
+>, B or 
+b for <A
+HREF="x1736.htm#SCTPHEADERDATA"
+>Beginning fragment bit</A
+> and E or 
+e for <A
+HREF="x1736.htm#SCTPHEADERDATA"
+>Ending fragment bit</A
+>.
+	    </P
+></LI
+><LI
+><P
+>ABORT - T or t for <A
+HREF="x1736.htm#SCTPHEADERABORT"
+>TCB destroy flag</A
+>.
+	    </P
+></LI
+><LI
+><P
+>SHUTDOWN_COMPLETE - T or t for <A
+HREF="x1736.htm#SCTPHEADERSHUTDOWNCOMPLETE"
+>TCB 
+destroyed flag</A
+>.
+	    </P
+></LI
+></UL
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c5572.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x6330.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Iptables matches</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c5572.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Explicit matches</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

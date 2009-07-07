@@ -1,0 +1,234 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>NFQUEUE target</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="Iptables targets and jumps"
+HREF="c8815.htm"><LINK
+REL="PREVIOUS"
+TITLE="NETMAP target"
+HREF="x9940.htm"><LINK
+REL="NEXT"
+TITLE="NOTRACK target"
+HREF="x10027.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x9940.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 11. Iptables targets and jumps</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x10027.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="NFQUEUETARGET"
+>NFQUEUE target</A
+></H1
+><P
+>The NFQUEUE target is used much the same way as the
+QUEUE target, and is basically an extension of it. The
+NFQUEUE target allows for sending packets for separate and
+specific queues. The queue is identified by a 16-bit id. 
+     </P
+><P
+>This target requires the nfnetlink_queue kernel
+support to run. For more information on what you can do with the
+NFQUEUE target, see the <A
+HREF="x10045.htm"
+><I
+>QUEUE target</I
+></A
+>. 
+     </P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.NFQUEUETARGET"
+></A
+><P
+><B
+>Table 11-12. NFQUEUE target options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Option</TD
+><TD
+>--queue-num</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -t nat -A PREROUTING -p tcp --dport 80 -j
+NFQUEUE --queue-num 30</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>The --queue-num option specifies which queue to use and to
+send the queue'd data to. If this option is skipped, the default queue 0 is
+used. The queue number is a 16 bit unsigned integer, which means it can take
+any value between 0 and 65535. The default 0 queue is also used by the
+QUEUE target.
+             </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Works under Linux kernel 2.6.14 and later.
+       </P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x9940.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x10027.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>NETMAP target</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c8815.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>NOTRACK target</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

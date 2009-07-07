@@ -1,0 +1,619 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Commands</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="How a rule is built"
+HREF="c5106.htm"><LINK
+REL="PREVIOUS"
+TITLE="Tables"
+HREF="x5146.htm"><LINK
+REL="NEXT"
+TITLE="What's next?"
+HREF="x5568.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x5146.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 9. How a rule is built</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x5568.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="COMMANDS"
+>Commands</A
+></H1
+><P
+>In this section we will cover all the different commands and what can be done
+with them. The command tells iptables what to do with the
+rest of the rule that we send to the parser. Normally we would want either to
+add or delete something in some table or another. The following commands are
+available to iptables:
+   </P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.COMMANDS"
+></A
+><P
+><B
+>Table 9-2. Commands</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Command</TD
+><TD
+>-A, --append</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT ...</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This command appends the rule to the end of the
+chain. The rule will in other words always be put last in the rule-set and
+hence be checked last, unless you append more rules later on.</TD
+></TR
+><TR
+><TD
+>Command</TD
+><TD
+>-D, --delete</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>          iptables -D INPUT --dport 80 -j DROP,
+          iptables -D INPUT 1
+        </TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This command deletes a rule in a chain. This could be done
+in two ways; either by entering the whole rule to match (as in the first
+example), or by specifying the rule number that you want to match. If you use
+the first method, your entry must match the entry in the chain exactly. If you
+use the second method, you must match the number of the rule you want to
+delete. The rules are numbered from the top of each chain, starting with
+number 1.</TD
+></TR
+><TR
+><TD
+>Command</TD
+><TD
+>-R, --replace</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -R INPUT 1 -s 192.168.0.1 -j
+DROP</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This command replaces the old entry at the specified line. It
+works in the same way as the --delete command, but instead 
+of
+totally deleting the entry, it will replace it with a new entry. The main use
+for this might be while you're experimenting with iptables.</TD
+></TR
+><TR
+><TD
+>Command</TD
+><TD
+>-I, --insert</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -I INPUT 1 --dport 80 -j
+ACCEPT</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>Insert a rule somewhere in a chain. The rule is inserted as
+the actual number that we specify. In other words, the above example would be
+inserted as rule 1 in the INPUT chain, and hence from
+now on it would be the very first rule in the chain.</TD
+></TR
+><TR
+><TD
+>Command</TD
+><TD
+>-L, --list</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -L INPUT</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This command lists all the entries in the specified chain.
+In the above case, we would list all the entries in the
+INPUT chain. It's also legal to not specify any chain
+at all. In the last case, the command would list all the chains in the 
+specified table (To specify a table, see the <A
+HREF="x5146.htm"
+><I
+>Tables</I
+></A
+> section). The exact output is affected by
+other options sent to the parser, for example the -n and
+-v options, etc.</TD
+></TR
+><TR
+><TD
+>Command</TD
+><TD
+>-F, --flush</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -F INPUT</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This command flushes all rules from the specified chain and is
+equivalent to deleting each rule one by one, but is quite a bit faster. The
+command can be used without options, and will then delete all rules in all
+chains within the specified table.&#13;</TD
+></TR
+><TR
+><TD
+>Command</TD
+><TD
+>-Z, --zero</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -Z INPUT</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This command tells the program to zero all counters in a
+specific chain, or in all chains. If you have used the -v
+option with the -L command, you have probably seen the
+packet counter at the beginning of each field. To zero this packet counter,
+use the -Z option. This option works the same as
+-L, except that -Z won't list the rules.
+If -L and -Z is used together (which is
+legal), the chains will first be listed, and then the packet counters are
+zeroed.</TD
+></TR
+><TR
+><TD
+>Command</TD
+><TD
+>-N, --new-chain</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -N allowed</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This command tells the kernel to create a new chain of the
+specified name in the specified table. In the above example we create a
+chain called allowed. Note that there must not already be a
+chain or target of the same name.</TD
+></TR
+><TR
+><TD
+>Command</TD
+><TD
+>-X, 
+--delete-chain</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -X allowed</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This command deletes the specified chain from the table. For
+this command to work, there must be no rules that refer to the chain that is
+to be deleted. In other words, you would have to replace or delete all rules
+referring to the chain before actually deleting the chain. If this command is
+used without any options, all chains but those built in to the specified table
+will be deleted.</TD
+></TR
+><TR
+><TD
+>Command</TD
+><TD
+>-P, --policy</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -P INPUT DROP</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This command tells the kernel to set a specified default
+target, or policy, on a chain. All packets that don't match any rule will
+then be forced to use the policy of the chain. Legal targets are
+DROP and ACCEPT
+(There might be more, mail me if so).</TD
+></TR
+><TR
+><TD
+>Command</TD
+><TD
+>-E, 
+--rename-chain</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -E allowed disallowed</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>The -E command tells
+iptables to change the first name of a chain, to the second
+name. In the example above we would, in other words, change the name of the
+chain from <CODE
+CLASS="VARNAME"
+>allowed</CODE
+> to <CODE
+CLASS="VARNAME"
+>disallowed</CODE
+>. Note
+that this will not affect the actual way the table will work. It is, in other
+words, just a cosmetic change to the table.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>You should always enter a complete command line, unless you just want
+to list the built-in help for iptables or get the version 
+of the
+command. To get the version, use the -v option and to get 
+the help
+message, use the -h option. As usual, in other words. Next
+comes a few options that can be used with various different commands. Note
+that we tell you with which commands the options can be used and what effect
+they will have. Also note that we do not include any options here that
+affect rules or matches. Instead, we'll take a look at matches and
+targets in a later section of this chapter.
+    </P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.OPTIONS"
+></A
+><P
+><B
+>Table 9-3. Options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Option</TD
+><TD
+>-v, --verbose</TD
+></TR
+><TR
+><TD
+>Commands used with</TD
+><TD
+>--list, --append,
+--insert, --delete,
+--replace</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This command gives verbose output and is mainly
+used together with the --list command. If used together 
+with
+the --list command, it outputs the interface address, rule
+options and TOS masks. The --list command will also include
+a bytes and packet counter for each rule, if the --verbose
+option is set. These counters uses the K (x1000), M (x1,000,000) and G
+(x1,000,000,000) multipliers. To overrule this and get exact output, you
+can use the -x option, described later. If this option is
+used with the --append, --insert,
+--delete or --replace commands, the
+program will output detailed information on how the rule was interpreted and
+whether it was inserted correctly, etc.</TD
+></TR
+><TR
+><TD
+>Option</TD
+><TD
+>-x, --exact</TD
+></TR
+><TR
+><TD
+>Commands used with</TD
+><TD
+>--list</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This option expands the numerics. The output from
+--list will in other words not contain the K, M or G
+multipliers. Instead we will get an exact output from the packet and byte
+counters of how many packets and bytes that have matched the rule in question.
+Note that this option is only usable in the --list command
+and isn't really relevant for any of the other commands.</TD
+></TR
+><TR
+><TD
+>Option</TD
+><TD
+>-n, --numeric</TD
+></TR
+><TR
+><TD
+>Commands used with</TD
+><TD
+>--list</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This option tells iptables to output numerical
+values. IP addresses and port numbers will be printed by using their
+numerical values and not host-names, network names or application names.
+This option is only applicable to the --list command. This
+option overrides the default of resolving all numerics to hosts and names,
+where this is possible.</TD
+></TR
+><TR
+><TD
+>Option</TD
+><TD
+>--line-numbers</TD
+></TR
+><TR
+><TD
+>Commands used with</TD
+><TD
+>--list</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>The --line-numbers command, together with
+the --list command, is used to output line numbers. Using
+this option, each rule is output with its number. It could be convenient to
+know which rule has which number when inserting rules. This option only works
+with the --list command.</TD
+></TR
+><TR
+><TD
+>Option</TD
+><TD
+>-c, 
+--set-counters</TD
+></TR
+><TR
+><TD
+>Commands used with</TD
+><TD
+>--insert, --append,
+--replace</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This option is used when creating a rule or modifying it in
+some way. We can then use the option to initialize the packet and byte
+counters for the rule. The syntax would be something like
+--set-counters 20 4000, which would tell the kernel to set
+the packet counter to 20 and byte counter to 4000.</TD
+></TR
+><TR
+><TD
+>Option</TD
+><TD
+>--modprobe</TD
+></TR
+><TR
+><TD
+>Commands used with</TD
+><TD
+>All</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>The --modprobe option is used to tell
+iptables which module to use when probing for modules or
+adding them to the kernel. It could be used if your
+modprobe command is not somewhere in the search path etc.
+In such cases, it might be necessary to specify this option so the program
+knows what to do in case a needed module is not loaded. This option can be
+used with all commands.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x5146.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x5568.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Tables</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c5106.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>What's next?</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

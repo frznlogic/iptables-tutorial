@@ -1,0 +1,230 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>UDP connections</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="The state machine"
+HREF="c4219.htm"><LINK
+REL="PREVIOUS"
+TITLE="TCP connections"
+HREF="x4436.htm"><LINK
+REL="NEXT"
+TITLE="ICMP connections"
+HREF="x4634.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x4436.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 7. The state machine</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x4634.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="UDPCONNECTIONS"
+>UDP connections</A
+></H1
+><P
+>UDP connections are in themselves not stateful
+connections, but rather stateless. There are several reasons why, mainly
+because they don't contain any connection establishment or connection
+closing; most of all they lack sequencing. Receiving two
+UDP datagrams in a specific order does not say
+anything about the order in which they were sent. It is, however,
+still possible to set states on the connections within the kernel. Let's have
+a look at how a connection can be tracked and how it might look in conntrack.
+
+   </P
+><P
+>    <DIV
+CLASS="MEDIAOBJECT"
+><P
+><IMG
+SRC="images/state-udp-connection.jpg"></P
+></DIV
+>
+   </P
+><P
+>As you can see, the connection is brought up almost exactly in the
+same way as a TCP connection. That is, from the
+user-land point of view. Internally, conntrack information looks quite a bit
+different, but intrinsically the details are the same. First of all, let's
+have a look at the entry after the initial UDP packet
+has been sent.
+   </P
+><PRE
+CLASS="SCREEN"
+>udp      17 20 src=192.168.1.2 dst=192.168.1.5 sport=137 dport=1025 \
+     [UNREPLIED] src=192.168.1.5 dst=192.168.1.2 sport=1025 \
+     dport=137 use=1
+   </PRE
+><P
+>As you can see from the first and second values, this is an
+UDP packet. The
+first is the protocol name, and the second is protocol number. This is just
+the same as for TCP connections. The third value
+marks how many seconds this state entry has to live. After this, we get the
+values of the packet that we have seen and the future expectations of packets
+over this connection reaching us from the initiating packet sender. These are
+the source, destination, source port and destination port. At this
+point, the [UNREPLIED] flag tells us that
+there's so far been no response to the packet. Finally, we get a brief list of
+the expectations for returning packets. Do note that the latter entries are
+in reverse order to the first values. The timeout at this
+point is set to 30 seconds, as per default.
+
+   </P
+><PRE
+CLASS="SCREEN"
+>udp      17 170 src=192.168.1.2 dst=192.168.1.5 sport=137 \
+     dport=1025 src=192.168.1.5 dst=192.168.1.2 sport=1025 \
+     dport=137 [ASSURED] use=1
+   </PRE
+><P
+>At this point the server has seen a reply to the first packet sent out and the
+connection is now considered as ESTABLISHED. This is not
+shown in the connection tracking, as you can see. The main difference is that
+the [UNREPLIED] flag has now gone. Moreover,
+the default timeout has changed to 180 seconds - but in this example that's
+by now been decremented to 170 seconds - in 10 seconds' time, it will be 160
+seconds. There's one thing that's missing, though, and can change a bit, and
+that is the [ASSURED] flag described above.
+For the [ASSURED] flag to be set on a tracked
+connection, there must have been a legitimate reply packet to the NEW packet.
+
+   </P
+><PRE
+CLASS="SCREEN"
+>udp      17 175 src=192.168.1.5 dst=195.22.79.2 sport=1025 \
+     dport=53 src=195.22.79.2 dst=192.168.1.5 sport=53 \
+     dport=1025 [ASSURED] use=1
+   </PRE
+><P
+>At this point, the connection has become assured. The connection looks
+exactly the same as the previous example. If this connection is not
+used for 180 seconds, it times out. 180 Seconds is a comparatively low value,
+but should be sufficient for most use. This value is reset to its full value
+for each packet that matches the same entry and passes through the firewall,
+just the same as for all of the internal states.
+   </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x4436.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x4634.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>TCP connections</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c4219.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>ICMP connections</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

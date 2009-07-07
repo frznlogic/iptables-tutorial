@@ -1,0 +1,313 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>The conntrack entries</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="The state machine"
+HREF="c4219.htm"><LINK
+REL="PREVIOUS"
+TITLE="The state machine"
+HREF="c4219.htm"><LINK
+REL="NEXT"
+TITLE="User-land states"
+HREF="x4342.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c4219.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 7. The state machine</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x4342.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="THECONNTRACKENTRIES"
+>The conntrack entries</A
+></H1
+><P
+>   Let's take a brief look at a conntrack entry and how to read them in
+<TT
+CLASS="FILENAME"
+>/proc/net/ip_conntrack</TT
+>. This gives a list of all the
+current entries in your conntrack database. If you have the
+ip_conntrack module loaded, a cat
+of <TT
+CLASS="FILENAME"
+>/proc/net/ip_conntrack</TT
+> might look like:
+    </P
+><PRE
+CLASS="SCREEN"
+>tcp      6 117 SYN_SENT src=192.168.1.6 dst=192.168.1.9 sport=32775 \
+     dport=22 [UNREPLIED] src=192.168.1.9 dst=192.168.1.6 sport=22 \
+     dport=32775 [ASSURED] use=2
+     </PRE
+><P
+>   This example contains all the information that the conntrack module
+maintains to know which state a specific connection is in. First of all, we
+have a protocol, which in this case is tcp. Next, the same value
+in normal decimal coding. After this, we see how long this conntrack entry has
+to live. This value is set to 117 seconds right now and is decremented
+regularly until we see more traffic. This value is then reset to the default
+value for the specific state that it is in at that relevant point of time.
+Next comes the actual state that this entry is in at the present point of
+time. In the above mentioned case we are looking at a packet that is in the
+SYN_SENT state. The internal value of a
+connection is slightly different from the ones used externally with
+iptables. The
+value SYN_SENT tells us that we are looking
+at a connection that has only seen a TCP SYN packet
+in one direction. Next, we see the source IP
+address, destination IP address,
+source port and destination
+port. At this point we see a specific keyword that tells us that
+we have seen no return traffic for this connection. Lastly, we
+see what we expect of return packets. The information details the
+source IP address and destination IP
+address (which are both inverted, since the packet is
+to be directed back to us). The same thing goes for the
+source port and destination
+port of the connection. These are the values that should be of
+any interest to us.
+    </P
+><P
+>   The connection tracking entries may take on a series of different values,
+all specified in the conntrack headers available in
+<TT
+CLASS="FILENAME"
+>linux/include/netfilter-ipv4/ip_conntrack*.h</TT
+> files.
+These values are dependent on which sub-protocol of
+IP we use. TCP,
+UDP or ICMP protocols
+take specific default values as specified in
+<TT
+CLASS="FILENAME"
+>linux/include/netfilter-ipv4/ip_conntrack.h</TT
+>. We will
+look closer at this when we look at each of the protocols; however, we
+will not use them extensively through this chapter, since they are not used
+outside of the conntrack internals. Also, depending on how this state
+changes, the default value of the time until the connection is destroyed
+will also change.
+    </P
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Recently there was a new patch made available in iptables patch-o-matic,
+called tcp-window-tracking. This patch adds, among other things, all of
+the above timeouts to special sysctl variables, which means that they can
+be changed on the fly, while the system is still running. Hence, this
+makes it unnecessary to recompile the kernel every time you want to change
+the timeouts.
+     </P
+><P
+> These can be altered via using specific system calls available in the
+<TT
+CLASS="FILENAME"
+>/proc/sys/net/ipv4/netfilter</TT
+> directory. You should
+in particular look at the
+<TT
+CLASS="FILENAME"
+>/proc/sys/net/ipv4/netfilter/ip_ct_*</TT
+> variables.
+     </P
+></TD
+></TR
+></TABLE
+></DIV
+><P
+>   When a connection has seen traffic in both directions, the conntrack entry
+will erase the [UNREPLIED] flag, and then
+reset it. The entry that tells us that the connection has not seen any
+traffic in both directions, will be replaced by the
+[ASSURED] flag, to be found close to the end
+of the entry. The [ASSURED] flag tells us
+that this connection is assured and that it will not be erased if we reach the
+maximum possible tracked connections. Thus, connections marked as
+[ASSURED] will not be erased, contrary to
+the non-assured connections (those not marked as
+[ASSURED]). How many connections that the
+connection tracking table can hold depends upon a variable that can be set
+through the ip-sysctl functions in recent kernels. The default value held by
+this entry varies heavily depending on how much memory you have. On 128 MB of
+RAM you will get 8192 possible entries, and at 256 MB of RAM, you will get
+16376 entries. You can read and set your settings through the
+<TT
+CLASS="FILENAME"
+>/proc/sys/net/ipv4/ip_conntrack_max</TT
+> setting.
+    </P
+><P
+>A different way of doing this, that is more efficient, is to set the hashsize 
+option to the <TT
+CLASS="FILENAME"
+>ip_conntrack</TT
+> module once this is loaded. 
+Under normal circumstances ip_conntrack_max equals 8 * hashsize. In other 
+words, setting the hashsize to 4096 will result in ip_conntrack_max being set 
+to 32768 conntrack entries. An example of this would be:
+    </P
+><PRE
+CLASS="SCREEN"
+><SAMP
+CLASS="PROMPT"
+>work3:/home/blueflux#</SAMP
+> <KBD
+CLASS="USERINPUT"
+>modprobe ip_conntrack hashsize=4096</KBD
+>
+<SAMP
+CLASS="PROMPT"
+>work3:/home/blueflux#</SAMP
+> <KBD
+CLASS="USERINPUT"
+>cat /proc/sys/net/ipv4/ip_conntrack_max</KBD
+>
+32768
+<SAMP
+CLASS="PROMPT"
+>work3:/home/blueflux#</SAMP
+>
+      </PRE
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c4219.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x4342.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>The state machine</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c4219.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>User-land states</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

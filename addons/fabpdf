@@ -1,0 +1,33 @@
+# Backend to convert something into PDF
+# Send any comments to Eric Bischoff <eric@caldera.de>
+# This program is under GPL license. See LICENSE file for details.
+
+# Convert to TeX
+echo $SGML_ARGUMENTS
+echo $SGML_JADE
+$SGML_JADE -t tex -o ${SGML_FILE_NAME}.tex $SGML_ARGUMENTS
+if [ $? -ne 0 ]
+then exit 1
+fi
+
+eps_to_png ${SGML_FILE_NAME}.tex
+
+# Convert from TeX to PDF
+pdfjadetex ${SGML_FILE_NAME}.tex >${SGML_FILE_NAME}.tmp
+if [ $? -ne 0 ]
+then
+  cat ${SGML_FILE_NAME}.tmp
+  rm ${SGML_FILE_NAME}.tmp
+  rm ${SGML_FILE_NAME}.tex
+  exit 2
+fi
+rm ${SGML_FILE_NAME}.tmp
+
+# Unconditionally re-run pdfjadetex, twice 
+pdfjadetex ${SGML_FILE_NAME}.tex >/dev/null
+pdfjadetex ${SGML_FILE_NAME}.tex >/dev/null
+rm ${SGML_FILE_NAME}.log
+rm ${SGML_FILE_NAME}.aux
+rm ${SGML_FILE_NAME}.tex
+
+exit 0

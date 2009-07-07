@@ -1,0 +1,322 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>IP filtering terms and 
+expressions</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="IP filtering introduction"
+HREF="c2873.htm"><LINK
+REL="PREVIOUS"
+TITLE="IP filtering introduction"
+HREF="c2873.htm"><LINK
+REL="NEXT"
+TITLE="How to plan an IP filter"
+HREF="x3032.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c2873.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 3. IP filtering introduction</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x3032.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="IPFILTERGENERALTERMS"
+>IP filtering terms and 
+expressions</A
+></H1
+><P
+>To fully understand the upcoming chapters there are a few general terms and 
+expressions that one must understand, including a lot of details regarding the 
+TCP/IP chapter. This is a listing of the most common
+terms used in IP filtering.
+      </P
+><P
+></P
+><UL
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Drop/Deny - When a packet is
+dropped or denied, it is simply deleted, and no further actions are taken. No
+reply to tell the host it was dropped, nor is the receiving host of the packet
+notified in any way. The packet simply disappears.
+          </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Reject
+ - This is basically the same
+as a drop or deny target or policy, except that we also send a reply to the
+host sending the packet that was dropped. The reply may be specified, or
+automatically calculated to some value. (To this date, there is unfortunately
+no iptables functionality to also send a packet notifying the receiving host
+of the rejected packet what happened (ie, doing the reverse of the Reject
+target). This would be very good in certain circumstances, since the receiving
+host has no ability to stop Denial of Service attacks from happening.)
+          </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>State
+ - A specific state of a
+packet in comparison to a whole stream of packets. For example, if the packet
+is the first that the firewall sees or knows about, it is considered new (the
+SYN packet in a TCP
+connection), or if it is part of an already established connection that the
+firewall knows about, it is considered to be established. States are known
+through the connection tracking system, which keeps track of all the
+sessions.
+          </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Chain
+ - A chain contains a ruleset
+of rules that are applied on packets that traverses the chain. Each chain has
+a specific purpose (e.g., which table it is connected to, which specifies what
+this chain is able to do), as well as a specific application area (e.g., only
+forwarded packets, or only packets destined for this host). In iptables, there
+are several different chains, which will be discussed in depth in later
+chapters.
+          </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Table
+ - Each table has a specific
+purpose, and in iptables there are 4 tables. The raw,
+nat, mangle and
+filter tables. For example, the
+filter table is specifically designed to filter
+packets, while the nat table is specifically designed
+to NAT (Network Address
+Translation) packets.
+          </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Match
+ - This word can have two
+different meanings when it comes to IP filtering. The
+first meaning would be a single match that tells a rule that 
+this header must contain this and this information. For example, the
+--source match tells us that the source address must be a
+specific network range or host address. The second meaning is if a whole rule
+is a match. If the packet matches the whole rule, the jump or target
+instructions will be carried out (e.g., the packet will be dropped.)
+          </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Target
+ - There is generally a target
+set for each rule in a ruleset. If the rule has matched fully, the target
+specification tells us what to do with the packet. For example, if we should
+drop or accept it, or NAT it, etc. There is also something called a jump
+specification, for more information see the jump description in this list. As
+a last note, there might not be a target or jump for each rule, but there may
+be.
+          </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Rule
+ - A rule is a set of a match or
+several matches together with a single target in most implementations of
+IP filters, including the iptables implementation.
+There are some implementations which let you use several targets/actions per
+rule.
+          </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Ruleset
+ - A ruleset is the complete
+set of rules that are put into a whole IP filter
+implementation. In the case of iptables, this
+includes all of the rules set in the filter,
+nat, raw and
+mangle tables, and in all of the subsequent chains.
+Most of the time, they are written down in a configuration file of some sort.
+	  </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Jump
+ - The jump instruction is
+closely related to a target. A jump instruction is written exactly the same as
+a target in iptables, with the exception that instead of writing a target
+name, you write the name of another chain. If the rule matches, the packet
+will hence be sent to this second chain and be processed as usual in that
+chain.
+          </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Connection tracking - A firewall which implements connection
+tracking is able to track connections/streams simply put. The ability to do so
+is often done at the impact of lots of processor and memory usage. This is
+unfortunately true in iptables as well, but much work has been done to work on
+this. However, the good side is that the firewall will be much more secure
+with connection tracking properly used by the implementer of the firewall
+policies. 
+          </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Accept
+ - To accept a packet and to
+let it through the firewall rules. This is the opposite of the drop or deny
+targets, as well as the reject target.
+          </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Policy
+ - There are two kinds of
+policies that we speak about most of the time when implementing a firewall.
+First we have the chain policies, which tells the firewall implementation the
+default behaviour to take on a packet if there was no rule that matched it.
+This is the main usage of the word that we will use in this book. The second
+type of policy is the security policy that we may have written documentation
+on, for example for the whole company or for this specific network segment.
+Security policies are very good documents to have thought through properly and
+to study properly before starting to actually implement the firewall. 
+         </P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c2873.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x3032.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>IP filtering introduction</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c2873.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>How to plan an IP filter</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,219 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Example rc.test-iptables script</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="Example scripts code-base"
+HREF="a13836.htm"><LINK
+REL="PREVIOUS"
+TITLE="Example rc.flush-iptables script"
+HREF="x13868.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x13868.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Appendix J. Example scripts code-base</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+>&nbsp;</TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="INCLUDETESTTABLES"
+>Example rc.test-iptables script</A
+></H1
+><P
+>    <PRE
+CLASS="PROGRAMLISTING"
+>#!/bin/bash
+#
+# rc.test-iptables - test script for iptables chains and tables.
+#
+# Copyright (C) 2001  Oskar Andreasson &lt;bluefluxATkoffeinDOTnet&gt;
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program or from the site that you downloaded it
+# from; if not, write to the Free Software Foundation, Inc., 59 Temple
+# Place, Suite 330, Boston, MA  02111-1307   USA
+#
+
+#
+# Filter table, all chains
+#
+iptables -t filter -A INPUT -p icmp --icmp-type echo-request \
+-j LOG --log-prefix="filter INPUT:"
+iptables -t filter -A INPUT -p icmp --icmp-type echo-reply \
+-j LOG --log-prefix="filter INPUT:"
+iptables -t filter -A OUTPUT -p icmp --icmp-type echo-request \
+-j LOG --log-prefix="filter OUTPUT:"
+iptables -t filter -A OUTPUT -p icmp --icmp-type echo-reply \
+-j LOG --log-prefix="filter OUTPUT:"
+iptables -t filter -A FORWARD -p icmp --icmp-type echo-request \
+-j LOG --log-prefix="filter FORWARD:"
+iptables -t filter -A FORWARD -p icmp --icmp-type echo-reply \
+-j LOG --log-prefix="filter FORWARD:"
+
+#
+# NAT table, all chains except OUTPUT which don't work.
+#
+iptables -t nat -A PREROUTING -p icmp --icmp-type echo-request \
+-j LOG --log-prefix="nat PREROUTING:"
+iptables -t nat -A PREROUTING -p icmp --icmp-type echo-reply \
+-j LOG --log-prefix="nat PREROUTING:"
+iptables -t nat -A POSTROUTING -p icmp --icmp-type echo-request \
+-j LOG --log-prefix="nat POSTROUTING:"
+iptables -t nat -A POSTROUTING -p icmp --icmp-type echo-reply \
+-j LOG --log-prefix="nat POSTROUTING:"
+iptables -t nat -A OUTPUT -p icmp --icmp-type echo-request \
+-j LOG --log-prefix="nat OUTPUT:"
+iptables -t nat -A OUTPUT -p icmp --icmp-type echo-reply \
+-j LOG --log-prefix="nat OUTPUT:"
+
+#
+# Mangle table, all chains
+#
+iptables -t mangle -A PREROUTING -p icmp --icmp-type echo-request \
+-j LOG --log-prefix="mangle PREROUTING:"
+iptables -t mangle -A PREROUTING -p icmp --icmp-type echo-reply \
+-j LOG --log-prefix="mangle PREROUTING:"
+iptables -t mangle -I FORWARD 1 -p icmp --icmp-type echo-request \
+-j LOG --log-prefix="mangle FORWARD:"
+iptables -t mangle -I FORWARD 1 -p icmp --icmp-type echo-reply \
+-j LOG --log-prefix="mangle FORWARD:"
+iptables -t mangle -I INPUT 1 -p icmp --icmp-type echo-request \
+-j LOG --log-prefix="mangle INPUT:"
+iptables -t mangle -I INPUT 1 -p icmp --icmp-type echo-reply \
+-j LOG --log-prefix="mangle INPUT:"
+iptables -t mangle -A OUTPUT -p icmp --icmp-type echo-request \
+-j LOG --log-prefix="mangle OUTPUT:"
+iptables -t mangle -A OUTPUT -p icmp --icmp-type echo-reply \
+-j LOG --log-prefix="mangle OUTPUT:"
+iptables -t mangle -I POSTROUTING 1 -p icmp --icmp-type echo-request \
+-j LOG --log-prefix="mangle POSTROUTING:"
+iptables -t mangle -I POSTROUTING 1 -p icmp --icmp-type echo-reply \
+-j LOG --log-prefix="mangle POSTROUTING:"
+
+    </PRE
+>
+   </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x13868.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>&nbsp;</TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Example rc.flush-iptables script</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="a13836.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>&nbsp;</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

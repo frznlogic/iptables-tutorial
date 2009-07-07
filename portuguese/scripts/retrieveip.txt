@@ -1,0 +1,46 @@
+#!/bin/bash
+#
+# ttl-inc.txt - short script to increase TTL of all packets on port 33434 - 33542
+#
+# Copyright (C) 2001  Oskar Andreasson &lt;bluefluxATkoffeinDOTnet&gt;
+#
+# Originally written and provided by Jelle Kalf &lt;jkalfATunoDOTnl&gt;. All
+# greetings, thanks and feedback should be sent to him for this script.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program or from the site that you downloaded it
+# from; if not, write to the Free Software Foundation, Inc., 59 Temple
+# Place, Suite 330, Boston, MA  02111-1307   USA
+#
+
+RetrieveIP() {
+  nic="$1"
+  TEMP=""
+
+  if ! /sbin/ifconfig | grep $nic > /dev/null; then
+    echo -e "\n\n interface $nic does not exist...  Aborting!"
+    exit 1;
+  fi
+
+  TEMP=`ifconfig $nic | awk '/inet addr/ { gsub(".*:", "", $2) ; print
+$2 }'`
+
+  if [ "$TEMP" = '' ]; then
+    echo "Aborting: Unable to determine the IP of $nic ... DHCP problem?"
+    exit 1
+  fi
+}
+
+RetrieveBC() {
+  nic="$1"
+  BROADCAST=`ifconfig $nic | awk '/inet addr/ { gsub(".*:", "", $3) ; print $3 }'`
+}

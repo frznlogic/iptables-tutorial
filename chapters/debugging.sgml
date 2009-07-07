@@ -1,0 +1,766 @@
+  <chapter id="debugging">
+    <title id="debugging.title">Debugging your scripts</title>
+    <indexterm zone="debugging">
+      <primary>Debugging</primary>
+    </indexterm>
+    
+    <para>
+One large and rather overlooked sides of writing your own rulesets is how
+to debug the rulesets on your own, and how to find where you have done your 
+mistakes in the rulesets. This chapter will show you a few basic steps you can
+take to debug your scripts and find out what is wrong with them, as well as
+some more elaborate things to look for and what can be done to avoid being
+unable to connect to your firewall in case you accidentally run a bad ruleset
+on it.
+    </para>
+    
+    <para>
+Most of what is taught here is based upon the assumption that the ruleset was
+written in bash shell scripts, but they should be easy to apply in other
+environments as well. Rulesets that have been saved with
+<command>iptables-save</command><indexterm><primary>iptables-save</primary>
+</indexterm>
+are another piece of code alltogether unfortunately, and pretty much none of
+these debugging methods will give you much luck. On the other hand,
+<command>iptables-save</command> files are much simpler and since they can't
+contain any scripting code that will create specific rules either, they are
+much simpler to debug as well.
+    </para>    
+    
+    <section id="debugginganecessity">
+      <title id="debugginganecessity.title">Debugging, a necessity</title>
+      
+      <para>
+Debugging is more or less a necessity when it comes to iptables and netfilter 
+and most firewalls in general. The problem with 99% of all firewalls is that 
+in the end there is a human being that decides upon the policies and how the 
+rulesets are created, and I can promise you, it is easy to make a mistake while 
+writing your rulesets. Sometimes, these errors are very hard to see with the 
+naked eye, or to see the holes that they are creating through the firewall. 
+Holes that you don't know of or didn't intend to happen in your scripts can
+create havoc on your networks, and create an easy entry for your attackers.
+Most of these holes can be found rather easily with a few good tools.
+      </para>
+      
+      <para>
+Other than this, you may write bugs into your scripts in other ways as 
+well, which can create the problem of being unable to login to the firewall. 
+This can also be solved by using a little bit of cleverness before running the 
+scripts at all. Using the full power of both the scripting language as well as 
+the system environment can prove incredibly powerful, which almost all 
+experienced Unix administrators should already have noticed from before, and 
+this is basically all we do when debugging our scripts as well.
+      </para>
+      
+    </section>
+    
+    <section id="bashx">
+      <title id="bashx.title">Bash debugging tips</title>
+      <indexterm zone="bashx">
+	<primary>Bash</primary>
+      </indexterm>
+      <indexterm zone="bashx">
+	<primary>Debugging</primary>
+	<secondary>Bash</secondary>
+      </indexterm>
+      
+      <para>
+There are quite a few things that can be done with bash to help debugging your 
+scripts containing the rulesets. One of the first problems with finding a bug 
+is to know on which line the problem appears. This can be solved in two 
+different ways, either using the bash -x flag, or by simply entering some 
+<command>echo</command><indexterm><primary>Debugging</primary>
+<secondary>Echo</secondary></indexterm><indexterm><primary>Echo</primary>
+</indexterm> statements to find the place where the problem happens. 
+Ideally, you would, with the <command>echo</command> statement, add something 
+like the following echo statement at regular intervals in the code:
+      </para>
+      
+      <screen>
+  ...
+  echo "Debugging message 1."
+  ...
+  echo "Debugging message 2."
+  ...
+      </screen>
+      
+      <para>
+In my case, I generally use pretty much worthless messages, as long as they
+have something in them that is unique so I can find the error message by a
+simple grep or search in the script file. Now, if the error message shows up
+after the "Debugging message 1." message, but before "Debugging message 2.",
+then we know that the erroneous line of code is somewhere in between the two
+debugging messages. As you can understand, bash has the not really bad, but at
+least peculiar, idea of continuing to execute commands even if there is an
+error in one of the commands before. In netfilter, this can cause some very
+interesting problems for you. The above idea of simply using echo statements
+to find the errors is extremely simple, but it is at the same time very nice
+since you can narrow the whole problem down to a single line of code and see
+what the problem is directly. 
+      </para>
+      
+      <para>
+The second possibility to find the above problem is to use the
+<command>-x</command><indexterm><primary>Bash</primary><secondary>-x</secondary>
+</indexterm> variable to bash, as we spoke of before. This can of course be a
+minor problem, especially if your script is large, and if your console buffer
+isn't large enough. What the <command>-x</command> variable means is quite
+simple, it tells the script to just echo every single line of code in the
+script to the standard output of the shell (generally your console). What you
+do is to change your normal start line of the script from this:
+      </para>
+      
+      <screen>
+#!/bin/bash
+      </screen>
+
+      <para>
+Into the line below:
+      </para>
+      
+      <screen>
+#!/bin/bash -x
+      </screen>
+      
+      <para>
+As you will see, this changes your output from perhaps a couple of lines, to 
+copious amounts of data on the output. The code shows you every single command 
+line that is executed, and with the values of all the variables et cetera, so 
+that you don't have to try and figure out exactly what the code is doing. 
+Simply put, each line that gets executed is output to your screen as well. One 
+thing that may be nice to see, is that all of the lines that bash outputs are 
+prefixed by a +<indexterm><primary>Bash</primary><secondary>+-sign</secondary>
+</indexterm> sign. This makes it a little bit easier to discern error or 
+warning messages from the actual script, rather than just one big mesh of 
+output. 
+      </para>
+      
+      <para>
+The <command>-x</command> option is also very interesting for debugging a
+couple of other rather common problems that you may run into with a little bit
+more complex rulesets. The first of them is to find out exactly what happens
+with what you thought was a simple loop, such as an for, if or while
+statement? For example, let's look at an example.
+      </para>
+      
+      <screen>
+  #!/bin/bash 
+  iptables="/sbin/iptables"
+  $iptables -N output_int_iface
+  cat /etc/configs/machines | while read host; do
+    $iptables -N output-$host
+    $iptables -A output_int_iface -p tcp -d $host -j output-$host
+
+    cat /etc/configs/${host}/ports | while read row2; do
+      $iptables -A output-$host -p tcp --dport $row2 -d $host -j ACCEPT
+    done
+  done
+      </screen>
+      
+      <para>
+This set of rules may look simple enough, but we continue to run into a problem 
+with it. We get the following error messages that we know come from the above 
+code by using the simple echo debugging method.
+      </para>
+      
+      <screen>
+work3:~# ./test.sh
+Bad argument `output-'
+Try `iptables -h' or 'iptables --help' for more information.
+cat: /etc/configs//ports: No such file or directory
+      </screen>
+      
+      <para>
+So we turn on the <command>-x</command> option to bash and look at the output.
+The output is shown below, and as you can see there is something very weird
+going on in it. There are a couple of commands where the
+<command>$host</command> and <command>$row2</command> variables are replaced
+by nothing. Looking closer, we see that it is only the last iteration of code
+that causes the trouble. Either we have done a programmatical error, or there
+is something strange with the data. In this case, it is a simple error with
+the data, which contains a single extra linebreak at the end of the file. This
+causes the loop to iterate one last time, which it shouldn't. Simply remove
+the trailing linebreak of the file, and the problem is solved. This may not be
+a very elegant solution, but for private work it should be enough. Otherwise,
+you could add code that looks to see that there is actually some data in the
+$host and <command>$row2</command> variables.
+      </para>
+   
+      <screen>
+work3:~# <command>./test.sh</command>
++ iptables=/sbin/iptables
++ /sbin/iptables -N output_int_iface
++ cat /etc/configs/machines
++ read host
++ /sbin/iptables -N output-sto-as-101
++ /sbin/iptables -A output_int_iface -p tcp -d sto-as-101 -j output-sto-as-101
++ cat /etc/configs/sto-as-101/ports
++ read row2
++ /sbin/iptables -A output-sto-as-101 -p tcp --dport 21 -d sto-as-101 -j ACCEPT
++ read row2
++ /sbin/iptables -A output-sto-as-101 -p tcp --dport 22 -d sto-as-101 -j ACCEPT
++ read row2
++ /sbin/iptables -A output-sto-as-101 -p tcp --dport 23 -d sto-as-101 -j ACCEPT
++ read row2
++ read host
++ /sbin/iptables -N output-sto-as-102
++ /sbin/iptables -A output_int_iface -p tcp -d sto-as-102 -j output-sto-as-102
++ cat /etc/configs/sto-as-102/ports
++ read row2
++ /sbin/iptables -A output-sto-as-102 -p tcp --dport 21 -d sto-as-102 -j ACCEPT
++ read row2
++ /sbin/iptables -A output-sto-as-102 -p tcp --dport 22 -d sto-as-102 -j ACCEPT
++ read row2
++ /sbin/iptables -A output-sto-as-102 -p tcp --dport 23 -d sto-as-102 -j ACCEPT
++ read row2
++ read host
++ /sbin/iptables -N output-sto-as-103
++ /sbin/iptables -A output_int_iface -p tcp -d sto-as-103 -j output-sto-as-103
++ cat /etc/configs/sto-as-103/ports
++ read row2
++ /sbin/iptables -A output-sto-as-103 -p tcp --dport 21 -d sto-as-103 -j ACCEPT
++ read row2
++ /sbin/iptables -A output-sto-as-103 -p tcp --dport 22 -d sto-as-103 -j ACCEPT
++ read row2
++ /sbin/iptables -A output-sto-as-103 -p tcp --dport 23 -d sto-as-103 -j ACCEPT
++ read row2
++ read host
++ /sbin/iptables -N output-
++ /sbin/iptables -A output_int_iface -p tcp -d -j output-
+Bad argument `output-'
+Try `iptables -h' or 'iptables --help' for more information.
++ cat /etc/configs//ports
+cat: /etc/configs//ports: No such file or directory
++ read row2
++ read host
+      </screen>
+  
+      <para>
+The third and final problem you run into that can be partially solved with the
+help of the <command>-x</command> option is if you are executing the firewall
+script via
+<command>SSH</command>,<indexterm><primary>SSH</primary></indexterm> and the
+console<indexterm><primary>console</primary></indexterm> hangs in the middle
+of executing the script, and the console simply won't come back, nor are you
+able to connect via <command>SSH</command> again. In 99.9% of the cases, this
+means there is some kind of problem inside the script with a couple of the
+rules. By turning on the <command>-x</command> option, you will see exactly at
+which line the script locks dead, hopefully at least. There are a couple of
+circumstances where this is not true, unfortunately. For example, what if the
+script sets up a rule that blocks incoming traffic, but since the
+<command>ssh/telnet</command> server sends the echo first as outgoing traffic,
+netfilter will remember the connection, and hence allow the incoming traffic
+anyways if you have a rule above that handles connection states.
+      </para>
+      
+      <para>
+As you can see, it can become quite complex to debug your ruleset to its full
+extent in the end. However, it is not impossible at all. You may also have
+noticed, if you have worked remotely on your firewalls via
+<command>SSH</command>, for example, that the firewall may hang when you load
+bad rulesets. There is one more thing that can be done to save the day in
+these circumstances.
+<command>Cron</command><indexterm><primary>Cron</primary></indexterm> is an
+excellent way of saving your day. For example, say you are working on a
+firewall 50 kilometers away, you add some rules, delete some others, and then
+delete and insert the new updated ruleset. The firewall locks dead, and you
+can't reach it. The only way of fixing this is to go to the firewall's
+physical location and fix the problem from there, unless you have taken
+precautions<indexterm><primary>precautions</primary></indexterm> that is! 
+      </para>
+    </section>
+      
+    <section id="systemtoolsdebug">
+      <title id="systemtoolsdebug.title">System tools used for debugging</title>
+      <indexterm zone="systemtoolsdebug">
+        <primary>Debugging</primary>
+	<secondary>System tools</secondary>
+      </indexterm>
+      <indexterm zone="debugging">
+        <primary>System tools</primary>
+      </indexterm>
+ 
+      <para>
+One of the best precautions you may take against a locked down firewall is to 
+simply use cron to add a script that is run every 5 minutes or so that resets 
+the firewall, and then remove that cron line once you are sure the installation 
+works fine. The cron line may look something like the one below and be entered 
+with the command <command>crontab<indexterm><primary>crontab</primary>
+</indexterm> -e</command>.
+      </para>
+      
+      <screen>
+*/5 * * * * /etc/init.d/rc.flush-iptables.sh stop
+      </screen>
+
+      <para>
+Make absolutely sure, that the line will actually work and do what you expect it
+to do before you start doing something you expect will or may freeze the 
+server you are working on. 
+      </para>
+      
+      <para>
+Another tool that is constantly used to debug your scripts is the syslog
+<indexterm><primary>syslog</primary></indexterm> facility. This is the
+facility that logs all log-messages created by a ton of different programs. In
+fact, almost all large programs support syslog logging, including the kernel.
+All messages sent to syslog have two basic variables set to them that are very
+important to remember, the facility and the log level/priority.
+       </para>
+      
+      <para>
+The facility tells the syslog server from which facility the log entry came 
+from, and where to log it. There are several specified facilities, but the one 
+in question right now is the Kern facility, or kernel facility as it may also 
+be called. All netfilter generated messages are sent using this facility.
+      </para>
+      
+      <para>
+The log level tells syslog how high priority the log messages have. There are 
+several priorities that can be used, listed below.
+      </para>
+      
+      <orderedlist>
+        <listitem>
+          <para>debug</para><indexterm><primary>syslog</primary><secondary>debug</secondary></indexterm>
+        </listitem>
+        <listitem>
+          <para>info</para><indexterm><primary>syslog</primary>
+	  <secondary>info</secondary></indexterm>
+        </listitem>
+        <listitem>
+          <para>notice</para><indexterm><primary>syslog</primary>
+	  <secondary>notice</secondary></indexterm>
+        </listitem>
+        <listitem>
+          <para>warning</para><indexterm><primary>syslog</primary>
+	  <secondary>warning</secondary></indexterm>
+        </listitem>
+        <listitem>
+          <para>err</para><indexterm><primary>syslog</primary>
+	  <secondary>err</secondary></indexterm>
+        </listitem>
+        <listitem>
+          <para>crit</para><indexterm><primary>syslog</primary>
+	  <secondary>crit</secondary></indexterm>
+        </listitem>
+        <listitem>
+          <para>alert</para><indexterm><primary>syslog</primary>
+	  <secondary>alert</secondary></indexterm>
+        </listitem>
+        <listitem>
+          <para>emerg</para><indexterm><primary>syslog</primary>
+	  <secondary>emerg</secondary></indexterm>
+        </listitem>
+      </orderedlist>
+      
+      <para>
+Depending on these priorities, we can send them to different log files using 
+the syslog.conf. For example, to send all messages from the kern facility with 
+warning priority to a file called <filename>/var/log/kernwarnings</filename>,
+we could do as shown below. The line should go into the
+<filename>/etc/syslog.conf</filename>.<indexterm><primary>syslog.conf</primary>
+</indexterm>
+      </para>
+      
+      <screen>
+kern.warning                       /var/log/kernwarnings
+      </screen>
+      
+      <para>
+As you can see, it's quite simple. Now you will hopefully find your netfilter
+logs in the file
+<filename>/var/log/kernwarnings</filename><indexterm>
+<primary>kernwarnings</primary></indexterm> (after restarting, or
+<command>HUP</command>'ing the <systemitem>syslog</systemitem>  server). Of
+course, this also depends on what log levels you set in your netfilter logging
+rules. The log level can be set there with the <command>--log-level</command>
+option.
+      </para>
+      
+      <para>
+The logs entered into this file will give you information about all the packets 
+that you wish to log via specific log rules in the ruleset. With these, you can 
+see if there is anything specific that goes wrong. For example, you can set 
+logrules in the end of all the chains to see if there are any packets that are 
+carried over the boundary of the chains. A log entry may look something like 
+the example below, and include quite a lot of information as you can see.
+      </para>
+      
+      <screen>
+  Oct 23 17:09:34 localhost kernel: IPT INPUT packet died: IN=eth1 OUT= 
+MAC=08:00:09:cd:f2:27:00:20:1a:11:3d:73:08:00 SRC=200.81.8.14 DST=217.215.68.146 
+LEN=78 TOS=0x00 PREC=0x00 TTL=110 ID=12818 PROTO=UDP SPT=1027 DPT=137 LEN=58
+      </screen>
+      
+      <para>
+As you can understand, syslog can really help you out when debugging your 
+rulesets. Looking at these logs may help you understand why some port that you 
+wanted to open doesn't work. 
+      </para>
+      
+    </section>
+    
+    <section id="iptablesdebugging">
+      <title id="iptablesdebuggint.title">Iptables debugging</title>
+      <indexterm zone="iptablesdebugging">
+        <primary>Debugging</primary>
+	<secondary>Iptables</secondary>
+      </indexterm>
+      <indexterm zone="debugging">
+        <primary>Iptables debugging</primary>
+      </indexterm>
+ 
+      <para>
+Iptables can be rough to debug sometimes, since the error messages from 
+iptables itself aren't very user friendly at all times. For this reason, it may 
+be a good idea to take a look at the most common error messages you can get 
+from iptables, and why you may have gotten them.
+      </para>
+      
+      <para>
+One of the first error messages to look at is the "Unknown
+arg"<indexterm><primary>Unknown arg</primary></indexterm> error. This may show
+up for several reasons. For example, look below.
+      </para>
+<indexterm><primary>Errors</primary><secondary>Unknown arg</secondary>
+</indexterm>
+      
+      <screen>
+work3:~# iptables -A INPUT --dport 67 -j ACCEPT
+iptables v1.2.9: Unknown arg `--dport'
+Try `iptables -h' or 'iptables --help' for more information.
+      </screen>
+      
+      <para>
+This error is simpler than normal to solve, since we have only used a single 
+argument. Normally, you may have used a long, long command and get this error 
+message. The problem in the above scenario is that we have forgotten to use the 
+<command>--protocol</command> match, and because of that, the
+<command>--dport</command> match isn't available to us. 
+Adding the <command>--protocol</command> match would also solve the problem in
+this match. Make absolutely certain that you are not missing any special
+preconditions that are required to use a specific match.
+      </para>
+      
+      <para>
+Another very common error is if you miss a dash (-) somewhere in the command 
+line, like below. The proper solution is to simply add the dash, and the 
+command will work.
+      </para>
+      
+      <screen>
+work3:~# iptables -A INPUT --protocol tcp -dport 67 -j ACCEPT
+Bad argument `67'
+Try `iptables -h' or 'iptables --help' for more information.
+      </screen>
+      
+      <para>
+And finally, there is the simple misspelling, which is rather common as well. 
+This is shown below. The error message, as you will notice, is exactly the same 
+as when you forget to add another prerequisite match to the rule, so it needs 
+to be carefully looked into.
+      </para>
+      
+      <screen>
+work3:~# iptables -A INPUT --protocol tcp --destination-ports 67 -j ACCEPT
+iptables v1.2.9: Unknown arg `--destination-ports'
+Try `iptables -h' or 'iptables --help' for more information.
+      </screen>
+      
+      <para>
+There is also one more possible cause for the "Unknown arg" error shown above. 
+If you can see that the argument is perfectly written, and no possible errors 
+in the prerequisites, there is a possibility that the target/match/table was 
+simply not compiled into the kernel. For example, let's say we forgot to 
+compile the filter table support into the kernel, this would then look 
+something like this:    
+      </para>      
+      
+      <screen>
+work3:~# iptables -A INPUT -j ACCEPT
+iptables v1.2.9: can't initialize iptables table `filter': Table does not exist 
+(do you need to insmod?)
+Perhaps iptables or your kernel needs to be upgraded.
+      </screen>
+      <indexterm><primary>Errors</primary><secondary>Table does not
+      exist</secondary></indexterm>
+      <indexterm><primary>Table does not exist error</primary></indexterm>
+      
+      <para>
+Normally, iptables should be able to automatically modprobe a specific module 
+that isn't already inside the kernel, so this is generally a sign of either not 
+having done a proper depmod after restarting with the new kernel, or you may 
+simply have forgotten about the module(s). If the problematic module would be a 
+match instead, the error message would be a little bit more cryptic and hard to 
+understand. For example, look at this error message.
+      </para>
+      
+      <screen>
+work3:~# iptables -A INPUT -m state 
+--state ESTABLISHED -j ACCEPT
+iptables: No chain/target/match by that name
+      </screen>
+      
+      <para>
+In this case, we forgot to compile the state module, and as you can see the 
+error message isn't very nice and easy to understand. But it does give you a 
+hint at what is wrong. Finally, we have the same error again, but this time, 
+the target is missing. As you understand from looking at the error message, it 
+get's rather complicated since it is the exact same error message for both 
+errors (missing match and/or target).
+      </para>
+      
+      <screen>
+work3:~# iptables -A INPUT -m state 
+--state ESTABLISHED -j REJECT
+iptables: No chain/target/match by that name
+      </screen>
+      
+      <para>
+The easiest way to see if we have simply forgotten to depmod, or if the module 
+is actually missing is to look in the directory where the modules should be. 
+This is the <filename>/lib/modules/2.6.4/kernel/net/ipv4/netfilter</filename> 
+directory. All ipt_*<indexterm><primary>ipt_*</primary></indexterm> files that
+are written in uppercase letters are targets, while all the ones with
+lowercase letters are matches. For example,
+<command>ipt_REJECT.ko</command><indexterm><primary>ipt_REJECT.ko</primary>
+</indexterm> is a target, while the
+<command>ipt_state.ko</command><indexterm><primary>ipt_state.ko</primary>
+</indexterm> is a match.
+      </para>
+      
+      <note>
+        <para>
+In 2.4 kernels and older, the file extension for all kernel modules was .o, 
+which changed to .ko for files in the 2.6 kernels.
+        </para>
+      </note>
+      
+      <para>
+Another way of getting help from iptables itself is to simply comment out a 
+whole chain from your script to see if that fixes the problem. This is kind of 
+a last resort problem solver, that may be very effective if you don't even know 
+which chain is causing the problem. By removing the whole chain and simply 
+setting a default policy of <command>ACCEPT</command>, and then testing, if it
+works better, then this is the chain that is causing the problems. If it
+doesn't work better, then it is another chain, and you can go on to find the
+problem elsewhere.
+      </para>
+    </section>
+
+    <section id="otherdebuggingtools">
+      <title id="otherdebuggingtools.title">Other debugging tools</title>
+      <indexterm zone="debugging">
+        <primary>Debugging</primary>
+	<secondary>Other tools</secondary>
+      </indexterm>
+      
+      <para>
+There are of course other tools that may be extremely useful when debugging
+your firewall scripts. This section will briefly touch the most common tools
+used to find out fast how your firewall looks from all sides of it (inside,
+outside, etc). The tools I have chosen here are the nmap and nessus tools. 
+      </para>
+      
+      <section id="debugging.nmap">
+        <title id="debugging.nmap.title">Nmap</title>
+        <indexterm zone="debugging">
+          <primary>Debugging</primary>
+  	  <secondary>Nmap</secondary>
+        </indexterm>
+        <indexterm zone="debugging">
+          <primary>Nmap</primary>
+        </indexterm>
+        
+        <para>
+<command>Nmap</command> is an excellent tool for looking at the pure firewall
+perspective, and to find out which ports are open and more low level
+information. It has support for OS fingerprinting, several different port
+scanning methods, <command>IPv6</command> and <command>IPv4</command> support
+and network scanning. 
+        </para>
+        
+        <para>
+The basic form of scanning is done with a very simple commandline syntax.
+Don't forget to specify which ports to scan through with the
+<command>-p</command> option, for example <command>-p 1-1024</command>. As an
+example, take a look below.
+        </para>
+        
+        <screen>
+blueflux@work3:~$ nmap -p 1-1024 192.168.0.1
+
+Starting nmap 3.50 ( http://www.insecure.org/nmap/ ) at 2004-03-18 17:19 CET
+Interesting ports on firewall (192.168.0.1):
+(The 1021 ports scanned but not shown below are in state: closed)
+PORT    STATE SERVICE
+22/tcp  open  ssh
+25/tcp  open  smtp
+587/tcp open  submission
+
+Nmap run completed -- 1 IP address (1 host up) scanned in 3.877 seconds
+        </screen>
+        
+        <para>
+It is also able to automatically guess the operating system of the scanned
+host by doing <systemitem>OS fingerprinting</systemitem>. Fingerprinting
+requires root privileges though, but it may also be very interesting to use to
+find out what most people will think of the host. Using <systemitem>OS
+fingerprinting</systemitem> may look something like the example listing
+below.
+        </para>
+        
+        <screen>
+work3:/home/blueflux# nmap -O -p 1-1024 192.168.0.1
+
+Starting nmap 3.50 ( http://www.insecure.org/nmap/ ) at 2004-03-18 17:38 CET
+Interesting ports on firewall (192.168.0.1):
+(The 1021 ports scanned but not shown below are in state: closed)
+PORT    STATE SERVICE
+22/tcp  open  ssh
+25/tcp  open  smtp
+587/tcp open  submission
+Device type: general purpose
+Running: Linux 2.4.X|2.5.X
+OS details: Linux Kernel 2.4.0 - 2.5.20
+Uptime 6.201 days (since Fri Mar 12 12:49:18 2004)
+
+Nmap run completed -- 1 IP address (1 host up) scanned in 14.303 seconds
+        </screen>
+        
+        <para>
+OS fingerprinting isn't perfect, as you can see, but it will help narrow it 
+down, both for you, and for the attacker. Hence, it is interesting for you to 
+know as well. The best thing to do, is to give as little material as possible 
+for the attacker to get a proper fingerprint on, and with this information you 
+will know fairly well what the attacker knows about your OS as well.
+        </para>
+        
+        <para>
+Nmap also comes with a graphical user interface that can be used, called the
+nmapfe<indexterm><primary>Nmapfe</primary></indexterm> (<systemitem>Nmap Front
+End</systemitem>). It is an excellent frontend of the nmap program, and if
+you know that you will need a little bit more complicated searches, you may
+wish to use it. For an example screenshot, take a look below.
+        </para>
+         
+        <para>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="images/nmapfe.eps" format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata fileref="images/nmapfe.jpg" format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+        <para>
+Of course, the nmap tool has more usages than this, which you can find out more 
+about on the nmap homepage. For more information, take a look at the <link 
+linkend="nmap">Nmap</link> resources.
+        </para>
+        
+        <para>
+As you may understand, this is an excellent tool to test your host with, and to 
+find out which ports are actually open and which are not. For example, after 
+finishing your setup, use nmap to see if you have actually succeeded in doing 
+what you wanted to do. Do you get the correct responses from the correct ports, 
+and so on.
+        </para>
+        
+      </section>
+      
+      <section id="debugging.nessus">
+        <title id="debugging.nessus.title">Nessus</title>
+        <indexterm zone="debugging">
+          <primary>Debugging</primary>
+	  <secondary>Nessus</secondary>
+        </indexterm>
+        <indexterm zone="debugging">
+          <primary>Nessus</primary>
+        </indexterm>
+        
+        <para>
+While <command>nmap</command> is more of a low level scanner, showing open
+ports etcetera, the <command>nessus</command> program is an actual security
+scanner. <command>Nmap</command> tries to connect to different ports, and to
+find out at most, what kind of version the different servers are running.
+<command>Nessus</command> takes this a step further, by finding all open
+ports, finding out what is running on that specific port, what program and
+which version is running, and then testing for different security threats to
+that program, and finally creating a complete report of all the security
+threats that are available.
+        </para>
+        
+        <para>
+As you can understand, this is an extremely useful tool to find out more about
+your host. The program is built up in a server client way, so it should be
+fairly easy to find out more about your firewall from the outside by using an
+external <systemitem>nessus daemon</systemitem>, or internal for that matter.
+The client is a <systemitem>graphical user interface</systemitem> where you
+login to the <systemitem>nessus daemon</systemitem>, set your settings, and
+specify which host you would like to scan for vulnerabilities. The generated
+report may look something like in the example below.
+        </para>
+        
+        <para>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="images/nessus-report.eps" format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata fileref="images/nessus-report.jpg" format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+        
+        <caution>
+          <para>
+<command>Nessus</command> should be used with some caution however, since it
+can crash a machine or a service that it is specified to attack. Those attacks
+that risk crashing a machine are per default turned off luckily.
+          </para>
+        </caution>
+               
+      </section>
+    </section>
+    
+    <section id="debugging.whatsnext">
+      <title id="debugging.whatsnext.title">What's next?</title>
+      
+      <para>
+In this chapter we have looked in detail at different techniques you can use to 
+debug your firewall scripts. Debugging of firewall scripts can become rather 
+tedious and longwinded, however it is a necessity. If you use some small simple 
+steps while doing this, it can become very easy in the end as well. We have 
+looked at the following techniques in particular:
+      </para>
+      
+      <itemizedlist mark=opencircle>
+        <listitem>
+          <para>
+Bash help in debugging
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+System tools fit for debugging
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+Iptables debugging
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+Other tools for debugging
+          </para>
+        </listitem>
+      </itemizedlist>
+    
+    </section>
+
+  </chapter>

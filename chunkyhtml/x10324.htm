@@ -1,0 +1,267 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>SNAT target</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="Iptables targets and jumps"
+HREF="c8815.htm"><LINK
+REL="PREVIOUS"
+TITLE="SECMARK target"
+HREF="x10272.htm"><LINK
+REL="NEXT"
+TITLE="TCPMSS target"
+HREF="x10386.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x10272.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 11. Iptables targets and jumps</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x10386.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="SNATTARGET"
+>SNAT target</A
+></H1
+><P
+>    The SNAT target is used to do Source Network 
+Address Translation, which means that this target will rewrite the 
+Source IP address in
+the IP header of the packet. This is what we want, for example, when several
+hosts have to share an Internet connection. We can then turn on ip forwarding
+in the kernel, and write an SNAT rule which will translate
+all packets going out from our local network to the source
+IP of our own Internet connection. Without doing this, the outside
+world would not know where to send reply packets, since our local networks
+mostly use the IANA specified IP addresses which are allocated for
+LAN networks. If we forwarded these packets as is, no one
+on the Internet would know that they were actually from us. The
+SNAT target does all the translation needed to do this kind
+of work, letting all packets leaving our LAN look as if
+they came from a single host, which would be our firewall.
+    </P
+><P
+>    The SNAT target is only valid within the nat table,
+within the POSTROUTING chain. This is in other words
+the only chain in which you may use SNAT. Only the first
+packet in a connection is mangled by SNAT, and after that
+all future packets using the same connection will also be
+SNATted. Furthermore, the initial rules in the
+POSTROUTING chain will be applied to all the packets
+in the same stream.
+     </P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.SNATTARGET"
+></A
+><P
+><B
+>Table 11-17. SNAT target options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Option</TD
+><TD
+>--to-source</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -t nat -A POSTROUTING -p tcp -o eth0 -j 
+SNAT --to-source 194.236.50.155-194.236.50.160:1024-32000
+        </TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>The --to-source option is used to
+specify which source the packet should use. This option, at its simplest,
+takes one IP address which we want to use for the source
+IP address in the IP header. If we want to
+balance between several IP addresses, we can use a range of IP addresses,
+separated by a hyphen. The --to--source IP numbers could
+then, for instance, be something like in the above example:
+194.236.50.155-194.236.50.160. The source IP for each
+stream that we open would then be allocated randomly from these, and a single
+stream would always use the same IP address for all packets within that
+stream. We can also specify a range of ports to be used by
+SNAT. All the source ports would then be confined to the
+ports specified. The port bit of the rule would then look like in the example
+above, :1024-32000. This is only valid if -p
+tcp or -p udp was specified somewhere in the
+match of the rule in question. iptables will always try to avoid making any
+port alterations if possible, but if two hosts try to use the same ports,
+iptables will map one of them to another port. If no port range is specified,
+then if they're needed, all source ports below 512 will be mapped to other
+ports below 512. Those between source ports 512 and 1023 will be mapped to
+ports below 1024. All other ports will be mapped to 1024 or above. As
+previously stated, iptables will always try to maintain the source ports used
+by the actual workstation making the connection. Note that this has nothing to
+do with destination ports, so if a client tries to make contact with an
+HTTP server outside the firewall, it will not be mapped to
+the FTP control port.
+        </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Works under Linux kernel 2.3, 2.4, 2.5 and 2.6.
+      </P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x10272.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x10386.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>SECMARK target</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c8815.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>TCPMSS target</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

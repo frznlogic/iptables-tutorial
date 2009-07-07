@@ -1,0 +1,565 @@
+ <chapter id="traversingoftables">
+  <title id="traversingoftables.title">Atravesando tablas y cadenas</title>
+
+  <para>
+En este capítulo hablaremos de cómo atraviesan los paquetes las diferentes
+cadenas y en qué orden. También analizaremos el orden en que las tablas son
+atravesadas. Más adelante veremos cuán valioso resulta ésto para escribir nuestras
+propias reglas. También veremos los momentos en que ciertos componentes,
+también dependientes del núcleo, entran en escena (por poner un ejemplo,
+las diferentes decisiones de enrutado). Ésto es especialmente necesario si
+pretendemos escribir reglas en <command>iptables</command> para poder cambiar
+las reglas/patrones de enrutado de los paquetes, o sea, si pretendemos conocer
+el por qué y el cómo los paquetes son enrutados, al hacer por ejemplo
+<command>DNAT</command> y <command>SNAT</command>. Y por supuesto, no
+olvidaremos los bits <systemitem>TOS</systemitem> (Type Of Service, o tipo
+de servicio).
+  </para>
+
+  <section id="traversinggeneral">
+   <title id="traversinggeneral.title">Generalidades</title>
+
+    <para>
+Cuando un paquete entra en el cortafuegos (firewall), alcanza el hardware y es
+procesado en el núcleo por su driver correspondiente. Después el paquete
+empieza a recorrer una serie de etapas en el núcleo antes de ser enviado a la
+aplicación adecuada (localmente), reenviada hacia otro host, o cualquier otra
+operación.
+    </para>
+
+    <para>
+En primer lugar, echemos un vistazo a un paquete destinado a nuestro
+propio host local (nuestra máquina). Recorrerá los siguientes pasos antes de
+ser entregado a la aplicación que lo requiere:
+   </para>
+
+   <table frame=all id="table.destinationlocalhost">
+    <title id="table.destinationlocalhost.title">Host local de destino
+    (nuestra propia máquina)</title>
+    <tgroup cols=4 align=left colsep=1 rowsep=1>
+    <colspec colwidth="1*">
+    <colspec colwidth="1*">
+    <colspec colwidth="2*">
+    <colspec colwidth="4*">
+      <thead>
+       <row>
+        <entry>Etapa</entry>
+        <entry>Tabla</entry>
+        <entry>Cadena</entry>
+        <entry>Comentario</entry>
+       </row>
+      </thead>
+      <tbody>
+
+       <row>
+        <entry>1</entry>
+        <entry></entry>
+        <entry></entry>
+        <entry>En los cables (por ejemplo Internet)</entry>
+       </row>
+
+       <row>
+        <entry>2</entry>
+        <entry></entry>
+        <entry></entry>
+        <entry>Llega a la interfaz de red (por ejemplo eth0)</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>mangle</entry>
+        <entry>PREROUTING</entry>
+        <entry>Esta cadena se usa normalmente para modificar/"deformar" (mangle)
+        paquetes, es decir, cambiar el <systemitem>TOS</systemitem> y cosas así.</entry>
+       </row>
+
+       <row>
+        <entry>4</entry>
+        <entry>nat</entry>
+        <entry>PREROUTING</entry>
+        <entry>Esta cadena se usa principalmente para la traducción de direcciones de red
+        de destino (<systemitem>DNAT</systemitem>, Destination Network Address
+        Translation). Debes evitar filtrar en esta cadena ya
+        que será puenteada (bypassed) o esquivada en ciertos casos.</entry>
+       </row>
+
+       <row>
+        <entry>5</entry>
+        <entry></entry>
+        <entry></entry>
+        <entry>Decisión de enrutamiento, o sea, ¿está el paquete destinado a
+        nuestro host local o debe ser reenviado?, ¿hacia dónde?.</entry>
+       </row>
+
+       <row>
+        <entry>6</entry>
+        <entry>mangle</entry>
+        <entry>INPUT</entry>
+        <entry>En este punto se alcanza la cadena <systemitem>INPUT</systemitem>
+        de la tabla mangle. Usaremos esta cadena para modificar/"retocar"
+        paquetes después de que hayan sido enrutados, pero antes de que se
+        envíen al proceso de destino.</entry>
+       </row>
+
+       <row>
+        <entry>7</entry>
+        <entry>filter</entry>
+        <entry>INPUT</entry>
+        <entry>Aquí es donde filtraremos todo el tráfico entrante destinado a
+        nuestro host local. Ten en cuenta que todo el tráfico entrante pasa a
+        través de esta cadena, sin importar la interfaz por la que entre
+        o de dónde proceda.</entry>
+       </row>
+
+       <row>
+        <entry>8</entry>
+        <entry></entry>
+        <entry></entry>
+        <entry>Proceso/aplicación local (es decir, programa cliente/servidor)</entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+    <para>
+Date cuenta que esta vez el paquete ha atravesado la cadena <systemitem>INPUT</systemitem>
+en lugar de la cadena <systemitem>FORWARD</systemitem> y ésto es bastante lógico.
+Lo más probable es que ahora al principio sea lo único que te parecerá realmente
+lógico acerca de cómo se atraviesan las tablas y cadenas, pero conforme
+sigas pensando en éllo con el paso del tiempo, lo irás viendo todo aún más claro.
+    </para>
+
+    <para>
+Ahora nos centraremos en los paquetes que salen de nuestro host y las etapas
+por las que pasan.
+    </para>
+
+   <table frame=all id="table.sourcelocalhost">
+    <title id="table.sourcelocalhost.title">Host local de origen
+    (nuestra própia máquina)</title>
+    <tgroup cols=4 align=left colsep=1 rowsep=1>
+    <colspec colwidth="1*">
+    <colspec colwidth="1*">
+    <colspec colwidth="2*">
+    <colspec colwidth="4*">
+      <thead>
+       <row>
+        <entry>Etapa</entry>
+        <entry>Tabla</entry>
+        <entry>Cadena</entry>
+        <entry>Comentario</entry>
+       </row>
+      </thead>
+      <tbody>
+
+       <row>
+        <entry>1</entry>
+        <entry></entry>
+        <entry></entry>
+        <entry>Proceso/aplicación local (es decir, programa cliente/servidor)</entry>
+       </row>
+
+       <row>
+        <entry>2</entry>
+        <entry></entry>
+        <entry></entry>
+        <entry>Decisión de enrutamiento. Qué dirección de origen usar, qué
+        interfaz de salida usar, y otra información que necesita ser recopilada.</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>mangle</entry>
+        <entry>OUTPUT</entry>
+        <entry>Aquí es donde se modifican los paquetes; se sugiere que no
+        filtres en esta cadena porque pueden producirse efectos	secundarios.</entry>
+       </row>
+
+       <row>
+        <entry>4</entry>
+        <entry>nat</entry>
+        <entry>OUTPUT</entry>
+        <entry>Esta cadena puede ser usada para hacer NAT a los paquetes que
+        salen desde el firewall.</entry>
+       </row>
+
+       <row>
+        <entry>5</entry>
+        <entry>filter</entry>
+        <entry>OUTPUT</entry>
+        <entry>Aquí es donde filtramos los paquetes salientes de nuestro host
+        local.</entry>
+       </row>
+
+       <row>
+        <entry>6</entry>
+        <entry>mangle</entry>
+        <entry>POSTROUTING</entry>
+        <entry>La cadena <systemitem>POSTROUTING</systemitem> de la tabla mangle
+        se usa principalmente cuando queremos modificar los paquetes antes de
+        que dejen nuestro host, pero después de	tomar las decisiones de
+        enrutamiento. Esta cadena será alcanzada tanto por los paquetes que
+        atraviesan el cortafuegos, como por los generados por él mismo.</entry>
+       </row>
+
+       <row>
+        <entry>7</entry>
+        <entry>nat</entry>
+        <entry>POSTROUTING</entry>
+        <entry>Aquí es donde efectuamos la traducción de las direcciones de red
+        de origen (<systemitem>SNAT</systemitem>, Source Network Address
+        Translation) como ya se ha descrito anteriormente. Es conveniente que
+        no filtres en esta cadena ya que pueden producirse efectos secundarios
+        y determinados paquetes podrían colarse incluso aunque se haya
+        establecido la política <command>DROP</command> (desechar) como
+        política por defecto.
+        </entry>
+       </row>
+
+       <row>
+        <entry>8</entry>
+        <entry></entry>
+        <entry></entry>
+        <entry>Sale al exterior por alguna interfaz (por ejemplo, eth0)</entry>
+       </row>
+
+       <row>
+        <entry>9</entry>
+        <entry></entry>
+        <entry></entry>
+        <entry>En los cables (por ejemplo, Internet)</entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+    <para>
+En este ejemplo estamos asumiendo que el paquete está destinado a otro host de
+otra red. El paquete sigue los siguientes pasos, de esta manera:
+    </para>
+
+   <table frame=all id="table.forwardedpackets">
+    <title id="table.forwardedpackets.title">Paquetes Reenviados (Forwarded)</title>
+    <tgroup cols=4 align=left colsep=1 rowsep=1>
+    <colspec colwidth="1*">
+    <colspec colwidth="1*">
+    <colspec colwidth="2*">
+    <colspec colwidth="4*">
+      <thead>
+       <row>
+        <entry>Etapa</entry>
+        <entry>Tabla</entry>
+        <entry>Cadena</entry>
+        <entry>Comentario</entry>
+       </row>
+      </thead>
+      <tbody>
+       <row>
+        <entry>1</entry>
+        <entry></entry>
+        <entry></entry>
+        <entry>En los cables (es decir, Internet)</entry>
+       </row>
+
+       <row>
+       <entry>2</entry>
+       <entry></entry>
+       <entry></entry>
+       <entry>Llega hasta la interfaz de red (es decir, eth0)</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>mangle</entry>
+        <entry>PREROUTING</entry>
+        <entry>Esta cadena se usa normalmente para modificar paquetes, o sea,
+        para cambiar el <systemitem>TOS</systemitem> y acciones similares.</entry>
+       </row>
+
+       <row>
+        <entry>4</entry>
+        <entry>nat</entry>
+        <entry>PREROUTING</entry>
+        <entry>Esta cadena se usa principalmente para hacer <systemitem>DNAT</systemitem>
+        (traducción de dirección de destino). El <systemitem>SNAT</systemitem>
+        (traducción de dirección de origen) se realiza más adelante.
+        Debes evitar filtrar en esta cadena ya que en ciertos casos será puenteada o esquivada.
+        </entry>
+       </row>
+
+       <row>
+        <entry>5</entry>
+        <entry></entry>
+        <entry></entry>
+        <entry>Decisión de enrutamiento, o sea, ¿el paquete está destinado a
+        nuestro propio host local, o debe ser reenviado?, ¿hacia dónde?.</entry>
+       </row>
+
+       <row>
+        <entry>6</entry>
+        <entry>mangle</entry>
+        <entry>FORWARD</entry>
+        <entry>El paquete es enviado a la cadena <systemitem>FORWARD</systemitem>
+        de la tabla mangle. Ésto puede aprovecharse para necesidades muy
+        específicas dónde queremos modificar paquetes después de la decisión de
+        enrutamiento inicial, pero antes de la última decision de enrutamiento,
+        hecha justo antes de que el paquete sea enviado.</entry>
+       </row>
+
+       <row>
+        <entry>7</entry>
+        <entry>filter</entry>
+        <entry>FORWARD</entry>
+        <entry>El paquete es enrutado hacia la cadena <systemitem>FORWARD</systemitem>.
+        Solamente los paquetes reenviados pasan por aquí y es donde hacemos
+        todo el filtrado. Ten en cuenta que todos los paquetes reenviados
+        (en cualquier dirección) pasan por aquí, así que necesitarás pensar en
+        éllo cuando escribas tu conjunto de reglas.</entry>
+       </row>
+
+       <row>
+        <entry>8</entry>
+        <entry>mangle</entry>
+        <entry>POSTROUTING</entry>
+        <entry>Esta cadena se usa para efectuar los tipos específicos de
+        modificación de paquetes (packet mangling) que queramos llevar a cabo
+        después de que todos los tipos de decisiones de enrutamiento se hayan
+        tomado, pero estando el paquete aún en esta máquina.</entry>
+       </row>
+
+       <row>
+        <entry>9</entry>
+        <entry>nat</entry>
+        <entry>POSTROUTING</entry>
+        <entry>Esta cadena debe ser usada principalmente y sobretodo para
+        efectuar <systemitem>SNAT</systemitem>. Debes evitar filtrar aquí ya
+        que ciertos paquetes podrían "pasar por delante" de la cadena sin ni siquiera
+        rozarla. Aquí es también dónde se realiza el enmascaramiento
+        (Masquerading).</entry>
+       </row>
+
+       <row>
+        <entry>10</entry>
+        <entry></entry>
+        <entry></entry>
+        <entry>Sale por la interfaz de salida (por ej. eth1).</entry>
+       </row>
+
+       <row>
+        <entry>11</entry>
+        <entry></entry>
+        <entry></entry>
+        <entry>En los cables de nuevo (es decir, la red local).</entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+    <para>
+Como puedes ver hay bastantes pasos que dar. El paquete puede ser bloqueado en
+cualquiera de las cadenas de <command>iptables</command> o en algún otro sitio si
+está malformado; sin embargo, estamos principalmente interesados en la parte
+relacionada con <command>iptables</command>. Ten en cuenta que no hay cadenas o
+tablas específicas para interfases diferentes ni nada por el estilo.
+La cadena <systemitem>FORWARD</systemitem> es siempre atravesada por todos los paquetes
+que son reenviados a través de este cortafuegos/router.
+    </para>
+
+    <caution>
+     <para>
+¡No uses la cadena <systemitem>INPUT</systemitem> para filtrar en el escenario
+anterior! <systemitem>INPUT</systemitem> está pensada sólamente para nuestro
+host local, no para hacer enrutamientos a ningún otro destino.
+     </para>
+    </caution>
+
+    <para>
+Hemos visto hasta ahora cómo las cadenas son atravesadas en tres escenarios
+independientes. Si deseáramos hacer un buen esquema de todo ésto, podría
+asemejarse a algo como:
+    </para>
+
+    <para>
+    <mediaobject>
+     <imageobject>
+      <imagedata fileref="images/tables_traverse.eps" format=eps>
+     </imageobject>
+     <imageobject>
+      <imagedata fileref="images/tables_traverse.jpg" format=jpg>
+     </imageobject>
+    </mediaobject>
+   </para>
+
+   <para>
+Para aclarar esta imagen considera lo siguiente: si llega un paquete que no
+está destinado a nuestra máquina local, en la primera decisión de enrutamiento
+será dirigido hacia la cadena <systemitem>FORWARD</systemitem>.
+Por otra parte, si el paquete está destinado a una <systemitem>dirección IP</systemitem>
+que está siendo escuchada por nuestra máquina local, el paquete sería enviado a
+la cadena <systemitem>INPUT</systemitem> y después a la máquina local.
+   </para>
+
+   <para>
+También conviene advertir el hecho de que los paquetes pueden estar destinados
+a la máquina local y, sin embargo, la dirección de destino ser modificada por la
+cadena <systemitem>PREROUTING</systemitem> haciendo <systemitem>NAT</systemitem>.
+Dado que ésto tiene lugar antes de la primera decisión de enrutamiento, el
+paquete será revisado tras dicho cambio. Debido a ésto, el camino a seguir por
+el paquete (debido a una modificación de la IP de destino) podría cambiar antes
+de que la decisión de enrutamiento sea tomada. Date cuenta que <emphasis>todos</emphasis>
+los paquetes irán a través de un camino u otro de esta imagen. Si haces
+<systemitem>DNAT</systemitem> devolviendo el paquete a la misma red por la que
+vino, seguirá viajando por el resto de cadenas hasta que regrese a dicha red.
+   </para>
+
+   <tip>
+    <para>
+Si crees que necesitas más información puedes usar el script
+<link linkend="rctest-iptablestxt" endterm="rctest-iptablestxt.title"></link>.
+Este script "de laboratorio" debería proporcionarte las reglas necesarias para
+comprobar cómo son atravesadas las tablas y las cadenas.
+    </para>
+   </tip>
+
+  </section>
+
+  <section id="mangletable">
+   <title id="mangletable.title">Tabla mangle</title>
+
+   <para>
+Esta tabla debe ser principalmente usada para modificar paquetes, como ya hemos
+dicho antes. En otras palabras, aquí puedes usar libremente las comparaciones de modificación
+para cambiar el campo <systemitem>TOS</systemitem> (Type Of Service), entre
+otras cosas.
+   </para>
+
+   <caution>
+    <para>
+Es más que recomendable no usar esta tabla como filtro: ni <command>DNAT</command>,
+ni <command>SNAT</command>, ni <command>Masquerading</command> trabajan en
+esta tabla.
+    </para>
+   </caution>
+
+   <para>
+Objetivos para los que únicamente se destina la tabla mangle:
+   </para>
+
+   <itemizedlist mark="opencircle">
+    <listitem><para>TOS</para></listitem>
+    <listitem><para>TTL</para></listitem>
+    <listitem><para>MARK</para></listitem>
+   </itemizedlist>
+
+   <para>
+El <command>TOS</command> es usado para definir y/o cambiar el
+campo <systemitem>Type Of Service</systemitem> del paquete. Puede ser usado
+para configurar políticas en la red considerando cómo deben ser enrutados los
+paquetes y tareas similares. Ten en cuenta que éste tema no ha sido
+perfeccionado y no está realmente implementado en Internet, por lo que la
+mayoría de los routers no hacen caso del valor de este campo y aún más, a veces
+actúan de manera imperfecta sobre los paquetes que reciben. En otras palabras,
+no lo uses para paquetes que vayan hacia Internet, a menos que quieras tomar
+decisiones de enrutamiento sobre ellos con iproute2.
+   </para>
+
+   <para>
+El <command>TTL</command> es usado para cambiar el campo <systemitem>TTL</systemitem>
+(Time To Live) de un paquete y con éllo conseguir que los paquetes tengan un
+<systemitem>TTL</systemitem> específico. Una buena razón para hacerlo podría ser
+que no queramos ser descubiertos por ciertos proveedores de servicios de
+internet (ISP) demasiado fisgones: a algunos ISPs no les gustan los clientes que usan
+multiples ordenadores bajo una única conexión y saben que se trata de una única
+conexión porque de un mismo host llegan paquetes con diferentes valores de
+<systemitem>TTL</systemitem> (entre otros muchos signos delatores).
+   </para>
+
+   <para>
+El <command>Mark</command> se usa para para marcar (<systemitem>mark</systemitem>)
+los paquetes con valores específicos. Estas marcas pueden ser reconocidas
+posteriormente por los programas iproute2 para realizar diferentes enrutamientos
+dependiendo de la marca que tengan o no tengan los paquetes. También podemos
+limitar en ancho de banda y realizar Class Based Queuing (colas basadas en
+clases, CBQ) según dichas marcas.
+    </para>
+
+  </section>
+
+  <section id="nattable">
+   <title id="nattable.title">Tabla nat</title>
+
+   <para>
+Esta tabla debe ser usada sólo para hacer <systemitem>NAT</systemitem> (Network
+Address Translation) a los diferentes paquetes. En otras palabras, debe ser
+empleada solamente para traducir el campo origen del paquete o el campo destino.
+Ten en cuenta que tal como hemos dicho antes, sólo el primer paquete de un flujo
+alzanzará esta cadena. Después, al resto de paquetes del mismo flujo de datos se les aplicará la misma
+acción que al primero. Los objetivos que hacen este tipo de cosas son:
+   </para>
+
+   <itemizedlist mark="opencircle">
+    <listitem><para>DNAT</para></listitem>
+    <listitem><para>SNAT</para></listitem>
+    <listitem><para>MASQUERADE</para></listitem>
+   </itemizedlist>
+
+   <para>
+El objetivo <command>DNAT</command> (Destination Network Address Translation)
+se emplea principalmente en los casos donde se tiene una IP pública y se quiere
+redirigir los accesos al firewall hacia algún otro host (en una "zona
+desmilitarizada", <systemitem>DMZ</systemitem>, por ejemplo). Dicho de otro
+modo, cambiamos la dirección de destino del paquete y lo re-enrutamos a otro
+host.
+   </para>
+
+   <para>
+<command>SNAT</command> (Source Network Address Translation) es principalmente
+usada para cambiar la dirección de origen de los paquetes. La mayoría de las veces
+querrás esconder tus redes locales, <systemitem>DMZ</systemitem>, etc. Un
+ejemplo muy bueno podría ser cuando queremos sustituir las direcciones IP de la red local que
+está tras el cortafuegos, por la dirección IP del propio cortafuegos, que posee una IP
+pública hacia fuera. Con este objetivo el firewall automaticamente hará
+<command>SNAT</command> y <command>de-SNAT</command> sobre los paquetes, lo cual
+hace posible que las conexiones provenientes de la <systemitem>LAN</systemitem>
+salgan a Internet. Por ejemplo, si tu red usa 192.168.0.0/máscara_de_red, los paquetes
+nunca regresarán de Internet, porque IANA ha designado dicho rango de direcciones (entre
+otras) como privadas y sólo para ser usadas en redes locales
+aisladas.
+  </para>
+
+  <para>
+El objetivo <command>MASQUERADE</command> se usa exactamente para lo mismo que
+<command>SNAT</command>, pero <command>MASQUERADE</command> requiere un poquito
+más de trabajo del procesador. La razón es que cada vez que llega un paquete al objetivo <command>MASQUERADE</command>,
+automáticamente chequea qué dirección IP debe
+asignarle, en lugar de hacer como <command>SNAT</command>, que simplemente
+utiliza la dirección IP configurada. <command>MASQUERADE</command> hace
+posible trabajar con las direcciones IP Dinámicas por <systemitem>DHCP</systemitem>
+que tu ISP pueda proporcionarte a través de conexiones a Internet vía
+<systemitem>PPP</systemitem>, <systemitem>PPPoE</systemitem> o <systemitem>SLIP</systemitem>.
+  </para>
+
+  </section>
+
+  <section id="filtertable">
+   <title id="filtertable.title">tabla Filter</title>
+   <para>
+La tabla <systemitem>filter</systemitem> se usa principalmente para el
+filtrado de paquetes: podemos comparar y filtrar paquetes de la forma que
+queramos.
+Se trata del lugar en
+que miramos el contenido de los paquetes y tomamos la determinación de
+desecharlos (<command>(DROP)</command>) o aceptarlos (<command>(ACCEPT)</command>).
+Por supuesto, podemos hacer filtrado antes, pero esta tabla en particular
+fue diseñada para realizar todas las operaciones de filtrado. Casi todos los objetivos se
+pueden usar en esta tabla.
+Trataremos ésto más ampliamente, pero desde ahora ya sabes que esta tabla es el lugar
+correcto para llevar a cabo el principal filtrado.
+  </para>
+
+  </section>
+
+ </chapter>

@@ -1,0 +1,216 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>User specified chains</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="Traversing of tables and chains"
+HREF="c3742.htm"><LINK
+REL="PREVIOUS"
+TITLE="Filter table"
+HREF="x4183.htm"><LINK
+REL="NEXT"
+TITLE="What's next?"
+HREF="x4215.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x4183.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 6. Traversing of tables and chains</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x4215.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="USERTABLES"
+>User specified chains</A
+></H1
+><P
+>If a packet enters a chain such as the INPUT chain in
+the filter table, we can specify a jump rule to a different chain within the
+same table. The new chain must be userspecified, it may not be a built-in
+chain such as the INPUT or
+FORWARD chain for example. If we consider a pointer
+pointing at the rule in the chain to execute, the pointer will go down from
+rule to rule, from top to bottom until the chain traversal is either ended by
+a target or the main chain (I.e., FORWARD,
+INPUT, et cetera) ends. Once this happens, the
+default policy of the built-in chain will be applied. 
+     </P
+><P
+>       <DIV
+CLASS="MEDIAOBJECT"
+><P
+><IMG
+SRC="images/table_subtraverse.jpg"></P
+></DIV
+>
+     </P
+><P
+>If one of the rules that matches points to another userspecified chain in the
+jump specification, the pointer will jump over to this chain and then start
+traversing that chain from the top to bottom. For example, see how the rule
+execution jumps from rule number 3 to chain 2 in the above image. The packet
+matched the matches contained in rule 3, and the jump/target specification was
+set to send the packet on for further examination in chain 2.
+     </P
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Userspecified chains can not have a default policy at the end of the chain.
+Only built in chains can have this. This can be circumvented by appending a
+single rule at the end of the chain that has no matches, and hence it will
+behave as a default policy. If no rule is matched in a userspecified chain,
+the default behaviour is to jump back to the originating chain. As seen in the
+image above, the rule execution jumps from chain 2 and back to chain 1 rule 4,
+below the rule that sent the rule execution into chain 2 to begin with.
+       </P
+></TD
+></TR
+></TABLE
+></DIV
+><P
+>Each and every rule in the user specified chain is traversed until either one
+of the rules matches -- then the target specifies if the traversing should end
+or continue -- or the end of the chain is reached. If the end of the user
+specified chain is reached, the packet is sent back to the invoking chain. The
+invoking chain can be either a user specified chain or a built-in chain. 
+     </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x4183.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x4215.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Filter table</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c3742.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>What's next?</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

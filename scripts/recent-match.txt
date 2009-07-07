@@ -1,0 +1,90 @@
+#!/bin/bash
+#
+# recent-match.txt - Example rule on how the recent match could be used.
+#
+# Copyright (C) 2005  Oskar Andreasson &lt;bluefluxATkoffeinDOTnet&gt;
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program or from the site that you downloaded it
+# from; if not, write to the Free Software Foundation, Inc., 59 Temple
+# Place, Suite 330, Boston, MA  02111-1307   USA
+#
+
+iptables -N http-recent
+iptables -N http-recent-final
+iptables -N http-recent-final1
+iptables -N http-recent-final2
+
+iptables -A INPUT -p tcp --dport 80 -j http-recent
+
+
+#
+# http-recent-final, has this connection been deleted from httplist or not?
+# 
+#
+iptables -A http-recent-final -p tcp -m recent --name httplist -j \
+http-recent-final1
+iptables -A http-recent-final -p tcp -m recent --name http-recent-final -j \
+http-recent-final2
+
+#
+# http-recent-final1, this chain deletes the connection from the httplist 
+# and adds a new entry to the http-recent-final
+#
+iptables -A http-recent-final1 -p tcp -m recent --name httplist \
+--tcp-flags SYN,ACK,FIN FIN,ACK --close -j ACCEPT
+iptables -A http-recent-final1 -p tcp -m recent --name http-recent-final \
+--tcp-flags SYN,ACK,FIN FIN,ACK --set -j ACCEPT
+
+#
+# http-recent-final2, this chain allows final traffic from non-closed host
+# and listens for the final FIN and FIN,ACK handshake.
+#
+iptables -A http-recent-final2 -p tcp --tcp-flags SYN,ACK NONE -m recent \
+--name http-recent-final --update -j ACCEPT
+iptables -A http-recent-final2 -p tcp --tcp-flags SYN,ACK ACK -m recent \
+--name http-recent-final --update -j ACCEPT
+iptables -A http-recent-final2 -p tcp -m recent --name http-recent-final \
+--tcp-flags SYN,ACK,FIN FIN --update -j ACCEPT
+iptables -A http-recent-final2 -p tcp -m recent --name http-recent-final \
+--tcp-flags SYN,ACK,FIN FIN,ACK --close -j ACCEPT
+
+#
+# http-recent chain, our homebrew state tracking system.
+#
+
+# Initial stage of the tcp connection SYN/ACK handshake
+iptables -A http-recent -p tcp --tcp-flags SYN,ACK,FIN,RST SYN -m recent \
+--name httplist --set -j ACCEPT
+iptables -A http-recent -p tcp --tcp-flags SYN,ACK,FIN,RST SYN,ACK -m recent \
+--name httplist --update -j ACCEPT
+# Note that at this state in a connection, RST packets are legal (see RFC 793).
+iptables -A http-recent -p tcp --tcp-flags SYN,ACK,FIN ACK -m recent \
+--name httplist --update -j ACCEPT
+
+# Middle stage of tcp connection where data transportation takes place.
+iptables -A http-recent -p tcp --tcp-flags SYN,ACK NONE -m recent \
+--name httplist --update -j ACCEPT
+iptables -A http-recent -p tcp --tcp-flags SYN,ACK ACK -m recent \
+--name httplist --update -j ACCEPT
+
+# Final stage of tcp connection where one of the parties tries to close the 
+# connection.
+iptables -A http-recent -p tcp --tcp-flags SYN,FIN,ACK FIN -m recent \
+--name httplist --update -j ACCEPT
+iptables -A http-recent -p tcp --tcp-flags SYN,FIN,ACK FIN,ACK -m recent \
+--name httplist -j http-recent-final
+
+# Special case if the connection crashes for some reason. Malicious intent or 
+# no.
+iptables -A http-recent -p tcp --tcp-flags SYN,FIN,ACK,RST RST -m recent \
+--name httplist --remove -j ACCEPT

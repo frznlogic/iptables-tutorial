@@ -1,0 +1,204 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Drawbacks with restore</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="Saving and restoring large
+ rule-sets"
+HREF="c4938.htm"><LINK
+REL="PREVIOUS"
+TITLE="Saving and restoring large
+ rule-sets"
+HREF="c4938.htm"><LINK
+REL="NEXT"
+TITLE="iptables-save"
+HREF="x5017.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c4938.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 8. Saving and restoring large
+ rule-sets</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x5017.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="DRAWBACKSWITHRESTORE"
+>Drawbacks with restore</A
+></H1
+><P
+>As you may have already wondered, can iptables-restore 
+handle any kind of scripting? So far, no, it cannot and it will most 
+probably never be able to. This is the main flaw in using 
+iptables-restore since you will not be able to
+do a huge set of things with these files. For example, what if you have a
+connection that has a dynamically assigned IP address and you want to 
+grab this dynamic IP every-time the computer boots up and then use that 
+value within your scripts? With iptables-restore, this 
+is more or less impossible.
+   </P
+><P
+>One possibility to get around this is to make a small script which grabs 
+the values you would like to use in the script, then sed the 
+iptables-restore file for specific keywords and replace 
+them with the values collected via the small script. At this point, you 
+could save it to a temporary file, and then use 
+iptables-restore to load the new values. This causes a 
+lot of problems however, and you will be unable to use 
+iptables-save properly since it would probably erase 
+your manually added keywords in the restore script. It is, in other words, a 
+clumsy solution.
+   </P
+><P
+>A second possibility is to do as previously described. Make a script that 
+outputs rules in iptables-restore format, and then feed 
+them on standard input of iptables-restore. For very large 
+rulesets this would be to be preferred over running iptables itself, since it 
+has a bad habit of taking a lot of processing power on very large rulesets as 
+previously described in this chapter.
+   </P
+><P
+>Another solution is to load the iptables-restore 
+scripts first, and then load a specific shell script that inserts more 
+dynamic rules in their proper places. Of course, as you can understand, 
+this is just as clumsy as the first solution. 
+iptables-restore is simply not very well suited for 
+configurations where IP addresses are dynamically assigned to your 
+firewall or where you want different behaviors depending on configuration 
+options and so on.
+   </P
+><P
+>Another drawback with iptables-restore and 
+iptables-save is that it is not fully functional as of 
+writing this. The problem is simply that not a lot of people use it as of 
+today and hence there are not a lot of people finding bugs, and in turn 
+some matches and targets will simply be inserted badly, which may lead to 
+some strange behaviors that you did not expect. Even though these 
+problems exist, I would highly recommend using these tools which should 
+work extremely well for most rule-sets as long as they do not contain some 
+of the new targets or matches that it does not know how to handle 
+properly.
+   </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c4938.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x5017.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Saving and restoring large
+ rule-sets</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c4938.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>iptables-save</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

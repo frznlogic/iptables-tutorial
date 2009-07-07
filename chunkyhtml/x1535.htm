@@ -1,0 +1,389 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>SCTP Characteristics</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="TCP/IP repetition"
+HREF="c171.htm"><LINK
+REL="PREVIOUS"
+TITLE="ICMP headers"
+HREF="x1078.htm"><LINK
+REL="NEXT"
+TITLE="SCTP Headers"
+HREF="x1736.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x1078.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 2. TCP/IP repetition</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x1736.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="SCTPCHARACTERISTICS"
+>SCTP Characteristics</A
+></H1
+><P
+>Stream Control Transmission Protocol 
+(SCTP) is a relatively new protocol in the game, but 
+since it is growing in usage and complements the TCP 
+and UDP protocols, I have chosen to add this section 
+about it. It has an even higher reliability than TCP,
+and at the same time a lower overhead from protocol headers. 
+      </P
+><P
+>SCTP has a couple of very interesting features that 
+can be interesting. For those who wish to learn more about this, read the 
+<A
+HREF="a13413.htm#RFC3286"
+><I
+>RFC 3286 - An Introduction to the Stream Control 
+Transmission Protocol</I
+></A
+> and <A
+HREF="a13413.htm#RFC2960"
+><I
+>RFC 2960 - Stream Control Transmission Protocol</I
+></A
+> document. The first document 
+is an introduction to SCTP and should be very 
+interesting to people who are still in need of more information. The second 
+document is the actual specification for the protocol, which might be less 
+interesting unless you are developing for the protocol or are really interested. 
+      </P
+><P
+>The protocol was originally developed for Telephony over 
+IP, or Voice over IP 
+(VoIP), and has some very interesting attributes due 
+to this. Industry grade VoIP requires very high 
+reliability for one, and this means that a lot of resilience has to be built 
+into the system to handle different kind of problems. The following is a list 
+of the basic features of SCTP. 
+      </P
+><P
+></P
+><UL
+><LI
+><P
+>Unicast  with
+Multicast  properties. This means it is a
+point-to-point protocol but with the ability to use
+several addresses at the same end host. It can in other words use different
+paths to reach the end host. TCP in comparison breaks
+if the transport path breaks, unless the IP protocol
+corrects it.
+        </P
+></LI
+><LI
+><P
+>Reliable transmission. It uses checksums and 
+SACK  to detect corrupted, damaged,
+discarded, duplicated and reordered data. It can then retransmit data as
+necessary. This is pretty much the same as TCP, but
+SCTP is more resilient when it comes to reordered
+data and allows for faster pickups. 
+        </P
+></LI
+><LI
+><P
+>Message oriented.  Each message can be
+framed and hence you can keep tabs on the structure and order of the
+datastream. TCP is byte oriented and all you get is a
+stream of bytes without any order between different data inside. You need an
+extra layer of abstraction in TCP in other words.
+        </P
+></LI
+><LI
+><P
+>Rate adaptive.   It is developed to cooperate
+and co-exist with TCP for bandwidth. It scales up and
+down based on network load conditions just the same as
+TCP. It also has the same algorithms for slow
+starting when packets where lost. ECN  is also
+supported.
+        </P
+></LI
+><LI
+><P
+>Multi-homing. As previously mentioned, it is able to 
+set up different end nodes directly in the protocol, and hence doesn't have to 
+rely on the IP layer for resilience.
+        </P
+></LI
+><LI
+><P
+>Multi-streaming. This allows for multiple simultaneous 
+streams inside the same stream. Hence the name Stream Control 
+Transmission Protocol. A single stream can for example be opened 
+to download a single webpage, and all the images and html documents can then 
+be downloaded within the same stream simultaneously. Or why not a database 
+protocol which can create a separate control stream and then use several 
+streams to receive the output from the different queries simultaneously.
+        </P
+></LI
+><LI
+><P
+>Initiation. 4 packet initiation of connections where 
+packet 3 and 4 can be used to send data. The equivalent of 
+syncookies is implemented by default to avoid 
+DoS attacks. INIT collision 
+resolution to avoid several simultaneous 
+SCTP connections. 
+        </P
+></LI
+></UL
+><P
+>This list could be made even longer, but I will not. Most of this information 
+is gathered from the <A
+HREF="a13413.htm#RFC3286"
+><I
+>RFC 3286 - An Introduction to the Stream Control 
+Transmission Protocol</I
+></A
+> 
+document, so read on there for more information.
+      </P
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>In SCTP we talk about chunks, 
+not packets or windows 
+anymore. An SCTP frame can contain several different 
+chunks since the protocol is message oriented. A 
+chunk can either be a control or a data chunk. 
+Control chunks is used to control the session, and 
+data chunks are used to send actual data.
+       </P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="SCTPINIT"
+>Initialization and association</A
+></H2
+><P
+>Each connection is initialized by creating an association between the two 
+hosts that wants to talk to each other. This association is initialized 
+when a user needs it. It is later used as needed.
+        </P
+><P
+>The initialization is done through 4 packets. First an INIT 
+chunk is sent, which is replied to with an INIT 
+ACK containing a cookie, after this the connection can start 
+sending data. However, two more packets are sent in the initialization. 
+The cookie is replied to with a COOKIE ECHO chunk, 
+which is finally replied to with a COOKIE ACK chunk.
+	</P
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="SCTPDATA"
+>Data sending and control session</A
+></H2
+><P
+>SCTP can at this point send data. In 
+SCTP there are control chunks 
+and data chunks, as previously stated. 
+Data chunks are sent using DATA 
+chunks, and DATA chunks are acknowledged 
+by sending a SACK chunk. This works practically the 
+same as a TCP SACK. SACK 
+chunks are control chunks.
+	</P
+><P
+>On top of this, there are some other control chunks 
+that can be seen. HEARTBEAT and HEARTBEAT 
+ACK chunks for one, and ERROR chunks for 
+another. HEARTBEATs are used to keep the connection 
+alive, and ERROR is used to inform of different 
+problems or errors in the connection, such as invalid stream id's or missing 
+mandatory parameters et cetera. 
+	</P
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="SCTPSHUTDOWN"
+>Shutdown and abort</A
+></H2
+><P
+>The SCTP connection is finally closed by either an 
+ABORT chunk or by a graceful 
+SHUTDOWN chunk. SCTP doesn't 
+have a half-closed state as TCP, in other words one 
+side can not continue sending data while the other end has closed its sending 
+socket. 
+        </P
+><P
+>When the user/application wants to close the SCTP 
+socket gracefully, it tells the protocol to SHUTDOWN. 
+SCTP then sends all the data still in its buffers, and 
+then sends a SHUTDOWN chunk. When the other end 
+receives the SHUTDOWN, it will stop accepting data 
+from the application and finish sending all the data. Once it has gotten all 
+the SACK's for the data, it will send a 
+SHUTDOWN ACK chunk and once the closing side has 
+received this chunk, it will finally reply with a SHUTDOWN 
+COMPLETE chunk. The whole session is now closed.
+	</P
+><P
+>Another way of closing a session is to ABORT it. This 
+is an ungraceful way of removing an SCTP association. 
+When a connecting party wants to remove an SCTP 
+association instantaneously, 
+it sends an ABORT chunk with all the right values 
+signed. All data in the buffers et cetera will be discarded and the association 
+will then be removed. The receiving end will do the same after verifying the 
+ABORT chunk. 
+	</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x1078.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x1736.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>ICMP headers</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c171.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>SCTP Headers</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

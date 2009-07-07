@@ -1,0 +1,291 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Iptables debugging</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="Debugging your scripts"
+HREF="c10762.htm"><LINK
+REL="PREVIOUS"
+TITLE="System tools used for debugging"
+HREF="x10835.htm"><LINK
+REL="NEXT"
+TITLE="Other debugging tools"
+HREF="x10958.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x10835.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 12. Debugging your scripts</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x10958.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="IPTABLESDEBUGGING"
+>Iptables debugging</A
+></H1
+><P
+>Iptables can be rough to debug sometimes, since the error messages from 
+iptables itself aren't very user friendly at all times. For this reason, it may 
+be a good idea to take a look at the most common error messages you can get 
+from iptables, and why you may have gotten them.
+      </P
+><P
+>One of the first error messages to look at is the "Unknown
+arg" error. This may show
+up for several reasons. For example, look below.
+      </P
+><PRE
+CLASS="SCREEN"
+>work3:~# iptables -A INPUT --dport 67 -j ACCEPT
+iptables v1.2.9: Unknown arg `--dport'
+Try `iptables -h' or 'iptables --help' for more information.
+      </PRE
+><P
+>This error is simpler than normal to solve, since we have only used a single 
+argument. Normally, you may have used a long, long command and get this error 
+message. The problem in the above scenario is that we have forgotten to use the 
+--protocol match, and because of that, the
+--dport match isn't available to us. 
+Adding the --protocol match would also solve the problem in
+this match. Make absolutely certain that you are not missing any special
+preconditions that are required to use a specific match.
+      </P
+><P
+>Another very common error is if you miss a dash (-) somewhere in the command 
+line, like below. The proper solution is to simply add the dash, and the 
+command will work.
+      </P
+><PRE
+CLASS="SCREEN"
+>work3:~# iptables -A INPUT --protocol tcp -dport 67 -j ACCEPT
+Bad argument `67'
+Try `iptables -h' or 'iptables --help' for more information.
+      </PRE
+><P
+>And finally, there is the simple misspelling, which is rather common as well. 
+This is shown below. The error message, as you will notice, is exactly the same 
+as when you forget to add another prerequisite match to the rule, so it needs 
+to be carefully looked into.
+      </P
+><PRE
+CLASS="SCREEN"
+>work3:~# iptables -A INPUT --protocol tcp --destination-ports 67 -j ACCEPT
+iptables v1.2.9: Unknown arg `--destination-ports'
+Try `iptables -h' or 'iptables --help' for more information.
+      </PRE
+><P
+>There is also one more possible cause for the "Unknown arg" error shown above. 
+If you can see that the argument is perfectly written, and no possible errors 
+in the prerequisites, there is a possibility that the target/match/table was 
+simply not compiled into the kernel. For example, let's say we forgot to 
+compile the filter table support into the kernel, this would then look 
+something like this:    
+      </P
+><PRE
+CLASS="SCREEN"
+>work3:~# iptables -A INPUT -j ACCEPT
+iptables v1.2.9: can't initialize iptables table `filter': Table does not exist 
+(do you need to insmod?)
+Perhaps iptables or your kernel needs to be upgraded.
+      </PRE
+><P
+>Normally, iptables should be able to automatically modprobe a specific module 
+that isn't already inside the kernel, so this is generally a sign of either not 
+having done a proper depmod after restarting with the new kernel, or you may 
+simply have forgotten about the module(s). If the problematic module would be a 
+match instead, the error message would be a little bit more cryptic and hard to 
+understand. For example, look at this error message.
+      </P
+><PRE
+CLASS="SCREEN"
+>work3:~# iptables -A INPUT -m state 
+--state ESTABLISHED -j ACCEPT
+iptables: No chain/target/match by that name
+      </PRE
+><P
+>In this case, we forgot to compile the state module, and as you can see the 
+error message isn't very nice and easy to understand. But it does give you a 
+hint at what is wrong. Finally, we have the same error again, but this time, 
+the target is missing. As you understand from looking at the error message, it 
+get's rather complicated since it is the exact same error message for both 
+errors (missing match and/or target).
+      </P
+><PRE
+CLASS="SCREEN"
+>work3:~# iptables -A INPUT -m state 
+--state ESTABLISHED -j REJECT
+iptables: No chain/target/match by that name
+      </PRE
+><P
+>The easiest way to see if we have simply forgotten to depmod, or if the module 
+is actually missing is to look in the directory where the modules should be. 
+This is the <TT
+CLASS="FILENAME"
+>/lib/modules/2.6.4/kernel/net/ipv4/netfilter</TT
+> 
+directory. All ipt_* files that
+are written in uppercase letters are targets, while all the ones with
+lowercase letters are matches. For example,
+ipt_REJECT.ko is a target, while the
+ipt_state.ko is a match.
+      </P
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>In 2.4 kernels and older, the file extension for all kernel modules was .o, 
+which changed to .ko for files in the 2.6 kernels.
+        </P
+></TD
+></TR
+></TABLE
+></DIV
+><P
+>Another way of getting help from iptables itself is to simply comment out a 
+whole chain from your script to see if that fixes the problem. This is kind of 
+a last resort problem solver, that may be very effective if you don't even know 
+which chain is causing the problem. By removing the whole chain and simply 
+setting a default policy of ACCEPT, and then testing, if it
+works better, then this is the chain that is causing the problems. If it
+doesn't work better, then it is another chain, and you can go on to find the
+problem elsewhere.
+      </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x10835.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x10958.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>System tools used for debugging</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c10762.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Other debugging tools</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,16 @@
+Basically, just add a new backend (pdf backend already exist, but doesn't work nice for me nor
+for you it seems...).
+
+Just copy the file fabpdf
+into /usr/share/sgml/docbook/utils-0.6/backends/fabpdf
+(for me, for you it might be another
+directory, to know the right path, just type :
+# jw -b toto
+jw: There is no backend called "/usr/share/sgml/docbook/utils-0.6/backends/toto".
+so here my directory is /usr/share/sgml/docbook/utils-0.6/backends/
+)
+
+Then move eps_to_png into /usr/bin/ or anywhere else in your path.
+
+I've modified your makefiles already,
+it should work nice for pdf...

@@ -1,0 +1,121 @@
+ <chapter id="introduction">
+  <title id="introduction.title">Introducción</title>
+
+  <section id="whythisdocument">
+   <title id="whythisdocument.title">Por qué se ha escrito este documento
+   </title>
+   <para>
+Bueno, encontraba un gran vacío en los CÓMOs (HOWTO's) existentes,
+en los cuales faltaba informacion sobre las funciones "iptables" y "Netfilter"
+del nuevo kernel 2.4.x de Linux. Entre otras cosas, voy a intentar
+responder las preguntas que algunos podéis tener sobre las nuevas posibilidades,
+como la comparación por estado (state matching). Muchas de estas cuestiones se
+ilustrarán con un ejemplo <ulink
+url="http://iptables-tutorial.frozentux.net/scripts/rc.firewall.txt">
+rc.firewall.txt</ulink> que podéis usar en vuestros scripts
+<filename>/etc/rc.d/</filename>. [Sí, este archivo se basa en el COMO sobre
+enmascaramiento (masquerading), para aquellos que lo reconozcan].
+   </para>
+
+   <para>
+Además hay un pequeño guión que he escrito por si te lías tanto como yo durante
+la configuración. Está disponible como <ulink
+url="http://iptables-tutorial.frozentux.net/scripts/rc.flush-iptables.txt">
+rc.flush-iptables.txt</ulink>.
+   </para>
+
+  </section>
+
+  <section id="howitwas">
+   <title id="howitwas.title">Cómo se ha escrito</title>
+
+   <para>
+He consultado a Marc Boucher y otras personas del equipo del núcleo de
+NetFilter. Les agradezco de todo corazón su trabajo y su ayuda en este tutorial,
+que escribí para boingworld.com y ahora lo mantengo en mi propio sitio
+web frozentux.net. Este documento os guiará paso a paso a través del proceso
+de configuración y espero que os ayude a comprender algo más acerca del
+paquete iptables. Basaré la mayor parte del estudio desarrollado aquí en el
+ejemplo del archivo rc.firewall, ya que encuentro en ese ejemplo una buena
+vía para aprender a usar iptables.
+He decidido estudiar sólamente las cadenas básicas y desde ahí adentrarme
+en todas y cada una de las cadenas atravesadas en su orden correspondiente.
+De esta forma el tutorial es un poquito mas complicado de seguir, aunque
+también es la forma más lógica. Siempre que encuentres algo difícil de
+comprender, simplemente vuelve a este tutorial.
+   </para>
+
+  </section>
+
+  <section id="termsused">
+   <title id="termsused.title">Términos empleados en este documento</title>
+
+   <para>
+Este documento contiene algunos términos que pueden necesitar explicaciones
+más detalladas antes que los leas. Esta sección intentará cubrir los más
+obvios y cómo los he escogido para usarlos en el documento.
+   </para>
+
+   <para>
+DNAT - Destination Network Address Translation (Traducción de la Dirección de
+Red de Destino). DNAT se refiere a la técnica de traducir la dirección IP de
+destino de los paquetes, o sea, de cambiarla. Se emplea conjuntamente
+con SNAT para permitir a varios hosts (máquinas) compartir una sola dirección IP
+de conexión con Internet entre todos ellos y al mismo tiempo que todavía puedan
+seguir ofreciendo funciones de servidor. Normalmente ésto se consigue asignando
+diferentes puertos a la dirección IP externa (la dirección enrutable) y a
+continuación informando al encaminador/enrutador (router) de Linux dónde debe enviar
+el tráfico.
+   </para>
+
+   <para>
+SNAT - Source Network Address Translation (Traducción de la Dirección de Red de
+Origen). Se refiere a las técnicas empleadas para traducir la dirección de
+origen de un paquete en otra distinta. Como en DNAT, se emplea para que varios
+hosts puedan compartir una misma dirección IP de salida a Internet. Estas
+técnicas se emplean debido a que cada vez hay menos direcciones de Internet
+disponibles a causa de la propia estructura de IPv4 (la versión 6 del protocolo
+IP, IPv6, solucionará este problema).
+   </para>
+
+   <para>
+Flujo (de datos) (Stream) - Este término se refiere a una conexion que envía
+y recibe paquetes relacionados entre sí de algún modo. Básicamente,
+he usado este término para cualquier conexión que envíe 2 ó más paquetes en
+ambas direcciones. En TCP ésto puede corresponder a una conexión que envía un
+paquete SYN y entonces responde con un paquete SYN/ACK; pero también puede ser
+equivalente a una conexión que envía un paquete SYN y responde con un mensaje
+ICMP de servidor (host) inalcanzable. En otras palabras, uso este término muy
+libremente.
+   </para>
+
+   <para>
+Estado (State) - Este término se refiere a en qué estado se encuentra el
+paquete, de acuerdo con el estándar <ulink
+url="http://iptables-tutorial.frozentux.net/other/rfc793.txt">RFC 793 -
+Transmission Control Protocol</ulink> o bien con los estados de usuario
+empleados en Netfilter/iptables. Ten en cuenta que los estados usados interna
+y externamente no siguen totalmente la especificación RFC 793. La razón
+principal es que Netfilter tiene hacer varias suposiciones acerca de las
+conexiones y los paquetes.
+   </para>
+
+   <para>
+Espacio de usuario (User space) - Con este término me refiero a cualquier
+cosa que tenga lugar fuera del núcleo. Por ejemplo, la ejecución de
+<command>iptables -h</command> tiene lugar fuera del núcleo, mientras que
+<command>iptables -A FORWARD -p tcp -j ACCEPT</command> tiene lugar
+(parcialmente) dentro del núcleo, puesto que se añade una nueva regla
+al conjunto de reglas.
+   </para>
+
+   <para>
+Espacio del núcleo (Kernel space) - Esto es más o menos lo opuesto al espacio
+de usuario. Ésto implica las acciones que tienen lugar dentro del núcleo y no
+fuera de él.
+   </para>
+
+ </section>
+
+ </chapter>
+

@@ -1,0 +1,266 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>System tools used for debugging</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="Debugging your scripts"
+HREF="c10762.htm"><LINK
+REL="PREVIOUS"
+TITLE="Bash debugging tips"
+HREF="x10776.htm"><LINK
+REL="NEXT"
+TITLE="Iptables debugging"
+HREF="x10910.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x10776.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 12. Debugging your scripts</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x10910.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="SYSTEMTOOLSDEBUG"
+>System tools used for debugging</A
+></H1
+><P
+>One of the best precautions you may take against a locked down firewall is to 
+simply use cron to add a script that is run every 5 minutes or so that resets 
+the firewall, and then remove that cron line once you are sure the installation 
+works fine. The cron line may look something like the one below and be entered 
+with the command crontab -e.
+      </P
+><PRE
+CLASS="SCREEN"
+>*/5 * * * * /etc/init.d/rc.flush-iptables.sh stop
+      </PRE
+><P
+>Make absolutely sure, that the line will actually work and do what you expect it
+to do before you start doing something you expect will or may freeze the 
+server you are working on. 
+      </P
+><P
+>Another tool that is constantly used to debug your scripts is the syslog
+ facility. This is the
+facility that logs all log-messages created by a ton of different programs. In
+fact, almost all large programs support syslog logging, including the kernel.
+All messages sent to syslog have two basic variables set to them that are very
+important to remember, the facility and the log level/priority.
+       </P
+><P
+>The facility tells the syslog server from which facility the log entry came 
+from, and where to log it. There are several specified facilities, but the one 
+in question right now is the Kern facility, or kernel facility as it may also 
+be called. All netfilter generated messages are sent using this facility.
+      </P
+><P
+>The log level tells syslog how high priority the log messages have. There are 
+several priorities that can be used, listed below.
+      </P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>debug</P
+></LI
+><LI
+><P
+>info</P
+></LI
+><LI
+><P
+>notice</P
+></LI
+><LI
+><P
+>warning</P
+></LI
+><LI
+><P
+>err</P
+></LI
+><LI
+><P
+>crit</P
+></LI
+><LI
+><P
+>alert</P
+></LI
+><LI
+><P
+>emerg</P
+></LI
+></OL
+><P
+>Depending on these priorities, we can send them to different log files using 
+the syslog.conf. For example, to send all messages from the kern facility with 
+warning priority to a file called <TT
+CLASS="FILENAME"
+>/var/log/kernwarnings</TT
+>,
+we could do as shown below. The line should go into the
+<TT
+CLASS="FILENAME"
+>/etc/syslog.conf</TT
+>.
+      </P
+><PRE
+CLASS="SCREEN"
+>kern.warning                       /var/log/kernwarnings
+      </PRE
+><P
+>As you can see, it's quite simple. Now you will hopefully find your netfilter
+logs in the file
+<TT
+CLASS="FILENAME"
+>/var/log/kernwarnings</TT
+> (after restarting, or
+HUP'ing the syslog  server). Of
+course, this also depends on what log levels you set in your netfilter logging
+rules. The log level can be set there with the --log-level
+option.
+      </P
+><P
+>The logs entered into this file will give you information about all the packets 
+that you wish to log via specific log rules in the ruleset. With these, you can 
+see if there is anything specific that goes wrong. For example, you can set 
+logrules in the end of all the chains to see if there are any packets that are 
+carried over the boundary of the chains. A log entry may look something like 
+the example below, and include quite a lot of information as you can see.
+      </P
+><PRE
+CLASS="SCREEN"
+>  Oct 23 17:09:34 localhost kernel: IPT INPUT packet died: IN=eth1 OUT= 
+MAC=08:00:09:cd:f2:27:00:20:1a:11:3d:73:08:00 SRC=200.81.8.14 DST=217.215.68.146 
+LEN=78 TOS=0x00 PREC=0x00 TTL=110 ID=12818 PROTO=UDP SPT=1027 DPT=137 LEN=58
+      </PRE
+><P
+>As you can understand, syslog can really help you out when debugging your 
+rulesets. Looking at these logs may help you understand why some port that you 
+wanted to open doesn't work. 
+      </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x10776.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x10910.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Bash debugging tips</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c10762.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Iptables debugging</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

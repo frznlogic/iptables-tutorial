@@ -1,0 +1,71 @@
+ <appendix id="examplecode">
+  <title id="examplecode.title">Example scripts codebase</title>
+  <section>
+   <title>Example rc.firewall script</title>
+
+   <para>
+    <literallayout>
+&rcfirewall;
+    </literallayout>
+   </para>
+
+  </section>
+
+  <section>
+   <title>Example rc.DMZ.firewall script</title>
+
+   <para>
+    <literallayout>
+&rcdmzfirewall;
+    </literallayout>
+   </para>
+
+  </section>
+
+  <section>
+   <title>Example rc.UTIN.firewall script</title>
+
+   <para>
+    <literallayout>
+&rcutinfirewall;
+    </literallayout>
+   </para>
+
+  </section>
+
+  <section id="rcDHCPscript">
+   <title id="rcDHCPscript.title">Example rc.DHCP.firewall script</title>
+
+   <para>
+    <literallayout>
+&rcdhcpfirewall;
+    </literallayout>
+   </para>
+
+  </section>
+
+  <section>
+   <title>Example rc.flush-iptables script</title>
+
+   <para>
+    <literallayout>
+&flushtables;
+    </literallayout>
+   </para>
+
+  </section>
+
+  <section>
+   <title>Example rc.test-iptables script</title>
+
+   <para>
+    <literallayout>
+&testtables;
+    </literallayout>
+   </para>
+
+  </section>
+ </appendix>
+
+
+

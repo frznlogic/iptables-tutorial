@@ -1,0 +1,1914 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Iptables Tutorial 1.2.2</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="NEXT"
+TITLE="About the author"
+HREF="f23.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="BOOK"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="BOOK"
+><A
+NAME="IPTABLES-TUTORIAL"
+></A
+><DIV
+CLASS="TITLEPAGE"
+><H1
+CLASS="TITLE"
+><A
+NAME="AEN2"
+>Iptables Tutorial 1.2.2</A
+></H1
+><H3
+CLASS="AUTHOR"
+><A
+NAME="AEN4"
+></A
+>Oskar Andreasson</H3
+><DIV
+CLASS="AFFILIATION"
+><DIV
+CLASS="ADDRESS"
+><P
+CLASS="ADDRESS"
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<CODE
+CLASS="EMAIL"
+>&#60;<A
+HREF="mailto:oan@frozentux.net"
+>oan@frozentux.net</A
+>&#62;</CODE
+><br>
+&nbsp;&nbsp;&nbsp;&nbsp;</P
+></DIV
+></DIV
+><P
+CLASS="COPYRIGHT"
+>Copyright &copy; 2001-2006 Oskar Andreasson</P
+><DIV
+CLASS="LEGALNOTICE"
+><P
+></P
+><A
+NAME="AEN13"
+></A
+><P
+> 
+Permission is granted to copy, distribute and/or modify this
+document under the terms of the GNU Free Documentation License, Version
+1.1; with the Invariant Sections being "Introduction" and all
+sub-sections, with the Front-Cover Texts being "Original Author: Oskar
+Andreasson", and with no Back-Cover Texts. A copy of the license is
+included in the section entitled "GNU Free Documentation License".
+   </P
+><P
+>All scripts in this tutorial are covered by the GNU General Public
+License. The scripts are free source; you can redistribute them and/or
+modify them under the terms of the GNU General Public License as published
+by the Free Software Foundation, version 2 of the License.
+   </P
+><P
+> These scripts are distributed in the hope that they will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+Public License for more details.
+   </P
+><P
+> You should have received a copy of the GNU General Public
+License within this tutorial, under the section entitled "GNU General
+Public License"; if not, write to the Free Software Foundation, Inc., 59
+Temple Place, Suite 330, Boston, MA 02111-1307 USA
+   </P
+><P
+></P
+></DIV
+><HR></DIV
+><H1
+><A
+NAME="AEN18"
+></A
+>Dedications</H1
+><P
+>I would like to dedicate this document to my wonderful sister, niece and 
+brother-in-law for giving me inspiration and feedback. They are a source of 
+joy and a ray of light when I have need of it.  Thank you!
+  </P
+><P
+>A special word should also be extended to Ninel for always encouraging my 
+writing and for taking care of me when I needed it the most. Thank you!
+  </P
+><P
+>Second of all, I would like to dedicate this work to all of the
+incredibly hard working Linux developers and maintainers. It is people
+like those who make this wonderful operating system possible.
+  </P
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Table of Contents</B
+></DT
+><DT
+><A
+HREF="f23.htm"
+>About the author</A
+></DT
+><DT
+><A
+HREF="f31.htm"
+>How to read</A
+></DT
+><DT
+><A
+HREF="f40.htm"
+>Prerequisites</A
+></DT
+><DT
+><A
+HREF="f44.htm"
+>Conventions used in this document</A
+></DT
+><DT
+>1. <A
+HREF="c65.htm"
+>Introduction</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c65.htm#WHYTHISDOCUMENT"
+>Why this document was written</A
+></DT
+><DT
+><A
+HREF="x76.htm"
+>How it was written</A
+></DT
+><DT
+><A
+HREF="x80.htm"
+>Terms used in this document</A
+></DT
+><DT
+><A
+HREF="x167.htm"
+>What's next?</A
+></DT
+></DL
+></DD
+><DT
+>2. <A
+HREF="c171.htm"
+>TCP/IP repetition</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c171.htm#TCPIPLAYERS"
+>TCP/IP Layers</A
+></DT
+><DT
+><A
+HREF="x362.htm"
+>IP characteristics</A
+></DT
+><DT
+><A
+HREF="x430.htm"
+>IP headers</A
+></DT
+><DT
+><A
+HREF="x669.htm"
+>TCP characteristics</A
+></DT
+><DT
+><A
+HREF="x724.htm"
+>TCP headers</A
+></DT
+><DT
+><A
+HREF="x956.htm"
+>UDP characteristics</A
+></DT
+><DT
+><A
+HREF="x980.htm"
+>UDP headers</A
+></DT
+><DT
+><A
+HREF="x1030.htm"
+>ICMP characteristics</A
+></DT
+><DT
+><A
+HREF="x1078.htm"
+>ICMP headers</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="x1078.htm#ICMPECHO"
+>ICMP Echo Request/Reply</A
+></DT
+><DT
+><A
+HREF="x1078.htm#ICMPDESTUNREACH"
+>ICMP Destination Unreachable</A
+></DT
+><DT
+><A
+HREF="x1078.htm#SOURCEQUENCH"
+>Source Quench</A
+></DT
+><DT
+><A
+HREF="x1078.htm#REDIRECT"
+>Redirect</A
+></DT
+><DT
+><A
+HREF="x1078.htm#TTLEQ0"
+>TTL equals 0</A
+></DT
+><DT
+><A
+HREF="x1078.htm#PARAMETERPROBLEM"
+>Parameter problem</A
+></DT
+><DT
+><A
+HREF="x1078.htm#TIMESTAMP"
+>Timestamp request/reply</A
+></DT
+><DT
+><A
+HREF="x1078.htm#INFORMATIONREQUEST"
+>Information request/reply</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="x1535.htm"
+>SCTP Characteristics</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="x1535.htm#SCTPINIT"
+>Initialization and association</A
+></DT
+><DT
+><A
+HREF="x1535.htm#SCTPDATA"
+>Data sending and control session</A
+></DT
+><DT
+><A
+HREF="x1535.htm#SCTPSHUTDOWN"
+>Shutdown and abort</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="x1736.htm"
+>SCTP Headers</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="x1736.htm#SCTPHEADERGENERIC"
+>SCTP Generic header format</A
+></DT
+><DT
+><A
+HREF="x1736.htm#SCTPHEADERCOMMON"
+>SCTP Common and generic headers</A
+></DT
+><DT
+><A
+HREF="x1736.htm#SCTPHEADERABORT"
+>SCTP ABORT chunk</A
+></DT
+><DT
+><A
+HREF="x1736.htm#SCTPHEADERCOOKIE-ACK"
+>SCTP COOKIE ACK chunk</A
+></DT
+><DT
+><A
+HREF="x1736.htm#SCTPHEADERCOOKIE-ECHO"
+>SCTP COOKIE ECHO chunk</A
+></DT
+><DT
+><A
+HREF="x1736.htm#SCTPHEADERDATA"
+>SCTP DATA chunk</A
+></DT
+><DT
+><A
+HREF="x1736.htm#SCTPHEADERERROR"
+>SCTP ERROR chunk</A
+></DT
+><DT
+><A
+HREF="x1736.htm#SCTPHEADERHEARTBEAT"
+>SCTP HEARTBEAT chunk</A
+></DT
+><DT
+><A
+HREF="x1736.htm#SCTPHEADERHEARTBEAT-ACK"
+>SCTP HEARTBEAT ACK chunk</A
+></DT
+><DT
+><A
+HREF="x1736.htm#SCTPHEADERINIT"
+>SCTP INIT chunk</A
+></DT
+><DT
+><A
+HREF="x1736.htm#SCTPHEADERINIT-ACK"
+>SCTP INIT ACK chunk</A
+></DT
+><DT
+><A
+HREF="x1736.htm#SCTPHEADERSACK"
+>SCTP SACK chunk</A
+></DT
+><DT
+><A
+HREF="x1736.htm#SCTPHEADERSHUTDOWN"
+>SCTP SHUTDOWN chunk</A
+></DT
+><DT
+><A
+HREF="x1736.htm#SCTPHEADERSHUTDOWNACK"
+>SCTP SHUTDOWN ACK chunk</A
+></DT
+><DT
+><A
+HREF="x1736.htm#SCTPHEADERSHUTDOWNCOMPLETE"
+>SCTP SHUTDOWN COMPLETE chunk</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="x2836.htm"
+>TCP/IP destination driven 
+routing</A
+></DT
+><DT
+><A
+HREF="x2856.htm"
+>What's next?</A
+></DT
+></DL
+></DD
+><DT
+>3. <A
+HREF="c2873.htm"
+>IP filtering introduction</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c2873.htm#WHATISANIPFILTER"
+>What is an IP filter</A
+></DT
+><DT
+><A
+HREF="x2940.htm"
+>IP filtering terms and 
+expressions</A
+></DT
+><DT
+><A
+HREF="x3032.htm"
+>How to plan an IP filter</A
+></DT
+><DT
+><A
+HREF="x3144.htm"
+>What's next?</A
+></DT
+></DL
+></DD
+><DT
+>4. <A
+HREF="c3163.htm"
+>Network Address Translation Introduction</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c3163.htm#NATUSAGE"
+>What NAT is used for and basic terms and 
+expressions</A
+></DT
+><DT
+><A
+HREF="x3236.htm"
+>Caveats using NAT</A
+></DT
+><DT
+><A
+HREF="x3259.htm"
+>Example NAT machine in theory</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="x3259.htm#WHATISNEEDEDTOBUILDNAT"
+>What is needed to build a 
+NAT machine</A
+></DT
+><DT
+><A
+HREF="x3259.htm#NATPLACEMENT"
+>Placement of NAT machines</A
+></DT
+><DT
+><A
+HREF="x3259.htm#NATPROXIES"
+>How to place proxies</A
+></DT
+><DT
+><A
+HREF="x3259.htm#NATFINALSTAGE"
+>The final stage of our NAT machine</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="x3376.htm"
+>What's next?</A
+></DT
+></DL
+></DD
+><DT
+>5. <A
+HREF="c3397.htm"
+>Preparations</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c3397.htm#WHERETOGET"
+>Where to get iptables</A
+></DT
+><DT
+><A
+HREF="x3418.htm"
+>Kernel setup</A
+></DT
+><DT
+><A
+HREF="x3588.htm"
+>User-land setup</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="x3588.htm#COMPILINGUSERAPPS"
+>Compiling the user-land applications</A
+></DT
+><DT
+><A
+HREF="x3588.htm#INSTALLRH71"
+>Installation on Red Hat 7.1</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="x3738.htm"
+>What's next?</A
+></DT
+></DL
+></DD
+><DT
+>6. <A
+HREF="c3742.htm"
+>Traversing of tables and chains</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c3742.htm#TRAVERSINGGENERAL"
+>General</A
+></DT
+><DT
+><A
+HREF="x4058.htm"
+>Mangle table</A
+></DT
+><DT
+><A
+HREF="x4113.htm"
+>Nat table</A
+></DT
+><DT
+><A
+HREF="x4156.htm"
+>Raw table</A
+></DT
+><DT
+><A
+HREF="x4183.htm"
+>Filter table</A
+></DT
+><DT
+><A
+HREF="x4192.htm"
+>User specified chains</A
+></DT
+><DT
+><A
+HREF="x4215.htm"
+>What's next?</A
+></DT
+></DL
+></DD
+><DT
+>7. <A
+HREF="c4219.htm"
+>The state machine</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c4219.htm#STATEMACHINEINTRODUCTION"
+>Introduction</A
+></DT
+><DT
+><A
+HREF="x4273.htm"
+>The conntrack entries</A
+></DT
+><DT
+><A
+HREF="x4342.htm"
+>User-land states</A
+></DT
+><DT
+><A
+HREF="x4436.htm"
+>TCP connections</A
+></DT
+><DT
+><A
+HREF="x4596.htm"
+>UDP connections</A
+></DT
+><DT
+><A
+HREF="x4634.htm"
+>ICMP connections</A
+></DT
+><DT
+><A
+HREF="x4755.htm"
+>Default connections</A
+></DT
+><DT
+><A
+HREF="x4772.htm"
+>Untracked connections and the raw 
+table</A
+></DT
+><DT
+><A
+HREF="x4809.htm"
+>Complex protocols and connection tracking</A
+></DT
+><DT
+><A
+HREF="x4931.htm"
+>What's next?</A
+></DT
+></DL
+></DD
+><DT
+>8. <A
+HREF="c4938.htm"
+>Saving and restoring large
+ rule-sets</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c4938.htm#SPEEDCONSIDERATIONS"
+>Speed considerations</A
+></DT
+><DT
+><A
+HREF="x4987.htm"
+>Drawbacks with restore</A
+></DT
+><DT
+><A
+HREF="x5017.htm"
+>iptables-save</A
+></DT
+><DT
+><A
+HREF="x5063.htm"
+>iptables-restore</A
+></DT
+><DT
+><A
+HREF="x5100.htm"
+>What's next?</A
+></DT
+></DL
+></DD
+><DT
+>9. <A
+HREF="c5106.htm"
+>How a rule is built</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c5106.htm#BASICS"
+>Basics of the iptables command</A
+></DT
+><DT
+><A
+HREF="x5146.htm"
+>Tables</A
+></DT
+><DT
+><A
+HREF="x5245.htm"
+>Commands</A
+></DT
+><DT
+><A
+HREF="x5568.htm"
+>What's next?</A
+></DT
+></DL
+></DD
+><DT
+>10. <A
+HREF="c5572.htm"
+>Iptables matches</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c5572.htm#GENERICMATCHES"
+>Generic matches</A
+></DT
+><DT
+><A
+HREF="x5796.htm"
+>Implicit matches</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="x5796.htm#TCPMATCHES"
+>TCP matches</A
+></DT
+><DT
+><A
+HREF="x5796.htm#UDPMATCHES"
+>UDP matches</A
+></DT
+><DT
+><A
+HREF="x5796.htm#ICMPMATCHES"
+>ICMP matches</A
+></DT
+><DT
+><A
+HREF="x5796.htm#SCTPMATCHES"
+>SCTP matches</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="x6330.htm"
+>Explicit matches</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="x6330.htm#ADDRTYPEMATCH"
+>Addrtype match</A
+></DT
+><DT
+><A
+HREF="x6330.htm#AHESPMATCH"
+>AH/ESP match</A
+></DT
+><DT
+><A
+HREF="x6330.htm#COMMENTMATCH"
+>Comment match</A
+></DT
+><DT
+><A
+HREF="x6330.htm#CONNMARKMATCH"
+>Connmark match</A
+></DT
+><DT
+><A
+HREF="x6330.htm#CONNTRACKMATCH"
+>Conntrack match</A
+></DT
+><DT
+><A
+HREF="x6330.htm#DSCPMATCH"
+>Dscp match</A
+></DT
+><DT
+><A
+HREF="x6330.htm#ECNMATCH"
+>Ecn match</A
+></DT
+><DT
+><A
+HREF="x6330.htm#HASHLIMITMATCH"
+>Hashlimit match</A
+></DT
+><DT
+><A
+HREF="x6330.htm#HELPERMATCH"
+>Helper match</A
+></DT
+><DT
+><A
+HREF="x6330.htm#IPRANGEMATCH"
+>IP range match</A
+></DT
+><DT
+><A
+HREF="x6330.htm#LENGTHMATCH"
+>Length match</A
+></DT
+><DT
+><A
+HREF="x6330.htm#LIMITMATCH"
+>Limit match</A
+></DT
+><DT
+><A
+HREF="x6330.htm#MACMATCH"
+>Mac match</A
+></DT
+><DT
+><A
+HREF="x6330.htm#MARKMATCH"
+>Mark match</A
+></DT
+><DT
+><A
+HREF="x6330.htm#MULTIPORTMATCH"
+>Multiport match</A
+></DT
+><DT
+><A
+HREF="x6330.htm#OWNERMATCH"
+>Owner match</A
+></DT
+><DT
+><A
+HREF="x6330.htm#PKTTYPEMATCH"
+>Packet type match</A
+></DT
+><DT
+><A
+HREF="x6330.htm#REALMMATCH"
+>Realm match</A
+></DT
+><DT
+><A
+HREF="x6330.htm#RECENTMATCH"
+>Recent match</A
+></DT
+><DT
+><A
+HREF="x6330.htm#STATEMATCH"
+>State match</A
+></DT
+><DT
+><A
+HREF="x6330.htm#TCPMSSMATCH"
+>Tcpmss match</A
+></DT
+><DT
+><A
+HREF="x6330.htm#TOSMATCH"
+>Tos match</A
+></DT
+><DT
+><A
+HREF="x6330.htm#TTLMATCH"
+>Ttl match</A
+></DT
+><DT
+><A
+HREF="x6330.htm#UNCLEANMATCH"
+>Unclean match</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="x8812.htm"
+>What's next?</A
+></DT
+></DL
+></DD
+><DT
+>11. <A
+HREF="c8815.htm"
+>Iptables targets and jumps</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c8815.htm#ACCEPTTARGET"
+>ACCEPT target</A
+></DT
+><DT
+><A
+HREF="x8862.htm"
+>CLASSIFY target</A
+></DT
+><DT
+><A
+HREF="x8906.htm"
+>CLUSTERIP target</A
+></DT
+><DT
+><A
+HREF="x9125.htm"
+>CONNMARK target</A
+></DT
+><DT
+><A
+HREF="x9235.htm"
+>CONNSECMARK target</A
+></DT
+><DT
+><A
+HREF="x9305.htm"
+>DNAT target</A
+></DT
+><DT
+><A
+HREF="x9474.htm"
+>DROP target</A
+></DT
+><DT
+><A
+HREF="x9488.htm"
+>DSCP target</A
+></DT
+><DT
+><A
+HREF="x9569.htm"
+>ECN target</A
+></DT
+><DT
+><A
+HREF="x9620.htm"
+>LOG target options</A
+></DT
+><DT
+><A
+HREF="x9795.htm"
+>MARK target</A
+></DT
+><DT
+><A
+HREF="x9845.htm"
+>MASQUERADE target</A
+></DT
+><DT
+><A
+HREF="x9909.htm"
+>MIRROR target</A
+></DT
+><DT
+><A
+HREF="x9940.htm"
+>NETMAP target</A
+></DT
+><DT
+><A
+HREF="x9983.htm"
+>NFQUEUE target</A
+></DT
+><DT
+><A
+HREF="x10027.htm"
+>NOTRACK target</A
+></DT
+><DT
+><A
+HREF="x10045.htm"
+>QUEUE target</A
+></DT
+><DT
+><A
+HREF="x10065.htm"
+>REDIRECT target</A
+></DT
+><DT
+><A
+HREF="x10122.htm"
+>REJECT target</A
+></DT
+><DT
+><A
+HREF="x10192.htm"
+>RETURN target</A
+></DT
+><DT
+><A
+HREF="x10214.htm"
+>SAME target</A
+></DT
+><DT
+><A
+HREF="x10272.htm"
+>SECMARK target</A
+></DT
+><DT
+><A
+HREF="x10324.htm"
+>SNAT target</A
+></DT
+><DT
+><A
+HREF="x10386.htm"
+>TCPMSS target</A
+></DT
+><DT
+><A
+HREF="x10464.htm"
+>TOS target</A
+></DT
+><DT
+><A
+HREF="x10539.htm"
+>TTL target</A
+></DT
+><DT
+><A
+HREF="x10650.htm"
+>ULOG target</A
+></DT
+><DT
+><A
+HREF="x10754.htm"
+>What's next?</A
+></DT
+></DL
+></DD
+><DT
+>12. <A
+HREF="c10762.htm"
+>Debugging your scripts</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c10762.htm#DEBUGGINGANECESSITY"
+>Debugging, a necessity</A
+></DT
+><DT
+><A
+HREF="x10776.htm"
+>Bash debugging tips</A
+></DT
+><DT
+><A
+HREF="x10835.htm"
+>System tools used for debugging</A
+></DT
+><DT
+><A
+HREF="x10910.htm"
+>Iptables debugging</A
+></DT
+><DT
+><A
+HREF="x10958.htm"
+>Other debugging tools</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="x10958.htm#DEBUGGING.NMAP"
+>Nmap</A
+></DT
+><DT
+><A
+HREF="x10958.htm#DEBUGGING.NESSUS"
+>Nessus</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="x11022.htm"
+>What's next?</A
+></DT
+></DL
+></DD
+><DT
+>13. <A
+HREF="c11034.htm"
+>rc.firewall file</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c11034.htm#EXAMPLERCFIREWALL"
+>example rc.firewall</A
+></DT
+><DT
+><A
+HREF="x11056.htm"
+>explanation of rc.firewall</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="x11056.htm#CONFIGOPTIONS"
+>Configuration options</A
+></DT
+><DT
+><A
+HREF="x11056.htm#INITIALLOADING"
+>Initial loading of extra modules</A
+></DT
+><DT
+><A
+HREF="x11056.htm#PROCSETUP"
+>proc set up</A
+></DT
+><DT
+><A
+HREF="x11056.htm#DISPLACEMENT"
+>Displacement of rules to different chains</A
+></DT
+><DT
+><A
+HREF="x11056.htm#DEFAULTPOLICIES"
+>Setting up default policies</A
+></DT
+><DT
+><A
+HREF="x11056.htm#SETTINGUPUSER"
+>Setting up user specified chains in the filter table</A
+></DT
+><DT
+><A
+HREF="x11056.htm#INPUTCHAIN"
+>INPUT chain</A
+></DT
+><DT
+><A
+HREF="x11056.htm#FORWARDCHAIN"
+>FORWARD chain</A
+></DT
+><DT
+><A
+HREF="x11056.htm#OUTPUTCHAIN"
+>OUTPUT chain</A
+></DT
+><DT
+><A
+HREF="x11056.htm#PREROUTINGCHAIN"
+>PREROUTING chain of the nat table</A
+></DT
+><DT
+><A
+HREF="x11056.htm#STARTINGSNAT"
+>Starting SNAT and the POSTROUTING chain</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="x11772.htm"
+>What's next?</A
+></DT
+></DL
+></DD
+><DT
+>14. <A
+HREF="c11777.htm"
+>Example scripts</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c11777.htm#RCFIREWALLTXTSCRIPTSTRUCTURE"
+>rc.firewall.txt script
+structure</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c11777.htm#THESTRUCTURE"
+>The structure</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="x12074.htm"
+>rc.firewall.txt</A
+></DT
+><DT
+><A
+HREF="x12114.htm"
+>rc.DMZ.firewall.txt</A
+></DT
+><DT
+><A
+HREF="x12188.htm"
+>rc.DHCP.firewall.txt</A
+></DT
+><DT
+><A
+HREF="x12280.htm"
+>rc.UTIN.firewall.txt</A
+></DT
+><DT
+><A
+HREF="x12321.htm"
+>rc.test-iptables.txt</A
+></DT
+><DT
+><A
+HREF="x12339.htm"
+>rc.flush-iptables.txt</A
+></DT
+><DT
+><A
+HREF="x12368.htm"
+>Limit-match.txt</A
+></DT
+><DT
+><A
+HREF="x12380.htm"
+>Pid-owner.txt</A
+></DT
+><DT
+><A
+HREF="x12395.htm"
+>Recent-match.txt</A
+></DT
+><DT
+><A
+HREF="x12409.htm"
+>Sid-owner.txt</A
+></DT
+><DT
+><A
+HREF="x12424.htm"
+>Ttl-inc.txt</A
+></DT
+><DT
+><A
+HREF="x12435.htm"
+>Iptables-save ruleset</A
+></DT
+><DT
+><A
+HREF="x12445.htm"
+>What's next?</A
+></DT
+></DL
+></DD
+><DT
+>15. <A
+HREF="c12449.htm"
+>Graphical User Interfaces for 
+Iptables/netfilter</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c12449.htm#FWBUILDER"
+>fwbuilder</A
+></DT
+><DT
+><A
+HREF="x12491.htm"
+>Turtle Firewall Project</A
+></DT
+><DT
+><A
+HREF="x12516.htm"
+>Integrated Secure Communications System</A
+></DT
+><DT
+><A
+HREF="x12529.htm"
+>IPMenu</A
+></DT
+><DT
+><A
+HREF="x12546.htm"
+>Easy Firewall Generator</A
+></DT
+><DT
+><A
+HREF="x12563.htm"
+>What's next?</A
+></DT
+></DL
+></DD
+><DT
+>16. <A
+HREF="c12566.htm"
+>Commercial products based on Linux, 
+iptables and netfilter</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="c12566.htm#INGATE1200"
+>Ingate Firewall 1200</A
+></DT
+><DT
+><A
+HREF="x12606.htm"
+>What's next?</A
+></DT
+></DL
+></DD
+><DT
+>A. <A
+HREF="a12610.htm"
+>Detailed explanations of special commands</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="a12610.htm#LISTINGRULESET"
+>Listing your active rule-set</A
+></DT
+><DT
+><A
+HREF="x12650.htm"
+>Updating and flushing your tables</A
+></DT
+></DL
+></DD
+><DT
+>B. <A
+HREF="a12684.htm"
+>Common problems and questions</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="a12684.htm#MODULEPROBLEMS"
+>Problems loading modules</A
+></DT
+><DT
+><A
+HREF="x12721.htm"
+>State NEW packets but no SYN bit set</A
+></DT
+><DT
+><A
+HREF="x12765.htm"
+>SYN/ACK and NEW packets</A
+></DT
+><DT
+><A
+HREF="x12802.htm"
+>Internet Service Providers who use assigned IP addresses</A
+></DT
+><DT
+><A
+HREF="x12819.htm"
+>Letting DHCP requests through iptables</A
+></DT
+><DT
+><A
+HREF="x12842.htm"
+>mIRC DCC problems</A
+></DT
+></DL
+></DD
+><DT
+>C. <A
+HREF="a12854.htm"
+>ICMP types</A
+></DT
+><DT
+>D. <A
+HREF="a13211.htm"
+>TCP options</A
+></DT
+><DT
+>E. <A
+HREF="a13413.htm"
+>Other resources and links</A
+></DT
+><DT
+>F. <A
+HREF="a13606.htm"
+>Acknowledgments</A
+></DT
+><DT
+>G. <A
+HREF="a13647.htm"
+>History</A
+></DT
+><DT
+>H. <A
+HREF="a13650.htm"
+>GNU Free Documentation License</A
+></DT
+><DD
+><DL
+><DT
+>0. <A
+HREF="a13650.htm#AEN13655"
+>PREAMBLE</A
+></DT
+><DT
+>1. <A
+HREF="x13660.htm"
+>APPLICABILITY AND DEFINITIONS</A
+></DT
+><DT
+>2. <A
+HREF="x13670.htm"
+>VERBATIM COPYING</A
+></DT
+><DT
+>3. <A
+HREF="x13674.htm"
+>COPYING IN QUANTITY</A
+></DT
+><DT
+>4. <A
+HREF="x13680.htm"
+>MODIFICATIONS</A
+></DT
+><DT
+>5. <A
+HREF="x13716.htm"
+>COMBINING DOCUMENTS</A
+></DT
+><DT
+>6. <A
+HREF="x13721.htm"
+>COLLECTIONS OF DOCUMENTS</A
+></DT
+><DT
+>7. <A
+HREF="x13725.htm"
+>AGGREGATION WITH INDEPENDENT WORKS</A
+></DT
+><DT
+>8. <A
+HREF="x13729.htm"
+>TRANSLATION</A
+></DT
+><DT
+>9. <A
+HREF="x13732.htm"
+>TERMINATION</A
+></DT
+><DT
+>10. <A
+HREF="x13735.htm"
+>FUTURE REVISIONS OF THIS LICENSE</A
+></DT
+><DT
+><A
+HREF="x13740.htm"
+>How to use this License for your documents</A
+></DT
+></DL
+></DD
+><DT
+>I. <A
+HREF="a13747.htm"
+>GNU General Public License</A
+></DT
+><DD
+><DL
+><DT
+>0. <A
+HREF="a13747.htm#AEN13752"
+>Preamble</A
+></DT
+><DT
+>1. <A
+HREF="x13762.htm"
+>TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION</A
+></DT
+><DT
+>2. <A
+HREF="x13817.htm"
+>How to Apply These Terms to Your New Programs</A
+></DT
+></DL
+></DD
+><DT
+>J. <A
+HREF="a13836.htm"
+>Example scripts code-base</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="a13836.htm#INCLUDERCFIREWALL"
+>Example rc.firewall script</A
+></DT
+><DT
+><A
+HREF="x13847.htm"
+>Example rc.DMZ.firewall script</A
+></DT
+><DT
+><A
+HREF="x13854.htm"
+>Example rc.UTIN.firewall script</A
+></DT
+><DT
+><A
+HREF="x13861.htm"
+>Example rc.DHCP.firewall script</A
+></DT
+><DT
+><A
+HREF="x13868.htm"
+>Example rc.flush-iptables script</A
+></DT
+><DT
+><A
+HREF="x13875.htm"
+>Example rc.test-iptables script</A
+></DT
+></DL
+></DD
+></DL
+></DIV
+><DIV
+CLASS="LOT"
+><DL
+CLASS="LOT"
+><DT
+><B
+>List of Tables</B
+></DT
+><DT
+>2-1. <A
+HREF="x1736.htm#TABLE.SCTPTYPES"
+>SCTP Types</A
+></DT
+><DT
+>2-2. <A
+HREF="x1736.htm#TABLEERRORCAUSES"
+>Error Causes</A
+></DT
+><DT
+>2-3. <A
+HREF="x1736.htm#TABLEINITPARAMETERS"
+>INIT Variable Parameters</A
+></DT
+><DT
+>2-4. <A
+HREF="x1736.htm#TABLEINITACKPARAMETERS"
+>INIT ACK Variable Parameters</A
+></DT
+><DT
+>6-1. <A
+HREF="c3742.htm#TABLEDESTINATIONLOCALHOST"
+>Destination local host (our own
+machine)</A
+></DT
+><DT
+>6-2. <A
+HREF="c3742.htm#TABLESOURCELOCALHOST"
+>Source local host (our own
+machine)</A
+></DT
+><DT
+>6-3. <A
+HREF="c3742.htm#TABLEFORWARDEDPACKETS"
+>Forwarded packets</A
+></DT
+><DT
+>7-1. <A
+HREF="x4342.htm#TABLE.USERLANDSTATES"
+>User-land states</A
+></DT
+><DT
+>7-2. <A
+HREF="x4436.htm#TABLE.INTERNALSTATES"
+>Internal states</A
+></DT
+><DT
+>7-3. <A
+HREF="x4809.htm#TABLE.COMPLEXPROTOCOLS"
+>Complex protocols support</A
+></DT
+><DT
+>9-1. <A
+HREF="x5146.htm#TABLE.TABLES"
+>Tables</A
+></DT
+><DT
+>9-2. <A
+HREF="x5245.htm#TABLE.COMMANDS"
+>Commands</A
+></DT
+><DT
+>9-3. <A
+HREF="x5245.htm#TABLE.OPTIONS"
+>Options</A
+></DT
+><DT
+>10-1. <A
+HREF="c5572.htm#TABLE.GENERICMATCHES"
+>Generic matches</A
+></DT
+><DT
+>10-2. <A
+HREF="x5796.htm#TABLE.TCPMATCHES"
+>TCP matches</A
+></DT
+><DT
+>10-3. <A
+HREF="x5796.htm#TABLE.UDPMATCHES"
+>UDP matches</A
+></DT
+><DT
+>10-4. <A
+HREF="x5796.htm#TABLE.ICMPMATCHES"
+>ICMP matches</A
+></DT
+><DT
+>10-5. <A
+HREF="x5796.htm#TABLE.SCTPMATCHES"
+>SCTP matches</A
+></DT
+><DT
+>10-6. <A
+HREF="x6330.htm#TABLE.ADDRTYPES"
+>Address types</A
+></DT
+><DT
+>10-7. <A
+HREF="x6330.htm#TABLE.ADDRTYPEMATCH"
+>Addrtype match options</A
+></DT
+><DT
+>10-8. <A
+HREF="x6330.htm#TABLE.AHMATCH"
+>AH match options</A
+></DT
+><DT
+>10-9. <A
+HREF="x6330.htm#TABLE.ESPMATCH"
+>ESP match options</A
+></DT
+><DT
+>10-10. <A
+HREF="x6330.htm#TABLE.COMMENTMATCH"
+>Comment match options</A
+></DT
+><DT
+>10-11. <A
+HREF="x6330.htm#TABLE.CONNMARKMATCH"
+>Connmark match options</A
+></DT
+><DT
+>10-12. <A
+HREF="x6330.htm#TABLE.CONNTRACKMATCH"
+>Conntrack match options</A
+></DT
+><DT
+>10-13. <A
+HREF="x6330.htm#TABLE.DSCPMATCH"
+>Dscp match options</A
+></DT
+><DT
+>10-14. <A
+HREF="x6330.htm#TABLE.ECNMATCH"
+>Ecn match options</A
+></DT
+><DT
+>10-15. <A
+HREF="x6330.htm#ECNFIELDIP"
+>ECN Field in IP</A
+></DT
+><DT
+>10-16. <A
+HREF="x6330.htm#TABLE.HASHLIMITMATCH"
+>Hashlimit match options</A
+></DT
+><DT
+>10-17. <A
+HREF="x6330.htm#TABLE.HELPERMATCH"
+>Helper match options</A
+></DT
+><DT
+>10-18. <A
+HREF="x6330.htm#TABLE.IPRANGEMATCH"
+>IP range match options</A
+></DT
+><DT
+>10-19. <A
+HREF="x6330.htm#TABLE.LENGTHMATCH"
+>Length match options</A
+></DT
+><DT
+>10-20. <A
+HREF="x6330.htm#TABLE.LIMITMATCH"
+>Limit match options</A
+></DT
+><DT
+>10-21. <A
+HREF="x6330.htm#TABLE.MACMATCH"
+>Mac match options</A
+></DT
+><DT
+>10-22. <A
+HREF="x6330.htm#TABLE.MARKMATCH"
+>Mark match options</A
+></DT
+><DT
+>10-23. <A
+HREF="x6330.htm#TABLE.MULTIPORTMATCH"
+>Multiport match options</A
+></DT
+><DT
+>10-24. <A
+HREF="x6330.htm#TABLE.OWNERMATCH"
+>Owner match options</A
+></DT
+><DT
+>10-25. <A
+HREF="x6330.htm#TABLE.PKTTYPEMATCH"
+>Packet type match options</A
+></DT
+><DT
+>10-26. <A
+HREF="x6330.htm#TABLE.REALMMATCH"
+>Realm match options</A
+></DT
+><DT
+>10-27. <A
+HREF="x6330.htm#TABLE.RECENTMATCH"
+>Recent match options</A
+></DT
+><DT
+>10-28. <A
+HREF="x6330.htm#TABLE.STATEMATCHES"
+>State match options</A
+></DT
+><DT
+>10-29. <A
+HREF="x6330.htm#TABLE.TCPMSSMATCH"
+>Tcpmss match options</A
+></DT
+><DT
+>10-30. <A
+HREF="x6330.htm#TABLE.TOSMATCH"
+>Tos match options</A
+></DT
+><DT
+>10-31. <A
+HREF="x6330.htm#TABLE.TTLMATCH"
+>Ttl match options</A
+></DT
+><DT
+>11-1. <A
+HREF="x8862.htm#TABLE.CLASSIFYTARGET"
+>CLASSIFY target options</A
+></DT
+><DT
+>11-2. <A
+HREF="x8906.htm#TABLE.CLUSTERIPTARGET"
+>CLUSTERIP target options</A
+></DT
+><DT
+>11-3. <A
+HREF="x9125.htm#TABLE.CONNMARKTARGET"
+>CONNMARK target options</A
+></DT
+><DT
+>11-4. <A
+HREF="x9235.htm#TABLE.CONNSECMARKTARGET"
+>CONNSECMARK target options</A
+></DT
+><DT
+>11-5. <A
+HREF="x9305.htm#TABLE.DNATTARGET"
+>DNAT target options</A
+></DT
+><DT
+>11-6. <A
+HREF="x9488.htm#TABLE.DSCPTARGET"
+>DSCP target options</A
+></DT
+><DT
+>11-7. <A
+HREF="x9569.htm#TABLE.ECNTARGET"
+>ECN target options</A
+></DT
+><DT
+>11-8. <A
+HREF="x9620.htm#TABLE.LOGTARGET"
+>LOG target options</A
+></DT
+><DT
+>11-9. <A
+HREF="x9795.htm#TABLE.MARKTARGET"
+>MARK target options</A
+></DT
+><DT
+>11-10. <A
+HREF="x9845.htm#TABLE.MASQUERADETARGET"
+>MASQUERADE target options</A
+></DT
+><DT
+>11-11. <A
+HREF="x9940.htm#TABLE.NETMAPTARGET"
+>NETMAP target options</A
+></DT
+><DT
+>11-12. <A
+HREF="x9983.htm#TABLE.NFQUEUETARGET"
+>NFQUEUE target options</A
+></DT
+><DT
+>11-13. <A
+HREF="x10065.htm#TABLE.REDIRECTTARGET"
+>REDIRECT target options</A
+></DT
+><DT
+>11-14. <A
+HREF="x10122.htm#TABLE.REJECTTARGET"
+>REJECT target options</A
+></DT
+><DT
+>11-15. <A
+HREF="x10214.htm#TABLE.SAMETARGET"
+>SAME target options</A
+></DT
+><DT
+>11-16. <A
+HREF="x10272.htm#TABLE.SECMARKTARGET"
+>SECMARK target options</A
+></DT
+><DT
+>11-17. <A
+HREF="x10324.htm#TABLE.SNATTARGET"
+>SNAT target options</A
+></DT
+><DT
+>11-18. <A
+HREF="x10386.htm#TABLE.TCPMSSTARGET"
+>TCPMSS target options</A
+></DT
+><DT
+>11-19. <A
+HREF="x10464.htm#TABLE.TOSTARGET"
+>TOS target options</A
+></DT
+><DT
+>11-20. <A
+HREF="x10539.htm#TABLE.TTLTARGET"
+>TTL target options</A
+></DT
+><DT
+>11-21. <A
+HREF="x10650.htm#TABLE.ULOGTARGET"
+>ULOG target options</A
+></DT
+><DT
+>C-1. <A
+HREF="a12854.htm#TABLE.ICMPTYPES"
+>ICMP types</A
+></DT
+><DT
+>D-1. <A
+HREF="a13211.htm#TABLE.TCPOPTIONS"
+>TCP Options</A
+></DT
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="f23.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>About the author</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

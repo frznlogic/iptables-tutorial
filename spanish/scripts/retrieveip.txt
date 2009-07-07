@@ -1,0 +1,52 @@
+#!/bin/bash
+#
+# retreiveip.txt - script conteniendo dos funciones que capturan
+#                  automáticamente la IP de una forma dinámica.
+#
+# Copyright (C) 2001  Oskar Andreasson &lt;bluefluxATkoffeinDOTnet&gt;
+#
+# Escrito y cedido originalmente por Jelle Kalf &lt;jkalfATunoDOTnl&gt;.
+# Los saludos, agradecimientos y comentarios por el script deben serle
+# remitidos a él, el autor original.
+#
+# Este programa es software libre; puedes redistribuirlo y/o modificarlo
+# bajo los términos expresados en la "GNU General Public License", tal como
+# lo publica la Free Software Foundation; versión 2 de la Licencia.
+#
+# Este programa se distribuye con el deseo de que sea útil, pero
+# SIN NINGUNA GARANTÍA; incluso sin garantía implícita de COMPRA-VENTA
+# o ADECUACIÓN A PROPÓSITO PARTICULAR. Para más detalles, referirse a la
+# GNU General Public License.
+#
+# Deberías haber recibido una copia de la GNU General Public License
+# junto a este programa o desde el sitio web de dónde lo bajaste;
+# si no es así, escribe a la Free Software Foundation, Inc., 59 Temple
+# Place, Suite 330, Boston, MA  02111-1307   USA
+#
+
+RetrieveIP() {
+  nic="$1"
+  TEMP=""
+
+  if ! /sbin/ifconfig | grep $nic > /dev/null; then
+    echo -e "\n\n interface $nic does not exist...  Aborting!"
+#   echo -e "\n\n la interfaz $nic no existe... ¡Abortando!"
+
+    exit 1;
+  fi
+
+  TEMP=`ifconfig $nic | awk '/inet addr/ { gsub(".*:", "", $2) ; print
+$2 }'`
+
+  if [ "$TEMP" = '' ]; then
+    echo "Aborting: Unable to determine the IP of $nic ... DHCP problem?"
+#   echo "Abortando: incapaz de determinar la IP de $nic... ¿Problema con DHCP?"
+
+    exit 1
+  fi
+}
+
+RetrieveBC() {
+  nic="$1"
+  BROADCAST=`ifconfig $nic | awk '/inet addr/ { gsub(".*:", "", $3) ; print $3 }'`
+}

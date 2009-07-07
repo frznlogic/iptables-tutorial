@@ -1,0 +1,201 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Caveats using NAT</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="Network Address Translation Introduction"
+HREF="c3163.htm"><LINK
+REL="PREVIOUS"
+TITLE="Network Address Translation Introduction"
+HREF="c3163.htm"><LINK
+REL="NEXT"
+TITLE="Example NAT machine in theory"
+HREF="x3259.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c3163.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 4. Network Address Translation Introduction</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x3259.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="NATCAVEATS"
+>Caveats using NAT</A
+></H1
+><P
+>As we have already explained to some extent, there are quite a lot of 
+minor caveats with using NAT. The main problem is
+certain protocols and applications which may not work at all. Hopefully, these
+applications are not too common in the networks that you administer, and in
+such case, it should cause no huge problems. 
+    </P
+><P
+>The second and smaller problem is applications and protocols which will only 
+work partially. These protocols are more common than the ones that will not 
+work at all, which is quite unfortunate, but there isn't very much we can do 
+about it as it seems. If complex protocols continue to be built, this is a 
+problem we will have to continue living with. Especially if the protocols 
+aren't standardized.
+    </P
+><P
+>The third, and largest problem, in my point of view, is the fact that the user
+who sits behind a NAT server to get out on the
+internet will not be able to run his own server. It could be done, of course,
+but it takes a lot more time and work to set this up. In companies, this is
+probably preferred over having tons of servers run by different employees that
+are reachable from the Internet, without any supervision. However, when it
+comes to home users, this should be avoided to the very last. You should never
+as an Internet service provider NAT your customers from a private IP range to
+a public IP. It will cause you more trouble than it is worth having to deal
+with, and there will always be one or another client which will want this or
+that protocol to work flawlessly. When it doesn't, you will be called down
+upon.
+     </P
+><P
+>As one last note on the caveats of NAT, it should be
+mentioned that NAT is actually just a hack more or
+less. NAT was a solution that was worked out while
+the <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>IANA</I
+></SPAN
+> and other organisations noted that the Internet
+grew exponentially, and that the IP addresses would soon be in shortage.
+NAT was and is a short term solution to the problem
+of the IPv4 (Yes, IP which we have talked about
+before is a short version of IPv4 which stands for
+Internet Protocol version 4). The long term solution to the
+IPv4 address shortage is the
+IPv6 protocol, which also solves a ton of other
+problems. IPv6 has 128 bits assigned to their
+addresses, while IPv4 only have 32 bits used for IP
+addresses. This is an incredible increase in address space. It may seem like
+ridiculous to have enough IP addresses to set one IP address for every atom in
+our planet, but on the other hand, noone expected the
+IPv4 address range to be too small either. 
+     </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c3163.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x3259.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Network Address Translation Introduction</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c3163.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Example NAT machine in theory</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

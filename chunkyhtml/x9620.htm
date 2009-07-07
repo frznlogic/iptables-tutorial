@@ -1,0 +1,418 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>LOG target options</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="Iptables targets and jumps"
+HREF="c8815.htm"><LINK
+REL="PREVIOUS"
+TITLE="ECN target"
+HREF="x9569.htm"><LINK
+REL="NEXT"
+TITLE="MARK target"
+HREF="x9795.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x9569.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 11. Iptables targets and jumps</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x9795.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="LOGTARGET"
+>LOG target options</A
+></H1
+><P
+>The LOG target is specially designed for logging detailed
+information about packets. These could, for example, be considered as illegal.
+Or, logging can be used purely for bug hunting and error finding. The
+LOG target will return specific information on packets,
+such as most of the IP headers and other information considered interesting.
+It does this via the kernel logging facility, normally
+syslogd. This information may then be read directly with
+dmesg, or from the syslogd logs, or with
+other programs or applications. This is an excellent target to use to debug
+your rule-sets, so that you can see what packets go where and what rules are
+applied on what packets. Note as well that it could be a really great idea to
+use the LOG target instead of the DROP
+target while you are testing a rule you are not 100% sure about on a
+production firewall, since a syntax error in the rule-sets could otherwise
+cause severe connectivity problems for your users. Also note that the
+ULOG target may be interesting if you are using really
+extensive logging, since the ULOG target has support for 
+direct logging to MySQL databases and suchlike.
+    </P
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Note that if you get undesired logging direct to consoles, this is not
+an iptables or Netfilter
+problem, but rather a problem caused by your syslogd configuration - most
+probably <TT
+CLASS="FILENAME"
+>/etc/syslog.conf</TT
+>. Read more in man
+syslog.conf for information about this kind of problem.
+     </P
+><P
+>You may also need to tweak your dmesg settings. 
+dmesg is the command that changes which errors from the 
+kernel that should be shown on the console. dmesg -n 1 
+should prevent all messages from showing up on the console, except panic 
+messages. The dmesg message levels matches exactly the syslogd levels, and it 
+only works on log messages from the kernel facility. For more information, 
+see man dmesg.
+     </P
+></TD
+></TR
+></TABLE
+></DIV
+><P
+>The LOG target currently takes five options that could be
+of interest if you have specific information needs, or want to set different
+options to specific values. They are all listed below.
+    </P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.LOGTARGET"
+></A
+><P
+><B
+>Table 11-8. LOG target options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Option</TD
+><TD
+>--log-level</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A FORWARD -p tcp -j LOG --log-level
+debug
+        </TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This is the option to tell iptables and
+syslog which log level to use. For a complete list of log
+levels read the <TT
+CLASS="FILENAME"
+>syslog.conf</TT
+> manual. Normally there are
+the following log levels, or priorities as they are normally referred to:
+debug, info,
+notice, warning,
+warn, err,
+error, crit,
+alert, emerg and
+panic. The keyword error is
+the same as err, warn is the
+same as warning and panic is
+the same as emerg. Note that all three of these are
+deprecated, in other words do not use error,
+warn and panic. The priority
+defines the severity of the message being logged. All messages are logged
+through the kernel facility. In other words, setting kern.=info
+/var/log/iptables in your <TT
+CLASS="FILENAME"
+>syslog.conf</TT
+> file and
+then letting all your LOG messages in
+iptables use log level info, would make all messages appear
+in the <TT
+CLASS="FILENAME"
+>/var/log/iptables</TT
+> file. Note that there may be
+other messages here as well from other parts of the kernel that uses the info
+priority. For more information on logging I recommend you to read the
+syslog and <TT
+CLASS="FILENAME"
+>syslog.conf</TT
+> man-pages as
+well as other HOWTOs etc.
+        </TD
+></TR
+><TR
+><TD
+>Option</TD
+><TD
+>--log-prefix</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp -j LOG --log-prefix "INPUT
+packets"</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This option tells iptables to prefix all log
+messages with a specific prefix, which can then easily be combined with
+grep or other tools to track specific problems and output
+from different rules. The prefix may be up to 29 letters long, including
+white-spaces and other special symbols.
+        </TD
+></TR
+><TR
+><TD
+>Option</TD
+><TD
+>--log-tcp-sequence</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp -j LOG
+--log-tcp-sequence</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This option will log the TCP Sequence
+numbers, together with the log message. The TCP
+Sequence numbers are special numbers that identify each packet and
+where it fits into a TCP sequence, as well as how the
+stream should be reassembled. Note that this option constitutes a security
+risk if the logs are readable by unauthorized users, or by the world for that
+matter. As does any log that contains output from iptables.
+        </TD
+></TR
+><TR
+><TD
+>Option</TD
+><TD
+>--log-tcp-options</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A FORWARD -p tcp -j LOG
+--log-tcp-options</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>The --log-tcp-options option logs the
+different options from the TCP packet headers and can
+be valuable when trying to debug what could go wrong, or what has actually
+gone wrong. This option does not take any variable fields or anything like
+that, just as most of the LOG options don't.
+        </TD
+></TR
+><TR
+><TD
+>Option</TD
+><TD
+>--log-ip-options</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A FORWARD -p tcp -j LOG
+--log-ip-options</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>The --log-ip-options option will log most of
+the IP packet header options. This works exactly the same as the
+--log-tcp-options option, but instead works on the IP
+options. These logging messages may be valuable when trying to debug or track
+specific culprits, as well as for debugging - in just the same way as the
+previous option.
+        </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Works under Linux kernel 2.3, 2.4, 2.5 and 2.6.
+      </P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x9569.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x9795.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>ECN target</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c8815.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>MARK target</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

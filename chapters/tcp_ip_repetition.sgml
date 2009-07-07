@@ -1,0 +1,4399 @@
+  <chapter id="tcpiprepetition">
+    <title id="tcpiprepetition.title">TCP/IP repetition</title>
+    <indexterm zone="tcpiprepetition">
+      <primary>TCP/IP</primary>
+    </indexterm>
+    <indexterm zone="tcpiprepetition">
+      <primary>TCP</primary>
+    </indexterm>
+    <indexterm zone="tcpiprepetition">
+      <primary>UDP</primary>
+    </indexterm>
+    <indexterm zone="tcpiprepetition">
+      <primary>ICMP</primary>
+    </indexterm>
+    <indexterm zone="tcpiprepetition">
+      <primary>IP</primary>
+    </indexterm>
+
+    <para>
+Iptables is an extremely knowledge intensive tool. This means that iptables 
+takes quite a bit of knowledge to be able to use iptables to it's full extent. 
+Among other things, you must have a very good understanding of the
+<systemitem>TCP/IP</systemitem> protocol.    
+    </para>
+
+    <para>
+This chapter aims at explaining the pure "must understands" of
+<systemitem>TCP/IP</systemitem> before you can go on and work with iptables.
+Among the things we will go through are the <systemitem>IP</systemitem>,
+<systemitem>TCP</systemitem>, <systemitem>UDP</systemitem> and
+<systemitem>ICMP</systemitem> protocols and their headers, and general usages
+of each of these protocols and how they correlate to each other. Iptables
+works inside Internet and Transport layers, and because of that, this chapter
+will focus mainly on those layers as well.
+    </para>
+
+    <para>
+Iptables is also able to work on higher layers, such as the Application layer.
+However, it was not built for this task, and should not be used for that kind of
+usage. I will explain more about this in the <link linkend="ipfiltering"
+endterm="ipfiltering.title"></link> chapter.
+    </para>
+
+    <section id="tcpiplayers">
+      <title id="tcpiplayers.title">TCP/IP Layers</title>
+      <indexterm zone="tcpiplayers">
+        <primary>TCP/IP</primary>
+	<secondary>Layers</secondary>
+      </indexterm>
+      <indexterm zone="tcpiplayers">
+        <primary>TCP/IP</primary>
+	<secondary>Stack</secondary>
+      </indexterm>
+      <indexterm zone="tcpiplayers">
+        <primary>OSI</primary>
+	<secondary>Reference model</secondary>
+      </indexterm>
+
+      <para>
+<systemitem>TCP/IP</systemitem> is, as already stated, multi-layered. This
+means that we have one functionality running at one depth, and another one at
+another level, etcetera. The reason that we have all of these layers is
+actually very simple.
+      </para>
+
+      <para>
+The biggest reason is that the whole architecture is very extensible. We can
+add new functionality to the application layers, for example, without having to
+reimplement the whole <systemitem>TCP/IP</systemitem> stack code, or to
+include a complete <systemitem>TCP/IP</systemitem> stack into the actual
+application. Just the same way as we don't need to rewrite every single
+program, every time that we make a new network interface card. Each layer
+should need to know as little as possible about each other, to keep them
+separated.
+      </para>
+
+      <note>
+        <para>
+When we are talking about the programming code of
+<systemitem>TCP/IP</systemitem> which resides inside the kernel, we are often
+talking about the <systemitem>TCP/IP</systemitem> stack. The
+<systemitem>TCP/IP</systemitem> stack simply means all of the sublayers used,
+from the Network access layer and all the way up to the Application layer.
+        </para>
+      </note>
+
+      <para>
+There are two basic architectures to follow when talking about layers. One of
+them is the <systemitem>OSI</systemitem> (<systemitem>Open Systems
+Interconnect</systemitem>) Reference Model and consists of 7 layers. We will
+only look at it superficially here since we are more interested in the
+<systemitem>TCP/IP</systemitem> layers. However, from an historical point,
+this is interesting to know about, especially if you are working with lots of
+different types of networks. The layers are as follows in the <link
+linkend="osireference">OSI Reference Model</link> list.
+      </para>
+      
+      <note>
+        <para>
+There is some discussion as to which of these reference models is mostly used, 
+but it seems that the <systemitem>OSI</systemitem> reference model still is
+the prevalent reference model. This might also depend on where you live,
+however, in most US and EU countries it seems as you can default to
+<systemitem>OSI</systemitem> reference model while speaking to technicians and
+salespeople. 
+        </para>
+        
+        <para>
+However, throughout the rest of this document, we will mainly refer to the 
+<systemitem>TCP/IP</systemitem> reference model, unless otherwise noted.
+        </para>
+      </note>
+
+      <indexterm zone="osireference">
+        <primary>OSI</primary>
+	<secondary>Application layer</secondary>
+      </indexterm>
+
+      <indexterm zone="osireference">
+        <primary>OSI</primary>
+	<secondary>Presentation layer</secondary>
+      </indexterm>
+      <indexterm zone="osireference">
+        <primary>Presentation layer</primary>
+      </indexterm>
+
+      <indexterm zone="osireference">
+        <primary>OSI</primary>
+	<secondary>Session layer</secondary>
+      </indexterm>
+      <indexterm zone="osireference">
+        <primary>Session layer</primary>
+      </indexterm>
+
+      <indexterm zone="osireference">
+        <primary>OSI</primary>
+	<secondary>Transport layer</secondary>
+      </indexterm>
+      <indexterm zone="osireference">
+        <primary>Transport layer</primary>
+      </indexterm>
+
+      <indexterm zone="osireference">
+        <primary>OSI</primary>
+	<secondary>Network layer</secondary>
+      </indexterm>
+      <indexterm zone="osireference">
+        <primary>Network layer</primary>
+      </indexterm>
+
+      <indexterm zone="osireference">
+        <primary>OSI</primary>
+	<secondary>Data Link layer</secondary>
+      </indexterm>
+      <indexterm zone="osireference">
+        <primary>Data Link layer</primary>
+      </indexterm>
+
+      <indexterm zone="osireference">
+        <primary>OSI</primary>
+	<secondary>Physical layer</secondary>
+      </indexterm>
+      <indexterm zone="osireference">
+        <primary>Physical layer</primary>
+      </indexterm>
+ 
+      <orderedlist id="osireference">
+        <listitem>
+          <para>
+            Application layer
+          </para>
+        </listitem>
+        
+        <listitem>
+          <para>
+            Presentation layer
+          </para>
+        </listitem>
+        
+        <listitem>
+          <para>
+            Session layer
+          </para>
+        </listitem>
+        
+        <listitem>
+          <para>
+            Transport layer
+          </para>
+        </listitem>
+        
+        <listitem>
+          <para>
+            Network layer
+          </para>
+        </listitem>
+        
+        <listitem>
+          <para>
+            Data Link layer
+          </para>
+        </listitem>
+        
+        <listitem>
+          <para>
+            Physical layer
+          </para>
+        </listitem>
+      </orderedlist>
+      
+      <para>
+A packet that is sent by us, goes from the top and to the bottom of this list, 
+each layer adding its own set of <emphasis>headers</emphasis> to the packet in 
+what we call the encapsulation phase. When the packet finally reaches it's 
+destination the packet goes backwards through the list and the headers are 
+stripped out of the packet, one by one, each header giving the destination host 
+all of the needed information for the packet data to finally reach the 
+application or program that it was destined for.
+      </para>
+
+      <para>
+The second and more interesting layering standard that we are more interested in
+is the TCP/IP protocol architecture, as shown in the <link 
+linkend="tcpiplayers.list">TCP/IP architecture</link> list. There is no 
+universal agreement among people on just how many layers there are in the 
+TCP/IP architecture. However, it is generally considered that there are 3 
+through 5 layers available, and in most pictures and explanations, there will 
+be 4 layers discussed. We will, for simplicities sake, only consider those 
+four layers that are generally discussed.
+      </para>
+
+      <indexterm zone="tcpiplayers.list">
+        <primary>TCP/IP</primary>
+	<secondary>Application layer</secondary>
+      </indexterm>
+      <indexterm zone="tcpiplayers.list">
+        <primary>Application layer</primary>
+      </indexterm>
+
+      <indexterm zone="tcpiplayers.list">
+        <primary>TCP/IP</primary>
+	<secondary>Transport layer</secondary>
+      </indexterm>
+
+      <indexterm zone="tcpiplayers.list">
+        <primary>TCP/IP</primary>
+	<secondary>Internet layer</secondary>
+      </indexterm>
+      <indexterm zone="tcpiplayers.list">
+        <primary>Internet layer</primary>
+      </indexterm>
+
+      <indexterm zone="tcpiplayers.list">
+        <primary>TCP/IP</primary>
+	<secondary>Network Access layer</secondary>
+      </indexterm>
+      <indexterm zone="tcpiplayers.list">
+        <primary>Network Access layer</primary>
+      </indexterm>
+
+      <orderedlist id="tcpiplayers.list">
+        <listitem>
+          <para>
+            Application layer
+          </para>
+        </listitem>
+
+        <listitem>
+          <para>
+            Transport layer
+          </para>
+        </listitem>
+
+        <listitem>
+          <para>
+            Internet layer
+          </para>
+        </listitem>
+
+        <listitem>
+          <para>
+            Network Access layer
+          </para>
+        </listitem>
+      </orderedlist>
+
+      <para>
+As you can see, the architecture of the <systemitem>TCP/IP</systemitem>
+protocol set is very much like the <systemitem>OSI</systemitem> Reference
+Model, but yet not. Just the same as with the <systemitem>OSI</systemitem>
+Reference Model, we add and subtract headers for each layer that we enter or
+leave.
+      </para>
+
+      <para>
+For example, lets use one of the most common analogies to modern computer 
+networking, the snail-mail letter. Everything is done in steps, just as 
+is everything in <systemitem>TCP/IP</systemitem>.
+      </para>
+
+      <para>
+You want to send a letter to someone asking how they are, and what they are
+doing. To do this, you must first create the data, or questions. The actual 
+data would be located inside the <systemitem>Application layer</systemitem>.
+      </para>
+
+      <para>
+After this we would put the data written on a sheet of paper inside an envelope 
+and write on it to whom the letter is destined for within a specific company or 
+household. Perhaps something like the example below:
+      </para>
+
+      <literallayout>
+Attn: John Doe
+      </literallayout>
+
+      <para>
+This is equivalent to the the <systemitem>Transport layer</systemitem>, as it
+is known in <systemitem>TCP/IP</systemitem>. In the <systemitem>Transport
+layer</systemitem>, if we were dealing with <systemitem>TCP</systemitem>, this
+would have been equivalent to some port (e.g., port 25).
+      </para>
+
+      <para>
+At this point we write the address on the envelope of the recipient, such as 
+this:
+      </para>
+
+      <literallayout>
+V. Andersgardsgatan 2
+41715 Gothenburg
+      </literallayout>
+
+      <para>
+This would in the analogy be the same as the <systemitem>Internet
+layer</systemitem>. The <systemitem>internet layer</systemitem> contains
+information telling us where to reach the recipient, or host, in a
+<systemitem>TCP/IP</systemitem> network. Just the same way as the recipient on
+an envelope. This would be the equivalent of the IP address in other words
+(e.g., IP 192.168.0.4).
+      </para>
+
+      <para>
+The final step is to put the whole letter in a postbox. Doing this would
+approximately equal to putting a packet into the <systemitem>Network Access
+Layer</systemitem>. The <systemitem>network access layer</systemitem> contains
+the functions and routines for accessing the actual physical network that the
+packet should be transported over.
+      </para>
+
+      <para>
+When the receiver finally receives the letter, he will open the whole letter 
+from the envelope and address etc (decapsulate it). The letter he receives may 
+either require a reply or not. In either case, the letter may be replied upon
+by the receiver, by reversing the receiver and transmitter addresses on the
+original letter he received, so that receiver becomes transmitter, and
+transmitter becomes receiver.
+      </para>
+
+      <note>
+        <para>
+It is very important to understand that iptables was and is specifically built 
+to work on the headers of the <systemitem>Internet</systemitem> and the
+<systemitem>Transport</systemitem> layers. It is possible to do some very
+basic filtering with iptables in the <systemitem>Application</systemitem> and
+<systemitem>Network access</systemitem> layers as well, but it was not
+designed for this, nor is it very suitable for those purposes. 
+        </para>
+
+        <para>
+For example, if we use a string match and match for a specific string inside
+the packet, lets say <command>get /index.html</command>. Will that work?
+Normally, yes. However, if the packet size is very small, it will not. The
+reason is that iptables is built to work on a <emphasis>per packet</emphasis>
+basis, which means that if the string is split into several separate packets,
+iptables will not see that whole string. For this reason, you are much, much
+better off using a proxy<indexterm><primary>Proxy</primary></indexterm> of
+some sort for filtering<indexterm><primary>Filtering</primary></indexterm> in
+the application layer. We will discuss these problems in more detail later on
+in the <link linkend="ipfiltering" endterm="ipfiltering.title"></link>.
+        </para>
+      </note>
+
+      <para>
+As iptables and netfilter mainly operate in the
+<systemitem>Internet</systemitem> and <systemitem>Transport</systemitem>
+layers, that is the layers that we will put our main focus in, in the upcoming
+sections of this chapter. Under the Internet layer, we will almost exclusively
+see the <systemitem>IP</systemitem> protocol. There are a few additions to
+this, such as, for example, the
+<systemitem>GRE</systemitem> <indexterm><primary>GRE</primary></indexterm>
+protocol, but they are very rare on the internet. Also, iptables is (as the
+name implies) not focused around these protocols very well either. Because of
+all these factors we will mainly focus around the <systemitem>IP</systemitem>
+protocol of  the <systemitem>Internet</systemitem> layer, and
+<systemitem>TCP</systemitem>, <systemitem>UDP</systemitem> and
+<systemitem>ICMP</systemitem> of the <systemitem>Transport</systemitem> layer.
+      </para>
+
+      <note>
+        <para>
+The <systemitem>ICMP</systemitem> protocol is actually sort of a mix between
+the two layers. It runs in the <systemitem>Internet</systemitem> layer, but it
+has the exact same headers as the <systemitem>IP</systemitem> protocol, but
+also a few extra headers, and then directly inside that encapsulation, the
+data. We will discuss this in more detail further on, in the <link
+linkend="icmpcharacteristics" endterm="icmpcharacteristics.title"></link>.
+        </para>
+      </note>
+
+    </section>
+
+    <section id="ipcharacteristics">
+      <title id="ipcharacteristics.title">IP characteristics</title>
+      <indexterm zone="ipcharacteristics">
+        <primary>IP</primary>
+	<secondary>Characteristics</secondary>
+      </indexterm>
+      <indexterm zone="ipcharacteristics">
+        <primary>Internet layer</primary>
+      </indexterm>
+
+      <para>
+The <systemitem>IP</systemitem> protocol resides in the
+<systemitem>Internet</systemitem> layer, as we have already said. The
+<systemitem>IP</systemitem>
+protocol is the protocol in the <systemitem>TCP/IP</systemitem> stack that is responsible for letting
+your machine, routers, switches and etcetera, know where a specific packet is
+going. This protocol is the very heart of the whole
+<systemitem>TCP/IP</systemitem> stack, and makes up
+the very foundation of everything in the Internet.
+      </para>
+
+      <para>
+The <systemitem>IP</systemitem> protocol encapsulates the
+<systemitem>Transport</systemitem> layer packet with information about which
+<systemitem>Transport</systemitem> layer protocol it came from, what host it
+is going to, and where it came from, and a little bit of other useful
+information. All of this is, of course, extremely precisely standardized, down
+to every single bit. The same applies to every single protocol that we will
+discuss in this chapter.
+      </para>
+
+      <para>
+The <systemitem>IP</systemitem> protocol has a couple of basic functionalities
+that it must be able to handle. It must be able to define the datagram, which
+is the next building block created by the transport layer (this may in other
+words be <systemitem>TCP</systemitem>, <systemitem>UDP</systemitem> or
+<systemitem>ICMP</systemitem> for example). The <systemitem>IP</systemitem>
+protocol also defines the Internet addressing system that we use today. This
+means that the <systemitem>IP</systemitem> protocol is what defines how to
+reach between hosts, and this also affects how we are able to route packets,
+of course. The addresses we are talking about are what we generally call an
+<systemitem>IP</systemitem> address. Usually when we talk about
+<systemitem>IP</systemitem> addresses, we talk about dotted quad numbers
+(e.g., <emphasis>127.0.0.1</emphasis>). This is mostly to make the
+<systemitem>IP</systemitem> addresses more readable for the human eye, since
+the <systemitem>IP</systemitem> address is actually just a 32 bit field of 1's
+and 0's (<emphasis>127.0.0.1</emphasis> would hence be read as
+<emphasis>01111111000000000000000000000001</emphasis> within the actual
+<systemitem>IP</systemitem> header).
+      </para>
+
+      <para>
+The <systemitem>IP</systemitem> protocol has even more magic it must perform
+up it's sleeve. It must also be able to decapsulate and encapsulate the
+<systemitem>IP datagram</systemitem> (<systemitem>IP data</systemitem>) and
+send or receive the datagram from either the <systemitem>Network access
+layer</systemitem>, or the <systemitem>transport layer</systemitem>. This may
+seem obvious, but sometimes it is not. On top of all this, it  has two big
+functions it must perform as well, that will be of quite interest for the
+firewalling and routing community. The <systemitem>IP</systemitem> protocol is
+responsible for routing packets from one host to another, as well as packets
+that we may receive from one host destined for another. Most of the time on
+single network access host, this is a very simple process. You have two
+different options, either the packet is destined for our locally attached
+network, or possibly through a default gateway. but once you start working
+with firewalls or security policies together with multiple network interfaces
+and different routes, it may cause quite some headache for many network
+administrators. The last of the responsibilities for the
+<systemitem>IP</systemitem> protocol is that it must fragment and reassemble
+any datagram that has previously been fragmented, or that needs to be
+fragmented to fit in to the packetsize of this specific network hardware
+topology that we are connected to. If these packet fragments are sufficiently
+small, they may cause a horribly annoying headache for firewall administrators
+as well. The problem is, that once they are fragmented to small enough chunks,
+we will start having problems to read even the headers of the packet, not to
+mention the actual data.
+      </para>
+
+      <tip>
+        <para>
+As of Linux kernel 2.4 series, and iptables, this should no longer be a problem
+for most linux firewalls. The connection tracking system used by iptables for
+state matching and <systemitem>NAT</systemitem>'ing etc must be able to read
+the packet defragmented. Because of this, conntrack automatically defragments
+all packets before they reach the netfilter/iptables structure in the kernel.
+        </para>
+      </tip>
+
+      <para>
+The <systemitem>IP</systemitem> protocol is also a connectionless protocol,
+which in turn means that <systemitem>IP</systemitem> does not "negotiate" a
+connection. a connection-oriented protocol on the other hand negotiates a
+<systemitem>connection</systemitem> (called a <emphasis>handshake</emphasis>)
+<indexterm><primary>Handshake</primary></indexterm> and then when all data has
+been sent, tears it down. <systemitem>TCP</systemitem> is an example of this
+kind of protocol, however, it is implemented on top of the
+<systemitem>IP</systemitem> protocol. The reason for not being
+connection-oriented
+<indexterm><primary>connection-oriented</primary></indexterm> just yet are
+several, but among others, a handshake is not required at this time yet since
+there are other protocols that this would add an unnecessarily high overhead
+to, and that is made up in such a way that if we don't get a reply, we know
+the packet was lost somewhere in transit anyways, and resend the original
+request. As you can see, sending the request and then waiting for a specified
+amount of time for the reply in this case, is much preferred over first
+sending one packet to say that we want to open a connection, then receive a
+packet letting us know it was opened, and finally acknowledge that we know
+that the whole connection is actually open, and <emphasis>then</emphasis>
+actually send the request, and after that send another packet to tear the
+connection down and wait for another reply.
+      </para>
+
+      <para>
+<systemitem>IP</systemitem> is also known as an
+<emphasis>unreliable protocol</emphasis>, <indexterm><primary>unreliable
+protocol</primary></indexterm> or simply put it does not know if a packet was
+received or not. It simply receives a packet from the transport layer and does
+its thing, and then passes it on to the <systemitem>network access
+layer</systemitem>, and then nothing more to it. It may receive a return
+packet, which traverses from network access layer to the
+<systemitem>IP</systemitem> protocol which  does it's thing again, and then
+passes it on upwards to the <systemitem>Transport layer</systemitem>. However,
+it doesn't care if it gets a reply packet, or if the packet was received at
+the other end. Same thing applies for the unreliability of
+<systemitem>IP</systemitem> as for the connectionless-ness, since
+unreliability would require adding an extra reply packet to each packet that
+is sent. For example, let us consider a <systemitem>DNS</systemitem> lookup.
+As it is, we send a <systemitem>DNS</systemitem>
+<indexterm><primary>DNS</primary></indexterm> request for servername.com. If
+we never receive a reply, we know something went wrong and re-request the
+lookup, but during normal use we would send out one request, and get one reply
+back. Adding reliability to this protocol would mean that the request would
+require two packets (one request, and one confirmation that the packet was
+received) and then two packets for the reply (one reply, and one reply to
+acknowledge the reply was received). In other words, we just doubled the
+amount of packets needed to send, and almost doubled the amount of data needed
+to be transmitted.
+      </para>
+
+    </section>
+
+    <section id="ipheaders">
+      <title id="ipheaders.title">IP headers</title>
+      <indexterm zone="ipheaders">
+        <primary>IP</primary>
+	<secondary>Headers</secondary>
+      </indexterm>
+      <indexterm zone="ipheaders">
+        <primary>RFC</primary>
+	<secondary>791</secondary>
+      </indexterm>
+      <indexterm zone="ipheaders">
+        <primary>RFC</primary>
+	<secondary>1349</secondary>
+      </indexterm>
+      <indexterm zone="ipheaders">
+        <primary>RFC</primary>
+	<secondary>2474</secondary>
+      </indexterm>
+      <indexterm zone="ipheaders">
+        <primary>RFC</primary>
+	<secondary>3168</secondary>
+      </indexterm>
+      <indexterm zone="ipheaders">
+        <primary>RFC</primary>
+	<secondary>3260</secondary>
+      </indexterm>
+      <indexterm zone="ipheaders">
+        <primary>RFC</primary>
+      </indexterm>
+
+      <para>
+The <systemitem>IP</systemitem> packet contains several different parts in the header as you have
+understood from the previous introduction to the <systemitem>IP</systemitem> protocol. The whole header 
+is meticuluously divided into different parts, and each part of the header is
+allocated as small of a piece as possible to do it's work, just to give the
+protocol as little overhead as possible. You will see the exact configuration of
+the IP headers in the <link linkend="ipheaders" 
+endterm="ipheaders.title"></link> image.
+      </para>
+
+      <note>
+        <para>
+Understand that the explanations of the different headers are very brief and 
+that we will only discuss the absolute basics of them. For each type of header 
+that we discuss, we will also list the proper <systemitem>RFC</systemitem>'s
+that you should read for further understanding and technical explanations of
+the protocol in question. As a sidenote to this note,
+<systemitem>RFC</systemitem> stands for <systemitem>Request For
+Comments</systemitem>, but these days, they have a totally different meaning
+to the Internet community. They are what defines and standardises the whole
+Internet, compared to what they were when the researchers started writing
+<systemitem>RFC</systemitem>'s to each other. Back then, they were simply
+requests for comments and a way of asking other researchers about their
+opinions.
+        </para>
+      </note>
+
+      <para>
+The <systemitem>IP</systemitem> protocol is mainly described in <link
+linkend="rfc791" endterm="rfc791.title"></link>. However, this
+<systemitem>RFC</systemitem> is also updated by <link linkend="rfc1349"
+endterm="rfc1349.title"></link>, which was obsoleted by <link
+linkend="rfc2474" endterm="rfc2474.title"></link>, and which was updated by
+<link linkend="rfc3168" endterm="rfc3168.title"></link> and <link
+linkend="rfc3260" endterm="rfc3260.title"></link>.
+      </para>
+
+      <tip>
+        <para>
+As you can see, all of these standards can get a little bit hard to follow at 
+times. One tip for finding the different <systemitem>RFC</systemitem>'s that
+are related to each other is to use the search functions available at <link
+linkend="rfceditor.org" endterm="rfceditor.org.title"></link>. In the case of
+<systemitem>IP</systemitem>, consider that the <systemitem>RFC
+791</systemitem> is the basic <systemitem>RFC</systemitem>, and all of the
+other are simply updates and changes to that standard. We will discuss these
+more in detail when we get to the specific headers that are changed by these
+newer <systemitem>RFC</systemitem>'s.
+        </para>
+
+        <para>
+One thing to remember is, that sometimes, an <systemitem>RFC</systemitem> can
+be obsoleted (not used at all). Normally this means that the
+<systemitem>RFC</systemitem> has been so drastically updated and that it is
+better to simply replace the whole thing. It may also become obsolete for
+other reasons as well. When an <systemitem>RFC</systemitem> becomes obsoleted,
+a field is added to the original <systemitem>RFC</systemitem> that points to
+the new <systemitem>RFC</systemitem> instead.
+        </para>
+      </tip>
+
+      <para>
+        <mediaobject id="ipheaders.img">
+          <imageobject>
+            <imagedata fileref="images/ip-headers.eps" format=eps>
+          </imageobject>
+          <imageobject>
+            <imagedata fileref="images/ip-headers.jpg" format=jpg>
+          </imageobject>
+        </mediaobject>
+      </para>
+
+      <para>
+Version
+<indexterm><primary>IP</primary><secondary>Version</secondary></indexterm>
+<indexterm><primary>Version</primary></indexterm> - bits 0-3. This is a
+version number of the <systemitem>IP</systemitem> protocol in binary.
+<systemitem>IPv4</systemitem> iscalled 0100, while
+<systemitem>IPv6</systemitem> is called 0110. This field is generally not used
+for filtering very much. The version described in <systemitem>RFC
+791</systemitem> is <systemitem>IPv4</systemitem>.
+      </para>
+
+      <para>
+IHL<indexterm><primary>IP</primary><secondary>IHL</secondary></indexterm>
+<indexterm><primary>IHL</primary></indexterm> (Internet Header Length) - bits
+4-7. This field tells us how long the <systemitem>IP</systemitem> 
+header is in 32 bit words. As you can see, we have split the header up in this 
+way (32 bits per line) in the image as well. Since the
+<systemitem>Options</systemitem> field is of 
+optional length, we can never be absolutely sure of how long the whole header 
+is, without this field. The minimum length of this of the header is 5 words.
+      </para>
+
+      <para>
+Type <indexterm><primary>IP</primary><secondary>Type of
+Service</secondary></indexterm> <indexterm><primary>Type of
+Service</primary></indexterm> of Service, DSCP,
+<indexterm><primary>IP</primary><secondary>DSCP</secondary></indexterm>
+<indexterm><primary>DSCP</primary></indexterm> ECN
+<indexterm><primary>IP</primary><secondary>ECN</secondary></indexterm>
+<indexterm><primary>ECN</primary></indexterm> - bits 8-15. This is one of the
+most complex areas of the <systemitem>IP</systemitem> header for the simple
+reason that it has been updated 3 times. It has always had the same basic
+usage, but the implementation has changed several times. First the field was
+called the <systemitem>Type of Service</systemitem> field. Bit [0-2] of the
+field was called the <systemitem>Precedence</systemitem> field. Bit [3] was
+<systemitem>Normal/Low</systemitem> delay, Bit [4] was
+<systemitem>Normal/High</systemitem> throughput, Bit [5] was
+<systemitem>Normal/High</systemitem> reliability and bit [6-7] was reserved
+for future usage. This is still used in a lot of places with older hardware,
+and it still causes some problems for the Internet. Among other things, bit
+[6-7] are specified to be set to 0. In the <systemitem>ECN</systemitem>
+updates (<systemitem>RFC 3168</systemitem>, we start using these reserved bits
+and hence set other values than 0 to these bits. But a lot of old firewalls
+and routers have built in checks looking if these bits are set to 1, and if
+the packets do, the packet is discarded. Today, this is clearly a violation of
+<systemitem>RFC</systemitem>'s, but there is not much you can do about it,
+except to complain. 
+      </para>
+
+      <para>
+The <indexterm><primary>Differentiated Services</primary></indexterm>
+second iteration of this field was when the field was changed into the
+<systemitem>DS</systemitem> field as defined in RFC
+<indexterm><primary>RFC</primary> <secondary>2474</secondary></indexterm>
+2474. <systemitem>DS</systemitem> stands for <systemitem>Differentiated
+Services</systemitem>. According to this standard bits [0-5] is
+<systemitem>Differentiated Services Code Point</systemitem>
+(<systemitem>DSCP</systemitem>) and the remaining two bits [6-7] are still
+unused. The <systemitem>DSCP</systemitem> field is pretty much used the same
+as in how the <systemitem>ToS</systemitem> field was used before, to mark what
+kind of service this packet should be treated like if the router in question
+makes any  difference between them. One big change is that a device must
+ignore the unused bits to be fully <systemitem>RFC 2474</systemitem>
+compliant, which means we get rid of the previous hassle as explained
+previously, as long as the device creators follow this
+<systemitem>RFC</systemitem>.
+      </para>
+
+      <para>
+The third, and almost last, change of the <systemitem>ToS</systemitem> field
+was when the two, previously, unused bits were used for
+<systemitem>ECN</systemitem> (<systemitem>Explicit Congestion
+Notification</systemitem>), <indexterm><primary>Explicit Congestion
+Notification</primary></indexterm> as defined in <systemitem>RFC
+3168</systemitem>. <indexterm><primary>RFC</primary>
+<secondary>3168</secondary></indexterm> <systemitem>ECN</systemitem> is used
+to let the end nodes know about a routers congestion, before it actually
+starts dropping packets, so that the end nodes will be able to slow down their
+data transmissions, before the router actually needs to start dropping data.
+Previously, dropping data was the only way that a router had to tell that it
+was overloaded, and the end nodes had to do a slow restart for each dropped
+packet, and then slowly gather up speed again. The two bits are named
+<systemitem>ECT</systemitem> (<systemitem>ECN Capable Transport</systemitem>)
+and <systemitem>CE</systemitem> (<systemitem>Congestion
+Experienced</systemitem>) codepoints. 
+      </para>
+
+      <para>
+The final iteration of the whole mess is <systemitem>RFC 3260</systemitem>
+<indexterm><primary>RFC</primary> <secondary>3260</secondary></indexterm>
+which gives some new terminology and clarifications to the usage of the
+<systemitem>DiffServ</systemitem>
+<indexterm><primary>DiffServ</primary></indexterm> system. It doesn't involve
+too many new updates or changes, except in the terminology. The
+<systemitem>RFC</systemitem> is also used to clarify some points that were
+discussed between developers. 
+      </para>
+
+      <para>
+Total <indexterm><primary>IP</primary><secondary>Total
+Length</secondary></indexterm> <indexterm><primary>Total
+Length</primary></indexterm> Length - bits 16 - 31. This field tells us how
+large the packet is in octets, including headers and everything. The maximum
+size is 65535 octets, or bytes, for a single packet. The minimum packet size
+is 576 bytes, not caring if the packet arrives in fragments or not. It is only
+recommended to send larger packets than this limit if it can be guaranteed
+that the host can receive it, according to RFC 791.<indexterm>
+<primary>RFC</primary> <secondary>791</secondary></indexterm> However, these
+days most networks runs at 1500 byte packet size. This includes almost all
+ethernet connections, and most Internet connections.
+      </para>
+
+      <para>
+Identification
+<indexterm><primary>IP</primary><secondary>Identification</secondary>
+</indexterm> <indexterm><primary>Identification</primary></indexterm> - bits
+32 - 46. This field is used in aiding the reassembly of fragmented
+<indexterm><primary>fragment</primary></indexterm> packets.
+      </para>
+
+      <para>
+Flags <indexterm><primary>IP</primary><secondary>Flags</secondary>
+</indexterm> <indexterm><primary>Flags</primary></indexterm> - bits 47 - 49.
+This field contains a few miscellaneous flags pertaining to fragmentation. The
+first bit is reserved, but still not used, and must be set to 0. The second
+bit is set to 0 if the packet may be fragmented, and to 1 if it may not be
+fragmented. The third and last bit can be set to 0 if this was the last
+fragment, and 1 if there are more fragments of this same packet.
+      </para>
+
+      <para>
+Fragment <indexterm><primary>IP</primary> <secondary>Fragment
+Offset</secondary></indexterm> <indexterm><primary>Fragment
+Offset</primary></indexterm> Offset - bits 50 - 63. The fragment offset field
+shows where in the datagram that this packet belongs. The fragments are
+calculated in 64 bits, and the first fragment has offset zero.
+      </para>
+
+      <para>
+Time <indexterm><primary>IP</primary><secondary>Time to
+live</secondary></indexterm> <indexterm><primary>Time to
+live</primary></indexterm> to live - bits 64 - 72. The
+<systemitem>TTL</systemitem> field tells us how long the packet may 
+live, or rather how many "hops" it may take over the Internet. Every process 
+that touches the packet must remove one point from the
+<systemitem>TTL</systemitem> field, and if the <systemitem>TTL</systemitem>
+reaches zero, the whole packet must be destroyed and discarded. This is
+basically used as a safety trigger so that a packet may not end up in an
+uncontrollable loop between one or several hosts. Upon destruction the host
+should return an <systemitem>ICMP Time exceeded</systemitem> message to the
+sender.
+      </para>
+
+      <para>
+Protocol <indexterm><primary>IP</primary><secondary>Protocol</secondary>
+</indexterm> <indexterm><primary>Protocol</primary></indexterm> - bits 73 -
+80. In this field the protocol of the next level layer is indicated. For
+example, this may be <systemitem>TCP</systemitem>,
+<systemitem>UDP</systemitem> or <systemitem>ICMP</systemitem> among others.
+All of these numbers are defined by the <emphasis>Internet Assigned Numbers
+Authority</emphasis>. All numbers can befound on their homepage <link
+linkend="iana.org" endterm="iana.org.title"></link>.
+      </para>
+
+      <para>
+Header <indexterm><primary>IP</primary><secondary>Header
+checksum</secondary></indexterm> <indexterm><primary>Header
+checksum</primary></indexterm> checksum - bits 81 - 96. This is a checksum of
+the <systemitem>IP</systemitem> header of the packet.This field is recomputed
+at every host that changes the header, which means pretty much every host that
+the packet traverses over, since they most often change the packets
+<systemitem>TTL</systemitem> field or some other.
+      </para>
+
+      <para>
+Source <indexterm><primary>IP</primary><secondary>Source
+address</secondary></indexterm> <indexterm><primary>Source
+address</primary></indexterm> address - bits 97 - 128. This is the source
+address field. It is generally written in 4 octets, translated from binary to
+decimal numbers with dots in between. That is for example, 127.0.0.1. The
+field lets the receiver know where the packet came from.
+      </para>
+
+      <para>
+Destination <indexterm><primary>IP</primary><secondary>Destination
+address</secondary></indexterm> <indexterm><primary>Destination
+address</primary></indexterm> address - bits 129 - 160. The destination
+address field contains the destination address, and what a surprise, it is
+formatted the same way as the source address.
+      </para>
+
+      <para>
+Options
+<indexterm><primary>IP</primary><secondary>Options</secondary></indexterm>
+<indexterm><primary>Options</primary></indexterm> - bits 161 - 192 &lt;&gt;
+478. The options field is not optional, as it may sound. Actually, this is one
+of the more complex fields in the <systemitem>IP</systemitem> header. The
+options field contains different optional settings within the header, such as
+<systemitem>Internet timestamps</systemitem>,
+<systemitem>SACK</systemitem><indexterm><primary>SACK</primary></indexterm> or
+<systemitem>record route</systemitem> route options. Since these options are
+all optional, the Options field can have different lengths, and hence the
+whole <systemitem>IP</systemitem> header. However, since we always calculate
+the <systemitem>IP</systemitem> header in 32 bit words, we must always end the
+header on an even number, that is the multiple of 32. The field may contain
+zero or more options.
+      </para>
+
+      <para>
+The options field starts with a brief 8 bit field that lets us know which 
+options are used in the packet. The options are all listed in the <link 
+linkend="table.tcpoptions" endterm="table.tcpoptions.title"></link> table, in 
+the <link linkend="tcpoptions" endterm="tcpoptions.title"></link> appendix.
+For more information about the different options, read the proper
+<systemitem>RFC</systemitem>'s. For an updated listing of the
+<systemitem>IP</systemitem> options, check at <link linkend="iana.org"
+endterm="iana.org.title"></link>.
+      </para>
+
+      <para>
+Padding <indexterm><primary>IP</primary><secondary>Padding</secondary>
+</indexterm> <indexterm><primary>Padding</primary></indexterm> - bits
+variable. This is a padding field that is used to make the header end at an
+even 32 bit boundary. The field must always be set to zeroes straight through
+to the end.
+      </para>
+
+    </section>
+
+    <section id="tcpcharacteristics">
+      <title id="tcpcharacteristics.title">TCP characteristics</title>
+      <indexterm zone="tcpcharacteristics">
+        <primary>TCP</primary>
+	<secondary>Characteristics</secondary>
+      </indexterm>
+      <indexterm zone="tcpcharacteristics">
+        <primary>TCP</primary>
+	<secondary>Handshake</secondary>
+      </indexterm>
+      <indexterm zone="tcpcharacteristics">
+        <primary>TCP</primary>
+	<secondary>SYN</secondary>
+      </indexterm>
+ 
+      <para>
+The <systemitem>TCP</systemitem> protocol resides on top of the
+<systemitem>IP</systemitem> protocol. It is a stateful protocol and has
+built-in functions to see that the data was received properly by the other end
+host. The main goals of the <systemitem>TCP</systemitem> protocol is to see
+that data is reliably received and sent, that the data is transported between
+the <systemitem>Internet</systemitem> layer and
+<systemitem>Application</systemitem> layer correctly, and that the packet data
+reaches the proper program in the application layer, and that the data reaches
+the program in the right order. All of this is possible through the
+<systemitem>TCP</systemitem> headers of the packet.
+      </para>
+      
+      <para>
+The <systemitem>TCP</systemitem> protocol looks at data as an continuous data
+stream with a start and a stop signal. The signal that indicates that a new
+stream is waiting to be opened is called a <systemitem>SYN</systemitem>
+three-way handshake in <systemitem>TCP</systemitem>, and consists of one
+packet sent with the <systemitem>SYN</systemitem> bit set. The other end then
+either answers with <systemitem>SYN/ACK</systemitem> or
+<systemitem>SYN/RST</systemitem> to let the client know if the connection was
+accepted or denied, respectively. If the client receives an
+<systemitem>SYN/ACK</systemitem> packet, it once again replies, this time with
+an <systemitem>ACK</systemitem> packet. At this point, the whole connection is
+established and data can be sent. During this initial handshake, all of the
+specific options that will be used throughout the rest of the
+<systemitem>TCP</systemitem> connection is also negotiated, such as
+<systemitem>ECN</systemitem>, <systemitem>SACK</systemitem>, etcetera.
+      </para>
+      
+      <para>
+While the datastream is alive, we have further mechanisms to see that the
+packets are actually received properly by the other end. This is the
+reliability part of <systemitem>TCP</systemitem>. This is done in a simple
+way, using a <systemitem>Sequence number</systemitem> in the packet. Every
+time we send a packet, we give a new value to the <systemitem>Sequence
+number</systemitem>, and when the other end receives the packet, it sends an
+<systemitem>ACK</systemitem> packet back to the data sender. The
+<systemitem>ACK</systemitem> packet acknowledges that the packet was received
+properly. The <systemitem>sequence number</systemitem> also sees to it that
+the packet is inserted into the data stream in a good order.
+      </para>
+
+      <para>
+Once the connection is closed, this is done by sending a
+<systemitem>FIN</systemitem>
+<indexterm><primary>TCP</primary><secondary>FIN</secondary></indexterm>
+<indexterm><primary>FIN</primary></indexterm> packet from either end-point. The other end then
+responds by sending a <systemitem>FIN/ACK</systemitem>
+<indexterm><primary>TCP</primary><secondary>FIN/ACK</secondary></indexterm>
+<indexterm><primary>FIN/ACK</primary></indexterm> packet. The
+<systemitem>FIN</systemitem> sending end can then no longer send any data, but
+the other end-point can still finish sending data. Once the second end-point
+wishes to close the connection totally, it sends a
+<systemitem>FIN</systemitem> packet back to the originally closing end-point,
+and the other end-point replies with a <systemitem>FIN/ACK</systemitem>
+packet. Once this whole procedure is done, the connection is torn down
+properly.
+      </para>
+      
+      <para>
+As you will also later see, the <systemitem>TCP</systemitem> headers contain a
+checksum as well. The checksum consists of a simple hash of the packet. With
+this hash, we can with rather high accuracy see if a packet has been corrupted
+in any way during transit between the hosts. 
+      </para>
+
+    </section>
+
+
+    <section id="tcpheaders">
+      <title id="tcpheaders.title">TCP headers</title>
+      <indexterm zone="tcpheaders">
+        <primary>TCP</primary>
+	<secondary>Headers</secondary>
+      </indexterm>
+      
+      <para>
+The <systemitem>TCP</systemitem> headers must be able to perform all of the
+tasks above. We have already explained when and where some of the headers are
+used, but there are still other areas that we haven't touched very deeply at.
+Below you see an image of the complete set of <systemitem>TCP</systemitem>
+headers. It is formatted in 32 bit words per row, as you can see. 
+      </para>
+
+      <para>
+        <mediaobject id="tcpheaders.img">
+          <imageobject>
+            <imagedata fileref="images/tcp-headers.eps" format=eps>
+          </imageobject>
+          <imageobject>
+            <imagedata fileref="images/tcp-headers.jpg" format=jpg>
+          </imageobject>
+        </mediaobject>
+      </para>
+
+      <para>
+Source <indexterm><primary>TCP</primary> <secondary>Source
+port</secondary></indexterm> <indexterm><primary>Source
+port</primary></indexterm> port - bit 0 - 15. This is the source port of the
+packet. The source port was originally bound directly to a process on the
+sending system. Today, we use a hash between the <systemitem>IP</systemitem>
+addresses, and both the <systemitem>destination</systemitem> and
+<systemitem>source ports</systemitem> to achieve this uniqueness that we can
+bind to a single application or program.
+      </para>
+
+      <para>
+Destination <indexterm><primary>TCP</primary>
+<secondary>Destination port</secondary></indexterm>
+<indexterm><primary>Destination port</primary></indexterm> port - bit 16 - 31.
+This is the <systemitem>destination port</systemitem> of the
+<systemitem>TCP</systemitem> packet. Just as with the <systemitem>source
+port</systemitem>, this was originally bound directly to a process on the
+receiving system. Today, a hash is used instead, which allows us to have more
+open connections at the same time. When a packet is received, the
+<systemitem>destination</systemitem> and <systemitem>source ports</systemitem>
+are reversed in the reply back to the originally sending host, so that
+<systemitem>destination port</systemitem> is now <systemitem>source
+port</systemitem>, and <systemitem>source port</systemitem> is
+<systemitem>destination port</systemitem>.
+      </para>
+
+      <para>
+Sequence Number - bit 32 - 63. The sequence number field is used to set a
+number on each <systemitem>TCP</systemitem> packet so that the
+<systemitem>TCP</systemitem> stream <indexterm><primary>TCP</primary>
+<secondary>Sequence number</secondary></indexterm>
+<indexterm><primary>Sequence Number</primary></indexterm> can be properly
+sequenced (e.g., the packets winds up in the correct order). The
+<systemitem>Sequence number</systemitem> is then returned in the
+<systemitem>ACK</systemitem> field to ackonowledge that the packet was
+properly received.
+      </para>
+
+      <para>
+Acknowledgment <indexterm><primary>TCP</primary>
+<secondary>Acknowledgment Number</secondary></indexterm>
+<indexterm><primary>Acknowledgment Number</primary></indexterm> Number - bit
+64 - 95. This field is used when we acknowledge a specific packet a host has
+received. For example, we receive a packet with one <systemitem>Sequence
+number</systemitem> set, and if everything is okey with the packet, we reply
+with an <systemitem>ACK</systemitem> packet with the
+<systemitem>Acknowledgment number</systemitem> set to the same as the original
+<systemitem>Sequence number</systemitem>.
+      </para>
+
+      <para>
+Data <indexterm><primary>TCP</primary>
+<secondary>Data Offset</secondary></indexterm>
+<indexterm><primary>Data Offset</primary></indexterm> Offset - bit 96 - 99.
+This field indicates how long the <systemitem>TCP</systemitem> header is, and
+where the Data part of the packet actually starts. It is set with 4 bits, and
+measures the <systemitem>TCP</systemitem> header in 32 bit words. The header
+should always end at an even 32 bit boundary, even with different options set.
+This is possible thanks to the <systemitem>Padding</systemitem> field at the
+very end of the <systemitem>TCP</systemitem> header.
+      </para>
+
+      <para>
+Reserved <indexterm><primary>TCP</primary>
+<secondary>Reserved</secondary></indexterm>
+<indexterm><primary>Reserved</primary></indexterm> - bit 100 - 103. These bits
+are reserved for future usage. In <systemitem>RFC 793</systemitem>
+<indexterm><primary>RFC</primary> <secondary>793</secondary></indexterm> this
+also included the <systemitem>CWR</systemitem> and
+<systemitem>ECE</systemitem> bits. According to <systemitem>RFC
+793</systemitem> bit 100-105 (i.e., this and the <systemitem>CWR</systemitem>
+and <systemitem>ECE</systemitem> fields) must be set to zero to be fully
+compliant. Later on, when we started introducing <systemitem>ECN</systemitem>,
+this caused a lot of troubles because a lot of Internet appliances such as
+firewalls and routers dropped packets with them set. This is still true as of
+writing this. 
+      </para>
+    
+      <para>
+CWR <indexterm><primary>TCP</primary> <secondary>CWR</secondary></indexterm>
+<indexterm><primary>CWR</primary></indexterm> - bit 104. This bit was added in
+RFC 3268 <indexterm><primary>RFC</primary>
+<secondary>3268</secondary></indexterm> and is used by
+<systemitem>ECN</systemitem>. <systemitem>CWR</systemitem> stands for
+<systemitem>Congestion Window Reduced</systemitem>, and is used by the data
+sending part to inform the receiving part that the congestion window has been
+reduced. When the congestion window is reduced, we send less data per
+timeunit, to be able to cope with the total network load.
+      </para>
+    
+      <para>
+ECE <indexterm><primary>TCP</primary> <secondary>ECE</secondary></indexterm>
+<indexterm><primary>ECE</primary></indexterm> - bit 105. This bit was also
+added with RFC 3268 <indexterm><primary>RFC</primary>
+<secondary>3268</secondary></indexterm> and is used by
+<systemitem>ECN</systemitem>. <systemitem>ECE</systemitem> stands for
+<systemitem>ECN Echo</systemitem>. It is used by the
+<systemitem>TCP/IP</systemitem> stack on the receiver host to  let the sending
+host know that it has received an <systemitem>CE</systemitem> packet. The same
+thing applies here, as for the <systemitem>CWR</systemitem> bit, it was
+originally a part of the reserved field and because of this, some networking
+appliances will simply drop the packet if these fields contain anything else
+than zeroes. This is actually still true for a lot of appliances
+unfortunately. 
+      </para>
+
+      <para>
+URG <indexterm><primary>TCP</primary> <secondary>URG</secondary></indexterm>
+<indexterm><primary>URG</primary></indexterm> - bit 106. This field tells us
+if we should use the <systemitem>Urgent Pointer field</systemitem> or not. If
+set to 0, do not use <systemitem>Urgent Pointer</systemitem>, if set to 1, do
+use <systemitem>Urgent pointer</systemitem>.
+      </para>
+
+      <para>
+ACK <indexterm><primary>TCP</primary> <secondary>ACK</secondary></indexterm>
+<indexterm><primary>ACK</primary></indexterm> - bit 107. This bit is set to a
+packet to indicate that this is in reply to another packet that we received,
+and that contained data. An Acknowledgment packet is always sent to indicate
+that we have actually received a packet, and that it contained no errors. If
+this bit is set, the original data sender will check the Acknowledgment Number
+to see which packet is actually acknowledged, and then dump it from the
+buffers.
+      </para>
+
+      <para>
+PSH <indexterm><primary>TCP</primary> <secondary>PSH</secondary></indexterm>
+<indexterm><primary>PSH</primary></indexterm> - bit 108. The PUSH
+<indexterm><primary>TCP</primary> <secondary>PUSH</secondary></indexterm>
+<indexterm><primary>PUSH</primary></indexterm> flag is used to tell the
+<systemitem>TCP</systemitem> protocol on any intermediate hosts to send the
+data on to the actual user, including the <systemitem>TCP</systemitem>
+implementation on the receiving host. This will push all data through,
+unregardless of where or how much of the <systemitem>TCP Window</systemitem>
+that has been pushed through yet. 
+      </para>
+
+      <para>
+RST <indexterm><primary>TCP</primary> <secondary>RST</secondary></indexterm>
+<indexterm><primary>RST</primary></indexterm> - bit 109. The
+<systemitem>RESET</systemitem> flag is set to tell the other end to tear down
+the <systemitem>TCP</systemitem> connection. This is done in a couple of
+different scenarios, the main reasons being that the connection has crashed
+for some reason, if the connection does not exist, or if the packet is wrong
+in some way.
+      </para>
+
+      <para>
+SYN <indexterm><primary>TCP</primary> <secondary>SYN</secondary></indexterm>
+<indexterm><primary>SYN</primary></indexterm> - bit 110. The
+<systemitem>SYN</systemitem> (or <systemitem>Synchronize sequence
+numbers</systemitem>) is used during the initial establishment of a
+connection. It is set in two instances of the connection, the initial packet
+that opens the connection, and the reply <systemitem>SYN/ACK</systemitem>
+packet. It should never be used outside of those instances.
+      </para>
+
+      <para>
+FIN <indexterm><primary>TCP</primary> <secondary>FIN</secondary></indexterm>
+<indexterm><primary>FIN</primary></indexterm> - bit 111. The
+<systemitem>FIN</systemitem> bit indicates that the host that sent the
+<systemitem>FIN</systemitem> bit has no more data to send. When the other end
+sees the <systemitem>FIN</systemitem> bit, it will reply with a
+<systemitem>FIN/ACK</systemitem>. Once this is done, the host that originally
+sent the <systemitem>FIN</systemitem> bit can no longer send any data.
+However, the other end can continue to send data until it is finished, and
+will then send a <systemitem>FIN</systemitem> packet back, and wait for the
+final <systemitem>FIN/ACK</systemitem>, after which the connection is sent to
+a <systemitem>CLOSED</systemitem><indexterm><primary>State
+match</primary><secondary>CLOSED</secondary></indexterm> state.
+      </para>
+
+      <para>
+Window - bit 112 - 127. The <systemitem>Window</systemitem> field is used by
+the receiving host to tell the sender how much data the receiver permits at
+the moment. This is done by sending an <systemitem>ACK</systemitem> back,
+which contains the <systemitem>Sequence number</systemitem> that we want to
+acknowledge, and the <systemitem>Window field</systemitem> then contains the
+maximum accepted sequence <indexterm><primary>TCP</primary>
+<secondary>Window</secondary></indexterm>
+<indexterm><primary>Window</primary></indexterm> numbers that the sending host
+can use before he receives the next <systemitem>ACK</systemitem> packet. The
+next <systemitem>ACK</systemitem> packet will update accepted Window which the
+sender may use.
+      </para>
+
+      <para>
+Checksum <indexterm><primary>TCP</primary>
+<secondary>Checksum</secondary></indexterm>
+<indexterm><primary>Checksum</primary></indexterm> - bit 128 - 143. This field
+contains the <systemitem>checksum</systemitem> of the whole
+<systemitem>TCP</systemitem> header. It is a one's complement of the one's
+complement sum of each 16 bit word in the header. If the header does not end
+on a 16 bit boundary, the additional bits are set to zero. While the
+<systemitem>checksum</systemitem> is calculated, the
+<systemitem>checksum</systemitem> field is set to zero. The
+<systemitem>checksum</systemitem> also covers a 96 bit pseudoheader containing
+the <systemitem>Destination</systemitem>-,
+<systemitem>Source-address</systemitem>, <systemitem>protocol</systemitem>,
+and <systemitem>TCP</systemitem> length. This is for extra security.
+      </para>
+
+      <para>
+Urgent <indexterm><primary>TCP</primary>
+<secondary>Urgent Pointer</secondary></indexterm>
+<indexterm><primary>Urgent Pointer</primary></indexterm> Pointer - bit 144 -
+159. This is a pointer that points to the end of the data which is considered
+urgent. If the connection has important data that should be processed as soon
+as possible by the receiving end, the sender can set the
+<systemitem>URG</systemitem> <indexterm><primary>TCP</primary>
+<secondary>URG</secondary></indexterm>
+<indexterm><primary>URG</primary></indexterm> flag and set the Urgent pointer
+to indicate where the urgent data ends.
+      </para>
+
+      <para>
+Options <indexterm><primary>TCP</primary>
+<secondary>Options</secondary></indexterm>
+<indexterm><primary>Options</primary></indexterm> - bit 160 - **. The
+<systemitem>Options</systemitem> field is a variable length field and contains
+optional headers that we may want to use. Basically, this field contains 3
+subfields at all times. An initial field tells us the length of the
+<systemitem>Options</systemitem> field, a second field tells us which options
+are used, and then we have the actual options. A complete listing of all the
+<systemitem>TCP Options</systemitem> can be found in <link
+linkend="tcpoptions" endterm="tcpoptions.title"></link>.
+      </para>
+
+      <para>
+Padding <indexterm><primary>TCP</primary>
+<secondary>Padding</secondary></indexterm>
+<indexterm><primary>Padding</primary></indexterm> - bit **. The
+<systemitem>padding</systemitem> field pads the <systemitem>TCP</systemitem>
+header until the whole header ends at a 32-bit boundary. This ensures that the
+data part of the packet begins on a 32-bit boundary, and no data is lost in
+the packet. The <systemitem>padding</systemitem> always consists of only
+zeros.
+      </para>
+
+    </section>
+
+    <section id="udpcharacteristics">
+      <title id="udpcharacteristics.title">UDP characteristics</title>
+      <indexterm zone="udpcharacteristics">
+        <primary>UDP</primary>
+	<secondary>Characteristics</secondary>
+      </indexterm>
+      <indexterm zone="udpcharacteristics">
+        <primary>UDP</primary>
+      </indexterm>
+      <indexterm zone="udpcharacteristics">
+        <primary>RFC</primary>
+	<secondary>768</secondary>
+      </indexterm>
+ 
+      <para>
+The <systemitem>User Datagram Protocol</systemitem>
+(<systemitem>UDP</systemitem>) is a very basic and simple protocol on top of
+the <systemitem>IP</systemitem> protocol. It was developed to allow for very
+simple data transmission without any error detection of any kind, and it is
+stateless. However, it is very well fit for query/response kind of
+applications, such as for example <systemitem>DNS</systemitem>, et cetera,
+since we know that unless we get a reply from the <systemitem>DNS</systemitem>
+server, the query was lost somewhere. Sometimes it may also be worth using the
+<systemitem>UDP</systemitem> protocol instead of <systemitem>TCP</systemitem>,
+such as when we want only error/loss detection but don't care about sequencing
+of the packets. This removes some overhead that comes from the
+<systemitem>TCP</systemitem> protocol. We may also do the other thing around,
+make our own protocol on top of <systemitem>UDP</systemitem> that only
+contains sequencing, but no error or loss detection.
+      </para>
+      
+      <para>
+The <systemitem>UDP</systemitem> protocol is specified in <link
+linkend="rfc768" endterm="rfc768.title"></link>. It is a very short and brief
+<systemitem>RFC</systemitem>, which fits a simple protocol like this very
+well.
+      </para>
+
+    </section>
+
+    <section id="udpheaders">
+      <title id="udpheaders.title">UDP headers</title>
+
+      <para>
+The <systemitem>UDP</systemitem> header can be said to contain a very basic
+and simplified <systemitem>TCP</systemitem> header. It contains
+<systemitem>destination</systemitem>-, <systemitem>source-ports</systemitem>,
+<systemitem>header length</systemitem> and a <systemitem>checksum</systemitem>
+as seen in the image below.
+      </para>
+
+      <para>
+        <mediaobject id="udpheaders.img">
+          <imageobject>
+            <imagedata fileref="images/udp-headers.eps" format=eps>
+          </imageobject>
+          <imageobject>
+            <imagedata fileref="images/udp-headers.jpg" format=jpg>
+          </imageobject>
+        </mediaobject>
+      </para>
+
+      <para>
+Source <indexterm><primary>UDP</primary>
+<secondary>Source port</secondary></indexterm>
+<indexterm><primary>Source port</primary></indexterm> port - bit 0-15. This is
+the <systemitem>source port</systemitem> of the packet, describing where a
+reply packet should be sent. This can actually be set to zero if it doesn't
+apply. For example, sometimes we don't require a reply packet, and the packet
+can then be set to <systemitem>source port</systemitem> zero. In most
+implementations, it is set to some port number.
+      </para>
+      
+      <para>
+Destination <indexterm><primary>UDP</primary>
+<secondary>Destination port</secondary></indexterm>
+<indexterm><primary>Destination port</primary></indexterm> port - bit 16-31.
+The <systemitem>destination port</systemitem> of the packet. This is required
+for all packets, as opposed to the <systemitem>source port</systemitem> of a
+packet. 
+      </para>
+
+      <para>
+Length <indexterm><primary>UDP</primary>
+<secondary>Length</secondary></indexterm>
+<indexterm><primary>Length</primary></indexterm> - bit 32-47. The
+<systemitem>length</systemitem> field specifies the length of the whole packet
+in octets, including header and data portions. The shortest possible packet
+can be 8 octets long. 
+      </para>
+
+      <para>
+Checksum <indexterm><primary>UDP</primary>
+<secondary>Checksum</secondary></indexterm>
+<indexterm><primary>Checksum</primary></indexterm> - bit 48-63. The
+<systemitem>checksum</systemitem> is the same kind of
+<systemitem>checksum</systemitem> as used in the <systemitem>TCP</systemitem>
+header, except that it contains a different set of data. In other words, it is
+a one's complement of the one's complement sum of parts of the
+<systemitem>IP</systemitem> header, the whole <systemitem>UDP</systemitem>
+header, the<systemitem>UDP</systemitem> data and padded with zeroes at the end
+when necessary.
+      </para>
+
+    </section>
+
+    <section id="icmpcharacteristics">
+      <title id="icmpcharacteristics.title">ICMP characteristics</title>
+      <indexterm zone="icmpcharacteristics">
+        <primary>ICMP</primary>
+	<secondary>Characteristics</secondary>
+      </indexterm>
+      <indexterm zone="icmpcharacteristics">
+        <primary>ICMP</primary>
+      </indexterm>
+ 
+      <para>
+<systemitem>ICMP</systemitem> messages are used for a basic kind of error
+reporting between host to host, or host to gateway. Between gateway to
+gateway, a protocol called <systemitem>Gateway to Gateway
+protocol</systemitem>
+(<systemitem>GGP</systemitem>)<indexterm><primary>GGP</primary></indexterm> should normally be used
+for error reporting. As we have already discussed, the
+<systemitem>IP</systemitem> protocol is not designed for perfect error
+handling, but <systemitem>ICMP</systemitem> messages solves some parts of
+these problems. The big problem from one standpoint is that the headers of the
+<systemitem>ICMP</systemitem> messages are rather complicated, and differ a
+little bit from message to message. However, this will not be a big problem
+from a filtering standpoint most of the time.
+      </para>
+      
+      <para>
+The basic form is that the message contains the standard
+<systemitem>IP</systemitem> header, <systemitem>type</systemitem>, 
+<systemitem>code</systemitem> and a <systemitem>checksum</systemitem>. All
+<systemitem>ICMP</systemitem> messages contains these fields. The
+<systemitem>type</systemitem> specifies what kind of error or reply message
+this packet is, such as for example <systemitem>destination
+unreachable</systemitem>, <systemitem>echo</systemitem>, <systemitem>echo
+reply</systemitem>, or <systemitem>redirect</systemitem> message. The
+<systemitem>code</systemitem> field specifies more information, if necessary.
+If the packet is of <systemitem>type</systemitem> <systemitem>destination
+unreachable</systemitem>, there are several possible values on this
+<systemitem>code</systemitem> field such as <systemitem>network
+unreachable</systemitem>, <systemitem>host unreachable</systemitem>, or
+<systemitem>port unreachable</systemitem>. The
+<systemitem>checksum</systemitem> is simply a checksum for the whole packet.
+      </para>
+      
+      <para>
+As you may have noticed, I mentioned the <systemitem>IP</systemitem> header
+explicitly for the <systemitem>ICMP</systemitem> packet. This was done since
+the actual <systemitem>IP</systemitem> header is an integral part of the
+<systemitem>ICMP</systemitem> packet, and the <systemitem>ICMP</systemitem>
+protocol lives on the same level as the <systemitem>IP</systemitem> protocol
+in a sense. <systemitem>ICMP</systemitem> does use the
+<systemitem>IP</systemitem> protocol as if it where a higher level protocol,
+but at the same time not. <systemitem>ICMP</systemitem> is an integral part of
+<systemitem>IP</systemitem>, and <systemitem>ICMP</systemitem> must be
+implemented in every <systemitem>IP</systemitem> implementation.
+      </para>
+
+    </section>
+
+    <section id="icmpheaders">
+      <title id="icmpheaders.title">ICMP headers</title>
+      <indexterm zone="icmpheaders">
+        <primary>ICMP</primary>
+	<secondary>Headers</secondary>
+      </indexterm>
+      <indexterm zone="icmpheaders">
+        <primary>RFC</primary>
+	<secondary>792</secondary>
+      </indexterm>
+ 
+      <para>
+As already explained, the headers differs a little bit from
+<systemitem>ICMP type</systemitem> to <systemitem>ICMP type</systemitem>. Most
+of the <systemitem>ICMP</systemitem> types are possible to group by their
+headers. Because of this, we will discuss the basic header form first, and
+then look at the specifics for each group of types that should be discussed.
+      </para>
+
+      <para>
+        <mediaobject id="icmpbasicheaders">
+          <imageobject>
+            <imagedata fileref="images/icmp-basic-headers.eps"
+format=eps>
+          </imageobject>
+          <imageobject>
+            <imagedata fileref="images/icmp-basic-headers.jpg"
+format=jpg>
+          </imageobject>
+        </mediaobject>
+      </para>
+
+      <para>
+All packets contain some basic values from the <systemitem>IP</systemitem>
+headers discussed previously in this chapter. The headers have previously been
+discussed at some length, so this is just a short listing of the headers, with
+a few notes about them.
+      </para>
+
+      <itemizedlist mark="opencircle">
+        <listitem>
+          <para>
+Version <indexterm><primary>ICMP</primary>
+<secondary>Version</secondary></indexterm>
+<indexterm><primary>Version</primary></indexterm> - This should always be set
+to 4.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+Internet <indexterm><primary>ICMP</primary> <secondary>Internet Header
+Length</secondary></indexterm> <indexterm><primary>Internet Header
+Length</primary></indexterm> Header Length - The length of the header in 32
+bit words.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+Type <indexterm><primary>ICMP</primary> <secondary>Type of
+Service</secondary></indexterm> <indexterm><primary>Type of
+Service</primary></indexterm> of Service - See above. This should be set to 0,
+as this is the only legit setting according to <link linkend="rfc792"
+endterm="rfc792.title"></link>.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+Total <indexterm><primary>ICMP</primary>
+<secondary>Total Length</secondary></indexterm>
+<indexterm><primary>Total Length</primary></indexterm> Length - Total length
+of the header and data portion of the packet, counted in octets.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+Identification <indexterm><primary>ICMP</primary>
+<secondary>Identification</secondary></indexterm>
+<indexterm><primary>Identification</primary></indexterm>, Flags and Fragment
+offsets - Ripped from the <systemitem>IP</systemitem> protocol.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+Time <indexterm><primary>ICMP</primary>
+<secondary>Time To Live</secondary></indexterm>
+<indexterm><primary>Time To Live</primary></indexterm> To Live - How many hops
+this packet will survive.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+Protocol <indexterm><primary>ICMP</primary>
+<secondary>Protocol</secondary></indexterm>
+<indexterm><primary>Protocol</primary></indexterm> - which version of
+<systemitem>ICMP</systemitem> is being used (should always be 1).
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+Header <indexterm><primary>ICMP</primary>
+<secondary>Header Checksum</secondary></indexterm>
+<indexterm><primary>Header Checksum</primary></indexterm> Checksum - See the
+<systemitem>IP</systemitem> explanation.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+Source <indexterm><primary>ICMP</primary>
+<secondary>Source Address</secondary></indexterm>
+<indexterm><primary>Source Address</primary></indexterm> Address - The source
+address from whom the packet was sent. This is not entirely true, since the
+packet can have another source address, than that which is located on the
+machine in question. The <systemitem>ICMP</systemitem> types that can have
+this effect will be noted if so.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+Destination <indexterm><primary>ICMP</primary>
+<secondary>Destination Address</secondary></indexterm>
+<indexterm><primary>Destination Address</primary></indexterm> Address - The
+destination address of the packet.
+          </para>
+        </listitem>
+      </itemizedlist>
+
+      <para>
+There are also a couple of new headers that are used by all of the
+<systemitem>ICMP</systemitem> types. The new headers are as follows, this time
+with a few more notes about them:
+      </para>
+
+      <itemizedlist mark="opencircle">
+        <listitem>
+          <para>
+Type <indexterm><primary>ICMP</primary>
+<secondary>Type</secondary></indexterm>
+<indexterm><primary>Type</primary></indexterm> - The
+<systemitem>type</systemitem> field contains the <systemitem>ICMP
+type</systemitem> of the packet. This is always different from
+<systemitem>ICMP</systemitem> type to type. For example <systemitem>ICMP
+Destination Unreachable</systemitem> packets will have a type 3 set to it. For
+a complete listing of the different <systemitem>ICMP</systemitem> types, see
+the <link linkend="icmptypes" endterm="icmptypes.title"></link> appendix. This
+field contains 8 bits total.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+Code <indexterm><primary>ICMP</primary>
+<secondary>Code</secondary></indexterm>
+<indexterm><primary>Code</primary></indexterm> - All
+<systemitem>ICMP</systemitem> types can contain different codes as well. Some
+types only have a single code, while others have several codes that they can
+use. For example, the <systemitem>ICMP Destination Unreachable</systemitem>
+(type 3) can have at least code 0, 1, 2, 3, 4 or 5 set. Each code has a
+different meaning in that context then. For a complete listing of the
+different codes, see the <link linkend="icmptypes"
+endterm="icmptypes.title"></link> appendix. This field is 8 bits in length,
+total. We will discuss the different codes a little bit more in detail for
+each type later on in this section.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+Checksum <indexterm><primary>ICMP</primary>
+<secondary>Checksum</secondary></indexterm>
+<indexterm><primary>Checksum</primary></indexterm> - The
+<systemitem>Checksum</systemitem> is a 16 bit field containing a one's
+complement of the ones complement of the headers starting with the
+<systemitem>ICMP</systemitem> type and down. While calculating the checksum,
+the <systemitem>checksum</systemitem> field should be set to zero.
+          </para>
+        </listitem>
+      </itemizedlist>
+
+      <para>
+At this point the headers for the different packets start to look different
+also. We will describe the most common <systemitem>ICMP</systemitem> Types one
+by one, with a brief discussion of its headers and different codes.
+      </para>
+
+      <section id="icmpecho">
+        <title>ICMP Echo Request/Reply</title>
+	<indexterm zone="icmpecho">
+          <primary>ICMP</primary>
+	  <secondary>Echo Request/Reply</secondary>
+	  <seealso>Echo Request/Reply</seealso>
+        </indexterm>
+	<indexterm zone="icmpecho">
+          <primary>Echo Request/Reply</primary>
+        </indexterm>
+ 
+
+        <para>
+          <mediaobject id="icmpechoreplyheaders">
+            <imageobject>
+              <imagedata
+fileref="images/icmp-echo-headers.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/icmp-echo-headers.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+        <para>
+I have chosen to speak about both the reply and the request of the
+<systemitem>ICMP echo</systemitem> packets here since they are so closely
+related to each other. The first difference is that the echo request is type
+8, while echo reply is type 0. When a host receives a type 8, it replies with
+a type 0.
+        </para>
+
+        <para>
+When the reply is sent, the <systemitem>source</systemitem> and
+<systemitem>destination addresses</systemitem> switch places as well. After
+both of those changes has been done, the <systemitem>checksum</systemitem> is
+recomputed, and the reply is sent. There is only one code for both of these
+types, they are always set to 0.
+        </para>
+
+        <itemizedlist mark="opencircle">
+          <listitem>
+            <para>
+Identifier <indexterm><primary>ICMP</primary>
+<secondary>Identifier</secondary></indexterm>
+<indexterm><primary>Identifier</primary></indexterm> - This is set in the
+request packet, and echoed back in the reply, to be able to keep different
+ping requests and replies together.
+            </para>
+          </listitem>
+
+          <listitem>
+            <para>
+Sequence <indexterm><primary>ICMP</primary>
+<secondary>Sequence number</secondary></indexterm>
+<indexterm><primary>Sequence number</primary></indexterm> number - The sequence number for each host, generally this starts at 1
+and is incremented by 1 for each packet.
+            </para>
+          </listitem>
+        </itemizedlist>
+
+        <para>
+The packets also contains a data part. Per default, the data part is generally
+empty, but it can contain a userspecified amount of random data.
+        </para>
+
+      </section>
+
+
+      <section id="icmpdestunreach">
+        <title>ICMP Destination Unreachable</title>
+	<indexterm zone="icmpdestunreach">
+          <primary>ICMP</primary>
+	  <secondary>Destination Unreachable</secondary>
+	  <seealso>Destination Unreachable</seealso>
+        </indexterm>
+        <indexterm zone="icmpdestunreach">
+          <primary>Destination Unreachable</primary>
+        </indexterm>
+ 
+        <para>
+          <mediaobject id="icmpdstunreachheaders">
+            <imageobject>
+              <imagedata
+fileref="images/icmp-destination-unreachable-headers.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/icmp-destination-unreachable-headers.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+        <para>
+The first three fields seen in the image are the same as previously described.
+The <systemitem>Destination Unreachable</systemitem> type has 16 basic codes
+that can be used, as seen below in the list.
+        </para>
+
+        <itemizedlist mark="opencircle">
+          <listitem>
+            <para>
+Code 0 - Network unreachable <indexterm><primary>Destination
+Unreachable</primary> <secondary>Network unreachable</secondary></indexterm> -
+Tells you if a specific network is currently unreachable.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+Code 1 - Host unreachable <indexterm><primary>Destination
+Unreachable</primary> <secondary>Host unreachable</secondary></indexterm> -
+Tells you if a specific host is currently unreachable.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+Code 2 - Protocol unreachable <indexterm><primary>Destination
+Unreachable</primary> <secondary>Protocol unreachable</secondary></indexterm>
+- This code tells you if a specific protocol (tcp, udp, etc) can not be
+reached at the moment.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+Code 3 - Port unreachable <indexterm><primary>Destination
+Unreachable</primary> <secondary>Port unreachable</secondary></indexterm> - If
+a port (ssh, http, ftp-data, etc) is not reachable, you will get this
+message.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+Code 4 - Fragmentation needed and DF set <indexterm><primary>Destination
+Unreachable</primary> <secondary>Fragmentation needed and DF
+set</secondary></indexterm> - If a packet needs to be fragmented to be
+delivered, but the Do not fragment bit is set in the packet, the gateway will
+return this message.
+           </para>
+          </listitem>
+          <listitem>
+            <para>
+Code 5 - Source route failed <indexterm><primary>Destination
+Unreachable</primary> <secondary>Source route failed</secondary></indexterm> -
+If a source route failed for some reason, this message is returned.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+Code 6 - Destination network unknown <indexterm><primary>Destination
+Unreachable</primary> <secondary>Destination network
+unknown</secondary></indexterm> - If there is no route to a specific network,
+this message is returned.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+Code 7 - Destination host unknown <indexterm><primary>Destination
+Unreachable</primary> <secondary>Destination host
+unknown</secondary></indexterm> - If there is no route to a specific host,
+this message is returned.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+Code 8 - Source host isolated (obsolete)<indexterm><primary>Destination
+Unreachable</primary> <secondary>Source host isolated</secondary></indexterm>
+- If a host is isolated, this message should be returned. This code is
+obsoleted today.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+Code 9 - Destination network administratively prohibited
+<indexterm><primary>Destination Unreachable</primary>
+<secondary>Destination network administratively
+prohibited</secondary></indexterm> - If a network was blocked at a gateway and
+your packet was unable to reach it because of this, you should get this
+<systemitem>ICMP</systemitem> code back.
+              </para>
+            </listitem>
+          <listitem>
+            <para>
+Code 10 - Destination host administratively prohibited
+<indexterm><primary>Destination Unreachable</primary>
+<secondary>Destination host administratively
+prohibited</secondary></indexterm> - If you where unable to reach a host
+because it was administratively prohibited (e.g., routing administration),
+you will get this message back.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+Code 11 - Network unreachable for TOS <indexterm><primary>Destination
+Unreachable</primary> <secondary>Network unreachable for
+TOS</secondary></indexterm> - If a network was unreachable because of a
+<emphasis>bad</emphasis> <systemitem>TOS</systemitem> setting in your packet,
+this code will be generated as a return packet.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+Code 12 - Host unreachable for TOS <indexterm><primary>Destination
+Unreachable</primary> <secondary>Host unreachable for
+TOS</secondary></indexterm> - If your packet was unable to reach a host
+because of the <systemitem>TOS</systemitem> of the packet, this is the message
+you get back.
+
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+Code 13 - Communication administratively prohibited by filtering
+<indexterm><primary>Destination Unreachable</primary> <secondary>Communication
+administratively prohibited by filtering</secondary></indexterm> - If the
+packet was prohibited by some kind of filtering (e.g., firewalling), we get a
+code 13 back.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+Code 14 - Host precedence violation <indexterm><primary>Destination
+Unreachable</primary> <secondary>Host precedence
+violation</secondary></indexterm> - This is sent by the first hop router to
+notify a connected host, to notify the host that the used precedence is not
+permitted for a specific destination/source combination.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+Code 15 - Precedence cutoff in effect <indexterm><primary>Destination
+Unreachable</primary> <secondary>Precedence cutoff in
+effect</secondary></indexterm> - The first hop router may send this message to
+a host if the datagram it received had a too low precedence level set in it.
+            </para>
+          </listitem>
+        </itemizedlist>
+
+        <para>
+On top of this, it also contains a small "data" part, which should be the whole
+Internet header (IP header) and 64 bits of the original IP datagram. If the next
+level protocol contains any ports, etc, it is assumed that the ports should be
+available in the extra 64 bits.
+        </para>
+      </section>
+
+      <section id="sourcequench">
+        <title>Source Quench</title>
+	<indexterm zone="sourcequench">
+          <primary>ICMP</primary>
+	  <secondary>Source Quench</secondary>
+	  <seealso>Source Quench</seealso>
+        </indexterm>
+	<indexterm zone="sourcequench">
+          <primary>Source Quench</primary>
+        </indexterm>
+
+        <para>
+          <mediaobject id="icmpsourcequenchheaders">
+            <imageobject>
+              <imagedata
+fileref="images/icmp-source-quench-headers.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/icmp-source-quench-headers.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+        <para>
+A source quench packet can be sent to tell the originating source of a packet or
+stream of packets to slow down when continuing to send data. Note that gateway
+or destination host that the packets traverses can also be quiet and silently
+discard the packets, instead of sending any <systemitem>source quench</systemitem> packets.
+        </para>
+
+        <para>
+This packet contains no extra header except the data portion, which contains the
+internet header plus 64 bits of the original data datagram. This is used to
+match the source quench message to the correct process, which is currently
+sending data through the gateway or to the destination host.
+        </para>
+
+        <para>
+All <systemitem>source quench</systemitem> packets have their
+<systemitem>ICMP</systemitem> types set to 4. They have no codes
+except 0.
+        </para>
+
+        <note>
+          <para>
+Today, there are a couple of new possible ways of notifying the sending and
+receiving host that a gateway or destination host is overloaded. One way for
+example is the <systemitem>ECN</systemitem> <indexterm><primary>ECN</primary>
+</indexterm>(<systemitem>Explicit Congestion Notification</systemitem>) system.
+          </para>
+        </note>
+      </section>
+
+      <section id="redirect">
+        <title>Redirect</title>
+	<indexterm zone="redirect">
+          <primary>ICMP</primary>
+	  <secondary>Redirect</secondary>
+	  <seealso>Redirect</seealso>
+        </indexterm>
+	<indexterm zone="redirect">
+          <primary>Redirect</primary>
+        </indexterm>
+
+        <para>
+          <mediaobject id="icmpredirectheaders">
+            <imageobject>
+              <imagedata
+fileref="images/icmp-redirect-headers.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/icmp-redirect-headers.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+        <para>
+The <systemitem>ICMP Redirect</systemitem> type is sent in a single case.
+Consider this, you have a network (192.168.0.0/24) with several clients and
+hosts on it, and two gateways. One gateway to a 10.0.0.0/24 network, and a
+default gateway to the rest of the Internet. Now consider if one of the hosts
+on the 192.168.0.0/24 network has no route set to 10.0.0.0/24, but it has the
+default gateway set. It sends a packet to the default gateway, which of course
+knows about the 10.0.0.0/24 network. The default gateway can deduce that it is
+faster to send the packet directly to the 10.0.0.0/24 gateway since the packet
+will enter and leave the gateway on the same interface. The default gateway
+will hence send out a single <systemitem>ICMP Redirect</systemitem> packet to
+the host, telling it about the real gateway, and then sending the packet on to
+the 10.0.0.0/24 gateway. The host will now know about the closest 10.0.0.0/24
+gateway, and hopefully use it in the future.
+        </para>
+        
+        <para>
+The main header of the <systemitem>Redirect</systemitem> type is the
+<systemitem>Gateway Internet Address</systemitem> field. This field tells the
+host about the proper gateway, which should really be used. The packet also
+contains the <systemitem>IP</systemitem> header of the original packet, and
+the 64 first bits of data in the original packet, which is used to connect it
+to the proper process sending the data.
+        </para>
+        
+        <para>
+The <systemitem>Redirect</systemitem> type has 4 different codes as well,
+these are the following.
+        </para>
+        
+        <itemizedlist mark="opencircle">
+          <listitem>
+            <para>
+Code 0 - Redirect for network<indexterm> <primary>Redirect</primary>
+<secondary>Redirect for network</secondary> </indexterm> - Only used for redirects for a whole network 
+(e.g., the example above).
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+Code 1 - Redirect for host<indexterm> <primary>Redirect</primary>
+<secondary>Redirect for host</secondary> </indexterm> - Only used for
+redirects of a specific host (e.g., a host route).
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+Code 2 - Redirect for TOS and network<indexterm> <primary>Redirect</primary>
+<secondary>Redirect for TOS and network</secondary> </indexterm> - Only used
+for redirects of a specific <systemitem>Type of Service</systemitem> and to a
+whole network. Used as code 0, but also based on the
+<systemitem>TOS</systemitem>.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+Code 3 - Redirect for TOS and host<indexterm> <primary>Redirect</primary>
+<secondary>Redirect for TOS and host</secondary> </indexterm> - Only used for
+redirects of a specific <systemitem>Type of Service</systemitem> and to a
+specific host. Used as code 1, but also based on the
+<systemitem>TOS</systemitem> in other words.
+            </para>
+          </listitem>
+        </itemizedlist>
+
+      </section>
+
+      <section id="ttleq0">
+        <title>TTL equals 0</title>
+	<indexterm zone="ttleq0">
+          <primary>ICMP</primary>
+	  <secondary>TTL equals zero</secondary>
+	  <seealso>TTL equals zero</seealso>
+        </indexterm>
+	<indexterm zone="ttleq0">
+          <primary>TTL equals zero</primary>
+        </indexterm>
+	<indexterm zone="ttleq0">
+          <primary>Time Exceeded Message</primary>
+        </indexterm>
+
+        <para>
+          <mediaobject id="icmpttlequals0headers">
+            <imageobject>
+              <imagedata
+fileref="images/icmp-time-exceeded-headers.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/icmp-time-exceeded-headers.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+        <para>
+The <systemitem>TTL</systemitem> equals 0 <systemitem>ICMP</systemitem> type
+is also known as <systemitem>Time Exceeded Message</systemitem> and has type 
+11 set to it, and has 2 <systemitem>ICMP</systemitem> codes available. If the
+<systemitem>TTL</systemitem> field reaches 0 during 
+transit through a gateway or fragment reassembly on the destination host, the 
+packet must be discarded. To notify the sending host of this problem, we can 
+send a <systemitem>TTL equals 0</systemitem> <systemitem>ICMP</systemitem>
+packet. The sender can then raise the <systemitem>TTL</systemitem> of outgoing 
+packets to this destination if necessary.
+        </para>
+        
+        <para>
+The packet only contains the extra data portion of the packet. The data field 
+contains the Internet header plus 64 bits of the data of the
+<systemitem>IP</systemitem> packet, so that 
+the other end may match the packet to the proper process. As previously 
+mentioned, the <systemitem>TTL equals 0</systemitem> type can have two codes.
+        </para>
+
+        <itemizedlist mark="opencircle">
+          <listitem>
+            <para>
+Code 0 - TTL equals 0 during transit <indexterm> <primary>TTL equals
+zero</primary> <secondary>TTL equals 0 during transit</secondary> </indexterm> -
+This is sent to the sending host if the original packet
+<systemitem>TTL</systemitem> reached 0 when it was forwarded by a gateway.
+            </para>
+          </listitem>
+
+          <listitem>
+            <para>
+Code 1 - TTL equals 0 during reassembly <indexterm> <primary>TTL equals
+zero</primary> <secondary>TTL equals 0 during reassembly</secondary> </indexterm>
+- This is sent if the original packet was fragmented, and
+<systemitem>TTL</systemitem> reached 0 during reassembly of the fragments.
+This code should only be sent from the destination host.
+            </para>
+          </listitem>
+        </itemizedlist>
+      </section>
+      
+      <section id="parameterproblem">
+        <title>Parameter problem</title>
+	<indexterm zone="parameterproblem">
+          <primary>ICMP</primary>
+	  <secondary>Parameter problem</secondary>
+	  <seealso>Parameter problem</seealso>
+        </indexterm>
+	<indexterm zone="parameterproblem">
+          <primary>Parameter problem</primary>
+        </indexterm>
+
+        <para>
+          <mediaobject id="icmpparameterproblemheaders">
+            <imageobject>
+              <imagedata
+fileref="images/icmp-parameter-problem-headers.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/icmp-parameter-problem-headers.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+        <para>
+The <systemitem>parameter problem</systemitem> <systemitem>ICMP</systemitem>
+uses type 12 and it has 2 codes that it uses as well. <systemitem>Parameter
+problem</systemitem> messages are used to tell the sending host that the
+gateway or receiving host had problems understanding parts of the
+<systemitem>IP</systemitem> headers such as errors, or that some required
+options where missing.
+        </para>
+        
+        <para>
+The <systemitem>parameter problem</systemitem> type contains one special
+header, which is a pointer to the field that caused the error in the original
+packet, if the code is 0 that is. The following codes are available:
+        </para>
+        
+        <itemizedlist mark="opencircle">
+          <listitem>
+            <para>
+Code 0 - IP header bad (catchall error) <indexterm> <primary>Parameter
+problem</primary> <secondary>IP header bad (catchall error)</secondary>
+</indexterm> - This is a catchall error message as discussed just above.
+Together with the pointer, this code is used to point to which part of the IP
+header contained an error.
+            </para>
+          </listitem>
+          <listitem>
+            <para>
+Code 1 - Required options missing <indexterm> <primary>Parameter
+problem</primary> <secondary>Required options missing</secondary> </indexterm>
+- If an IP option that is required is missing, this code is used to tell about
+it.
+            </para>
+          </listitem>
+        </itemizedlist>
+
+      </section>
+
+
+      <section id="timestamp">
+        <title>Timestamp request/reply</title>
+	<indexterm zone="timestamp">
+          <primary>ICMP</primary>
+	  <secondary>Timestamp</secondary>
+	  <seealso>Timestamp</seealso>
+        </indexterm>
+	<indexterm zone="redirect">
+          <primary>Timestamp</primary>
+        </indexterm>
+
+        <para>
+          <mediaobject id="icmptimestampheaders">
+            <imageobject>
+              <imagedata
+fileref="images/icmp-timestamp-headers.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/icmp-timestamp-headers.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+        <para>
+The <systemitem>timestamp</systemitem> type is obsolete these days, but we
+bring it up briefly here. Both the reply and the request has a single code
+(0). The request is type 13 while the reply is type 14. The timestamp packets
+contains 3 32-bit timestamps counting the milliseconds since midnight UT
+(Universal Time). 
+        </para>
+        
+        <para>
+The first timestamp is the Originate timestamp, which contains the last time
+the sender touched the packet. The receive timestamp is the time that the
+echoing host first touched the packet and the transmit timestamp is the last
+timestamp set just previous to sending the packet.
+        </para>
+        
+        <para>
+Each timestamp message also contains the same identifiers and sequence numbers 
+as the <systemitem>ICMP</systemitem> echo packets.
+        </para>
+      </section>
+
+      <section id="informationrequest">
+        <title>Information request/reply</title>
+	<indexterm zone="informationrequest">
+          <primary>ICMP</primary>
+	  <secondary>Information request</secondary>
+	  <seealso>Information request</seealso>
+        </indexterm>
+	<indexterm zone="informationrequest">
+          <primary>Information request</primary>
+        </indexterm>
+
+        <para>
+          <mediaobject id="icmpinformationheaders">
+            <imageobject>
+              <imagedata
+fileref="images/icmp-information-headers.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/icmp-information-headers.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+        <para>
+The information request and reply types are obsolete since there are protocols 
+on top of the <systemitem>IP</systemitem> protocol that can now take care of
+this when necessary (<systemitem>DHCP</systemitem>, etc). The information
+request generates a reply from any answering host on the network that we are
+attached to.
+        </para>
+        
+        <para>
+The host that wishes to receive information creates a packet with the source
+address set to the network we are attached to (for example, 192.168.0.0), and
+the destination network set to 0. The reply will contain information about our
+numbers (netmask and ip address).
+         </para>
+         
+         <para>
+The information request is run through ICMP type 15 while the reply is sent via 
+type 16.
+         </para>
+      </section>
+
+    </section>
+    <section id="sctpcharacteristics">
+      <title id="sctpcharacteristics.title">SCTP Characteristics</title>
+      <indexterm zone="sctpcharacteristics">
+        <primary>SCTP</primary>
+	<secondary>Characteristics</secondary>
+      </indexterm>
+      <indexterm zone="sctpcharacteristics">
+        <primary>SCTP</primary>
+      </indexterm>
+      <indexterm zone="sctpcharacteristics">
+        <primary>RFC</primary>
+	<secondary>3286</secondary>
+      </indexterm>
+      <indexterm zone="sctpcharacteristics">
+        <primary>RFC</primary>
+	<secondary>2960</secondary>
+      </indexterm>
+ 
+      <para>
+<systemitem>Stream Control Transmission Protocol</systemitem> 
+(<systemitem>SCTP</systemitem>) is a relatively new protocol in the game, but 
+since it is growing in usage and complements the <systemitem>TCP</systemitem> 
+and <systemitem>UDP</systemitem> protocols, I have chosen to add this section 
+about it. It has an even higher reliability than <systemitem>TCP</systemitem>,
+and at the same time a lower overhead from protocol headers. 
+      </para>
+
+      <para>
+<systemitem>SCTP</systemitem> has a couple of very interesting features that 
+can be interesting. For those who wish to learn more about this, read the 
+<link linkend="rfc3286" endterm="rfc3286.title"></link> and <link 
+linkend="rfc2960" endterm="rfc2960.title"></link> document. The first document 
+is an introduction to <systemitem>SCTP</systemitem> and should be very 
+interesting to people who are still in need of more information. The second 
+document is the actual specification for the protocol, which might be less 
+interesting unless you are developing for the protocol or are really interested. 
+      </para>
+
+      <para>
+The protocol was originally developed for <systemitem>Telephony over 
+IP</systemitem>, or <systemitem>Voice over IP</systemitem> 
+(<systemitem>VoIP</systemitem>), and has some very interesting attributes due 
+to this. Industry grade <systemitem>VoIP</systemitem> requires very high 
+reliability for one, and this means that a lot of resilience has to be built 
+into the system to handle different kind of problems. The following is a list 
+of the basic features of <systemitem>SCTP</systemitem>. 
+      </para>
+
+      <itemizedlist>
+       <listitem>
+        <para>
+<systemitem>Unicast</systemitem> <indexterm> <primary>SCTP</primary>
+<secondary>Unicast</secondary> </indexterm> with
+<systemitem>Multicast</systemitem> <indexterm> <primary>SCTP</primary>
+<secondary>Multicast</secondary> </indexterm> properties. This means it is a
+<systemitem>point-to-point</systemitem> protocol but with the ability to use
+several addresses at the same end host. It can in other words use different
+paths to reach the end host. <systemitem>TCP</systemitem> in comparison breaks
+if the transport path breaks, unless the <systemitem>IP</systemitem> protocol
+corrects it.
+        </para>
+       </listitem>
+
+       <listitem>
+        <para>
+<systemitem>Reliable transmission</systemitem>. It uses checksums and 
+<systemitem>SACK</systemitem> <indexterm> <primary>SCTP</primary>
+<secondary>SACK</secondary> </indexterm> to detect corrupted, damaged,
+discarded, duplicated and reordered data. It can then retransmit data as
+necessary. This is pretty much the same as <systemitem>TCP</systemitem>, but
+<systemitem>SCTP</systemitem> is more resilient when it comes to reordered
+data and allows for faster pickups. 
+        </para>
+       </listitem>
+       
+       <listitem>
+        <para>
+<systemitem>Message oriented</systemitem>. <indexterm> <primary>SCTP</primary>
+<secondary>Message oriented</secondary> </indexterm> Each message can be
+framed and hence you can keep tabs on the structure and order of the
+datastream. <systemitem>TCP</systemitem> is byte oriented and all you get is a
+stream of bytes without any order between different data inside. You need an
+extra layer of abstraction in <systemitem>TCP</systemitem> in other words.
+        </para>
+       </listitem>
+       
+       <listitem>
+        <para>
+<systemitem>Rate adaptive</systemitem>.  <indexterm> <primary>SCTP</primary>
+<secondary>Rate adaptive</secondary> </indexterm> It is developed to cooperate
+and co-exist with <systemitem>TCP</systemitem> for bandwidth. It scales up and
+down based on network load conditions just the same as
+<systemitem>TCP</systemitem>. It also has the same algorithms for slow
+starting when packets where lost. <systemitem>ECN</systemitem> <indexterm>
+<primary>SCTP</primary> <secondary>ECN</secondary> </indexterm> is also
+supported.
+        </para>
+       </listitem>
+       
+       <listitem>
+        <para>
+<systemitem>Multi-homing</systemitem>. As previously mentioned, it is able to 
+set up different end nodes directly in the protocol, and hence doesn't have to 
+rely on the <systemitem>IP</systemitem> layer for resilience.
+        </para>
+       </listitem>
+       
+       <listitem>
+        <para>
+<systemitem>Multi-streaming</systemitem>. This allows for multiple simultaneous 
+streams inside the same stream. Hence the name <systemitem>Stream Control 
+Transmission Protocol</systemitem>. A single stream can for example be opened 
+to download a single webpage, and all the images and html documents can then 
+be downloaded within the same stream simultaneously. Or why not a database 
+protocol which can create a separate control stream and then use several 
+streams to receive the output from the different queries simultaneously.
+        </para>
+       </listitem>
+       
+       <listitem>
+        <para>
+<systemitem>Initiation</systemitem>. 4 packet initiation of connections where 
+packet 3 and 4 can be used to send data. The equivalent of 
+<systemitem>syncookies</systemitem> is implemented by default to avoid 
+<systemitem>DoS</systemitem> attacks. <systemitem>INIT collision 
+resolution</systemitem> to avoid several simultaneous 
+<systemitem>SCTP</systemitem> connections. 
+        </para>
+       </listitem>
+
+      </itemizedlist>
+
+      <para>
+This list could be made even longer, but I will not. Most of this information 
+is gathered from the <link linkend="rfc3286" endterm="rfc3286.title"></link> 
+document, so read on there for more information.
+      </para>
+
+      <note>
+       <para>
+In <systemitem>SCTP</systemitem> we talk about <systemitem>chunks</systemitem>, 
+not <systemitem>packets</systemitem> or <systemitem>windows</systemitem> 
+anymore. An <systemitem>SCTP frame</systemitem> can contain several different 
+<systemitem>chunks</systemitem> since the protocol is message oriented. A 
+<systemitem>chunk</systemitem> can either be a control or a data chunk. 
+<systemitem>Control chunks</systemitem> is used to control the session, and 
+<systemitem>data chunks</systemitem> are used to send actual data.
+       </para>
+      </note>
+
+      <section id="sctpinit">
+        <title id="sctp.init.title">Initialization and association</title>
+	<indexterm zone="sctpinit">
+          <primary>SCTP</primary>
+	  <secondary>Initialization</secondary>
+        </indexterm>
+	<indexterm zone="sctpinit">
+          <primary>SCTP</primary>
+	  <secondary>COOKIE ECHO</secondary>
+        </indexterm>
+	<indexterm zone="sctpinit">
+          <primary>SCTP</primary>
+	  <secondary>INIT</secondary>
+        </indexterm>
+	<indexterm zone="sctpinit">
+          <primary>SCTP</primary>
+	  <secondary>INIT ACK</secondary>
+        </indexterm>
+	<indexterm zone="sctpinit">
+          <primary>SCTP</primary>
+	  <secondary>COOKIE ACK</secondary>
+        </indexterm>
+	
+        <para>
+Each connection is initialized by creating an association between the two 
+hosts that wants to talk to each other. This association is initialized 
+when a user needs it. It is later used as needed.
+        </para>
+
+	<para>
+The initialization is done through 4 packets. First an <systemitem>INIT 
+chunk</systemitem> is sent, which is replied to with an <systemitem>INIT 
+ACK</systemitem> containing a cookie, after this the connection can start 
+sending data. However, two more packets are sent in the initialization. 
+The cookie is replied to with a <systemitem>COOKIE ECHO chunk</systemitem>, 
+which is finally replied to with a <systemitem>COOKIE ACK chunk</systemitem>.
+	</para>
+
+      </section>
+
+      <section id="sctpdata">
+        <title id="sctp.data.title">Data sending and control session</title>
+        <indexterm zone="sctpdata"> 
+	  <primary>SCTP</primary> 
+	  <secondary>Data sending and control session</secondary> 
+	</indexterm>
+        <indexterm zone="sctpdata"> 
+	  <primary>SCTP</primary> 
+	  <secondary>SACK</secondary> 
+	</indexterm>
+        <indexterm zone="sctpdata"> 
+	  <primary>SCTP</primary> 
+	  <secondary>DATA</secondary> 
+	</indexterm>
+        <indexterm zone="sctpdata"> 
+	  <primary>SCTP</primary> 
+	  <secondary>HEARTBEAT</secondary> 
+	</indexterm>
+        <indexterm zone="sctpdata"> 
+	  <primary>SCTP</primary> 
+	  <secondary>HEARTBEAT ACK</secondary> 
+	</indexterm>
+        <indexterm zone="sctpdata"> 
+	  <primary>SCTP</primary> 
+	  <secondary>ERROR</secondary> 
+	</indexterm>
+
+	<para>
+<systemitem>SCTP</systemitem> can at this point send data. In 
+<systemitem>SCTP</systemitem> there are <systemitem>control chunks</systemitem> 
+and <systemitem>data chunks</systemitem>, as previously stated. 
+<systemitem>Data chunks</systemitem> are sent using <systemitem>DATA 
+chunks</systemitem>, and <systemitem>DATA chunks</systemitem> are acknowledged 
+by sending a <systemitem>SACK chunk</systemitem>. This works practically the 
+same as a <systemitem>TCP SACK</systemitem>. <systemitem>SACK 
+chunks</systemitem> are <systemitem>control chunks</systemitem>.
+	</para>
+
+	<para>
+On top of this, there are some other <systemitem>control chunks</systemitem> 
+that can be seen. <systemitem>HEARTBEAT</systemitem> and <systemitem>HEARTBEAT 
+ACK</systemitem> chunks for one, and <systemitem>ERROR</systemitem> chunks for 
+another. <systemitem>HEARTBEAT</systemitem>s are used to keep the connection 
+alive, and <systemitem>ERROR</systemitem> is used to inform of different 
+problems or errors in the connection, such as invalid stream id's or missing 
+mandatory parameters et cetera. 
+	</para>
+
+      </section>
+
+      <section id="sctpshutdown">
+        <title id="sctp.shutdown.title">Shutdown and abort</title>
+        <indexterm zone="sctpshutdown"> 
+	  <primary>SCTP</primary> 
+	  <secondary>Shutdown and abort</secondary> 
+	</indexterm>
+        <indexterm zone="sctpshutdown"> 
+	  <primary>SCTP</primary> 
+	  <secondary>ABORT</secondary> 
+	</indexterm>
+        <indexterm zone="sctpshutdown"> 
+	  <primary>SCTP</primary> 
+	  <secondary>SHUTDOWN</secondary> 
+	</indexterm>
+        <indexterm zone="sctpshutdown"> 
+	  <primary>SCTP</primary> 
+	  <secondary>SHUTDOWN ACK</secondary> 
+	</indexterm>
+        <indexterm zone="sctpshutdown"> 
+	  <primary>SCTP</primary> 
+	  <secondary>SHUTDOWN COMPLETE</secondary> 
+	</indexterm>
+
+	<para>
+The <systemitem>SCTP</systemitem> connection is finally closed by either an 
+<systemitem>ABORT chunk</systemitem> or by a graceful 
+<systemitem>SHUTDOWN chunk</systemitem>. <systemitem>SCTP</systemitem> doesn't 
+have a half-closed state as <systemitem>TCP</systemitem>, in other words one 
+side can not continue sending data while the other end has closed its sending 
+socket. 
+        </para>
+
+	<para>
+When the user/application wants to close the <systemitem>SCTP</systemitem> 
+socket gracefully, it tells the protocol to <systemitem>SHUTDOWN</systemitem>. 
+<systemitem>SCTP</systemitem> then sends all the data still in its buffers, and 
+then sends a <systemitem>SHUTDOWN chunk</systemitem>. When the other end 
+receives the <systemitem>SHUTDOWN</systemitem>, it will stop accepting data 
+from the application and finish sending all the data. Once it has gotten all 
+the <systemitem>SACK</systemitem>'s for the data, it will send a 
+<systemitem>SHUTDOWN ACK chunk</systemitem> and once the closing side has 
+received this chunk, it will finally reply with a <systemitem>SHUTDOWN 
+COMPLETE chunk</systemitem>. The whole session is now closed.
+	</para>
+
+	<para>
+Another way of closing a session is to <systemitem>ABORT</systemitem> it. This 
+is an ungraceful way of removing an <systemitem>SCTP association</systemitem>. 
+When a connecting party wants to remove an <systemitem>SCTP 
+association</systemitem> instantaneously, 
+it sends an <systemitem>ABORT chunk</systemitem> with all the right values 
+signed. All data in the buffers et cetera will be discarded and the association 
+will then be removed. The receiving end will do the same after verifying the 
+<systemitem>ABORT chunk</systemitem>. 
+	</para>
+      </section>
+
+    </section>
+
+    <section id="sctpheaders">
+      <title id="sctpheaders.title">SCTP Headers</title>
+      <indexterm zone="sctpheaders">
+        <primary>SCTP</primary>
+	<secondary>Headers</secondary>
+      </indexterm>
+ 
+      <para>
+This will be a very brief introduction to the <systemitem>SCTP</systemitem>
+headers. <systemitem>SCTP</systemitem> has a lot of different types of
+packets, and hence I will try to follow the <systemitem>RFC</systemitem>'s as
+close as possible and how they depict the different headers, starting with a
+general overview of the headers applicable to all
+<systemitem>SCTP</systemitem> packets.
+      </para>
+
+      <section id="sctpheadergeneric">
+	<title id="sctpheader.generic.title">SCTP Generic header format</title>
+        <indexterm zone="sctpheadergeneric">
+          <primary>SCTP</primary>
+          <secondary>Generic Header format</secondary>
+        </indexterm>
+        <indexterm zone="sctpheadergeneric">
+          <primary>SCTP</primary>
+          <secondary>INIT</secondary>
+        </indexterm>
+        <indexterm zone="sctpheadergeneric">
+          <primary>SCTP</primary>
+          <secondary>INIT ACK</secondary>
+        </indexterm>
+        <indexterm zone="sctpheadergeneric">
+          <primary>SCTP</primary>
+          <secondary>SHUTDOWN COMPLETE</secondary>
+        </indexterm>
+        <indexterm zone="sctpheadergeneric">
+          <primary>SCTP</primary>
+          <secondary>DATA</secondary>
+        </indexterm>
+        <indexterm zone="sctpheadergeneric">
+          <primary>SCTP</primary>
+          <secondary>MTU</secondary>
+        </indexterm>
+        <indexterm zone="sctpheadergeneric">
+          <primary>MTU</primary>
+        </indexterm>
+
+        <para>
+          <mediaobject id="sctp.genericheaders">
+            <imageobject>
+              <imagedata
+fileref="images/sctp-generic-header.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/sctp-generic-header.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+	<para>
+This is a generic overview of how a <systemitem>SCTP</systemitem> packet is 
+laid out. Basically, you have a common header first with information describing 
+the whole packet, and the source and destination ports etc. See more below for 
+information on the common header.
+	</para>
+
+	<para>
+After the common header a variable number of chunks are sent, up to the maximum 
+possible in the <systemitem>MTU</systemitem>. All chunks can be bundled except 
+for <systemitem>INIT</systemitem>, <systemitem>INIT ACK</systemitem> and 
+<systemitem>SHUTDOWN COMPLETE</systemitem>, which must not be bundled. 
+<systemitem>DATA</systemitem> chunks may be broken down to fit inside the 
+<systemitem>MTU</systemitem> of the packets. 
+	</para>
+      </section>
+
+     <section id="sctpheadercommon">
+	<title id="sctpheader.common.title">SCTP Common and generic headers</title>
+        <indexterm zone="sctpheadercommon">
+          <primary>SCTP</primary>
+          <secondary>Source port</secondary>
+        </indexterm>
+        <indexterm zone="sctpheadercommon">
+          <primary>SCTP</primary>
+          <secondary>Destination port</secondary>
+        </indexterm>
+        <indexterm zone="sctpheadercommon">
+          <primary>SCTP</primary>
+          <secondary>Verification tag</secondary>
+        </indexterm>
+        <indexterm zone="sctpheadercommon">
+          <primary>SCTP</primary>
+          <secondary>INIT</secondary>
+        </indexterm>
+        <indexterm zone="sctpheadercommon">
+          <primary>SCTP</primary>
+          <secondary>SHUTDOWN COMPLETE</secondary>
+        </indexterm>
+        <indexterm zone="sctpheadercommon">
+          <primary>SCTP</primary>
+          <secondary>ABORT</secondary>
+        </indexterm>
+        <indexterm zone="sctpheadercommon">
+          <primary>SCTP</primary>
+          <secondary>Checksum</secondary>
+        </indexterm>
+
+        <para>
+          <mediaobject id="sctp.commonheaders">
+            <imageobject>
+              <imagedata
+fileref="images/sctp-common-header.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/sctp-common-header.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+	<para>
+Every <systemitem>SCTP</systemitem> packet contains the Common header as seen above. The header contains 
+four different fields and is set for every <systemitem>SCTP</systemitem> packet.
+	</para>
+
+	<para>
+Source port - bit 0-15. This field gives the source port of the packet, which 
+port it was sent from. The same as for <systemitem>TCP</systemitem> and 
+<systemitem>UDP</systemitem> source port.
+	</para>
+
+	<para>
+Destination port - bit 16-31. This is the destination port of the packet, ie., 
+the port that the packet is going to. It is the same as for the 
+<systemitem>TCP</systemitem> and <systemitem>UDP</systemitem> destination port.
+	</para>
+
+	<para>
+Verification Tag - bit 32-63. The verification tag is used to verify that the 
+packet comes from the correct sender. It is always set to the same value as the 
+value received by the other peer in the Initiate Tag during the 
+<systemitem>association initialization</systemitem>, with a few exceptions:
+	</para>
+
+	<itemizedlist>
+	  <listitem>
+	    <para>
+An <systemitem>SCTP</systemitem> packet containing an 
+<systemitem>INIT</systemitem> chunk must have the Verification tag set to 0.
+            </para>
+	  </listitem>
+	  
+	  <listitem>
+	    <para>
+A <systemitem>SHUTDOWN COMPLETE</systemitem> chunk with the 
+<systemitem>T-bit</systemitem> set must have the verification tag copied from 
+the verification tag of the <systemitem>SHUTDOWN-ACK</systemitem> chunk. 
+            </para>
+	  </listitem>
+
+	  <listitem>
+	    <para>
+Packets containing <systemitem>ABORT</systemitem> chunk may have the 
+verification tag set to the same verification tag as the packet causing the 
+<systemitem>ABORT</systemitem>.
+            </para>
+	  </listitem>
+	</itemizedlist>
+
+	<para>
+Checksum - bit 64-95. A checksum calculated for the whole 
+<systemitem>SCTP</systemitem> packet based on the 
+<systemitem>Adler-32</systemitem> algorithm. Read <link linkend=rfc2960 
+endterm="rfc2960.title"></link>, appendix B for more information about this 
+algorithm.
+        </para>
+
+          <mediaobject id="sctp.chunk.genericheaders">
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunks-generic-fields.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunks-generic-fields.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+
+        <para>
+All <systemitem>SCTP</systemitem> chunks has a special layout that they all
+adhere to as can be seen above. This isn't an actual header, but rather a
+formalized way of how they do look. 
+	</para>
+
+	<para>
+Type - bit 0-7. This field specifies the chunk type of the packet, for example
+is it an <systemitem>INIT</systemitem> or <systemitem>SHUTDOWN</systemitem>
+chunk or what? Each chunk type has a specific number, and is specified in the
+image below. Here is a complete list of Chunk types:
+	</para>
+
+	<table frame=all id="table.sctptypes">
+	  <title id="table.sctptypes.title">SCTP Types</title>
+	  <tgroup cols=2 align=left colsep=1 rowsep=1>
+	    <colspec colwidth="42pt">
+	    <colspec colwidth="*">
+	    <thead>
+	      <row>
+	        <entry>Chunk Number</entry>
+		<entry>Chunk Name</entry>
+	      </row>
+	    </thead>
+
+	    <tbody>
+	      <row>
+	        <entry>0</entry>
+		<entry>Payload Data (DATA)</entry>
+	      </row>
+
+	      <row>
+	        <entry>1</entry>
+		<entry>Initiation (INIT)</entry>
+	      </row>
+
+	      <row>
+	        <entry>2</entry>
+		<entry>Initiation Acknowledgement (INIT ACK)</entry>
+	      </row>
+
+	      <row>
+	        <entry>3</entry>
+		<entry>Selective Acknowledgement (SACK)</entry>
+	      </row>
+
+	      <row>
+	        <entry>4</entry>
+		<entry>Heartbeat Request (HEARTBEAT)</entry>
+	      </row>
+
+	      <row>
+	        <entry>5</entry>
+		<entry>Heartbeat Acknowledgement (HEARTBEAT ACK)</entry>
+	      </row>
+
+
+	      <row>
+	        <entry>6</entry>
+		<entry>Abort (ABORT)</entry>
+	      </row>
+
+	      <row>
+	        <entry>7</entry>
+		<entry>Shutdown (SHUTDOWN)</entry>
+	      </row>
+
+	      <row>
+	        <entry>8</entry>
+		<entry>Shutdown Acknowledgement (SHUTDOWN ACK)</entry>
+	      </row>
+
+	      <row>
+	        <entry>9</entry>
+		<entry>Operation Error (ERROR)</entry>
+	      </row>
+
+	      <row>
+	        <entry>10</entry>
+		<entry>State Cookie (COOKIE ECHO)</entry>
+	      </row>
+
+	      <row>
+	        <entry>11</entry>
+		<entry>Cookie Acknowledgement (COOKIE ACK)</entry>
+	      </row>
+
+	      <row>
+	        <entry>12</entry>
+		<entry>Reserved for Explicit Congestion Notification Echo
+(ECNE)</entry>
+	      </row>
+
+	      <row>
+	        <entry>13</entry>
+		<entry>Reserved for Congestion Window Reduced (CWR)</entry>
+	      </row>
+
+	      <row>
+	        <entry>14</entry>
+		<entry>Shutdown Complete (SHUTDOWN COMPLETE)</entry>
+	      </row>
+
+	      <row>
+	        <entry>15-62</entry>
+		<entry>Reserved for IETF</entry>
+	      </row>
+
+	      <row>
+	        <entry>63</entry>
+		<entry>IETF-defined chunk extensions</entry>
+	      </row>
+
+	      <row>
+	        <entry>64-126</entry>
+		<entry>reserved to IETF</entry>
+	      </row>
+	      
+	      <row>
+	        <entry>127</entry>
+		<entry>IETF-defined chunk extensions</entry>
+	      </row>
+
+	      <row>
+	        <entry>128-190</entry>
+		<entry>reserved to IETF</entry>
+	      </row>
+
+	      <row>
+	        <entry>191</entry>
+		<entry>IETF-defined chunk extensions</entry>
+	      </row>
+	      <row>
+	        <entry>192-254</entry>
+		<entry>reserved to IETF</entry>
+	      </row>
+	      <row>
+	        <entry>255</entry>
+		<entry>IETF-defined chunk extensions</entry>
+	      </row>
+
+	    </tbody>
+
+	</table>
+
+	<para>
+Chunk Flags<indexterm> <primary>SCTP</primary> <secondary>Chunk
+Flags</secondary> </indexterm> - bit 8-15. The chunk flags are generally not
+used but are set up for future usage if nothing else. They are chunk specific
+flags or bits of information that might be needed for the other peer.
+According to specifications, flags are only used in
+<systemitem>DATA</systemitem>, <systemitem>ABORT</systemitem> and
+<systemitem>SHUTDOWN COMPLETE</systemitem> packets at this moment. This may
+change however.
+	</para>
+
+	<important>
+	  <para>
+A lot of times when you read an RFC, you might run into some old proven
+problems. The <link linkend="rfc2960" endterm="rfc2960.title"></link> document
+is one example of this, where they specifically specify that the Chunk flags
+should always be set to 0 and ignored unless used for something. This is
+written all over the place, and it begs for problems in the future. If you do
+firewalling or routing, watch out very carefully for this, since specifications
+for fields like this may change in the future and hence break at your firewall
+without any legit reason. This happened before with the implementation of ECN
+in the IP headers for example. See more in the <link linkend="ipheaders"
+endterm="ipheaders.title"></link> section of this chapter.
+	  </para>
+	</important>
+
+	<para>
+Chunk Length<indexterm> <primary>SCTP</primary> <secondary>Chunk
+Length</secondary> </indexterm> - bit 16-31. This is the chunk length
+calculated in bytes. It includes all headers, including the chunk type, chunk
+flags, chunk length and chunk value. If there is no chunk value, the chunk
+length will be set to 4 (bytes).
+	</para>
+
+	<para>
+Chunk Value<indexterm> <primary>SCTP</primary> <secondary>Chunk
+Value</secondary> </indexterm> - bit 32-n. This is specific to each chunk and
+may contain more flags and data pertaining to the chunk type. Sometimes it
+might be empty, in which case the chunk length will be set to 4. 
+	</para>
+      </section>
+
+     <section id="sctpheaderabort">
+       <title id="sctpheader.abort.title">SCTP ABORT chunk</title>
+       <indexterm zone="sctpheaderabort">
+         <primary>SCTP</primary>
+         <secondary>ABORT</secondary>
+       </indexterm>
+
+       <para>
+          <mediaobject id="sctp.chunk.abortheaders">
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-abort-header.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-abort-header.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+	<para>
+The <systemitem>ABORT</systemitem> chunk is used to abort an association as
+previously described in the <link linkend="sctpshutdown"
+endterm="sctp.shutdown.title"></link> section of this chapter.
+<systemitem>ABORT</systemitem> is issued upon unrecoverable errors in the
+association such as bad headers or data.
+	</para>
+
+	<para>
+Type<indexterm> <primary>SCTP</primary> <secondary>Type</secondary>
+</indexterm> - bit 0-7. Always set to 6 for this chunk type.
+	</para>
+
+	<para>
+Reserved - bit 8-14. Reserved for future chunk flags but not used as of writing
+this. See the <link linkend="sctpheadercommon"
+endterm="sctpheader.common.title"></link> for more information about the chunk
+flags field.
+	</para>
+
+	<para>
+T-bit<indexterm> <primary>SCTP</primary> <secondary>T-bit</secondary>
+</indexterm> - bit 15. If this bit is set to 0, the sender had a
+<systemitem>TCB</systemitem><indexterm> <primary>SCTP</primary>
+<secondary>TCB</secondary> </indexterm> associated with this packet that it
+has destroyed. If the sender had no <systemitem>TCB</systemitem> the
+<systemitem>T-bit</systemitem> should be set to 1.
+	</para>
+
+	<para>
+Length <indexterm> <primary>SCTP</primary> <secondary>Length</secondary>
+</indexterm>- bit 16-31. Sets the length of the chunk in bytes including error
+causes.
+	</para>
+      </section>
+
+     <section id="sctpheadercookie-ack">
+       <title id="sctpheader.cookie-ack.title">SCTP COOKIE ACK chunk</title>
+       <indexterm zone="sctpheadercookie-ack">
+         <primary>SCTP</primary>
+         <secondary>COOKIE ACK</secondary>
+       </indexterm>
+
+       <para>
+          <mediaobject id="sctp.chunk.cookieackheaders">
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-cookie-ack-header.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-cookie-ack-header.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+	<para>
+The <systemitem>COOKIE ACK</systemitem> chunk is used during the initialization 
+of the connection and never anywhere else in the connection. It must precede
+all <systemitem>DATA</systemitem> and <systemitem>SACK</systemitem> chunks but 
+may be sent in the same packet as the first of these packets.
+	</para>
+
+	<para>
+Type - bit 0-7. Always set to 11 for this type.
+	</para>
+
+	<para>
+Chunk flags - bit 8-15. Not used so far. Should always be set to 0 according to
+<link linkend="rfc2960" endterm="rfc2960.title"></link>. You should always
+watch out for this kind of specific behaviour stated by RFC's since it might
+change in the future, and hence break your firewalls etc. Just the same as
+happened with <systemitem>IP</systemitem> and <systemitem>ECN</systemitem>. See
+the <link linkend="sctpheadercommon" endterm="sctpheader.common.title"></link>
+section for more information.
+	</para>
+
+	<para>
+Length <indexterm> <primary>SCTP</primary> <secondary>Length</secondary>
+</indexterm>- bit 16-31. Should always be 4 (bytes) for this chunk.
+	</para>
+      </section>
+
+     <section id="sctpheadercookie-echo">
+       <title id="sctpheader.cookie-echo.title">SCTP COOKIE ECHO chunk</title>
+       <indexterm zone="sctpheadercookie-echo">
+         <primary>SCTP</primary>
+         <secondary>COOKIE ECHO</secondary>
+       </indexterm>
+
+       <para>
+          <mediaobject id="sctp.chunk.cookieechoheaders">
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-cookie-echo-header.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-cookie-echo-header.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+	<para>
+The <systemitem>COOKIE ECHO</systemitem> chunk is used during the
+initialization of the <systemitem>SCTP</systemitem> connection by the
+initiating party to reply to the cookie sent by the responding party in
+the <systemitem>State cookie</systemitem> field in the <systemitem>INIT
+ACK</systemitem> packet. It may be sent together with
+<systemitem>DATA</systemitem> chunks in the same packet, but must precede the
+<systemitem>DATA</systemitem> chunks in such case.
+	</para>
+
+	<para>
+Type - bit 0-7. The chunk type is always set to 10 for this chunk.
+	</para>
+
+	<para>
+Chunk flags <indexterm> <primary>SCTP</primary> <secondary>Chunk
+flags</secondary> </indexterm>- bit 8-15. This field is not used today. The
+<systemitem>RFC</systemitem> specifies that the flags should always be set to
+0, but this might cause trouble as can be seen in the <link
+linkend="sctpheadercommon" endterm="sctpheader.common.title"></link> section
+above, specifically the Chunk flags explanation.
+	</para>
+
+	<para>
+Length <indexterm> <primary>SCTP</primary> <secondary>Length</secondary>
+</indexterm>- bit 16-31. Specifies the length of the chunk, including type,
+chunk flags, length and cookie fields in bytes.
+	</para>
+
+	<para>
+Cookie <indexterm> <primary>SCTP</primary> <secondary>Cookie</secondary>
+</indexterm>- bit 32-n. This field contains the cookie as sent in the previous
+<systemitem>INIT ACK</systemitem> chunk. It must be the exact same as the
+cookie sent by the responding party for the other end to actually open the
+connection. The <link linkend="rfc2960" endterm="rfc2960.title"></link>
+specifies that the cookie should be as small as possible to insure
+interoperability, which is very vague and doesn't say much.
+	</para>
+      </section>
+
+     <section id="sctpheaderdata">
+       <title id="sctpheader.data.title">SCTP DATA chunk</title>
+        <indexterm zone="sctpheaderdata">
+          <primary>SCTP</primary>
+          <secondary>DATA</secondary>
+        </indexterm>
+
+       <para>
+          <mediaobject id="sctp.chunk.dataheaders">
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-data-header.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-data-header.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+	<para>
+<systemitem>DATA</systemitem> chunks are used to send actual data through the
+stream and have rather complex headers in some ways, but not really worse than
+<systemitem>TCP</systemitem> headers in general. Each
+<systemitem>DATA</systemitem> chunk may be part of a different stream, since
+each <systemitem>SCTP</systemitem> connection can handle several different
+streams. 
+	</para>
+
+	<para>
+Type - bit 0-7. The Type field should always be set to 0 for DATA chunks.
+	</para>
+
+	<para>
+Reserved - bit 8-12. Not used today. Might be applicable for change. See <link
+linkend="sctpheadercommon" endterm="sctpheader.common.title"></link> for more
+information.
+	</para>
+
+	<para>
+U-bit <indexterm> <primary>SCTP</primary> <secondary>U-bit</secondary>
+</indexterm>- bit 13. The <systemitem>U-bit</systemitem> is used to indicate
+if this is an unordered <systemitem>DATA</systemitem> chunk. If it is, the
+<systemitem>Stream Sequence Number</systemitem> must be ignored by the
+receiving host and send it on to the upper layer without delay or tries to
+re-order the <systemitem>DATA</systemitem> chunks.
+	</para>
+
+	<para>
+B-bit <indexterm> <primary>SCTP</primary> <secondary>B-bit</secondary>
+</indexterm>- bit 14. The <systemitem>B-bit</systemitem> is used to indicate
+the beginning of a fragmented <systemitem>DATA</systemitem> chunk. If this bit
+is set and the E (ending) bit is not set, it indicates that this is the first
+fragment of a chunk that has been fragmented into several
+<systemitem>DATA</systemitem> chunks. 
+	</para>
+
+	<para>
+E-bit <indexterm> <primary>SCTP</primary> <secondary>E-bit</secondary>
+</indexterm>- bit 15. The <systemitem>E-bit</systemitem> is used to indicate
+the ending of a fragmented <systemitem>DATA</systemitem> chunk. If this flag
+is set on a chunk, it signals to the <systemitem>SCTP</systemitem> receiver
+that it can start reassembling the fragments and pass them on to the upper
+layer. If a packet has both the <systemitem>BE-bits</systemitem> set to set to
+0, it signals that the chunk is a middle part of a fragmented chunk. If both
+<systemitem>BE-bits</systemitem> are set to 1 it signals that the packet is
+unfragmented and requires no reassembly et cetera.
+	</para>
+
+	<para>
+Length <indexterm> <primary>SCTP</primary> <secondary>Length</secondary>
+</indexterm>- bit 16-31. The length of the whole <systemitem>DATA</systemitem>
+chunk calculated in bytes,including the chunk type field and on until the end
+of the chunk.
+	</para>
+
+	<para>
+TSN <indexterm> <primary>SCTP</primary> <secondary>TSN</secondary>
+</indexterm>- bit 32-63. The <systemitem>Transmission Sequence
+Number</systemitem> (<systemitem>TSN</systemitem>) is sent in the
+<systemitem>DATA</systemitem> chunk, and the receiving host uses the
+<systemitem>TSN</systemitem> to acknowledge that the chunk got through
+properly by replying with a <systemitem>SACK</systemitem> chunk. This is an
+overall value for the whole <systemitem>SCTP</systemitem> association.
+	</para>
+
+	<para>
+Stream Identifier <indexterm> <primary>SCTP</primary> <secondary>Stream
+Identifier</secondary> </indexterm>- bit 64-79. The <systemitem>Stream
+Identifier</systemitem> is sent along with the <systemitem>DATA</systemitem>
+chunk to identify which stream the <systemitem>DATA</systemitem> chunk is
+associated with. This is used since <systemitem>SCTP</systemitem> can
+transport several streams within a single association.
+	</para>
+
+	<para>
+Stream Sequence Number <indexterm> <primary>SCTP</primary> <secondary>Stream
+Sequence Number</secondary> </indexterm>- bit 80-95. This is the sequence
+number of the chunk for the specific stream identified by the
+<systemitem>Stream Identifier</systemitem>. This sequence number is specific
+for each stream identifier. If a chunk has been fragmented, the
+<systemitem>Stream Sequence Number</systemitem> must be the same for all
+fragments of the original chunk. 
+	</para>
+
+	<para>
+Payload Protocol Identifier <indexterm> <primary>SCTP</primary>
+<secondary>Payload Protocol Identifier</secondary> </indexterm>- bit 96-127.
+This value is filled in by the upper layers, or applications using the
+<systemitem>SCTP</systemitem> protocol as a way to identify to each other the
+content of the <systemitem>DATA</systemitem> chunk. The field must always be
+sent, including in fragments since routers and firewalls, et cetera, on the
+way might need the information. If the value was set to 0, the value was not
+set by the upper layers.
+	</para>
+
+	<para>
+User data <indexterm> <primary>SCTP</primary> <secondary>User data</secondary>
+</indexterm>- bit 128-n. This is the actual data that the chunk is
+transporting. It can be of variable length, ending on an even octet. It is the
+data in the stream as specified by the stream sequence number n in the stream
+S. 
+	</para>
+      </section>
+
+     <section id="sctpheadererror">
+	<title id="sctpheader.error.title">SCTP ERROR chunk</title>
+        <indexterm zone="sctpheadererror">
+          <primary>SCTP</primary>
+          <secondary>ERROR</secondary>
+        </indexterm>
+
+        <para>
+          <mediaobject id="sctp.chunk.errorheaders">
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-error-header.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-error-header.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+	<para>
+The <systemitem>ERROR</systemitem> chunk is sent to inform the other peer of
+any problems within the current stream. Each <systemitem>ERROR</systemitem>
+chunk can contain one or more <systemitem>Error Causes</systemitem>, which are
+more specifically detailed in the <link linkend="rfc2960"
+endterm="rfc2960.title"></link> document. I will not go into further details
+here than the basic <systemitem>ERROR</systemitem> chunk, since it would be too
+much information. The <systemitem>ERROR</systemitem> chunk is not fatal in and
+of itself, but rather details an error that has happened. It may however be
+used together with an <systemitem>ABORT</systemitem> chunk to inform the peer
+of the error before killing the connection. 
+	</para>
+
+	<para>
+Type - bit 0-7. This value is always set to 9 for
+<systemitem>ERROR</systemitem> chunks. 
+	</para>
+
+	<para>
+Chunk flags <indexterm> <primary>SCTP</primary> <secondary>Chunk
+flags</secondary> </indexterm>- bit 8-15. Not used today. Might be applicable
+for change. See <link linkend="sctpheadercommon"
+endterm="sctpheader.common.title"></link> for more information.
+	</para>
+
+	<para>
+Length <indexterm> <primary>SCTP</primary> <secondary>Length</secondary>
+</indexterm>- bit 16-31. Specifies the length of the chunk in bytes, including
+all the <systemitem>Error Causes</systemitem>.
+	</para>
+
+	<para>
+Error causes <indexterm> <primary>SCTP</primary> <secondary>Error
+causes</secondary> </indexterm>- bit 32-n. Each <systemitem>ERROR</systemitem>
+chunk may contain one or more <systemitem>Error Causes</systemitem>, which
+notifies the opposite peer of a problem with the connection. Each
+<systemitem>Error Cause</systemitem> follows a specific format, as described
+in the <link linkend="rfc2960" endterm="rfc2960.title"></link> document. We
+will not go into them here more than to say that they all contain an
+<systemitem>Cause Code</systemitem>, cause length and cause specific
+information field. The following <systemitem>Error Causes</systemitem> are
+possible:
+	</para>
+<indexterm zone="tableerrorcauses">
+  <primary>SCTP</primary>
+  <secondary>ERROR</secondary>
+  <tertiary>Invalid Stream Identifier</tertiary>
+</indexterm>
+<indexterm zone="tableerrorcauses">
+  <primary>SCTP</primary>
+  <secondary>ERROR</secondary>
+  <tertiary>Missing Mandatory Parameter</tertiary>
+</indexterm>
+<indexterm zone="tableerrorcauses">
+  <primary>SCTP</primary>
+  <secondary>ERROR</secondary>
+  <tertiary>Stale Cookie Error</tertiary>
+</indexterm>
+<indexterm zone="tableerrorcauses">
+  <primary>SCTP</primary>
+  <secondary>ERROR</secondary>
+  <tertiary>Out of Resource</tertiary>
+</indexterm>
+<indexterm zone="tableerrorcauses">
+  <primary>SCTP</primary>
+  <secondary>ERROR</secondary>
+  <tertiary>Unresolvable Address</tertiary>
+</indexterm>
+<indexterm zone="tableerrorcauses">
+  <primary>SCTP</primary>
+  <secondary>ERROR</secondary>
+  <tertiary>Unrecognized Chunk Type</tertiary>
+</indexterm>
+<indexterm zone="tableerrorcauses">
+  <primary>SCTP</primary>
+  <secondary>ERROR</secondary>
+  <tertiary>Invalid Mandatory Parameter</tertiary>
+</indexterm>
+<indexterm zone="tableerrorcauses">
+  <primary>SCTP</primary>
+  <secondary>ERROR</secondary>
+  <tertiary>Unrecognized Parameters</tertiary>
+</indexterm>
+<indexterm zone="tableerrorcauses">
+  <primary>SCTP</primary>
+  <secondary>ERROR</secondary>
+  <tertiary>No User Data</tertiary>
+</indexterm>
+<indexterm zone="tableerrorcauses">
+  <primary>SCTP</primary>
+  <secondary>ERROR</secondary>
+  <tertiary>Cookie Received While Shutting Down</tertiary>
+</indexterm>
+
+	<table frame=all id="tableerrorcauses">
+	  <title id="table.errorcauses.title">Error Causes</title>
+	  <tgroup cols=2 align=left colsep=1 rowsep=1>
+	    <colspec colwidth="36pt">
+	    <colspec colwidth="*">
+	    <thead>
+	      <row>
+	        <entry>Cause Value</entry>
+		<entry>Chunk Code</entry>
+	      </row>
+	    </thead>
+
+	    <tbody>
+	      <row>
+	        <entry>1</entry>
+		<entry>Invalid Stream Identifier</entry>
+	      </row>
+	      
+	      <row>
+	        <entry>2</entry>
+		<entry>Missing Mandatory Parameter</entry>
+	      </row>
+
+	      <row>
+	        <entry>3</entry>
+		<entry>Stale Cookie Error</entry>
+	      </row>
+
+	      <row>
+	        <entry>4</entry>
+		<entry>Out of Resource</entry>
+	      </row>
+
+	      <row>
+	        <entry>5</entry>
+		<entry>Unresolvable Address</entry>
+	      </row>
+
+	      <row>
+	        <entry>6</entry>
+		<entry>Unrecognized Chunk Type</entry>
+	      </row>
+
+	      <row>
+	        <entry>7</entry>
+		<entry>Invalid Mandatory Parameter</entry>
+	      </row>
+
+	      <row>
+	        <entry>8</entry>
+		<entry>Unrecognized Parameters</entry>
+	      </row>
+
+	      <row>
+	        <entry>9</entry>
+		<entry>No User Data</entry>
+	      </row>
+
+	      <row>
+	        <entry>10</entry>
+		<entry>Cookie Received While Shutting Down</entry>
+	      </row>
+	    </tbody>
+	  </tgroup>
+	</table>
+
+      </section>
+
+      <section id="sctpheaderheartbeat">
+	<title id="sctpheader.heartbeat.title">SCTP HEARTBEAT chunk</title>
+        <indexterm zone="sctpheaderheartbeat">
+          <primary>SCTP</primary>
+          <secondary>HEARTBEAT</secondary>
+        </indexterm>
+
+        <para>
+          <mediaobject id="sctp.chunk.heartbeatheaders">
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-heartbeat-header.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-heartbeat-header.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+	<para>
+The <systemitem>HEARTBEAT</systemitem> chunk is sent by one of the peers to
+probe and find out if a specific <systemitem>SCTP</systemitem> endpoint address
+is up. This is sent to the different addresses that was negotiated during the
+initialization of the association to find out if they are all up.
+	</para>
+
+	<para>
+Type - bit 0-7. The type is always set to 4 for
+<systemitem>HEARTBEAT</systemitem> chunks.
+	</para>
+
+	<para>
+Chunk flags <indexterm> <primary>SCTP</primary> <secondary>Chunk
+flags</secondary> </indexterm>- bit 8-15. Not used today. Might be applicable
+for change. See <link linkend="sctpheadercommon"
+endterm="sctpheader.common.title"></link> for more information.
+	</para>
+
+	<para>
+Length <indexterm> <primary>SCTP</primary> <secondary>Length</secondary>
+</indexterm>- bit 16-31. The length of the whole chunk, including the
+<systemitem>Heartbeat Information TLV</systemitem>. 
+	</para>
+
+	<para>
+Heartbeat Information TLV <indexterm> <primary>SCTP</primary>
+<secondary>Heartbeat Information TLV</secondary> </indexterm>- bit 32-n. This
+is a variable-length parameter as defined inside the <link linkend="rfc2960"
+endterm="rfc2960.title"></link> document. This is a mandatory parameter for
+the <systemitem>HEARTBEAT</systemitem> chunks that contains 3 fields, info
+type = 1, info length and a sender-specific <systemitem>Heartbeat
+Information</systemitem> parameter. The last field should be a sender-specific
+information field of some kind, for example a timestamp when the heartbeat was
+sent and a destination IP address. This is then returned in the
+<systemitem>HEARTBEAT ACK</systemitem> chunk.
+        </para>
+
+      </section>
+
+      <section id="sctpheaderheartbeat-ack">
+	<title id="sctpheader.heartbeat-ack.title">SCTP HEARTBEAT ACK chunk</title>
+        <indexterm zone="sctpheaderheartbeat-ack">
+          <primary>SCTP</primary>
+          <secondary>HEARTBEAT ACK</secondary>
+        </indexterm>
+
+        <para>
+          <mediaobject id="sctp.chunk.heartbeatackheaders">
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-heartbeat-ack-header.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-heartbeat-ack-header.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+	<para>
+The <systemitem>HEARTBEAT ACK</systemitem> is used to acknowledge that a
+<systemitem>HEARTBEAT</systemitem> was received and that the connection is
+working properly. The chunk is always sent to the same IP address as the
+request was sent from. 
+	</para>
+
+	<para>
+Type - bit 0-7. Always set to 5 for <systemitem>HEARTBEAT ACK</systemitem>
+chunks. 
+	</para>
+
+	<para>
+Chunk flags - bit 8-15. Not used today. Might be applicable
+for change. See <link linkend="sctpheadercommon"
+endterm="sctpheader.common.title"></link> for more information.
+	</para>
+
+	<para>
+Chunk length <indexterm> <primary>SCTP</primary> <secondary>Chunk
+length</secondary> </indexterm>- bit 16-31. The length of the
+<systemitem>HEARTBEAT ACK</systemitem> chunk including the
+<systemitem>Heartbeat Information TLV</systemitem>, calculated in bytes. 
+	</para>
+
+	<para>
+Heartbeat Information TLV <indexterm> <primary>SCTP</primary>
+<secondary>Heartbeat Information TLV</secondary> </indexterm>- bit 32-n. This
+field must contain the <systemitem>Heartbeat Information</systemitem>
+parameter that was sent in the original <systemitem>HEARTBEAT</systemitem>
+chunk. 
+	</para>
+      </section>
+
+      <section id="sctpheaderinit">
+	<title id="sctpheader.init.title">SCTP INIT chunk</title>
+        <indexterm zone="sctpheaderinit">
+          <primary>SCTP</primary>
+          <secondary>INIT</secondary>
+        </indexterm>
+
+        <para>
+          <mediaobject id="sctp.chunk.initheaders">
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-init-header.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-init-header.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+	<para>
+The <systemitem>INIT</systemitem> chunk is used to initiate a new association
+with a destination host, and is the first chunk to be sent by the connecting
+host. The <systemitem>INIT</systemitem> chunk contains several mandatory fixed
+length parameters, and some optional variable length parameters. The fixed
+length mandatory parameters are already in the above headers, and are the
+<systemitem>Initiate Tag</systemitem>, <systemitem>Advertised Receiver Window
+Credit</systemitem>, <systemitem>Number of Outbound Streams</systemitem>,
+<systemitem>Number of Inbound Streams</systemitem> and the <systemitem>Initial
+TSN</systemitem> parameters. After this comes a couple of optional parameters,
+they will be listed with the optional parameters paragraph below.
+	</para>
+
+	<para>
+Type - bit 0-7. The type field is always set to 1 for
+<systemitem>INIT</systemitem> chunks. 
+	</para>
+
+	<para>
+Chunk flags <indexterm> <primary>SCTP</primary> <secondary>Chunk
+flags</secondary> </indexterm>- bit 8-15. Not used today. Might be applicable
+for change. See <link linkend="sctpheadercommon"
+endterm="sctpheader.common.title"></link> for more information.
+	</para>
+
+	<para>
+Chunk Length <indexterm> <primary>SCTP</primary> <secondary>Chunk
+Length</secondary> </indexterm>- bit 16-31. The chunk length is the length of
+the whole packet, including everything in the headers, including the optional
+parameters.
+	</para>
+
+	<para>
+Initiate Tag <indexterm> <primary>SCTP</primary> <secondary>Initiate
+Tag</secondary> </indexterm>- bit 32-63. The <systemitem>Initiate
+Tag</systemitem> is set within the <systemitem>INIT</systemitem> chunk and
+must be used by the receiver to acknowledge all packets henceforth, within the
+<systemitem>Verification Tag</systemitem> of the established association. The
+<systemitem>Initiate Tag</systemitem> may take any value except 0. If the
+value is 0 anyways, the receiver must react with an
+<systemitem>ABORT</systemitem>. 
+	</para>
+
+	<para>
+Advertised Receiver Window Credit (a_rwnd)<indexterm> <primary>SCTP</primary>
+<secondary>Advertised Receiver Window Credit</secondary> </indexterm>- bit
+64-95. This is the minimum receiving buffer that the sender of the
+<systemitem>INIT</systemitem> chunk will allocate for this association, in
+bytes. This can then be used by the receiver of the
+<systemitem>a_rwnd</systemitem>, to know how much data it can send out without
+being <systemitem>SACK</systemitem>'ed. This window should not be lessened,
+but it might by sending the new a_rwnd in a <systemitem>SACK</systemitem>
+chunk.
+	</para>
+
+	<para>
+Number of Outbound Streams - bit 96-111. This specifies the maximum number of
+outbound streams that the connecting host wishes to create to the receiving
+host. The value must not be 0, and if it is, the receiving host should
+<systemitem>ABORT</systemitem> the association immediately. There is no
+<indexterm> <primary>SCTP</primary> <secondary>Number of Outbound
+Streams</secondary> </indexterm>negotiation of the minimum number of outbound
+or inbound streams, it is simply set to the lowest that either host has set in
+the header.
+	</para>
+
+	<para>
+Number of Inbound Streams <indexterm> <primary>SCTP</primary>
+<secondary>Number of Inbound Streams</secondary> </indexterm>- bit 112-127.
+Specifies the maximum number of inbound connections that the sending peer will
+allow the receiving host to create in this association. This must not be set
+to 0, or the receiving host should <systemitem>ABORT</systemitem> the
+connection. There is no negotiation of the minimum number of outbound or
+inbound streams, it is simply set to the lowest that either host has set in
+the header.
+	</para>
+
+	<para>
+Initial TSN <indexterm> <primary>SCTP</primary> <secondary>Initial
+TSN</secondary> </indexterm>- bit 128-159. This value sets the initial
+<systemitem>Transmit Sequence Number</systemitem>
+(<systemitem>TSN</systemitem>) that the sender will use when sending data. The
+field may be set to the same value as the <systemitem>Initiate
+Tag</systemitem>. 
+	</para>
+
+	<para>
+On top of the above mandatory fixed length headers, there are also some
+optional variable length parameters that might be set, and at least one of the
+<systemitem>IPv4</systemitem>, <systemitem>IPv6</systemitem> or
+<systemitem>Hostname</systemitem> parameters must be set. Only one
+<systemitem>Hostname</systemitem> may be set, and if a
+<systemitem>Hostname</systemitem> is set, no <systemitem>IPv4</systemitem> or
+<systemitem>IPv6</systemitem> parameters may be set. Multiple
+<systemitem>IPv4</systemitem> and <systemitem>IPv6</systemitem> parameters may
+also be set in the same <systemitem>INIT</systemitem> chunk. Also, none of
+these parameters needs to be set in case the sender only has one address that
+can be reached, which is where the chunk should be coming from. These
+parameters are used to set up which addresses may be used to connect to the
+other end of the association. This is a full list of all the parameters
+available in the <systemitem>INIT</systemitem> chunk:
+	</para>
+
+<indexterm zone="tableinitparameters">
+  <primary>SCTP</primary>
+  <secondary>INIT</secondary>
+  <tertiary>Variable Parameters</tertiary>
+</indexterm>
+
+	<table frame=all id="tableinitparameters">
+	  <title id="table.initparameters.title">INIT Variable Parameters</title>
+	  <tgroup cols=3 align=left colsep=1 rowsep=1>
+	    <colspec colwidth="4*">
+	    <colspec colwidth="2*">
+	    <colspec colwidth="2*">
+	    <thead>
+	      <row>
+	        <entry>Parameter Name</entry>
+		<entry>Status</entry>
+		<entry>Type Value</entry>
+	      </row>
+	    </thead>
+
+	    <tbody>
+	      <row>
+		<entry>IPv4 Address</entry>
+	        <entry>Optional</entry>
+	        <entry>5</entry>
+	      </row>
+
+	      <row>
+		<entry>IPv6 Address</entry>
+	        <entry>Optional</entry>
+	        <entry>6</entry>
+	      </row>
+
+	      <row>
+		<entry>Cookie Preservative</entry>
+	        <entry>Optional</entry>
+	        <entry>9</entry>
+	      </row>
+
+	      <row>
+		<entry>Host Name Address</entry>
+	        <entry>Optional</entry>
+	        <entry>11</entry>
+	      </row>
+
+	      <row>
+		<entry>Supported Address Types</entry>
+	        <entry>Optional</entry>
+	        <entry>12</entry>
+	      </row>
+
+	      <row>
+		<entry>Reserved for ECN Capable</entry>
+	        <entry>Optional</entry>
+	        <entry>32768</entry>
+	      </row>
+
+	    </tbody>
+	  </tgroup>
+	</table>
+
+	<para>
+Below we describe the three most common Parameters used in the
+<systemitem>INIT</systemitem> chunk.
+	</para>
+	
+
+        <para>
+          <mediaobject id="sctp.chunk.init.paramipv4.headers">
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-init-param-ipv4-header.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-init-param-ipv4-header.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+	<para>
+The <systemitem>IPv4</systemitem> parameter is used to send an
+<systemitem>IPv4</systemitem> address in the <systemitem>INIT</systemitem>
+chunk. The <systemitem>IPv4</systemitem> address can be used to send data
+through the association. Multiple <systemitem>IPv4</systemitem> and
+<systemitem>IPv6</systemitem> addresses can be specified for a single
+<systemitem>SCTP</systemitem> association. 
+	</para>
+
+	<para>
+Parameter Type - bit 0-15. This is always set to 5 for
+<systemitem>IPv4</systemitem> address parameters. 
+	</para>
+
+	<para>
+Length - bit 16-31. This is always set to 8 for <systemitem>IPv4</systemitem>
+address parameters.
+	</para>
+
+	<para>
+IPv4 Address - bit 32-63. This is an <systemitem>IPv4</systemitem> address of
+the sending endpoint. 
+	</para>
+
+        <para>
+          <mediaobject id="sctp.chunk.init.paramipv6.headers">
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-init-param-ipv6-header.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-init-param-ipv6-header.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+	<para>
+This parameter is used to send <systemitem>IPv6</systemitem> addresses in the
+<systemitem>INIT</systemitem> chunk. This address can then be used to contact
+the sending endpoint with this association.
+	</para>
+
+	<para>
+Type - bit 0-15. Always set to 6 for the <systemitem>IPv6</systemitem>
+parameters. 
+	</para>
+
+	<para>
+Length bit 16-31. Always set to 20 for <systemitem>IPv6</systemitem>
+parameters. 
+	</para>
+
+	<para>
+IPv6 address - bit 32-159. This is an <systemitem>IPv6</systemitem> address of
+the sending endpoint that can be used to connect to by the receiving endpoint.
+	</para>
+
+        <para>
+          <mediaobject id="sctp.chunk.init.paramhostname.headers">
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-init-param-host-name-header.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-init-param-host-name-header.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+	<para>
+The <systemitem>Hostname</systemitem> parameter is used to send a single
+hostname as an address. Thea receiving host must then look up the hostname and
+use any and/or all of the addresses it receives from there. If a hostname
+parameter is sent, no other <systemitem>IPv4</systemitem>,
+<systemitem>IPv6</systemitem> or <systemitem>Hostname</systemitem> parameters
+may be sent.
+	</para>
+
+	<para>
+Type - bit 0-15. This is always set to 11 for <systemitem>Hostname</systemitem>
+Parameters.
+	</para>
+
+	<para>
+Length - bit 16-31. The length of the whole parameter, including type, length
+and hostname field. The <systemitem>Hostname</systemitem> field is variable
+length. The length is counted in bytes.
+	</para>
+
+	<para>
+Hostname - bit 32-n. A variable length parameter containing a hostname. The
+hostname is resolved by the receiving end to get the addresses that can be used
+to contact the sending endpoint. 
+	</para>
+
+      </section>
+      
+     <section id="sctpheaderinit-ack">
+	<title id="sctpheader.init-ack.title">SCTP INIT ACK chunk</title>
+        <indexterm zone="sctpheaderinit-ack">
+          <primary>SCTP</primary>
+          <secondary>INIT ACK</secondary>
+        </indexterm>
+
+        <para>
+          <mediaobject id="sctp.chunk.initackheaders">
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-init-ack-header.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-init-ack-header.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+	<para>
+The <systemitem>INIT ACK</systemitem> chunk is sent in response to a
+<systemitem>INIT</systemitem> chunk and contains basically the same headers,
+but with values from the recipient of the original
+<systemitem>INIT</systemitem> chunk. In addition, it has two extra variable
+length parameters, the <systemitem>State Cookie</systemitem> and the
+<systemitem>Unrecognized Parameter</systemitem> parameters.
+	</para>
+
+	<para>
+Type - bit 0-7. This header is always set to 2 for <systemitem>INIT
+ACK</systemitem> chunks. 
+	</para>
+
+	<para>
+Chunk flags <indexterm> <primary>SCTP</primary> <secondary>Chunk
+flags</secondary> </indexterm>- bit 8-15. Not used today. Might be applicable
+for change. See <link linkend="sctpheadercommon"
+endterm="sctpheader.common.title"></link> for more information.
+	</para>
+
+	<para>
+Chunk Length <indexterm> <primary>SCTP</primary> <secondary>Chunk
+Length</secondary> </indexterm>- bit 16-31. The chunk length is the length of
+the whole packet, including everything in the headers, and the optional
+parameters.
+	</para>
+
+	<para>
+Initiate Tag <indexterm> <primary>SCTP</primary> <secondary>Initiate
+Tag</secondary> </indexterm>- bit 32-63. The receiver of the
+<systemitem>Initiate Tag</systemitem> of the <systemitem>INIT ACK</systemitem>
+chunk must save this value and copy it into the <systemitem>Verification
+Tag</systemitem> field of every packet that it sends to the sender of the
+<systemitem>INIT ACK</systemitem> chunk. The <systemitem>Initiate
+Tag</systemitem> must not be 0, and if it is, the receiver of the
+<systemitem>INIT ACK</systemitem> chunk must close the connection with an
+<systemitem>ABORT</systemitem>. 
+	</para>
+
+	<para>
+Advertised Receiver Window Credit (a_rwnd) <indexterm> <primary>SCTP</primary>
+<secondary>Advertised Receiver Window Credit</secondary> </indexterm>- bit
+64-95. The dedicated buffers that the sender of this chunk has located for
+traffic, counted in bytes. The dedicated buffers should never be lowered to
+below this value. 
+	</para>
+
+	<para>
+Number of Outbound Streams <indexterm> <primary>SCTP</primary>
+<secondary>Number of Outbound Streams</secondary> </indexterm>- bit 96-111.
+How many outbound streams that the sending host wishes to create. Must not be
+0, or the receiver of the <systemitem>INIT ACK</systemitem> should
+<systemitem>ABORT</systemitem> the association. There is no negotiation of the
+minimum number of outbound or inbound streams, it is simply set to the lowest
+that either host has set in the header.
+	</para>
+
+	<para>
+Number of Inbound Streams <indexterm> <primary>SCTP</primary>
+<secondary>Number of Inbound Streams</secondary> </indexterm>- bit 112-127.
+How many inbound streams that the sending endpoint is willing to accept. Must
+not be 0, or the receiver of the <systemitem>INIT ACK</systemitem> should
+<systemitem>ABORT</systemitem> the association. There is no negotiation of the
+minimum number of outbound or inbound streams, it is simply set to the lowest
+that either host has set in the header.
+	</para>
+
+	<para>
+Initial TSN <indexterm> <primary>SCTP</primary> <secondary>Initial
+TSN</secondary> </indexterm>- bit 128-159. This is set to the
+<systemitem>Initial Transmission Sequence Number</systemitem>
+(<systemitem>I-TSN</systemitem>) which will be used by the sending party in
+the association to start with.
+	</para>
+
+	<para>
+After this point, the <systemitem>INIT ACK</systemitem> chunk continues with
+optional variable-length parameters. The parameters are exactly the same as for
+the <systemitem>INIT</systemitem> chunk, with the exception of the addition of
+the <systemitem>State Cookie</systemitem> and the <systemitem>Unrecognized
+Parameters</systemitem> parameter, and the deletion of the
+<systemitem>Supported Address Types</systemitem> parameter. The list in other
+words look like this:
+	</para>
+
+<indexterm zone="tableinitackparameters">
+  <primary>SCTP</primary>
+  <secondary>INIT ACK</secondary>
+  <tertiary>Variable Parameters</tertiary>
+</indexterm>
+
+	<table frame=all id="tableinitackparameters">
+	  <title id="table.initackparameters.title">INIT ACK Variable Parameters</title>
+	  <tgroup cols=3 align=left colsep=1 rowsep=1>
+	    <colspec colwidth="4*">
+	    <colspec colwidth="2*">
+	    <colspec colwidth="2*">
+	    <thead>
+	      <row>
+	        <entry>Parameter Name</entry>
+		<entry>Status</entry>
+		<entry>Type Value</entry>
+	      </row>
+	    </thead>
+
+	    <tbody>
+	      <row>
+		<entry>IPv4 Address</entry>
+	        <entry>Optional</entry>
+	        <entry>5</entry>
+	      </row>
+
+	      <row>
+		<entry>IPv6 Address</entry>
+	        <entry>Optional</entry>
+	        <entry>6</entry>
+	      </row>
+
+	      <row>
+		<entry>State Cookie</entry>
+	        <entry>Mandatory</entry>
+	        <entry>7</entry>
+	      </row>
+
+	      <row>
+		<entry>Unrecognized Parameters</entry>
+	        <entry>Optional</entry>
+	        <entry>8</entry>
+	      </row>
+
+	      <row>
+		<entry>Cookie Preservative</entry>
+	        <entry>Optional</entry>
+	        <entry>9</entry>
+	      </row>
+
+	      <row>
+		<entry>Host Name Address</entry>
+	        <entry>Optional</entry>
+	        <entry>11</entry>
+	      </row>
+
+	      <row>
+		<entry>Reserved for ECN Capable</entry>
+	        <entry>Optional</entry>
+	        <entry>32768</entry>
+	      </row>
+
+	    </tbody>
+	  </tgroup>
+	</table>
+	
+        <para>
+          <mediaobject id="sctp.chunk.initack.param.statecookieheaders">
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-init-ack-param-state-cookie-header.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-init-ack-param-state-cookie-header.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+	<para>
+The <systemitem>State Cookie</systemitem> is used in <systemitem>INIT
+ACK</systemitem> to send a cookie to the other host, and until the receiving
+host has replied with a <systemitem>COOKIE ECHO</systemitem> chunk, the
+association is not guaranteed. This is to prevent basically the same as a
+<systemitem>SYN</systemitem> attack in <systemitem>TCP</systemitem> protocol. 
+	</para>
+
+	<para>
+Type - bit 0-15. Always set to 7 for all <systemitem>State Cookie</systemitem>
+parameters.
+	</para>
+
+	<para>
+Length - bit 16-31. The size of the whole parameter, including the type, length
+and <systemitem>State Cookie</systemitem> field in bytes.
+	</para>
+
+	<para>
+State Cookie - bit 31-n. This parameter contains a cookie of variable length.
+For a description on how this cookie is created, see the <link
+linkend="rfc2960" endterm="rfc2960.title"></link> document. 
+	</para>
+
+      </section>
+     
+      <section id="sctpheadersack">
+	<title id="sctpheader.sack.title">SCTP SACK chunk</title>
+        <indexterm zone="sctpheadersack">
+          <primary>SCTP</primary>
+          <secondary>SACK</secondary>
+        </indexterm>
+
+        <para>
+          <mediaobject id="sctp.chunk.sackheaders">
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-sack-header.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-sack-header.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+	<para>
+The <systemitem>SACK</systemitem> chunk is used to tell the sender of
+<systemitem>DATA</systemitem> chunks which chunks has been received and where
+there has been a gap in the stream, based on the received
+<systemitem>TSN</systemitem>'s. Basically, the <systemitem>SACK</systemitem>
+chunk acknowledges that it has received data up to a certain point (the
+<systemitem>Cumulative TSN Ack</systemitem> parameter), and then adds
+<systemitem>Gap Ack Blocks</systemitem> for all of the data that it has
+received after the <systemitem>Cumulative TSN Ack</systemitem> point. A
+<systemitem>SACK</systemitem> chunk must not be sent more than once for every
+<systemitem>DATA</systemitem> chunk that is received.
+	</para>
+
+	<para>
+Type - bit 0-7. This header is always set to 3 for
+<systemitem>SACK</systemitem> chunks. 
+	</para>
+
+	<para>
+Chunk flags <indexterm> <primary>SCTP</primary> <secondary>Chunk
+flags</secondary> </indexterm>- bit 8-15. Not used today. Might be applicable
+for change. See <link linkend="sctpheadercommon"
+endterm="sctpheader.common.title"></link> for more information.
+	</para>
+
+	<para>
+Chunk Length <indexterm> <primary>SCTP</primary> <secondary>Chunk
+Length</secondary> </indexterm>- bit 16-31. The chunk length is the length of
+the whole chunk, including everything in the headers and all the parameters.
+	</para>
+
+	<para>
+Cumulative TSN Ack <indexterm> <primary>SCTP</primary> <secondary>Cumulative
+TSN Ack</secondary> </indexterm>- bit 32-63. This is the
+<systemitem>Cumulative TSN Ack</systemitem> parameter, which is used to
+acknowledge data. The <systemitem>DATA</systemitem> chunk receiver will use
+this field to tell the sending host that it has received all data up to this
+point of the association. After this point, all data that has not been
+specifically acknowledged by the <systemitem>Gap Ack Blocks</systemitem> will,
+basically, be considered unaccounted for. 
+	</para>
+
+	<para>
+Advertised Receiver Window Credit (a_rwnd) <indexterm> <primary>SCTP</primary>
+<secondary>Advertised Receiver Window Credit</secondary> </indexterm>- bit
+64-95. The <systemitem>a_rwnd</systemitem> field is basically the same as the
+<systemitem>a_rwnd</systemitem> in the <systemitem>INIT</systemitem> and
+<systemitem>INIT ACK</systemitem> chunks, but can be used to raise or lower
+the <systemitem>a_rwnd</systemitem> value. Please read more in the <link
+linkend="rfc2960" endterm="rfc2960.title"></link> document about this. 
+        </para>
+
+	<para>
+Number of Gap Ack Blocks <indexterm> <primary>SCTP</primary> <secondary>Number
+of Gap Ack Blocks</secondary> </indexterm>- bit 96-111. The number of
+<systemitem>Gap Ack Blocks</systemitem> listed in this chunk. Each
+<systemitem>Gap Ack Block</systemitem> takes up 32 bits in the chunk.
+	</para>
+
+	<para>
+Number of Duplicate TSNs <indexterm> <primary>SCTP</primary> <secondary>Number
+of Duplicate TSNs</secondary> </indexterm>- bit 112-127. The number of
+<systemitem>DATA</systemitem> chunks that has been duplicated. Each duplicated
+<systemitem>TSN</systemitem> is listed after the <systemitem>Gap Ack
+Blocks</systemitem> in the chunk, and each <systemitem>TSN</systemitem> takes
+32 bits to send. 
+	</para>
+
+	<para>
+Gap Ack Block #1 Start <indexterm> <primary>SCTP</primary> <secondary>Gap Ack
+Block #1 Start</secondary> </indexterm>- bit 128-143. This is the first
+<systemitem>Gap Ack Block</systemitem> in the <systemitem>SACK</systemitem>
+chunk. If there are no gaps in the received <systemitem>DATA</systemitem>
+chunk <systemitem>TSN</systemitem> numbers, there will be no <systemitem>Gap
+Ack Blocks</systemitem> at all. However, if <systemitem>DATA</systemitem>
+chunks are received out of order or some <systemitem>DATA</systemitem> chunks
+where lost during transit to the host, there will be gaps. The gaps that has
+been seen will be reported with <systemitem>Gap Ack Blocks</systemitem>. The
+<systemitem>Gap Ack Block</systemitem> start point is calculated by adding the
+<systemitem>Gap Ack Block Start</systemitem> parameter to the
+<systemitem>Cumulative TSN</systemitem> value. The calculated value is the
+start of the block. 
+	</para>
+
+	<para>
+Gap Ack Block #1 End <indexterm> <primary>SCTP</primary> <secondary>Gap Ack
+Block #1 End</secondary> </indexterm>- bit 144-159. This value reports the end
+of the first <systemitem>Gap Ack Block </systemitem>in the stream. All the
+<systemitem>DATA</systemitem> chunks with the <systemitem>TSN</systemitem>
+between the <systemitem>Gap Ack Block Start</systemitem> and the
+<systemitem>Gap Ack Block End</systemitem> has been received. The
+<systemitem>Gap Ack Block End</systemitem> value is added to the
+<systemitem>Cumulative TSN</systemitem>, just as the Start parameter, to get
+the actual last <systemitem>TSN</systemitem> of the block chunks to be
+Acknowledged. 
+	</para>
+
+	<para>
+Gap Ack Block #N Start <indexterm> <primary>SCTP</primary> <secondary>Gap Ack
+Block #N Start</secondary> </indexterm>- bits variable. For every
+<systemitem>Gap Ack Block</systemitem> counted in the <systemitem>Number of
+Gap Ack Blocks</systemitem> parameter, one <systemitem>Gap Ack
+Block</systemitem> is added, until the final N block. Ie, if
+<systemitem>Number of Gap Ack Blocks</systemitem> = 2, then there will be two
+<systemitem>Gap Ack Blocks</systemitem> in the <systemitem>SACK</systemitem>
+chunk. This is the last one simply, and contains the same type of value as the
+<systemitem>Gap Ack Block #1 Start</systemitem>.
+	</para>
+
+	<para>
+Gap Ack Block #N End <indexterm> <primary>SCTP</primary> <secondary>Gap Ack
+Block #N End</secondary> </indexterm>- bits variable. Same as for the
+<systemitem>Gap Ack Block #N End</systemitem>, but for the end of the gap. 
+	</para>
+
+	<para>
+Duplicate TSN #1 <indexterm> <primary>SCTP</primary> <secondary>Duplicate TSN
+#1</secondary> </indexterm>- bits variable. These fields report a duplicate
+<systemitem>TSN</systemitem>, in which case we have already received a
+specific chunk, but receive the same <systemitem>TSN</systemitem> several
+times more. This can either be router glitches (retransmitting already sent
+data) or a case of retransmission from the sending endpoint, or a score of
+other possibilities. Each instance of a duplicate <systemitem>TSN</systemitem>
+should be reported once. For example, if 2 duplicate
+<systemitem>TSN</systemitem>'s has been received after acknowledging the first
+one, each of these duplicate <systemitem>TSN</systemitem>'s should be sent
+sent in the next <systemitem>SACK</systemitem> message that is being sent. If
+even more duplicate <systemitem>TSN</systemitem>'s should appear after this
+second <systemitem>SACK</systemitem> is sent, the new duplicates should be
+added in the next <systemitem>SACK</systemitem>, and so on.
+	</para>
+
+	<para>
+Duplicate TSN #X <indexterm> <primary>SCTP</primary> <secondary>Duplicate TSN
+#X</secondary> </indexterm>- bits variable. This is the last duplicate
+<systemitem>TSN</systemitem> parameter, containing the same type of
+information as the first parameter.
+	</para>
+
+      </section>
+      
+      <section id="sctpheadershutdown">
+	<title id="sctpheader.shutdown.title">SCTP SHUTDOWN chunk</title>
+        <indexterm zone="sctpheadershutdown">
+          <primary>SCTP</primary>
+          <secondary>SHUTDOWN</secondary>
+        </indexterm>
+
+        <para>
+          <mediaobject id="sctp.chunk.shutdownheaders">
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-shutdown-header.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-shutdown-header.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+	<para>
+The <systemitem>SHUTDOWN</systemitem> chunk is issued when one of the endpoints
+of a connection wants to close the current association. The sending party must
+empty all of its sending buffers before sending the
+<systemitem>SHUTDOWN</systemitem> chunk, and must not send any more
+<systemitem>DATA</systemitem> chunks afterwards. The receiver must also empty
+its sending buffers and must then send the responding <systemitem>SHUTDOWN
+ACK</systemitem> chunk. 
+	</para>
+
+	<para>
+Type - bit 0-7. This header is always set to 7 for
+<systemitem>SHUTDOWN</systemitem> chunks. 
+	</para>
+
+	<para>
+Chunk flags <indexterm> <primary>SCTP</primary> <secondary>Chunk
+flags</secondary> </indexterm>- bit 8-15. Not used today. Might be applicable
+for change. See <link linkend="sctpheadercommon"
+endterm="sctpheader.common.title"></link> for more information.
+	</para>
+
+	<para>
+Chunk Length <indexterm> <primary>SCTP</primary> <secondary>Chunk
+Length</secondary> </indexterm>- bit 16-31. The chunk length is the length of
+the whole packet, including the <systemitem>Cumulative TSN Ack</systemitem>
+parameter. The length of the <systemitem>SHUTDOWN</systemitem> chunk should
+always be 8.
+	</para>
+
+	<para>
+Cumulative TSN Ack <indexterm> <primary>SCTP</primary> <secondary>Cumulative
+TSN Ack</secondary> </indexterm>- bit 32-63. This is a <systemitem>Cumulative
+TSN Ack</systemitem> field, just the same as in the
+<systemitem>SACK</systemitem> chunk. The <systemitem>Cumulative TSN
+Ack</systemitem> acknowledges the last <systemitem>TSN</systemitem> received
+in sequence from the opposite endpoint. This parameter does not, nor can the
+rest of the <systemitem>SHUTDOWN</systemitem> chunk either, acknowledge
+<systemitem>Gap Ack Blocks</systemitem>. The lack of a <systemitem>Gap Ack
+Block</systemitem> in the <systemitem>SHUTDOWN</systemitem> chunk that was
+acknowledged before should not be interpreted as if the previously
+acknowledged block was lost again.
+	</para>
+      </section>
+
+      <section id="sctpheadershutdownack">
+	<title id="sctpheader.shutdownack.title">SCTP SHUTDOWN ACK chunk</title>
+        <indexterm zone="sctpheadershutdownack">
+          <primary>SCTP</primary>
+          <secondary>SHUTDOWN ACK</secondary>
+        </indexterm>
+
+        <para>
+          <mediaobject id="sctp.chunk.shutdownackheaders">
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-shutdown-ack-header.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-shutdown-ack-header.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+	<para>
+The <systemitem>SHUTDOWN ACK</systemitem> chunk is used to acknowledge a
+<systemitem>SHUTDOWN</systemitem> chunk that has been received. Before the
+<systemitem>SHUTDOWN ACK</systemitem> chunk is sent, all data in the sending
+buffers should be sent, but the buffers must not accept any new data from the
+application. <systemitem>SCTP</systemitem> does not support half-open
+connections as <systemitem>TCP</systemitem> does. 
+	</para>
+
+	<para>
+Type - bit 0-7. This header is always set to 8 for
+<systemitem>SHUTDOWN ACK</systemitem> chunks. 
+	</para>
+
+	<para>
+Chunk flags <indexterm> <primary>SCTP</primary> <secondary>Chunk
+flags</secondary> </indexterm>- bit 8-15. Not used today. Might be applicable
+for change. See <link linkend="sctpheadercommon"
+endterm="sctpheader.common.title"></link> for more information.
+	</para>
+
+	<para>
+Chunk Length <indexterm> <primary>SCTP</primary> <secondary>Chunk
+Length</secondary> </indexterm>- bit 16-31. The chunk length is the length of
+the whole chunk. The length of the <systemitem>SHUTDOWN ACK</systemitem> chunk
+should always be 4.
+	</para>
+
+      </section>
+
+      <section id="sctpheadershutdowncomplete">
+	<title id="sctpheader.shutdowncomplete.title">SCTP SHUTDOWN COMPLETE chunk</title>
+        <indexterm zone="sctpheadershutdowncomplete">
+          <primary>SCTP</primary>
+          <secondary>SHUTDOWN COMPLETE</secondary>
+        </indexterm>
+
+       <para>
+          <mediaobject id="sctp.chunk.shutdowncompleteheaders">
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-shutdown-complete-header.eps"  format=eps>
+            </imageobject>
+            <imageobject>
+              <imagedata
+fileref="images/sctp-chunk-shutdown-complete-header.jpg"  format=jpg>
+            </imageobject>
+          </mediaobject>
+        </para>
+
+	<para>
+The <systemitem>SHUTDOWN COMPLETE</systemitem> chunk is sent, by the originating
+host of the <systemitem>SHUTDOWN</systemitem>, in response to the
+<systemitem>SHUTDOWN ACK</systemitem> chunk. It is sent to acknowledge that the
+association is finally closed. 
+	</para>
+
+	<para>
+Type - bit 0-7. Always set to 14 for <systemitem>SHUTDOWN COMPLETE</systemitem>
+chunks.
+	</para>
+
+	<para>
+Reserved - bit 8-14. Not used today. Might be applicable for change. See
+<link linkend="sctpheadercommon" endterm="sctpheader.common.title"></link> for
+more information.
+	</para>
+
+	<para>
+T-bit <indexterm> <primary>SCTP</primary> <secondary>T-bit</secondary>
+</indexterm>- bit 15. The <systemitem>T-bit</systemitem> is not set to signal
+that the sending host had a <systemitem>Transmission Control
+Block</systemitem> (<systemitem>TCB</systemitem>) associated with this
+connection and that it destroyed. If the <systemitem>T-bit</systemitem> was
+set, it had no <systemitem>TCB</systemitem> to destroy. 
+	</para>
+
+	<para>
+Length <indexterm> <primary>SCTP</primary> <secondary>Length</secondary>
+</indexterm>- bit 16-31. This is always set to 4 for <systemitem>SHUTDOWN
+COMPLETE</systemitem> chunks, since the chunk should never be any larger, as
+long as no updates to the standards are made. 
+	</para>
+      </section>
+
+    </section>
+    
+    <section id="tcpipdstdrivenrouting">
+      <title id="tcpipdstdrivenrouting.title">TCP/IP destination driven 
+routing</title>
+      <indexterm zone="tcpipdstdrivenrouting">
+        <primary>TCP/IP routing</primary>
+      </indexterm>
+      <indexterm zone="tcpipdstdrivenrouting">
+        <primary>Routing</primary>
+      </indexterm>
+      <indexterm zone="tcpipdstdrivenrouting">
+        <primary>Advanced routing</primary>
+      </indexterm>
+
+      <para>
+<systemitem>TCP/IP</systemitem> has grown in complexity quite a lot when it
+comes to the routing part. In the beginning, most people thought it would be
+enough with destination driven routing. The last few years, this has become
+more and more complex however. Today, Linux can route on basically every
+single field or bit in the <systemitem>IP</systemitem> header, and even based
+on <systemitem>TCP</systemitem>, <systemitem>UDP</systemitem> or
+<systemitem>ICMP</systemitem> headers as well. This is called policy based
+routing, or advanced routing.
+      </para>
+      
+      <para>
+This is simply a brief discussion on how the destination driven routing is 
+performed. When we send a packet from a sending host, the packet is created. 
+After this, the computer looks at the packet destination address and compares
+it to the routing table that it has. If the destination address is local, the
+packet is sent directly to that address via its hardware
+<systemitem>MAC</systemitem> address. If the packet is on the other side of a
+gateway, the packet is sent to the <systemitem>MAC</systemitem> address of the
+gateway. The gateway will then look at the <systemitem>IP</systemitem> headers
+and see the destination address of the packet. The destination address is
+looked up in the routing table again, and the packet is sent to the next
+gateway, et cetera, until the packet finally reaches the local network of the
+destination.
+      </para>
+      
+      <para>
+As you can see, this routing is very basic and simple. With the advanced
+routing and policy based routing, this gets quite a bit more complex. We can
+route packets differently based on their source address for example, or their
+<systemitem>TOS</systemitem> value, et cetera.
+      </para>
+    </section>
+
+    <section id="tcpiprep.summary">
+      <title id="tcpiprep.summary.title">What's next?</title>
+
+      <para>
+This chapter has brought you up to date to fully understand the subsequent 
+chapters. The following has been gone through thoroughly:
+      </para>
+      
+      <itemizedlist mark=opencircle>
+        <listitem>
+          <para>
+TCP/IP structure
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+IP protocol functionality and headers.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+TCP protocol functionality and headers.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+UDP protocol functionality and headers.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+ICMP protocol functionality and headers.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+TCP/IP destination driven routing.
+          </para>
+        </listitem>
+      </itemizedlist>
+      
+      <para>
+All of this will come in very handy later on when you start to work with the 
+actual firewall rulesets. All of this information are pieces that fit together, 
+and will lead to a better firewall design.
+      </para>
+
+    </section>
+
+  </chapter>
+

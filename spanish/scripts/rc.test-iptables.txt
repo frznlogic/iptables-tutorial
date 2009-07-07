@@ -1,0 +1,76 @@
+#!/bin/bash
+#
+# rc.test-iptables - Script de prueba para las tablas y cadenas de iptables.
+#
+# Copyright (C) 2001  Oskar Andreasson &lt;bluefluxATkoffeinDOTnet&gt;
+#
+# Este programa es software libre; puedes redistribuirlo y/o modificarlo
+# bajo los términos expresados en la "GNU General Public License", tal como
+# lo publica la Free Software Foundation; versión 2 de la Licencia.
+#
+# Este programa se distribuye con el deseo de que sea útil, pero
+# SIN NINGUNA GARANTÍA; incluso sin garantía implícita de COMPRA-VENTA
+# o ADECUACIÓN A PROPÓSITO PARTICULAR. Para más detalles, referirse a la
+# GNU General Public License.
+#
+# Deberías haber recibido una copia de la GNU General Public License
+# junto a este programa o desde el sitio web de dónde lo bajaste;
+# si no es así, escribe a la Free Software Foundation, Inc., 59 Temple
+# Place, Suite 330, Boston, MA  02111-1307   USA
+#
+
+#
+# Tabla Filter, todas las cadenas.
+#
+iptables -t filter -A INPUT -p icmp --icmp-type echo-request \
+-j LOG --log-prefix="filter INPUT:"
+iptables -t filter -A INPUT -p icmp --icmp-type echo-reply \
+-j LOG --log-prefix="filter INPUT:"
+iptables -t filter -A OUTPUT -p icmp --icmp-type echo-request \
+-j LOG --log-prefix="filter OUTPUT:"
+iptables -t filter -A OUTPUT -p icmp --icmp-type echo-reply \
+-j LOG --log-prefix="filter OUTPUT:"
+iptables -t filter -A FORWARD -p icmp --icmp-type echo-request \
+-j LOG --log-prefix="filter FORWARD:"
+iptables -t filter -A FORWARD -p icmp --icmp-type echo-reply \
+-j LOG --log-prefix="filter FORWARD:"
+
+#
+# Tabla NAT, todas las cadenas excepto la OUTPUT, que no funcionaría.
+#
+iptables -t nat -A PREROUTING -p icmp --icmp-type echo-request \
+-j LOG --log-prefix="nat PREROUTING:"
+iptables -t nat -A PREROUTING -p icmp --icmp-type echo-reply \
+-j LOG --log-prefix="nat PREROUTING:"
+iptables -t nat -A POSTROUTING -p icmp --icmp-type echo-request \
+-j LOG --log-prefix="nat POSTROUTING:"
+iptables -t nat -A POSTROUTING -p icmp --icmp-type echo-reply \
+-j LOG --log-prefix="nat POSTROUTING:"
+iptables -t nat -A OUTPUT -p icmp --icmp-type echo-request \
+-j LOG --log-prefix="nat OUTPUT:"
+iptables -t nat -A OUTPUT -p icmp --icmp-type echo-reply \
+-j LOG --log-prefix="nat OUTPUT:"
+
+#
+# Tabla Mangle, todas las cadenas.
+#
+iptables -t mangle -A PREROUTING -p icmp --icmp-type echo-request \
+-j LOG --log-prefix="mangle PREROUTING:"
+iptables -t mangle -A PREROUTING -p icmp --icmp-type echo-reply \
+-j LOG --log-prefix="mangle PREROUTING:"
+iptables -t mangle -I FORWARD 1 -p icmp --icmp-type echo-request \
+-j LOG --log-prefix="mangle FORWARD:"
+iptables -t mangle -I FORWARD 1 -p icmp --icmp-type echo-reply \
+-j LOG --log-prefix="mangle FORWARD:"
+iptables -t mangle -I INPUT 1 -p icmp --icmp-type echo-request \
+-j LOG --log-prefix="mangle INPUT:"
+iptables -t mangle -I INPUT 1 -p icmp --icmp-type echo-reply \
+-j LOG --log-prefix="mangle INPUT:"
+iptables -t mangle -A OUTPUT -p icmp --icmp-type echo-request \
+-j LOG --log-prefix="mangle OUTPUT:"
+iptables -t mangle -A OUTPUT -p icmp --icmp-type echo-reply \
+-j LOG --log-prefix="mangle OUTPUT:"
+iptables -t mangle -I POSTROUTING 1 -p icmp --icmp-type echo-request \
+-j LOG --log-prefix="mangle POSTROUTING:"
+iptables -t mangle -I POSTROUTING 1 -p icmp --icmp-type echo-reply \
+-j LOG --log-prefix="mangle POSTROUTING:"

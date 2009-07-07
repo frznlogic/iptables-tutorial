@@ -1,0 +1,214 @@
+ <chapter id="introduction">
+  <title id="introduction.title">Introduction</title>
+  <indexterm zone="introduction">
+    <primary>Introduction</primary>
+  </indexterm>
+ 
+  <section id="whythisdocument">
+   <title id="whythisdocument.title">Why this document was written</title>
+ 
+   <para> Well, I found a big empty space in the HOWTO's out there lacking
+in information about the iptables and Netfilter functions in the new Linux
+2.4.x kernels. Among other things, I'm going to try to answer questions
+that some might have about the new possibilities like state matching.  
+Most of this will be illustrated with an example <link 
+linkend="rcfirewalltxt" endterm="rcfirewalltxt.title"></link> file that you 
+can use in your <filename>/etc/rc.d/</filename> scripts. Yes, this file was 
+originally based upon the masquerading HOWTO for those of you who recognize 
+it.
+   </para>
+
+   <para> Also, there's a small script that I wrote just in case you screw
+up as much as I did during the configuration available as <link
+linkend="rcflush-iptablestxt" endterm="rcflush-iptablestxt.title"></link>.
+   </para>
+
+  </section>
+
+  <section id="howitwas">
+   <title id="howitwas.title">How it was written</title>
+
+   <para>
+I originally wrote this as a very small tutorial for boingworld.com, which was 
+an Amiga/Linux/General newssite that a small group of people, including me, 
+ran a couple of years back. Due to the fantastic amount of readers and 
+comments that I got from it, I continued to write on it. The original version 
+was approximately 10-15 A4 pages in printed version and has since been growing 
+slowly but steadily. A huge amount of people has helped me out, spellchecking, 
+bug corrections, etc. At the time of writing this, the 
+http://iptables-tutorial.frozentux.net/ site has had over 600.000 unique hits 
+alone. 
+   </para>
+
+   <para>
+This document was written to guide you through the setup process step by step 
+and hopefully help you to understand some more about the iptables package. I 
+have based most of the stuff here on the example rc.firewall file, since I 
+found that example to be a good way to learn how to use iptables. I 
+decided to just follow the basic chain structure and from there walk
+through each and one of the chains traversed and explain how the script works. 
+That way the tutorial is a little bit harder to follow, though this way is 
+more logical. Whenever you find something that's hard to understand, just come 
+back to this tutorial.
+   </para>
+
+  </section>
+
+  <section id="termsused">
+   <title id="termsused.title">Terms used in this document</title>
+   <indexterm zone="termsused">
+     <primary>Terms</primary>
+   </indexterm>
+   <indexterm zone="termsused">
+     <primary>Words</primary>
+   </indexterm>
+
+   <para>
+This document contains a few terms that may need more detailed 
+explanations before you read them. This section will try to cover the most 
+obvious ones and how I have chosen to use them within this document.
+   </para>
+
+   <para>
+Connection<indexterm><primary>Connection</primary></indexterm> - This is
+generally referred to in this document as a series of packets relating to each
+other. These packets refer to each other as an established kind of connection.
+A connection is in another word a series of exchanged packets. In TCP, this
+mainly means establishing a connection via the 3-way handshake, and then this
+is considered a connection until the release handshake.
+   </para>
+
+   <para>
+DNAT<indexterm><primary>DNAT</primary></indexterm> - Destination Network
+Address Translation. <systemitem>DNAT</systemitem> refers to the technique of
+translating the <systemitem>Destination IP</systemitem> address of a packet,
+or to change it simply put. This is used together with
+<systemitem>SNAT</systemitem> to allow several hosts to share a single
+Internet routable <systemitem>IP address</systemitem>, and to still provide
+Server Services. This is normally done by assigning different ports with an
+Internet routable <systemitem>IP address</systemitem>, and then tell the Linux
+router where to send the traffic.
+   </para>
+
+   <para>
+IPSEC<indexterm><primary>IPSEC</primary></indexterm> - Internet Protocol
+Security is a protocol used to encrypt <systemitem>IPv4</systemitem> packets
+and sending them securely over the Internet. For more information on
+<systemitem>IPSEC</systemitem>, look in the <link linkend="otherresources"
+endterm="otherresources.title"></link> appendix for other resources on the
+topic.
+   </para>
+
+   <para>
+Kernel space<indexterm><primary>Kernel space</primary></indexterm> - This is
+more or less the opposite of <systemitem>User space</systemitem>. This implies
+the actions that take place within the kernel, and not outside of the kernel.
+   </para>
+
+   <para>
+Packet<indexterm><primary>Packet</primary></indexterm> - A singular unit sent
+over a network, containing a header and a data portion. For example, an
+<systemitem>IP</systemitem> packet or an <systemitem>TCP</systemitem> packet.
+In <systemitem>Request For Comments</systemitem>
+(<systemitem>RFC</systemitem>'s) a packet isn't so generalized, instead
+<systemitem>IP</systemitem> packets are called datagrams, while
+<systemitem>TCP</systemitem> packets are called segments. I have chosen to
+call pretty much everything packets in this document for simplicity.
+   </para>
+
+   <para>
+QoS<indexterm><primary>QoS</primary></indexterm> - Quality of Service is a way
+of specifying how a packet should be handled and what kind of service quality
+it should receive while sending it. For more information on this topic, take a
+look in the <link linkend="tcpiprepetition"
+endterm="tcpiprepetition.title"></link> chapter as well as the <link
+linkend="otherresources" endterm="otherresources.title"></link> appendix for
+external resources on the subject.
+   </para>
+
+   <para>
+Segment<indexterm><primary>Segment</primary></indexterm> - A
+<systemitem>TCP</systemitem> segment is pretty much the same as an packet, but
+a formalized word for a <systemitem>TCP</systemitem> packet. 
+   </para>
+
+   <para>
+Stream<indexterm><primary>Stream</primary></indexterm> - This term refers to a
+connection that sends and receives packets that are related to each other in
+some fashion. Basically, I have used this term for any kind of connection that
+sends two or more packets in both directions. In <systemitem>TCP</systemitem>
+this may mean a connection that sends a <systemitem>SYN</systemitem> and then
+replies with an <systemitem>SYN/ACK</systemitem>, but it may also mean a
+connection that sends a <systemitem>SYN</systemitem> and then replies with an
+<systemitem>ICMP Host unreachable</systemitem>. In other words, I use this
+term very loosely.
+   </para>
+
+   <para>
+SNAT<indexterm><primary>SNAT</primary></indexterm> - <systemitem>Source
+Network Address Translation</systemitem>. This refers to the techniques used
+to translate one source address to another in a packet. This is used to make
+it possible for several hosts to share a single Internet routable
+<systemitem>IP</systemitem> address, since there is currently a shortage of
+available <systemitem>IP</systemitem> addresses in
+<systemitem>IPv4</systemitem> (<systemitem>IPv6</systemitem> will solve
+this).
+   </para>
+
+   <para> 
+State<indexterm><primary>State match</primary></indexterm> - This term refers to
+which state the packet is in, either according to <link linkend="rfc793"
+endterm="rfc793.title"></link> or according to userside states used in
+<systemitem>Netfilter/iptables</systemitem>. Note that the used states
+internally, and externally, do not follow the <systemitem>RFC 793</systemitem>
+<indexterm><primary>RFC</primary><secondary>793</secondary></indexterm>
+specification fully. The main reason is that
+<systemitem>Netfilter</systemitem> has to make several assumptions about the
+connections and packets.
+   </para>
+
+   <para>
+User space<indexterm><primary>User space</primary></indexterm> - With this
+term I mean everything and anything that takes place outside the kernel. For
+example, invoking <command>iptables -h</command> takes place outside the
+kernel, while <command>iptables -A FORWARD -p tcp -j ACCEPT</command> takes
+place (partially) within the kernel, since a new rule is added to the
+ruleset.
+   </para>
+
+   <para>
+Userland<indexterm><primary>Userland</primary></indexterm> - See User space.
+   </para>
+
+   <para>
+VPN<indexterm><primary>VPN</primary></indexterm> - Virtual Private Network is
+a technique used to create virtually private networks over non-private
+networks, such as the Internet. <systemitem>IPSEC</systemitem> is one
+technique used to create <systemitem>VPN</systemitem> connections.
+<systemitem>OpenVPN</systemitem> is another.
+   </para>
+
+ </section>
+
+ <section>
+   <title>What's next?</title>
+
+   <para>
+This chapter has given some small insight into why this document was written
+and how it was written. It also explained some common terms used throughout
+the document.
+   </para>
+
+   <para>
+The next chapter will bring up a rather lengthy introduction and repetition to
+TCP/IP. Basically this means the IP protocol and some of its sub-protocols
+that are commonly used with iptables and netfilter. These are TCP, UDP, ICMP
+and SCTP. SCTP is a rather new standard in comparison to the other protocols,
+hence quite a lot of space and time has gone into describing this protocol for
+all of those who are still not quite familiar with it. The next chapter will
+also discuss some basic and more advanced routing techniques used today.
+   </para>
+ </section>
+
+ </chapter>
+

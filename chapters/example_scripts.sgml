@@ -1,0 +1,1420 @@
+ <chapter id="examplescripts">
+  <title id="examplescripts.title">Example scripts</title>
+  <indexterm zone="debugging">
+    <primary>Example scripts</primary>
+  </indexterm>
+ 
+  <para>
+The objective of this chapter is to give a fairly brief and short explanation 
+of each script available with this tutorial, and to provide an overview of the
+scripts and what services they provide. These scripts are not in any way
+perfect, and they may not fit your exact intentions perfectly. It is, in other
+words, up to you to make these scripts suitable for your needs. The rest of this
+tutorial should most probably be helpful in making this feat. The first section
+of this tutorial deals with the actual structure that I have established in each
+script so we may find our way within the script a bit easier.
+  </para>
+
+  <section id="rcfirewalltxtscriptstructure">
+   <title id="rcfirewalltxtscriptstructure.title">rc.firewall.txt script
+structure</title>
+   <indexterm zone="rcfirewalltxtscriptstructure">
+     <primary>Example scripts</primary>
+     <secondary>rc.firewall.txt</secondary>
+   </indexterm>
+   <indexterm zone="rcfirewalltxtscriptstructure">
+     <primary>rc.firewall.txt</primary>
+   </indexterm>
+ 
+   <para>
+All scripts written for this tutorial have been written after a specific
+structure. The reason for this is that they should be fairly similar to
+each other and to make it easier to find the differences between the scripts.
+This structure should be fairly well documented in this brief chapter. This
+chapter should hopefully give a short understanding to why all the scripts have
+been written as they have, and why I have chosen to maintain this structure.
+   </para>
+
+   <note>
+    <para>
+Even though this is the structure I have chosen, do note that this may not be
+the best structure for your scripts. It is only a structure that I have chosen
+to use since it fits the need of being easy to read and follow the best
+according to my logic.
+    </para>
+   </note>
+
+   <section id="thestructure">
+    <title id="thestructure.title">The structure</title>
+    <indexterm zone="thestructure">
+      <primary>Example scripts</primary>
+      <secondary>Structure</secondary>
+    </indexterm>
+    <indexterm zone="thestructure">
+      <primary>Script structure</primary>
+    </indexterm>
+ 
+    <para>
+This is the structure that all scripts in this tutorial should follow. If they
+differ in some way it is probably an error on my part, unless it is specifically
+explained why I have broken this structure.
+    </para>
+
+    <orderedlist numeration="arabic" inheritnum="inherit">
+
+     <listitem>
+      <para>
+<emphasis>Configuration</emphasis><indexterm><primary>Example
+scripts</primary><secondary>Configuration</secondary> </indexterm> - First of
+all we have the configuration options which the rest of the script should use.
+Configuration options should pretty much always be the first thing in any
+shell-script.
+      </para>
+
+      <orderedlist numeration="arabic" inheritnum="inherit">
+
+       <listitem>
+        <para>
+<emphasis>Internet</emphasis><indexterm><primary>Example
+scripts</primary><secondary>Internet</secondary></indexterm> - This is the
+configuration section which pertains to the Internet connection. This could be
+skipped if we do not have any Internet connection. Note that there may be more
+subsections than those listed here, but only such that pertain to our Internet
+connection.
+        </para>
+
+        <orderedlist numeration="arabic" inheritnum="inherit">
+
+         <listitem>
+          <para>
+<emphasis>DHCP</emphasis><indexterm><primary>Example
+scripts</primary><secondary>DHCP</secondary></indexterm> - If there are
+possibly any special <systemitem>DHCP</systemitem> requirements with this
+specific script, we will add the <systemitem>DHCP</systemitem> specific
+configuration options here.
+          </para>
+         </listitem>
+
+         <listitem>
+          <para>
+<emphasis>PPPoE</emphasis><indexterm><primary>Example
+scripts</primary><secondary>PPPoE</secondary></indexterm> - If there is a
+possibility that the user that wants to use this specific script, and if there
+are any special circumstances that raises the chances that he is using a
+<systemitem>PPPoE</systemitem> connection, we will add specific options for
+those here.
+          </para>
+         </listitem>
+
+        </orderedlist>
+
+       </listitem>
+
+       <listitem>
+        <para>
+<emphasis>LAN</emphasis><indexterm><primary>Example
+scripts</primary><secondary>LAN</secondary></indexterm> - If there is any
+<systemitem>LAN</systemitem> available behind the firewall, we will add
+options pertaining to that in this section. This is most likely, hence this
+section will almost always be available.
+        </para>
+       </listitem>
+
+       <listitem>
+        <para>
+<emphasis>DMZ</emphasis><indexterm><primary>Example
+scripts</primary><secondary>DMZ</secondary></indexterm> - If there is any
+reason to it, we will add a <systemitem>DMZ</systemitem> zone configuration at
+this point. Most scripts lacks this section, mainly because any normal home
+network, or small corporate network, will not have one.
+        </para>
+       </listitem>
+
+       <listitem>
+        <para>
+<emphasis>Localhost</emphasis><indexterm><primary>Example
+scripts</primary><secondary>Localhost</secondary></indexterm> - These options
+pertain to our <systemitem>localhost</systemitem>. These variables are highly
+unlikely to change, but we have put most of it into variables anyway.
+Hopefully, there should be no reason to change these variables.
+        </para>
+       </listitem>
+
+       <listitem>
+        <para>
+<emphasis>iptables</emphasis><indexterm><primary>Example
+scripts</primary><secondary>iptables</secondary></indexterm> - This section
+contains <systemitem>iptables</systemitem> specific configuration. In most
+scripts and situations this should only require one variable which tells us
+where the <command>iptables</command> binary is located.
+
+        </para>
+       </listitem>
+
+       <listitem>
+        <para>
+<emphasis>Other</emphasis><indexterm><primary>Example
+scripts</primary><secondary>Other</secondary></indexterm> - If there are any other specific
+options and variables, they should first of all be fitted into the correct
+subsection (If it pertains to the Internet connection, it should be
+sub-sectioned there, etc). If it does not fit in anywhere, it should be
+sub-sectioned directly to the configuration options somewhere.
+        </para>
+       </listitem>
+      </orderedlist>
+
+     </listitem>
+
+     <listitem>
+      <para>
+<emphasis>Module loading</emphasis><indexterm><primary>Example
+scripts</primary><secondary>Module loading</secondary></indexterm> - This
+section of the scripts should maintain a list of modules. The first part
+should contain the required modules, while the second part should contain the
+non-required modules.
+      </para>
+
+      <note>
+       <para>
+Note that some modules that may raise security, or add certain services or
+possibilities, may have been added even though they are not required. This
+should normally be noted in such cases within the example scripts.
+       </para>
+      </note>
+
+      <note>
+	<para>
+As of the later iptables versions, modules are automatically loaded and most
+module loading should not be required, but from a control perspective, it is
+better to load the modules on your own. For example, the conntrack helpers are
+never automatically loaded.
+	</para>
+      </note>
+
+      <orderedlist numeration="arabic" inheritnum="inherit">
+
+       <listitem>
+        <para>
+<emphasis>Required modules</emphasis><indexterm><primary>Example
+scripts</primary><secondary>Required modules</secondary></indexterm> - This
+section should contain the required modules, and possibly special modules that
+add to the security or add special services to the administrator or clients.
+        </para>
+       </listitem>
+
+       <listitem>
+        <para>
+<emphasis>Non-required modules</emphasis><indexterm><primary>Example
+scripts</primary><secondary>Non-required modules</secondary></indexterm> -
+This section contains modules that are not required for normal operations. All
+of these modules should be commented out per default, and if you want to add
+the service it provides, it is up to you.
+        </para>
+       </listitem>
+
+      </orderedlist>
+     </listitem>
+
+     <listitem>
+      <para>
+<emphasis>proc configuration</emphasis><indexterm><primary>Example
+scripts</primary><secondary>proc configuration</secondary></indexterm> - This
+section should take care of any special configuration needed in the proc file
+system. If some of these options are required, they will be listed as such, if
+not, they should be commented out per default, and listed under the
+non-required proc configurations. Most of the useful proc configurations will
+be listed here, but far from all of them.
+       </para>
+
+      <orderedlist numeration="arabic" inheritnum="inherit">
+
+       <listitem>
+        <para>
+<emphasis>Required proc configuration</emphasis><indexterm><primary>Example
+scripts</primary><secondary>Required proc
+configuration</secondary></indexterm> - This section should contain all of the
+required proc configurations for the script in question to work. It could
+possibly also contain configurations that raise security, and possibly which
+add special services or possibilities for the administrator or clients.
+        </para>
+       </listitem>
+
+       <listitem>
+        <para>
+<emphasis>Non-required proc
+configuration</emphasis><indexterm><primary>Example
+scripts</primary><secondary>Non-required proc
+configuration</secondary></indexterm> - This section should contain
+non-required proc configurations that may prove useful. All of them should be
+commented out, since they are not actually necessary to get the script to
+work. This list will contain far from all of the proc configurations or
+nodes.
+        </para>
+       </listitem>
+
+      </orderedlist>
+     </listitem>
+
+     <listitem>
+      <para>
+<emphasis>Rules set up</emphasis><indexterm><primary>Example
+scripts</primary><secondary>Rules set up</secondary></indexterm> -  By now the
+scripts should most probably be ready to insert the
+<systemitem>rule-set</systemitem>. I have chosen to split all the rules down
+after table and then chain names in the rule-sets, to make them easier to
+follow and read. All user specified chains are created before we do anything
+to the system built in chains. I have also chosen to set the chains and their
+rule specifications in the same order as they are output by the
+<command>iptables -L</command> command.
+      </para>
+
+      <orderedlist numeration="arabic" inheritnum="inherit">
+
+       <listitem>
+        <para>
+<emphasis>Filter table</emphasis><indexterm><primary>Example
+scripts</primary><secondary>Filter table</secondary></indexterm>
+<indexterm><primary>Filter table</primary></indexterm> - First of all we go
+through the filter table and its content. First of all we should set up all
+the policies in the table.
+        </para>
+
+        <orderedlist numeration="arabic" inheritnum="inherit">
+         <listitem>
+          <para>
+<emphasis>Set policies</emphasis><indexterm><primary>Example
+scripts</primary><secondary>Set policies</secondary></indexterm> - Set up all
+the default policies for the system chains. Normally I will set
+<command>DROP</command> policies on the chainsa in the
+<systemitem>filter</systemitem> table, and specifically
+<command>ACCEPT</command> services and streams that I want to allow inside.
+This way we will get rid of all ports that we do not want to let people use.
+          </para>
+         </listitem>
+
+         <listitem>
+          <para>
+<emphasis>Create user specified chains</emphasis><indexterm><primary>Example
+scripts</primary><secondary>User specified chains</secondary></indexterm> - At
+this point we create all the user specified chains that we want to use later
+on within this table. We will not be able to use these chains in the system
+chains anyway if they are not already created so we might as well get to it as
+soon as possible.
+          </para>
+         </listitem>
+
+         <listitem>
+          <para>
+<emphasis>Create content in user specified chains</emphasis>
+<indexterm><primary>Example scripts</primary><secondary>User specified chains
+content</secondary></indexterm> - After creating the user specified chains we
+may as well enter all the rules within these chains. The only reason I have to
+enter this data at this point already is that you may as well put it close to
+the creation of the user specified chains. You may as well put this later on
+in your script, it is totally up to you.
+          </para>
+         </listitem>
+
+         <listitem>
+          <para>
+<emphasis>INPUT
+chain</emphasis><indexterm><primary>Chain</primary><secondary>INPUT</secondary>
+</indexterm> - When we have come this far, we do not have a lot of things left
+to do within the filter table so we get onto the
+<systemitem>INPUT</systemitem> chain. At this point we should add all rules
+within the <systemitem>INPUT</systemitem> chain.
+          </para>
+
+          <note>
+           <para>
+At this point we start following the output from the <command>iptables
+-L</command> command as you may see. There is no reason for you to stay with
+this structure, however, do try to avoid mixing up data from different tables
+and chains since it will become much harder to read such rule-sets and to fix
+possible problems.
+           </para>
+          </note>
+         </listitem>
+
+         <listitem>
+          <para>
+<emphasis>FORWARD
+chain</emphasis><indexterm><primary>Chain</primary>
+<secondary>FORWARD</secondary></indexterm> - At this point we go on to add the
+rules within the <systemitem>FORWARD</systemitem> chain. Nothing special about
+this decision.
+          </para>
+         </listitem>
+
+         <listitem>
+          <para>
+<emphasis>OUTPUT
+chain</emphasis><indexterm><primary>Chain</primary>
+<secondary>OUTPUT</secondary></indexterm> - Last of all in the filter table,
+we add the rules dealing with the <systemitem>OUTPUT</systemitem> chain. There
+should, hopefully, not be too much to do at this point.
+          </para>
+         </listitem>
+        </orderedlist>
+
+       </listitem>
+
+       <listitem>
+        <para>
+<emphasis>nat table</emphasis><indexterm><primary>Table</primary>
+<secondary>Nat</secondary></indexterm> - After the filter table we take care
+of the nat table. This is done after the filter table because of a number of
+reasons within these scripts. First of all we do not want to turn the whole
+forwarding mechanism and NAT function on at too early a stage, which could
+possibly lead to packets getting through the firewall at just the wrong
+time point (i.e., when the NAT has been turned on, but none of the filter
+rules has been run). Also, I look upon the nat table as a sort of layer that
+lies just outside the filter table and kind of surrounds it. The filter table
+would hence be the core, while the nat table acts as a layer lying around the
+filter table, and finally the mangle table lies around the nat table as a
+second layer. This may be wrong in some perspectives, but not too far from
+reality.
+        </para>
+
+        <orderedlist numeration="arabic" inheritnum="inherit">
+         <listitem>
+          <para>
+<emphasis>Set policies</emphasis> - First of all we set up all the
+default policies within the nat table. Normally, I will be satisfied with the
+default policy set from the beginning, namely the ACCEPT policy. This table
+should not be used for filtering anyways, and we should not let packets be
+dropped here since there are some really nasty things that may happen in such
+cases due to our own presumptions. I let these chains be set to ACCEPT since
+there is no reason not to do so.
+
+          </para>
+         </listitem>
+
+         <listitem>
+          <para>
+<emphasis>Create user specified chains</emphasis> - At this point
+we create any user specified chains that we want within the nat table. Normally
+I do not have any of these, but I have added this section anyways, just in case.
+Note that the user specified chains must be created before they can actually be
+used within the system chains.
+          </para>
+         </listitem>
+
+         <listitem>
+          <para>
+<emphasis>Create content in user specified chains</emphasis> - By
+now it should be time to add all the rules to the user specified chains in the
+nat table. The same thing goes here as for the user specified chains in the
+filter table. We add this material here since I do not see any reason not to.
+          </para>
+         </listitem>
+
+         <listitem>
+          <para>
+<emphasis>PREROUTING chain</emphasis><indexterm><primary>Chain</primary>
+<secondary>PREROUTING</secondary></indexterm> - The
+<systemitem>PREROUTING</systemitem> chain is
+used to do <systemitem>DNAT</systemitem> on packets in case we have a need for
+it. In most scripts this feature is not used, or at the very least commented
+out. The reason being that we do not want to open up big holes to our local
+network without knowing about it. Within some scripts we have this turned on
+by default since the sole purpose of those scripts is to provide such
+services.
+          </para>
+         </listitem>
+
+         <listitem>
+          <para>
+<emphasis>POSTROUTING chain</emphasis><indexterm><primary>chain</primary>
+<secondary>POSTROUTING</secondary></indexterm> - The
+<systemitem>POSTROUTING</systemitem> chain should be fairly well used by the
+scripts I have written since most of them depend upon the fact that you have
+one or more local networks that we want to firewall against the Internet.
+Mainly we will try to use the <systemitem>SNAT</systemitem> target, but in
+certain cases we are forced to use the <systemitem>MASQUERADE</systemitem>
+target instead.
+          </para>
+         </listitem>
+
+         <listitem>
+          <para>
+<emphasis>OUTPUT chain</emphasis>
+<indexterm><primary>chain</primary>
+<secondary>OUTPUT</secondary></indexterm> - The
+<systemitem>OUTPUT</systemitem> chain is barely used at all in any of the
+scripts. As it looks now, it is not broken, but I have been unable to find any
+good reasons to use this chain so far. If anyone has a reason to use this
+chain, send me a line and I will add it to the tutorial.
+          </para>
+         </listitem>
+        </orderedlist>
+
+       </listitem>
+
+       <listitem>
+        <para>
+<emphasis>mangle table</emphasis>
+<indexterm><primary>Table</primary>
+<secondary>Mangle</secondary></indexterm> - The last table to do anything
+about is the <systemitem>mangle</systemitem> table. Normally I will not use
+this table at all, since it should normally not be used for anyone, unless
+they have specific needs, such as masking all boxes to use the exact same
+<systemitem>TTL</systemitem> or to change <systemitem>TOS</systemitem> fields
+etc. I have in other words chosen to leave these parts of the scripts more or
+less blank, with a few exceptions where I have added a few examples of what it
+may be used for.
+        </para>
+
+        <orderedlist numeration="arabic" inheritnum="inherit">
+         <listitem>
+          <para>
+<emphasis>Set policies</emphasis> - Set the default policies within
+the chain. The same thing goes here as for the nat table, pretty much. The table
+was not made for filtering, and hence you should avoid it alltogether. I have
+not set any policies in any of the scripts in the mangle table one way or the
+other, and you are encouraged not to do so either.
+          </para>
+         </listitem>
+
+         <listitem>
+          <para>
+<emphasis>Create user specified chains</emphasis> - Create all the
+user specified chains. Since I have barely used the mangle table at all in the
+scripts, I have neither created any chains here since it is fairly unusable
+without any data to use within it. However, this section was added just in case
+someone, or I, would have the need for it in the future.
+          </para>
+         </listitem>
+
+         <listitem>
+          <para>
+<emphasis>Create content in user specified chains</emphasis> - If
+you have any user specified chains within this table, you may at this point add
+the rules that you want within them here.
+          </para>
+         </listitem>
+
+         <listitem>
+          <para>
+<emphasis>PREROUTING</emphasis><indexterm><primary>Chain</primary>
+<secondary>PREROUTING</secondary></indexterm> - At this point there is barely
+any information in any of the scripts in this tutorial that contains any rules
+here. Basically, the <systemitem>PREROUTING</systemitem> chain can be used to
+set netfilter, routing and SEC marks, both on a per packet basis and on a per
+connection basis. 
+          </para>
+         </listitem>
+
+         <listitem>
+          <para>
+<emphasis>INPUT chain</emphasis><indexterm><primary>Chain</primary>
+<secondary>INPUT</secondary></indexterm> - The <systemitem>INPUT</systemitem>
+chain is barely used in the current scripts of the tutorial, but it could be
+used for mark handling for example. 
+	  </para>
+         </listitem>
+
+         <listitem>
+          <para>
+<emphasis>FORWARD chain</emphasis><indexterm><primary>Chain</primary>
+<secondary>FORWARD</secondary></indexterm> - The
+<systemitem>FORWARD</systemitem> chain of the mangle table can be used for
+mark handling and for mangling packet headers of packets that are traveling
+across the firewall in question. Changing <systemitem>TTL</systemitem> and
+<systemitem>TOS</systemitem> for example. 
+	  </para>
+         </listitem>
+
+         <listitem>
+          <para>
+<emphasis>OUTPUT chain</emphasis><indexterm><primary>Chain</primary>
+<secondary>OUTPUT</secondary></indexterm> - The
+<systemitem>OUTPUT</systemitem> chain could be used to mangle the packets
+leaving the firewall or host itself, for example setting different marks or
+setting <systemitem>TTL</systemitem> or <systemitem>TOS</systemitem> values.
+This is not done in most of the scripts here, but the section has been added
+however.
+          </para>
+         </listitem>
+
+         <listitem>
+          <para>
+<emphasis>POSTROUTING chain</emphasis><indexterm><primary>Chain</primary>
+<secondary>POSTROUTING</secondary></indexterm> - This chain is basically not
+in use by any of the scripts in the tutorial as of writing this, but it could
+be used to setting values for all packets leaving both the host or firewall
+itself, and traffic traversing the machine. For example, it could be used to
+reset the <systemitem>MTU</systemitem> of packets, set
+<systemitem>TTL</systemitem> or <systemitem>TOS</systemitem> et cetera.
+
+          </para>
+         </listitem>
+        </orderedlist>
+
+       </listitem>
+      </orderedlist>
+
+     </listitem>
+    </orderedlist>
+
+    <para>
+Hopefully this should explain more in detail how each script is structured and
+why they are structured in such a way.
+    </para>
+
+    <caution>
+     <para>
+Do note that these descriptions are extremely brief, and should mainly just be
+seen as a brief explanation to what and why the scripts have been split down
+as they have. There is nothing that says that this is the only and best way to
+go.
+     </para>
+    </caution>
+
+    </section>
+   </section>
+
+   <section id="rcfirewalltxt">
+    <title id="rcfirewalltxt.title">rc.firewall.txt</title>
+    <indexterm zone="rcfirewalltxt">
+      <primary>rc.firewall.txt</primary>
+    </indexterm>
+    <indexterm zone="rcfirewalltxt">
+      <primary>Example scripts</primary>
+      <secondary>rc.firewall.txt</secondary>
+    </indexterm>
+ 
+     <para> 
+     <mediaobject>
+      <imageobject>
+       <imagedata fileref="images/rc_firewall.eps" format="eps">
+      </imageobject>
+      <imageobject>
+       <imagedata fileref="images/rc_firewall.jpg" format="jpg">
+      </imageobject>
+     </mediaobject>
+    </para>
+
+    <para>
+The <ulink
+url="http://iptables-tutorial.frozentux.net/scripts/rc.firewall.txt">
+rc.firewall.txt</ulink> script is the main core on which the rest of
+the scripts are based upon. The <link linkend="rcfirewallfile"
+endterm="rcfirewallfile.title"></link> chapter should explain every detail in
+the script most thoroughly. Mainly it was written for a dual homed network.
+For example, where you have one <systemitem>LAN</systemitem> and one Internet
+Connection. This script also makes the assumption that you have a static IP to
+the Internet, and hence don't use <systemitem>DHCP</systemitem>,
+<systemitem>PPP</systemitem>, <systemitem>SLIP</systemitem> or some other
+protocol that assigns you an IP automatically. If you are looking for a script
+that will work with those setups, please take a closer look at the <link
+linkend="rcDHCPfirewalltxt" endterm="rcDHCPfirewalltxt.title"></link> script.
+    </para>
+
+    <para>
+    The <filename>rc.firewall.txt</filename> script requires the following
+options to be compiled statically to the kernel, or as modules. Without one or
+more of these, the script will become more or less flawed since parts of the
+script's required functionalities will be unusable. As you change the script you
+use, you could possibly need more options to be compiled into your kernel
+depending on what you want to use.
+    </para>
+
+    <itemizedlist mark="opencircle">
+     <listitem>
+      <para>
+      CONFIG_NETFILTER
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_CONNTRACK
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_IPTABLES
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_MATCH_LIMIT
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_MATCH_STATE
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_FILTER
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_NAT
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_TARGET_LOG
+      </para>
+     </listitem>
+    </itemizedlist>
+
+   </section>
+
+   <section id="rcdmzfirewalltxt">
+     <title id="rcdmzfirewalltxt.title">rc.DMZ.firewall.txt</title>
+     <indexterm zone="rcdmzfirewalltxt">
+       <primary>rc.DMZ.firewall.txt</primary>
+     </indexterm>
+     <indexterm zone="rcdmzfirewalltxt">
+       <primary>Example scripts</primary>
+       <secondary>rc.DMZ.firewall.txt</secondary>
+     </indexterm>
+     <indexterm zone="rcdmzfirewalltxt">
+       <primary>De-Militarized Zone (DMZ)</primary>
+     </indexterm>
+ 
+     <para>
+     <mediaobject>
+      <imageobject>
+       <imagedata fileref="images/rc_DMZ_firewall.eps" format="eps">
+      </imageobject>
+      <imageobject>
+       <imagedata fileref="images/rc_DMZ_firewall.jpg" format="jpg">
+      </imageobject>
+     </mediaobject>
+    </para>
+
+    <para>
+The <ulink
+url="http://iptables-tutorial.frozentux.net/scripts/rc.DMZ.firewall.txt">
+rc.DMZ.firewall.txt</ulink> script was written for those people out there
+that have one <systemitem>Trusted Internal Network</systemitem>, one
+<systemitem>De-Militarized Zone</systemitem> and one <systemitem>Internet
+Connection</systemitem>. The <systemitem>De-Militarized Zone</systemitem> is
+in this case 1-to-1 <systemitem>NAT</systemitem>ed and requires you to do some
+IP aliasing on your firewall, i.e., you must make the box recognize packets
+for more than one IP. There are several ways to get this to work, one is to
+set 1-to-1 <systemitem>NAT</systemitem>, another one if you have a whole
+subnet is to create a subnetwork, giving the firewall one IP both internally
+and externally. You could then set the IP's to the
+<systemitem>DMZ</systemitem>ed boxes as you wish. Do note that this will
+"steal" two IP's for you, one for the broadcast address and one for the network
+address. This is pretty much up to you to decide and to implement. This
+tutorial will give you the tools to actually accomplish the firewalling and
+<systemitem>NAT</systemitem>ing part, but it will not tell you exactly what
+you need to do since it is out of the scope of the tutorial.
+    </para>
+
+    <para>
+    The rc.DMZ.firewall.txt script requires these options to be compiled into
+your kernel, either statically or as modules. Without these options, at the very
+least, available in your kernel, you will not be able to use this scripts
+functionality. You may in other words get a lot of errors complaining about
+modules and targets/jumps or matches missing. If you are planning to do traffic
+control or any other things like that, you should see to it that you have all
+the required options compiled into your kernel there as well.
+    </para>
+
+    <itemizedlist mark="opencircle">
+     <listitem>
+      <para>
+      CONFIG_NETFILTER
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_CONNTRACK
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_IPTABLES
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_MATCH_LIMIT
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_MATCH_STATE
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_FILTER
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_NAT
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_TARGET_LOG
+      </para>
+     </listitem>
+    </itemizedlist>
+
+    <para>
+You need to have two internal networks with this script as you can see from the
+picture. One uses IP range 192.168.0.0/24 and consists of a <systemitem>Trusted
+Internal Network</systemitem>. The other one uses IP range 192.168.1.0/24 and
+consists of the <systemitem>De-Militarized Zone</systemitem> which we will do
+1-to-1 <systemitem>NAT</systemitem> to. For example, if someone from the
+Internet sends a packet to our <varname>DNS_IP</varname>, then we use
+<systemitem>DNAT</systemitem> to send the packet on to our
+<systemitem>DNS</systemitem> on the <systemitem>DMZ</systemitem> network. When
+the <systemitem>DNS</systemitem> sees our packet, the packet will be destined
+for the actual <systemitem>DNS</systemitem> internal network IP, and not to our
+external <systemitem>DNS</systemitem> IP. If the packet would not have been
+translated, the <systemitem>DNS</systemitem> wouldn't have answered the packet.
+We will show a short example of how the <systemitem>DNAT</systemitem> code
+looks:
+    </para>
+
+    <screen>
+<command>
+$IPTABLES -t nat -A PREROUTING -p TCP -i $INET_IFACE -d $DNS_IP \
+--dport 53 -j DNAT --to-destination $DMZ_DNS_IP
+</command>
+    </screen>
+
+    <para>
+First of all, <systemitem>DNAT</systemitem> can only be performed in the
+<systemitem>PREROUTING</systemitem> chain of the <systemitem>nat</systemitem>
+table. Then we look for <systemitem>TCP</systemitem> protocol on our
+<varname>$INET_IFACE</varname> with destination IP that matches our
+<varname>$DNS_IP</varname>, and is directed to port 53, which is the
+<systemitem>TCP</systemitem> port for zone transfers between name servers. If
+we actually get such a packet we give a target of
+<systemitem>DNAT</systemitem>. After that we specify where we want the packet 
+to go with the <command>--to-destination</command> option and give it the value 
+of <varname>$DMZ_DNS_IP</varname>, in other words the IP of the
+<systemitem>DNS</systemitem> on our <systemitem>DMZ</systemitem> network. This
+is how basic <systemitem>DNAT</systemitem> works. When the reply to the
+<systemitem>DNAT</systemitem>ed packet is sent through the firewall, it
+automatically gets un-DNATed.
+    </para>
+
+    <para>
+By now you should have enough understanding of how everything works to be able
+to understand this script pretty well without any huge complications. If there
+is something you don't understand that hasn't been gone through in the rest of
+the tutorial, mail me since it is probably a fault on my side.
+    </para>
+
+   </section>
+
+   <section id="rcDHCPfirewalltxt">
+    <title id="rcDHCPfirewalltxt.title">rc.DHCP.firewall.txt</title>
+    <indexterm zone="rcDHCPfirewalltxt">
+      <primary>rc.DHCP.firewall.txt</primary>
+    </indexterm>
+    <indexterm zone="rcDHCPfirewalltxt">
+      <primary>Example scripts</primary>
+      <secondary>rc.DHCP.firewall.txt</secondary>
+    </indexterm>
+    <indexterm zone="rcDHCPfirewalltxt">
+      <primary>Dynamic Host Configuration Protocol (DHCP)</primary>
+    </indexterm>
+ 
+     <para> 
+     <mediaobject>
+      <imageobject>
+       <imagedata fileref="images/rc_DHCP_firewall.eps" format="eps">
+      </imageobject>
+      <imageobject>
+       <imagedata fileref="images/rc_DHCP_firewall.jpg" format="jpg">
+      </imageobject>
+     </mediaobject>
+    </para>
+
+    <para>
+The <ulink
+url="http://iptables-tutorial.frozentux.net/scripts/rc.DHCP.firewall.txt">
+rc.DHCP.firewall.txt</ulink> script is pretty much identical to the original
+<link linkend="rcfirewalltxt" endterm="rcfirewalltxt.title"></link>. However,
+this script no longer uses the <command>STATIC_IP</command> variable, which is
+the main change to the original rc.firewall.txt script. The reason is that
+this won't work together with a dynamic IP connection. The actual changes
+needed to be done to the original script are minimal, however, I've had some
+people mail me and ask about the problem so this script will be a good
+solution for you. This script will allow people who uses
+<systemitem>DHCP</systemitem>, <systemitem>PPP</systemitem> and
+<systemitem>SLIP</systemitem> connections to connect to the Internet.
+</para>
+
+    <para>
+    The <filename>rc.DHCP.firewall.txt</filename> script requires the following
+options to be compiled statically to the kernel, or as modules, as a bare
+minimum to run properly.
+    </para>
+
+    <itemizedlist mark="opencircle">
+     <listitem>
+      <para>
+      CONFIG_NETFILTER
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_CONNTRACK
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_IPTABLES
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_MATCH_LIMIT
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_MATCH_STATE
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_FILTER
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_NAT
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_TARGET_MASQUERADE
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_TARGET_LOG
+      </para>
+     </listitem>
+    </itemizedlist>
+
+    <para>
+The main changes done to the script consist of erasing the
+<varname>STATIC_IP</varname> variable as I already said and deleting all
+references to this variable. Instead of using this variable the script now 
+does its main filtering on the variable <varname>INET_IFACE</varname>. In
+other words <command>-d $STATIC_IP</command> has been changed to <command>-i
+$INET_IFACE</command>. This is pretty much the only change made and that's all
+that's needed really.
+    </para>
+
+    <para>
+There are some more things to think about though. We can no longer filter in the
+<systemitem>INPUT</systemitem> chain depending on, for example,
+<command>--in-interface $LAN_IFACE --dst $INET_IP</command>. This in turn forces
+us to filter only based on interfaces in such cases where the internal machines
+must access the Internet addressable IP. One great example is if we are
+running an <systemitem>HTTP</systemitem> on our firewall. If we go to the main
+page (i.e., http://192.168.0.1/), which contains static links back to the same 
+host (i.e., http://foobar.dyndns.net/fuubar.html), which could be some dyndns 
+solution, we would get a minor problem. The
+<systemitem>NAT</systemitem>ed box would ask the <systemitem>DNS</systemitem>
+for the IP of the <systemitem>HTTP</systemitem> server, then try to access
+that IP. In case we filter based on interface and IP, the
+<systemitem>NAT</systemitem>ed box would be unable to get to the
+<systemitem>HTTP</systemitem> because the <systemitem>INPUT</systemitem> chain
+would <command>DROP</command> the packets flat to the ground. This also
+applies in a sense to the case where we got a static IP, but in such cases it
+could be gotten around by adding rules which check the
+<systemitem>LAN</systemitem> interface packets for our
+<varname>INET_IP</varname>, and if so <command>ACCEPT</command> them.
+    </para>
+
+    <para>
+As you may read from above, it may be a good idea to get a script, or
+write one, that handles dynamic IP in a better sense. We could for example
+make a script that grabs the IP from <command>ifconfig</command> and adds it to
+a variable, upon boot-up of the Internet connection. A good way to do this, 
+would be to use, for example, the <filename>ip-up</filename> scripts provided
+with <command>pppd</command> and some other programs. For a good site, check
+out the linuxguruz.org iptables site which has a huge collection of scripts
+available to download. You will find a link to the linuxguruz.org site from
+the <link linkend="otherresources" endterm="otherresources.title"></link>
+appendix.     </para>
+
+    <note>
+     <para>
+This script might be a bit less secure than the
+<filename>rc.firewall.txt</filename> script. I would definitely advise you to
+use that script if at all possible since this script is more open to attacks
+from the outside.
+     </para>
+    </note>
+
+    <para>
+    Also, there is the possibility to add something like this to your scripts:
+    </para>
+
+    <screen>
+<command>
+INET_IP=`ifconfig $INET_IFACE | grep inet | cut -d : -f 2 | \
+cut -d ' ' -f 1`
+</command>
+    </screen>
+
+    <para>
+    The above would automatically grab the <systemitem>IP address</systemitem>
+of the <command>$INET_IFACE</command> variable, grep the correct line which
+contains the <systemitem>IP address</systemitem> and then cuts it down
+to a manageable <systemitem>IP address</systemitem>. For a more
+elaborate way of doing this, you could apply the snippets of code available
+within the <ulink url="scripts/retrieveip.txt">retreiveip.txt</ulink> script,
+which will automatically grab your Internet IP address when you run the script.
+Do note that this may in turn lead to a little bit of "weird" behavior, such
+as stalling connections to and from the firewall on the internal side. The
+most common strange behaviors are described in the following list.
+
+    </para>
+
+
+    <orderedlist numeration="arabic">
+     <listitem>
+      <para>
+      If the script is run from within a script which in turn is executed by,
+for example, the <systemitem>PPP daemon</systemitem>, it will hang all currently
+active connections due to the NEW not SYN rules (see the <link
+linkend="newnotsyn" endterm="newnotsyn.title"></link> section). It is possible
+to get by, if you get rid of the <systemitem>NEW not SYN</systemitem> rules for
+example, but it is questionable.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+     If you got rules that are static and always want to be around, it is
+rather harsh to add and erase rules all the time, without hurting the already
+existing ones. For example, if you want to block hosts on your
+<systemitem>LAN</systemitem> to connect to the firewall, but at the same time
+operate a script from the <systemitem>PPP daemon</systemitem>, how would you do
+it without erasing your already active rules blocking the
+<systemitem>LAN</systemitem>?
+
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+     It may get unnecessarily complicated, as seen above which, in turn, could
+lead to security compromises. If the script is kept simple, it is easier to spot
+problems, and to keep order in it.
+      </para>
+     </listitem>
+    </orderedlist>
+
+   </section>
+
+   <section id="rcutinfirewalltxt">
+    <title id="rcutinfirewalltxt.title">rc.UTIN.firewall.txt</title>
+    <indexterm zone="rcutinfirewalltxt">
+      <primary>rc.UTIN.firewall.txt</primary>
+    </indexterm>
+    <indexterm zone="rcutinfirewalltxt">
+      <primary>Example scripts</primary>
+      <secondary>rc.UTIN.firewall.txt</secondary>
+    </indexterm>
+ 
+     <para>
+     <mediaobject>
+      <imageobject>
+       <imagedata fileref="images/rc_UTIN_firewall.eps" format="eps">
+      </imageobject>
+      <imageobject>
+       <imagedata fileref="images/rc_UTIN_firewall.jpg" format="jpg">
+      </imageobject>
+     </mediaobject>
+    </para>
+
+    <para>
+    The <ulink
+url="http://iptables-tutorial.frozentux.net/scripts/rc.UTIN.firewall.txt">
+rc.UTIN.firewall.txt</ulink> script will in contrast to the other scripts block the
+<systemitem>LAN</systemitem> that is sitting behind us. In other words, we don't
+trust anyone on any networks we are connected to. We also disallow people on our
+<systemitem>LAN</systemitem> to do anything but specific tasks on the Internet.
+The only things we actually allow are <systemitem>POP3</systemitem>,
+<systemitem>HTTP</systemitem> and <systemitem>FTP</systemitem> access to the
+Internet. We also don't trust the internal users to access the firewall more
+than we trust users on the Internet.
+    </para>
+
+    <para>
+    The <filename>rc.UTIN.firewall.txt</filename> script requires the following
+options to be compiled statically to the kernel, or as modules. Without one or
+more of these, the script will become more or less flawed since parts of the
+script's required functionalities will be unusable. As you change the script you
+use, you could possibly need more options to be compiled into your kernel
+depending on what you want to use.
+    </para>
+
+    <itemizedlist mark="opencircle">
+     <listitem>
+      <para>
+      CONFIG_NETFILTER
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_CONNTRACK
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_IPTABLES
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_MATCH_LIMIT
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_MATCH_STATE
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_FILTER
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_NAT
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+      CONFIG_IP_NF_TARGET_LOG
+      </para>
+     </listitem>
+    </itemizedlist>
+
+    <para>
+    This script follows the golden rule to not trust anyone, not
+even our own employees. This is a sad fact, but a large part of the hacks and
+cracks that a company gets hit by are a matter of people from their own staff
+perpetrating the hit. This script will hopefully give you some clues as to what
+you can do with your firewall to strengthen it. It's not very different from
+the original <filename>rc.firewall.txt</filename> script, but it does give a few
+hints at what we would normally let through etc.
+    </para>
+   </section>
+
+   <section id="rctest-iptablestxt">
+    <title id="rctest-iptablestxt.title">rc.test-iptables.txt</title>
+    <indexterm zone="rctest-iptablestxt">
+      <primary>rc.test-iptables.txt</primary>
+    </indexterm>
+    <indexterm zone="rctest-iptablestxt">
+      <primary>Example scripts</primary>
+      <secondary>rc.test-iptables.txt</secondary>
+    </indexterm>
+ 
+    <para>
+The <ulink
+url="http://iptables-tutorial.frozentux.net/scripts/rc.test-iptables.txt">
+rc.test-iptables.txt</ulink> script can be used to test all the different
+chains, but it might need some tweaking depending on your configuration, such
+as turning on <command>ip_forwarding</command>, and setting up
+<systemitem>masquerading</systemitem> etc. It will work for most everyone 
+who has all the basic set up and all the basic tables loaded into kernel.
+All it really does is set some <command>LOG</command> targets which will log
+ping replies and ping requests. This way, you will get information on which
+chain was traversed and in which order. For example, run this script and then
+do:
+    </para>
+
+    <screen>
+<command>
+ping -c 1 host.on.the.internet
+</command>
+    </screen>
+
+    <para>
+And <command>tail -n 0 -f /var/log/messages</command> while doing the first
+command. This should show you all the different chains used, and in which order,
+unless the log entries are swapped around for some reason.
+    </para>
+
+    <note>
+     <para>
+This script was written for testing purposes only. In other words,
+it's not a good idea to have rules like this that log everything of one sort
+since your log partitions might get filled up quickly and it would be an
+effective Denial of Service attack against you and might lead to real attacks on
+you that would be unlogged after the initial Denial of Service attack.
+     </para>
+    </note>
+
+   </section>
+
+   <section id="rcflush-iptablestxt">
+    <title id="rcflush-iptablestxt.title">rc.flush-iptables.txt</title>
+    <indexterm zone="rcflush-iptablestxt">
+      <primary>rc.flush-iptables.txt</primary>
+    </indexterm>
+    <indexterm zone="rcflush-iptablestxt">
+      <primary>Example scripts</primary>
+      <secondary>rc.flush-iptables.txt</secondary>
+    </indexterm>
+    <indexterm zone="rcflush-iptablestxt">
+      <primary>Flush iptables</primary>
+    </indexterm>
+
+ 
+    <para>
+The <ulink
+url="http://iptables-tutorial.frozentux.net/scripts/rc.flush-iptables.txt">
+rc.flush-iptables.txt</ulink> script should not really be called
+a script in itself. The <ulink
+url="http://iptables-tutorial.frozentux.net/scripts/rc.flush-iptables.txt">
+rc.flush-iptables.txt</ulink>  script will reset and flush
+all your tables and chains. The script starts by setting the default policies
+to <command>ACCEPT</command> on the <systemitem>INPUT</systemitem>,
+<systemitem>OUTPUT</systemitem> and <systemitem>FORWARD</systemitem> chains of
+the <systemitem>filter</systemitem> table. After this we reset the default
+policies of the <systemitem>PREROUTING</systemitem>,
+<systemitem>POSTROUTING</systemitem> and <systemitem>OUTPUT</systemitem>
+chains of the <systemitem>nat</systemitem> table. We do this first so we won't
+have to bother about closed connections and packets not getting through. This
+script is intended for actually setting up and troubleshooting your firewall,
+and hence we only care about opening the whole thing up and resetting it to
+default values.
+    </para>
+
+    <para>
+After this we flush all chains first in the <systemitem>filter</systemitem>
+table and then in the <systemitem>NAT</systemitem> table. This way we know there
+are no redundant rules lying around anywhere. When all of this is done, we jump
+down to the next section where we erase all the user specified chains in the
+<systemitem>NAT</systemitem> and <systemitem>filter</systemitem> tables. When
+this step is done, we consider the script done. You may consider adding rules
+to flush your <systemitem>mangle</systemitem> table if you use it.
+    </para>
+
+    <note>
+     <para>
+One final word on this issue. Certain people have mailed me asking me to
+put this script into the original rc.firewall script using Red Hat Linux
+syntax where you type something like rc.firewall start and the script starts.
+However, I will not do that since this is a tutorial and should be used as a
+place to fetch ideas mainly and it shouldn't be filled up with shell scripts
+and strange syntax. Adding shell script syntax and other things makes the
+script harder to read as far as I am concerned and the tutorial was written
+with readability in mind and will continue being so.
+     </para>
+    </note>
+   </section>
+
+   <section id="limit-matchtxt">
+    <title id="limit-matchtxt.title">Limit-match.txt</title>
+    <indexterm zone="limit-matchtxt">
+      <primary>Limit-match.txt</primary>
+    </indexterm>
+    <indexterm zone="limit-matchtxt">
+      <primary>Example scripts</primary>
+      <secondary>Limit-match.txt</secondary>
+    </indexterm>
+    <indexterm zone="limit-matchtxt">
+      <primary>Limit match</primary>
+    </indexterm>
+ 
+     <para>
+The <ulink 
+url="http://iptables-tutorial.frozentux.net/scripts/limit-match.txt">limit-match.txt</ulink> 
+script is a minor test script which will let you test the limit match and see 
+how it works. Load the script up, and then send ping packets at different 
+intervals to see which gets through, and how often they get through. All 
+<systemitem>echo replies</systemitem> will be blocked until the threshold 
+for the burst limit has again been reached.
+     </para>
+   </section>
+
+   <section id="pid-ownertxt">
+    <title id="pid-ownertxt.title">Pid-owner.txt</title>
+    <indexterm zone="pid-ownertxt">
+      <primary>Pid-owner.txt</primary>
+    </indexterm>
+    <indexterm zone="pid-ownertxt">
+      <primary>Example scripts</primary>
+      <secondary>Pid-owner.txt</secondary>
+    </indexterm>
+    <indexterm zone="pid-ownertxt">
+      <primary>Owner match</primary>
+      <secondary>Pid match</secondary>
+    </indexterm>
+    <indexterm zone="pid-ownertxt">
+      <primary>Owner match</primary>
+    </indexterm>
+ 
+    <para>
+The <ulink
+url="http://iptables-tutorial.frozentux.net/scripts/pid-owner.txt">pid-owner.txt</ulink>
+is a small example script that shows how we could use the PID owner 
+match. It does nothing real, but you should be able to run the script, and 
+then from the output of <command>iptables -L -v</command> be able to tell 
+that the rule actually matches.
+    </para>
+   </section>
+
+   <section id="recent-matchtxt">
+    <title id="recent-matchtxt.title">Recent-match.txt</title>
+    <indexterm zone="recent-matchtxt">
+      <primary>Recent-match.txt</primary>
+    </indexterm>
+    <indexterm zone="recent-matchtxt">
+      <primary>Example scripts</primary>
+      <secondary>Recent-match.txt</secondary>
+    </indexterm>
+    <indexterm zone="recent-matchtxt">
+      <primary>Recent match</primary>
+    </indexterm>
+ 
+    <para>
+The <ulink
+url="http://iptables-tutorial.frozentux.net/scripts/recent-match.txt">
+recent-match.txt</ulink> script is a small example of how the 
+<systemitem>recent</systemitem> match can be used. For a complete explanation 
+of this script take a look at the <link linkend="recentmatch" endterm="recentmatch.title"></link> section in the <link linkend="matches" 
+endterm="matches.title"></link> chapter.
+    </para>
+   </section>
+
+   <section id="sid-ownertxt">
+    <title id="sid-ownertxt.title">Sid-owner.txt</title>
+    <indexterm zone="sid-ownertxt">
+      <primary>Sid-owner.txt</primary>
+    </indexterm>
+    <indexterm zone="sid-ownertxt">
+      <primary>Example scripts</primary>
+      <secondary>Sid-owner.txt</secondary>
+    </indexterm>
+    <indexterm zone="sid-ownertxt">
+      <primary>Owner match</primary>
+      <secondary>Sid match</secondary>
+    </indexterm>
+    <indexterm zone="sid-ownertxt">
+      <primary>Owner match</primary>
+    </indexterm>
+ 
+    <para>
+The <ulink 
+url="http://iptables-tutorial.frozentux.net/scripts/sid-owner.txt">sid-owner.txt</ulink> 
+is a small example script that shows how we could use the SID owner
+match. It does nothing real, but you should be able to run the script, and
+then from the output of <command>iptables -L -v</command> be able to tell
+that the rule actually matches.
+    </para>
+   </section>
+
+   <section id="ttl-inctxt">
+    <title id="ttl-inctxt.title">Ttl-inc.txt</title>
+    <indexterm zone="ttl-inctxt">
+      <primary>TTL-inc.txt</primary>
+    </indexterm>
+    <indexterm zone="ttl-inctxt">
+      <primary>Example scripts</primary>
+      <secondary>TTL-inc.txt</secondary>
+    </indexterm>
+    <indexterm zone="ttl-inctxt">
+      <primary>TTL target</primary>
+    </indexterm>
+ 
+    <para>
+A small example <ulink 
+url="http://iptables-tutorial.frozentux.net/scripts/ttl-inc.txt">ttl-inc.txt</ulink> 
+script. This script shows how we could make the firewall/router invisible to 
+traceroutes, which would otherwise reveal much information to possible 
+attackers.
+    </para>
+   </section>
+
+   <section id="iptsave-ruleset">
+    <title id="iptsave-ruleset.title">Iptables-save ruleset</title>
+    <indexterm zone="iptsave-ruleset">
+      <primary>Iptables-save ruleset</primary>
+    </indexterm>
+    <indexterm zone="iptsave-ruleset">
+      <primary>Example scripts</primary>
+      <secondary>Iptables-save ruleset</secondary>
+    </indexterm>
+ 
+    <para>
+A small <ulink url="http://iptables-tutorial.frozentux.net/scripts/iptsave-ruleset.txt">
+example script</ulink> used in the <link linkend="saveandrestore" 
+endterm="saveandrestore.title"></link> chapter to illustrate how iptables-save 
+may be used. This script is non-working, and should hence not be used for 
+anything else than a reference.
+    </para>
+   </section>
+
+   <section>
+     <title>What's next?</title>
+
+     <para>
+The chapter you have just read basically gave you a brief overlook of all the
+different scripts that are available with this tutorial and the basic idea
+that they are trying to bring across to you. Hopefully it has been able to
+explain something at the very least.
+     </para>
+
+     <para>
+The next chapter will discuss some different graphical user interfaces that
+are available for iptables and netfilter. This is far from a complete listing
+of all the different interfaces available, but as you can see, there are quite
+a lot of othem. These interfaces mostly tries to simplify creating iptables
+scripts for you, and for simple setups they are more than enough most of the
+time. At other times, you may have higher and more complex needs and you must
+have to write your own script none the less.
+     </para>
+   </section>
+
+ </chapter>
+

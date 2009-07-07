@@ -1,0 +1,600 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>TCP/IP repetition</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="PREVIOUS"
+TITLE="What's next?"
+HREF="x167.htm"><LINK
+REL="NEXT"
+TITLE="IP characteristics"
+HREF="x362.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x167.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x362.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="TCPIPREPETITION"
+></A
+>Chapter 2. TCP/IP repetition</H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Table of Contents</B
+></DT
+><DT
+><A
+HREF="c171.htm#TCPIPLAYERS"
+>TCP/IP Layers</A
+></DT
+><DT
+><A
+HREF="x362.htm"
+>IP characteristics</A
+></DT
+><DT
+><A
+HREF="x430.htm"
+>IP headers</A
+></DT
+><DT
+><A
+HREF="x669.htm"
+>TCP characteristics</A
+></DT
+><DT
+><A
+HREF="x724.htm"
+>TCP headers</A
+></DT
+><DT
+><A
+HREF="x956.htm"
+>UDP characteristics</A
+></DT
+><DT
+><A
+HREF="x980.htm"
+>UDP headers</A
+></DT
+><DT
+><A
+HREF="x1030.htm"
+>ICMP characteristics</A
+></DT
+><DT
+><A
+HREF="x1078.htm"
+>ICMP headers</A
+></DT
+><DT
+><A
+HREF="x1535.htm"
+>SCTP Characteristics</A
+></DT
+><DT
+><A
+HREF="x1736.htm"
+>SCTP Headers</A
+></DT
+><DT
+><A
+HREF="x2836.htm"
+>TCP/IP destination driven 
+routing</A
+></DT
+><DT
+><A
+HREF="x2856.htm"
+>What's next?</A
+></DT
+></DL
+></DIV
+><P
+>Iptables is an extremely knowledge intensive tool. This means that iptables 
+takes quite a bit of knowledge to be able to use iptables to it's full extent. 
+Among other things, you must have a very good understanding of the
+TCP/IP protocol.    
+    </P
+><P
+>This chapter aims at explaining the pure "must understands" of
+TCP/IP before you can go on and work with iptables.
+Among the things we will go through are the IP,
+TCP, UDP and
+ICMP protocols and their headers, and general usages
+of each of these protocols and how they correlate to each other. Iptables
+works inside Internet and Transport layers, and because of that, this chapter
+will focus mainly on those layers as well.
+    </P
+><P
+>Iptables is also able to work on higher layers, such as the Application layer.
+However, it was not built for this task, and should not be used for that kind of
+usage. I will explain more about this in the <A
+HREF="c2873.htm"
+><I
+>IP filtering introduction</I
+></A
+> chapter.
+    </P
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="TCPIPLAYERS"
+>TCP/IP Layers</A
+></H1
+><P
+>TCP/IP is, as already stated, multi-layered. This
+means that we have one functionality running at one depth, and another one at
+another level, etcetera. The reason that we have all of these layers is
+actually very simple.
+      </P
+><P
+>The biggest reason is that the whole architecture is very extensible. We can
+add new functionality to the application layers, for example, without having to
+reimplement the whole TCP/IP stack code, or to
+include a complete TCP/IP stack into the actual
+application. Just the same way as we don't need to rewrite every single
+program, every time that we make a new network interface card. Each layer
+should need to know as little as possible about each other, to keep them
+separated.
+      </P
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>When we are talking about the programming code of
+TCP/IP which resides inside the kernel, we are often
+talking about the TCP/IP stack. The
+TCP/IP stack simply means all of the sublayers used,
+from the Network access layer and all the way up to the Application layer.
+        </P
+></TD
+></TR
+></TABLE
+></DIV
+><P
+>There are two basic architectures to follow when talking about layers. One of
+them is the OSI (Open Systems
+Interconnect) Reference Model and consists of 7 layers. We will
+only look at it superficially here since we are more interested in the
+TCP/IP layers. However, from an historical point,
+this is interesting to know about, especially if you are working with lots of
+different types of networks. The layers are as follows in the <A
+HREF="c171.htm#OSIREFERENCE"
+>OSI Reference Model</A
+> list.
+      </P
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>There is some discussion as to which of these reference models is mostly used, 
+but it seems that the OSI reference model still is
+the prevalent reference model. This might also depend on where you live,
+however, in most US and EU countries it seems as you can default to
+OSI reference model while speaking to technicians and
+salespeople. 
+        </P
+><P
+>However, throughout the rest of this document, we will mainly refer to the 
+TCP/IP reference model, unless otherwise noted.
+        </P
+></TD
+></TR
+></TABLE
+></DIV
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>            Application layer
+          </P
+></LI
+><LI
+><P
+>            Presentation layer
+          </P
+></LI
+><LI
+><P
+>            Session layer
+          </P
+></LI
+><LI
+><P
+>            Transport layer
+          </P
+></LI
+><LI
+><P
+>            Network layer
+          </P
+></LI
+><LI
+><P
+>            Data Link layer
+          </P
+></LI
+><LI
+><P
+>            Physical layer
+          </P
+></LI
+></OL
+><P
+>A packet that is sent by us, goes from the top and to the bottom of this list, 
+each layer adding its own set of <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>headers</I
+></SPAN
+> to the packet in 
+what we call the encapsulation phase. When the packet finally reaches it's 
+destination the packet goes backwards through the list and the headers are 
+stripped out of the packet, one by one, each header giving the destination host 
+all of the needed information for the packet data to finally reach the 
+application or program that it was destined for.
+      </P
+><P
+>The second and more interesting layering standard that we are more interested in
+is the TCP/IP protocol architecture, as shown in the <A
+HREF="c171.htm#TCPIPLAYERS.LIST"
+>TCP/IP architecture</A
+> list. There is no 
+universal agreement among people on just how many layers there are in the 
+TCP/IP architecture. However, it is generally considered that there are 3 
+through 5 layers available, and in most pictures and explanations, there will 
+be 4 layers discussed. We will, for simplicities sake, only consider those 
+four layers that are generally discussed.
+      </P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>            Application layer
+          </P
+></LI
+><LI
+><P
+>            Transport layer
+          </P
+></LI
+><LI
+><P
+>            Internet layer
+          </P
+></LI
+><LI
+><P
+>            Network Access layer
+          </P
+></LI
+></OL
+><P
+>As you can see, the architecture of the TCP/IP
+protocol set is very much like the OSI Reference
+Model, but yet not. Just the same as with the OSI
+Reference Model, we add and subtract headers for each layer that we enter or
+leave.
+      </P
+><P
+>For example, lets use one of the most common analogies to modern computer 
+networking, the snail-mail letter. Everything is done in steps, just as 
+is everything in TCP/IP.
+      </P
+><P
+>You want to send a letter to someone asking how they are, and what they are
+doing. To do this, you must first create the data, or questions. The actual 
+data would be located inside the Application layer.
+      </P
+><P
+>After this we would put the data written on a sheet of paper inside an envelope 
+and write on it to whom the letter is destined for within a specific company or 
+household. Perhaps something like the example below:
+      </P
+>Attn: John Doe
+      <P
+>This is equivalent to the the Transport layer, as it
+is known in TCP/IP. In the Transport
+layer, if we were dealing with TCP, this
+would have been equivalent to some port (e.g., port 25).
+      </P
+><P
+>At this point we write the address on the envelope of the recipient, such as 
+this:
+      </P
+>V. Andersgardsgatan 2
+41715 Gothenburg
+      <P
+>This would in the analogy be the same as the Internet
+layer. The internet layer contains
+information telling us where to reach the recipient, or host, in a
+TCP/IP network. Just the same way as the recipient on
+an envelope. This would be the equivalent of the IP address in other words
+(e.g., IP 192.168.0.4).
+      </P
+><P
+>The final step is to put the whole letter in a postbox. Doing this would
+approximately equal to putting a packet into the Network Access
+Layer. The network access layer contains
+the functions and routines for accessing the actual physical network that the
+packet should be transported over.
+      </P
+><P
+>When the receiver finally receives the letter, he will open the whole letter 
+from the envelope and address etc (decapsulate it). The letter he receives may 
+either require a reply or not. In either case, the letter may be replied upon
+by the receiver, by reversing the receiver and transmitter addresses on the
+original letter he received, so that receiver becomes transmitter, and
+transmitter becomes receiver.
+      </P
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>It is very important to understand that iptables was and is specifically built 
+to work on the headers of the Internet and the
+Transport layers. It is possible to do some very
+basic filtering with iptables in the Application and
+Network access layers as well, but it was not
+designed for this, nor is it very suitable for those purposes. 
+        </P
+><P
+>For example, if we use a string match and match for a specific string inside
+the packet, lets say get /index.html. Will that work?
+Normally, yes. However, if the packet size is very small, it will not. The
+reason is that iptables is built to work on a <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>per packet</I
+></SPAN
+>
+basis, which means that if the string is split into several separate packets,
+iptables will not see that whole string. For this reason, you are much, much
+better off using a proxy of
+some sort for filtering in
+the application layer. We will discuss these problems in more detail later on
+in the <A
+HREF="c2873.htm"
+><I
+>IP filtering introduction</I
+></A
+>.
+        </P
+></TD
+></TR
+></TABLE
+></DIV
+><P
+>As iptables and netfilter mainly operate in the
+Internet and Transport
+layers, that is the layers that we will put our main focus in, in the upcoming
+sections of this chapter. Under the Internet layer, we will almost exclusively
+see the IP protocol. There are a few additions to
+this, such as, for example, the
+GRE 
+protocol, but they are very rare on the internet. Also, iptables is (as the
+name implies) not focused around these protocols very well either. Because of
+all these factors we will mainly focus around the IP
+protocol of  the Internet layer, and
+TCP, UDP and
+ICMP of the Transport layer.
+      </P
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>The ICMP protocol is actually sort of a mix between
+the two layers. It runs in the Internet layer, but it
+has the exact same headers as the IP protocol, but
+also a few extra headers, and then directly inside that encapsulation, the
+data. We will discuss this in more detail further on, in the <A
+HREF="x1030.htm"
+><I
+>ICMP characteristics</I
+></A
+>.
+        </P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x167.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x362.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>What's next?</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>IP characteristics</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,271 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>TCPMSS target</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="Iptables targets and jumps"
+HREF="c8815.htm"><LINK
+REL="PREVIOUS"
+TITLE="SNAT target"
+HREF="x10324.htm"><LINK
+REL="NEXT"
+TITLE="TOS target"
+HREF="x10464.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x10324.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 11. Iptables targets and jumps</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x10464.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="TCPMSSTARGET"
+>TCPMSS target</A
+></H1
+><P
+>The TCPMSS target can be used to alter the
+MSS (Maximum Segment Size)
+value of TCP SYN packets that the firewall sees. The
+MSS value is used to control the maximum size of
+packets for specific connections. Under normal circumstances, this means the
+size of the MTU (Maximum Transfer
+Unit) value, minus 40 bytes. This is used to overcome some ISP's
+and servers that block ICMP fragmentation needed
+packets, which can result in really weird problems which can mainly be
+described such that everything works perfectly from your firewall/router, but
+your local hosts behind the firewall can't exchange large packets. This could
+mean such things as mail servers being able to send small mails, but not large
+ones, web browsers that connect but then hang with no data received, and ssh
+connecting properly, but scp hangs after the initial handshake. In other
+words, everything that uses any large packets will be unable to work.
+     </P
+><P
+>The TCPMSS target is able to solve these problems, by
+changing the size of the packets going out through a connection. Please note
+that we only need to set the MSS on the
+SYN packet since the hosts take care of the
+MSS after that. The target takes two arguments.
+     </P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.TCPMSSTARGET"
+></A
+><P
+><B
+>Table 11-18. TCPMSS target options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Option</TD
+><TD
+>--set-mss</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -t mangle -A POSTROUTING -p tcp --tcp-flags 
+SYN,RST SYN -o eth0 -j TCPMSS --set-mss 1460
+        </TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>The --set-mss argument explicitly sets a specific
+MSS value of all outgoing packets. In the example
+above, we set the MSS of all
+SYN packets going out over the eth0 interface to 1460
+bytes -- normal MTU for ethernet is 1500 bytes, minus
+40 bytes is 1460 bytes. MSS only has to be set
+properly in the SYN packet, and then the peer hosts
+take care of the MSS automatically.
+        </TD
+></TR
+><TR
+><TD
+>Option</TD
+><TD
+>--clamp-mss-to-pmtu</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -t mangle -A POSTROUTING -p tcp --tcp-flags 
+SYN,RST SYN -o eth0 -j TCPMSS --clamp-mss-to-pmtu
+        </TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>The --clamp-mss-to-pmtu automatically sets the
+MSS to the proper value, hence you don't need to
+explicitly set it. It is automatically set to PMTU
+(Path Maximum Transfer Unit) minus 40 bytes, which
+should be a reasonable value for most applications.
+        </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Works under Linux kernel 2.5 and 2.6.
+      </P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x10324.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x10464.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>SNAT target</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c8815.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>TOS target</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

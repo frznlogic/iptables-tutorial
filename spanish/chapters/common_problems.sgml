@@ -1,0 +1,357 @@
+<appendix id="commonproblems">
+<title id="commonproblems.title">Problemas y preguntas frecuentes</title>
+
+<section id="moduleproblems">
+<title id="moduleproblems.title">Problemas en la carga de módulos</title>
+
+<para>
+Puedes tener algún problema a la hora de cargar módulos. Por ejemplo, pueden
+haber errores que indican que no existe ningún módulo con ese nombre. Pueden
+tener el siguiente aspecto (lógicamente en inglés):
+</para>
+
+<screen>
+insmod: iptable_filter: no module by that name found
+</screen>
+
+   <para>
+Traducción: no se ha encontrado ningún módulo con ese nombre. Sin embargo no
+hay por qué preocuparse. Ese o esos módulos posiblemente hayan sido compilados
+estáticamente en el núcleo (kernel). Esto será lo primero que tendrás que
+comprobar cuando intentes solucionar el problema. La forma más sencilla de saber
+si los módulos ya se han cargado o si se han compilado estáticamente en el
+núcleo, es ejecutar un comando que utilice esa funcionalidad específica y ver
+lo que ocurre. En el caso anterior no se ha podido cargar la tabla de filtrado
+(tabla <systemitem>filter</systemitem>). Si esta funcionalidad no está cargada,
+seremos incapaces de utilizar la tabla de filtrado, por lo que podremos probar con:
+   </para>
+
+   <screen>
+<command>
+iptables -t filter -L
+</command>
+   </screen>
+
+   <para>
+Con ello se deberían listar todas las cadenas de la tabla
+<systemitem>filter</systemitem>, o bien podría fallar. Si todo es correcto, el
+resultado puede ser semejante a lo siguiente (dependiendo si tienes alguna
+regla en la tabla o no):
+   </para>
+
+    <screen>
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination
+
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination
+    </screen>
+
+   <para>
+Si no tienes la tabla <systemitem>filter</systemitem> cargada obtendrás un
+error parecido a:
+   </para>
+
+    <screen>
+iptables v1.2.5: can't initialize iptables table `filter': Table \
+     does not exist (do you need to insmod?)
+Perhaps iptables or your kernel needs to be upgraded.
+    </screen>
+
+    <para>
+Este error ya es algo más serio, puesto que para empezar nos dice que no
+tenemos esa funcionalidad compilada en el núcleo. Además, no es posible
+encontrar el módulo en nuestra ruta de acceso a los módulos. Esto puede
+significar que has olvidado instalar los módulos, que has olvidado ejecutar
+<command>depmod -a</command> para actualizar las bases de datos de los módulos,
+o que no has compilado la funcionalidad como módulo o estáticamente en el
+núcleo. Por supuesto pueden haber otras razones para que el módulo no esté
+cargado, pero estas son las más comunes. La mayoría de ellas se resuelven
+fácilmente. El primer problema se puede eliminar ejecutando
+<command>make modules_install</command> en el directorio de instalación del
+núcleo (siempre que el código fuente se haya compilado y los módulos se hayan
+creado). El segundo problema se resuelve ejecutando <command>depmod -a</command>
+una vez y comprobar si todo funciona a partir de entonces. El tercer problema
+se sale de los objetivos de estas explicaciones y debes solucionarlo por tu
+cuenta. Probablemente encontrarás información útil en
+<ulink url="http://www.tldp.org">Linux Documentation Project homepage</ulink>
+(en inglés) o también en <ulink url="http://es.tldp.org">TLDP-ES/LuCAS</ulink>
+(más o menos la misma página que la anterior, pero en castellano).
+   </para>
+
+   <para>
+Otro error que puede ocurrir cuando ejecutes iptables es:
+   </para>
+
+   <screen>
+iptables: No chain/target/match by that name
+   </screen>
+
+   <para>
+Este error indica que no existe esa cadena, objetivo o esa comparación. Depende
+de un montón de factores, si bien el más común que te has equivocado al escribir
+la cadena, objetivo o comparación que deseabas. También puede ser que no hayas
+cargado el módulo adecuado, no fue compilado en el núcleo o iptables no fue
+capaz de cargar automáticamente el módulo. En general debes revisar todo lo
+anterior, pero también deberías revisar si la regla está correctamente escrita
+(en iptables).
+   </para>
+
+  </section>
+
+  <section id="newnotsyn">
+   <title id="newnotsyn.title">Paquetes cuyo estado es NEW pero cuyo bit SYN no
+   se ha establecido</title>
+
+   <para>
+Existe cierta <emphasis>característica</emphasis> de <command>iptables</command>
+que no está muy bien documentada y puede ser obviada por mucha gente (sí,
+incluso yo). Si empleas el estado <command>NEW</command> de los paquetes,
+aquellos con el bit <systemitem>SYN</systemitem> sin establecer pasarán por el
+cortafuegos. Esto es así porque en determinadas ocasiones se necesita considerar
+que un paquete puede ser parte de una conexión ya establecida
+(<command>ESTABLISHED</command>) en, por ejemplo, otro cortafuegos. Con ello es
+posible tener dos o más cortafuegos y poder atravesar uno de ellos sin pérdida
+de datos. El trabajo de filtrado lo puede realizar el cortafuegos secundario, en
+la subred. Sin embargo ésto conduce al hecho de que el estado
+<command>NEW</command> permitirá casi cualquier tipo de conexión TCP,
+independientemente de si se trata de un "saludo" inicial (un establecimiento de
+conexión) o no. Para evitar este problema se añaden las siguientes reglas a las
+cadenas de los cortafuegos <systemitem>INPUT</systemitem>,
+<systemitem>OUTPUT</systemitem> y <systemitem>FORWARD</systemitem>:
+   </para>
+
+    <screen>
+<command>
+$IPTABLES -A INPUT -p tcp ! --syn -m state --state NEW -j LOG \ --log-prefix "New not syn:"
+$IPTABLES -A INPUT -p tcp ! --syn -m state --state NEW -j DROP
+</command>
+    </screen>
+
+   <caution>
+    <para>
+Las reglas anteriores evitarán este problema. Nos encontramos ante un
+comportamiento mal documentado del proyecto
+<command>Netfilter</command>/<command>iptables</command> que debería ser
+claramente expuesto para el conocimiento general. Para ser más claro, que quede
+como un enorme aviso acerca de este tipo de comportamiento en tu cortafuegos.
+    </para>
+   </caution>
+
+   <para>
+Ten en cuenta que existen algunas incompatibilidades entre las reglas anteriores
+y las malas implementaciones (adaptaciones) del TCP/IP realizadas por Microsoft.
+Las reglas anteriores conducirán a ciertas condiciones en que los paquetes
+generados por los productos de Microsoft serán etiquetados con el estado
+<command>NEW</command> y por tanto registrados y desechados. De todas formas no
+derivarán en pérdidas de conexiones, por lo que sé. El problema ocurre cuando
+una conexión se cierra, se envía el
+<systemitem>FIN</systemitem>/<systemitem>ACK</systemitem> final, el controlador
+de estado (state machine) de <command>Netfilter</command> cierra la conexión y a
+partir de entonces ya no existe en la tabla de seguimiento de conexiones
+(conntrack table). Llegados a este punto, la defectuosa implementación de
+Microsoft envía otro paquete que es considerado <command>NEW</command>, pero
+carece del bit <systemitem>SYN</systemitem> y por ello es interceptado por las
+reglas anteriores. O sea, no te preocupes demasiado por estas reglas, aunque si
+lo haces incluye la opción <command>--log-headers</command> a la regla y
+registra también las cabeceras, de forma que podrás analizar mejor cómo es el
+paquete.
+   </para>
+
+   <para>
+Aún existe otro problema conocido con estas reglas: si alguien está conectado al
+cortafuegos (por ejemplo desde la red local) y has configurado el guión (script)
+para que sea activado al realizar una conexión <systemitem>PPP</systemitem>. En
+este caso, cuando estableces una conexión <systemitem>PPP</systemitem>, aquel
+que estuviera previamente conectado a través de la red local será poco menos que
+eliminado. Aunque es cierto que esto sólo ocurre cuando estás trabajando con el
+seguimiento de conexiones y los códigos base de NAT cargados como módulos, y
+además los módulos son cargados y descargados cada vez que ejecutas el guión.
+Otra forma de llegar a este problema es ejecutar el guión
+<filename>rc.firewall.txt</filename> desde una conexión telnet, desde un
+servidor situado fuera de la red del cortafuegos. Para aclararlo: conectas
+mediante <command>telnet</command> u otra conexión. Arrancas los módulos de
+seguimiento de conexiones, después cargas las reglas "<command>NEW</command>
+not <systemitem>SYN</systemitem>". Por último, el <command>cliente telnet</command>
+o el <command>demonio (daemon)</command> intenta enviar algo. Es entonces cuando
+el código de seguimiento de conexiones no reconoce esta conexión como legal,
+puesto que no tiene constancia de ningún paquete en ninguna dirección para esta
+conexión; además no habrá ningún bit <systemitem>SYN</systemitem> establecido,
+puesto que no es el primer paquete de la conexión. Como consecuencia, el paquete
+será interceptado por estas reglas y después de añadirlo al registro, será
+eliminado.
+   </para>
+  </section>
+
+  <section id="synackandnew">
+   <title id="synackandnew.title">Paquetes SYN/ACK y NEW</title>
+
+   <para>
+Ciertos ataques de "camuflaje" TCP emplean una técnica llamada Predicción de
+Secuencia Numérica (Sequence Number Prediction). En ellos el atacante simula
+la dirección IP de otra máquina, mientras ataca a alguien e intenta predecir la
+secuencia numérica empleada por el ordenador al que está suplantando.
+   </para>
+
+   <para>
+Veamos un caso típico. "Jugadores": atacante [A] intentando enviar paquetes a la
+víctima [V], intentando hacerse pasar por otra máquina [O].
+   </para>
+
+   <orderedlist>
+<listitem><para>[A] le envía un SYN a [V] con la dirección IP de [O].</para></listitem>
+<listitem><para>[V] responde a [O] con un SYN/ACK.</para></listitem>
+<listitem><para>Entonces [O] debería responder a un SYN/ACK desconocido con un
+RST y entonces el ataque no tendría éxito, pero asumamos que [O] no está
+operativo (está desbordado, apagado o tras un cortafuegos que ha rechazado los
+paquetes).</para></listitem>
+<listitem><para>Si [O] no se interpone, entonces [A] podrá "hablar" con [V]
+haciéndose pasar por [O], siempre que pueda predecir la secuencia de números
+correcta.</para></listitem>
+   </orderedlist>
+   
+   <para>
+Mientras no enviemos el paquete RST en respuesta al SYN/ACK desconocido en el
+paso 3, permitiremos que [V] sea atacado y nos echen la culpa a nosotros. Así
+pues, será pura cortesía enviar adecuadamente el RST a [V]. Si utilizas las
+reglas "NEW not SYN" especificadas en el conjunto de reglas, los paquetes
+SYN/ACK serán desechados. Por ello se añaden las siguientes reglas en la cadena
+<systemitem>bad_tcp_packets</systemitem>, justo antes de las reglas "NEW not SYN":
+   </para>
+
+   <screen>
+<command>
+iptables -A bad_tcp_packets -p tcp --tcp-flags SYN,ACK SYN,ACK \
+-m state --state NEW -j REJECT --reject-with tcp-reset
+</command>
+   </screen>
+
+   <para>
+Gracias a ello, las posibilidades de ser [O] son relativamente pequeñas, al
+tiempo que son unas reglas seguras en casi todos los casos (excepto cuando
+ejecutas varios cortafuegos redundantes, en los que los unos se hacen cargo a
+menudo de los flujos de datos de los otros). En este caso algunas conexiones
+pueden ser bloqueadas, incluso si son legítimas. Esta regla también permite
+que algunos exploradores (scanners) de puertos sean capaces de ver nuestro
+cortafuegos, pero no serán capaces de averiguar mucho más que ésto (que el
+cortafuegos está ahí).
+   </para>
+  </section>
+
+  <section id="ispwhouseassignedip">
+   <title id="ispwhouseassignedip.title">Proveedores de Acceso a Internet que
+   emplean direcciones IP asignadas</title>
+
+   <para>
+He añadido este problema porque un amigo me dijo algo que había olvidado
+completamente. Ciertos Proveedores de Acceso a Internet (ISPs) realmente
+estúpidos asignan las direcciones IP de las redes locales (asignadas por el
+<emphasis>IANA</emphasis>) para la configuración de conexión de todos sus
+clientes. Por ejemplo, el ISP y monopolio sueco Telia emplea este método por
+ejemplo en sus servidores <systemitem>DNS</systemitem> (Servidor de Nombres de
+Dominio), que cubren el rango de direcciones 10.x.x.x. El problema es que en
+este guión no se permiten conexiones desde ninguna dirección IP del rango
+10.x.x.x, debido a las posibilidades de simulación de la dirección IP de origen
+(el "spoofing", ya discutido en el punto anterior, es una técnica mediante la
+cual el ordenador atacante modifica la cabecera de los paquetes IP de forma que
+el servidor/cortafuegos crean que provienen de una dirección IP en la que se
+confía o que al menos no es sospechosa, de forma que atraviesan el cortafuegos
+sin problemas). Bueno, tristemente es una situación en la que debes olvidarte
+de estas reglas para esas direcciones, insertando un <command>ACCEPT</command>
+antes de la sección Spoof, para permitir el tráfico desde esos servidores
+<systemitem>DNS</systemitem>, o puedes simplemente convertir en comentario esa
+parte del guión. Más o menos se debe parecer a ésto:
+   </para>
+
+   <screen>
+<command>
+/usr/local/sbin/iptables -t nat -I PREROUTING -i eth1 -s \
+     10.0.0.1/32 -j ACCEPT
+</command>
+   </screen>
+
+   <para>
+Me gustaría tomarme un momento para maldecir a esos ISPs. Estos rangos de
+direcciones IP no se han asignado para tonterías como esa, por lo menos no que
+yo sepa. Para la red de grandes empresas, para la red local de tu casa, éstos
+sí son buenos ejemplos y no el hecho de que estés obligado a abrir tu red por
+la "feliz" idea de algún listillo.
+   </para>
+
+  </section>
+
+  <section id="lettingdhcprequests">
+   <title id="lettingdhcprequests.title">Permitir peticiones DHCP a través de
+   iptables</title>
+
+   <para>
+En realidad esta es una tarea bastante sencilla, una vez sabes cómo trabaja
+el <systemitem>DHCP</systemitem>. Sin embargo debes ser algo cuidadoso acerca
+de lo que dejas pasar y lo que no. Para empezar, debes saber que
+<systemitem>DHCP</systemitem> trabaja sobre el protocolo <systemitem>UDP</systemitem>.
+Por ello es lo primero que debes mirar. Además, debes chequear a que interfaz
+le enviamos peticiones y cuál las responde. Por ejemplo, si la interfaz
+<systemitem>eth0</systemitem> está configurada a través de
+<systemitem>DHCP</systemitem>, no debes permitir peticiones
+<systemitem>DHCP</systemitem> en <systemitem>eth1</systemitem>. Para que la
+regla sea más específica sólo permitiremos los puertos <systemitem>UDP</systemitem>
+realmente empleados por <systemitem>DHCP</systemitem>, que deberían ser los
+puertos 67 y 68. Estos serán los criterios que emplearemos para comparar
+paquetes y permitir (o no) su paso. Así pues, la regla quedará poco más o
+menos así:
+   </para>
+
+   <screen>
+<command>
+$IPTABLES  -I INPUT -i $LAN_IFACE -p udp --dport 67:68 --sport \
+     67:68 -j ACCEPT
+</command>
+   </screen>
+
+   <para>
+Ten en cuenta que de esta forma se permite todo el tráfico hacia y desde los
+puertos <systemitem>UDP</systemitem> 67 y 68, aunque esto no tiene por qué ser
+un gran problema, puesto que sólo permite peticiones desde servidores conectando
+desde los mismos puertos (67 y 68). Si te preocupa esta confianza casi ciega
+(debería preocuparte), la regla se puede hacer más restrictiva, por supuesto,
+pero debería bastar para aceptar todas las peticiones y actualizaciones
+<systemitem>DHCP</systemitem> sin abrir un agujero demasiado grande en el
+cortafuegos.
+   </para>
+  </section>
+
+  <section id="mircdcc">
+   <title id="mircdcc.title">Problemas con mIRC DCC</title>
+
+   <para>
+mIRC emplea una configuración especial que le permite conectar a través de un
+cortafuegos y conseguir que las conexiones DCC funcionen correctamente sin que
+el cortafuegos se entere de nada. Si esta opción se emplea conjuntamente con
+iptables y, en concreto, con los módulos ip_conntrack_irc e ip_nat_irc,
+simplemente no funcionará. El problema es que mIRC efectuará automáticamente
+un cambio de dirección de red (NAT) al paquete y cuando éste llegue al
+cortafuegos, iptables no sabrá qué hacer con él. La cuestión es que mIRC no
+espera que exista ningún cortafuegos lo suficientemente eficiente como para
+hacer bien el cambio de dirección: no cree que simplemente preguntando al
+servidor IRC la dirección IP, el cortafuegos pueda enviar peticiones DCC a esas
+direcciones.
+   </para>
+
+   <para>
+Vamos, que activando la opción "estoy detrás de un cortafuegos" ("I am behind
+a firewall") de la configuración de mIRC y emplear los módulos ip_conntrack_irc
+y ip_nat_irc, únicamente servirá para crear entradas en el registro diciendo
+"Paquete falsificado de envío DCC" ("Forged DCC send packet").
+   </para>
+
+   <para>
+La solución más simple es no emplear dicha opción de la configuración de mIRC y
+dejar que iptables haga su trabajo. O sea, debes decirle a mIRC que
+<emphasis>no</emphasis> está detrás de un cortafuegos.
+   </para>
+  </section>
+
+ </appendix>

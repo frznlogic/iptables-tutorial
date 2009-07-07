@@ -1,0 +1,258 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Mangle table</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="Traversing of tables and chains"
+HREF="c3742.htm"><LINK
+REL="PREVIOUS"
+TITLE="Traversing of tables and chains"
+HREF="c3742.htm"><LINK
+REL="NEXT"
+TITLE="Nat table"
+HREF="x4113.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c3742.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 6. Traversing of tables and chains</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x4113.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="MANGLETABLE"
+>Mangle table</A
+></H1
+><P
+>This table should as we've already noted mainly be used for mangling packets.
+In other words, you may freely use the mangle targets within this table, to 
+change TOS (Type Of Service) fields and the like.
+   </P
+><DIV
+CLASS="CAUTION"
+><P
+></P
+><TABLE
+CLASS="CAUTION"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/caution.gif"
+HSPACE="5"
+ALT="Caution"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+> You are strongly advised not to use this table for any
+filtering; nor will any DNAT, SNAT
+or Masquerading work in this table.
+    </P
+></TD
+></TR
+></TABLE
+></DIV
+><P
+>The following targets are only valid in the mangle table. They can not be used 
+outside the mangle table.
+   </P
+><P
+></P
+><UL
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>TOS</P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>TTL</P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>MARK</P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>SECMARK</P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>CONNSECMARK</P
+></LI
+></UL
+><P
+>The TOS target is used to set and/or change
+the Type of Service field in the packet. This
+could be used for setting up policies on the network regarding how a
+packet should be routed and so on. Note that this has not been perfected
+and is not really implemented on the Internet and most of the routers
+don't care about the value in this field, and sometimes, they act faulty
+on what they get. Don't set this in other words for packets going to the
+Internet unless you want to make routing decisions on it, with iproute2.
+   </P
+><P
+> 
+The TTL  target is used to change the TTL (Time
+To Live) field of the packet. We could tell packets to only have a specific
+TTL and so on. One good reason for this could be that
+we don't want to give ourself away to nosy Internet Service Providers. Some
+Internet Service Providers do not like users running multiple computers on one
+single connection, and there are some Internet Service Providers known to look
+for a single host generating different TTL values,
+and take this as one of many signs of multiple computers connected to a single
+connection.
+   </P
+><P
+>The MARK target is used to set special mark values
+to the packet. These marks could then be recognized by the
+iproute2 programs to do different routing on the packet
+depending on what mark they have, or if they don't
+have any. We could also do bandwidth limiting and Class Based Queuing based on
+these marks.
+    </P
+><P
+>The SECMARK target can be used to set security context marks on single
+packets for usage in SELinux and other security
+systems that are able to handle these marks. This is then used for very fine
+grained security on what subsystems of the system can touch what packets et
+cetera. The SECMARK can also be set on a whole connection
+with the CONNSECMARK target. 
+    </P
+><P
+>CONNSECMARK  is used to copy a security context to or from a
+single packet from or to the whole connection. This is then used by the
+SELinux and other security systems to do more
+fine-grained security on a connection level. 
+    </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c3742.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x4113.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Traversing of tables and chains</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c3742.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Nat table</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

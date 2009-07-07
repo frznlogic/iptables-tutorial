@@ -1,0 +1,350 @@
+  <chapter id="guis">
+    <title id="guis.title">Graphical User Interfaces for 
+Iptables/netfilter</title>
+    <indexterm zone="guis">
+      <primary>Graphical user interfaces</primary>
+    </indexterm>
+    <indexterm zone="guis">
+      <primary>User interfaces</primary>
+    </indexterm>
+    <indexterm zone="guis">
+      <primary>User interfaces</primary>
+      <secondary>Graphical</secondary>
+      <seealso>Graphical user interfaces</seealso>
+    </indexterm>
+ 
+    <para>
+One side of iptables and netfilter that we haven't looked at very much yet, is 
+the graphical user interfaces that are available for iptables and netfilter. 
+One of the biggest problems with this is that netfilter is a very complex and 
+flexible setup, that can perform the strangest of tasks. For this reason, 
+it can become a very daunting task to create a <systemitem>GUI</systemitem>
+for netfilter.
+    </para>
+    
+    <para>
+Several persons and organisations have tried to create
+<systemitem>GUI's</systemitem> for netfilter and iptables, and some have
+succeeded better than others, while others have given up after some time. All
+have different reasoning behind their tries as well, so it isn't an easy task
+to show them all. However, this chapter is a small compilation of some of the
+<systemitem>GUI's</systemitem> for iptables and netfilter that may be worth
+looking at. Suggestions on others to add are always welcome.
+    </para>
+    
+    <section id="fwbuilder">
+      <title id="fwbuilder.title">fwbuilder</title>
+      <indexterm zone="fwbuilder">
+        <primary>Firewall Builder</primary>
+      </indexterm>
+      <indexterm zone="fwbuilder">
+        <primary>fwbuilder</primary>
+      </indexterm>
+      <indexterm zone="fwbuilder">
+        <primary>Graphical user interfaces</primary>
+	<secondary>fwbuilder</secondary>
+      </indexterm>
+      
+      <para>
+Firewall Builder, or simply <systemitem>fwbuilder</systemitem>, is an extremely versatile and powerful 
+tool that can be used to build your own firewalls, or to maintain several 
+firewalls for that matter. It can be used to create policies for several 
+different types of firewalls, including <systemitem>iptables</systemitem>
+(Linux 2.4 and 2.6), <systemitem>ipfilter</systemitem> 
+(freebsd, netbsd, etc), <systemitem>openbsd</systemitem>
+<systemitem>pf</systemitem>, and, a module that must be bought, 
+<systemitem>Cisco PIX</systemitem>.
+      </para>
+      
+      <para>
+<systemitem>Fwbuilder</systemitem> has, as you can see, a very big audience
+and is well taken care of and continues to be developed. It is run on a
+separate host system, where you create the policy files, and then copy them
+over and run them on the target system. It is able to handle everything from
+very simple rulesets to large and rather complicated ones. It has extensive
+abilities to handle different versions and installations of
+<systemitem>iptables</systemitem>, by configuration of which targets/matches
+are available on each host system, etcetera. The end result may be saved in an
+xml file, or a system parsable configuration file (e.g., the real firewall
+scripts). 
+      </para>
+      
+      <para>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/fwbuilder-firewall.eps" format=eps>
+          </imageobject>
+          <imageobject>
+            <imagedata fileref="images/fwbuilder-firewall.jpg" format=jpg>
+          </imageobject>
+        </mediaobject>
+      </para>
+      
+      <para>
+You can see the configuration of the "firewall" in the above example, and the 
+main menus of the whole fwbuilder system. fwbuilder can be found at <ulink 
+url="http://www.fwbuilder.org">http://www.fwbuilder.org</ulink>.
+      </para>
+      
+    </section>
+    
+    <section id="turtlefirewall">
+      <title id="turtlefirewall.title">Turtle Firewall Project</title>
+      <indexterm zone="turtlefirewall">
+        <primary>Turtle Firewall Project</primary>
+      </indexterm>
+      <indexterm zone="turtlefirewall">
+        <primary>Graphical user interfaces</primary>
+	<secondary>Turtle Firewall Project</secondary>
+      </indexterm>
+      
+      <para>
+Turtle Firewall is an excellent, yet simpler kind of user interface to 
+iptables. It is integrated in something called webmin (a web administration 
+interface). It is fairly basic, and neither as complex nor able to handle as 
+complex changes as the fwbuilder package, but it is more than able to handle 
+most simpler firewalls, as well as some more advanced ones as well.
+      </para>
+      
+      <para>
+One big advantage with Turtle Firewall is the fact that it is web-based, and 
+hence can be remotely controlled in a totally different manner than with 
+fwbuilder and most other tools. Of course, it also adds more of a security risk 
+since webmin is a separate extra service running on the firewall itself.
+      </para>
+      
+      <para>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/turtlefirewall-items.eps" format=eps>
+          </imageobject>
+          <imageobject>
+            <imagedata fileref="images/turtlefirewall-items.jpg" format=jpg>
+          </imageobject>
+        </mediaobject>
+      </para>
+      
+      <para>
+The above screenshot shows the items page of the Turtle Firewall, where you can 
+configure network interfaces and networks, and other items.
+      </para>
+      
+      <para>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/turtlefirewall-main-screen.eps" 
+format=eps>
+          </imageobject>
+          <imageobject>
+            <imagedata fileref="images/turtlefirewall-main-screen.jpg" 
+format=jpg>
+          </imageobject>
+        </mediaobject>
+      </para>
+      
+      <para>
+This final screenshot shows the turtlefirewalls main screen, and with the whole 
+ruleset expanded at the bottom. The whole ruleset isn't showing, as you can see, 
+but you get a good general idea of what it looks like in Turtle Firewall.
+      </para>
+      
+      <para>
+You can find the Turtle Firewall Project and more information over at <ulink 
+url="http://www.turtlefirewall.com/">http://www.turtlefirewall.com/</ulink>.
+      </para>
+
+    </section>
+    
+    <section id="iscs">
+      <title id="iscs.title">Integrated Secure Communications System</title>
+      <indexterm zone="iscs">
+        <primary>Integrated Secure Communications System</primary>
+      </indexterm>
+      <indexterm zone="iscs">
+        <primary>Graphical user interfaces</primary>
+	<secondary>Integrated Secure Communications System</secondary>
+      </indexterm>
+      
+      <para>
+The Integrated Secure Communications System, or shortly ISCS, is still 
+undergoing development, and no public version has been released. However, this 
+looks like it will become an extremely helpful tool once it is finished. The 
+developer has very high standards, and this is the main reason that it has not 
+been released yet. ISCS integrates several functionalities into a single suite 
+of administration and management user interface. Basically this means that once 
+this project is released, you will be able to fully configure all your 
+firewalls from a centralized point using a single GUI, including VPN's, VLAN's, 
+Tunnels, sysctl's, etcetera.
+      </para>
+      
+      <para>
+The main attack angle that the developer(s) of ISCS has, is to simplify 
+management and administration and to remove tedious work for the 
+administrators, so to save as much work hours as possible for the 
+administrators. This is done by putting together policies, and then the 
+programs creates the rulesets and "pushes" them out to the "enforcements 
+points" (e.g., firewalls, proxies, etcetera). The administrator doesn't 
+actually "write" or "click" together the rulesets, just simply put together 
+policies that are then enforced by ISCS.
+      </para>
+      
+      <para>
+This tool isn't finished yet, as of writing this. However, I have been in touch 
+with the main developer of this project before, and this is indeed a very large 
+project. When it is finished, I believe this will be one of the best tools on 
+the market. Of course, time can only tell, but it is well worth mentioning 
+here. You can find the ISCS project over at <ulink 
+url="http://iscs.sourceforge.net/">http://iscs.sourceforge.net/</ulink>. 
+      </para>
+      
+      <note>
+        <para>
+The main developer, John Sullivan, of ISCS has specifically asked me to ask 
+people to join his development efforts. The project is very big, and he would 
+definitely like as much help with the project as possible. If you are able to 
+help, you are, in other words, more than welcome.
+        </para>
+      </note>
+    </section>
+    
+    <section id="ipmenu">
+      <title id="ipmenu.title">IPMenu</title>
+      <indexterm zone="ipmenu">
+        <primary>IPmenu</primary>
+      </indexterm>
+      <indexterm zone="ipmenu">
+        <primary>Graphical user interfaces</primary>
+	<secondary>IPmenu</secondary>
+      </indexterm>
+      
+      <para>
+IPMenu is a very able program, yet simple to operate and not too demanding on 
+resources nor bandwidth. It is a console based program, so it works perfect over 
+an SSH connection for example. It works perfectly on machines running over a 
+simple and old modem as well.
+      </para>
+      
+      <para>
+As you can see from the screenshot, it is able to handle all iptables 
+functionality, including filtering, mangling and nating. It is also able to 
+handle routing tables and bandwidth shaping and to save and restore rulesets. 
+You can add new rules directly into the currently running iptables script 
+easily, and handle all of the different tables. Including adding and removing 
+custom chains.
+      </para>
+      
+      <para>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/ipmenu.eps" format=eps>
+          </imageobject>
+          <imageobject>
+            <imagedata fileref="images/ipmenu.jpg" format=jpg>
+          </imageobject>
+        </mediaobject>
+      </para>
+    
+
+      <para>
+As you can see from the screenshot above, the program is rather basic, but 
+still able to handle most situations rather well. And first of all, it is very 
+simple, and can be used for remote administration simply enough, and since it 
+runs on top of ssh via a standard console, it should also be fairly secure. You 
+can find the homepage of IPMenu at <ulink 
+url="http://users.pandora.be/stes/ipmenu.html">
+http://users.pandora.be/stes/ipmenu.html</ulink>. 
+      </para>
+    </section>
+    
+    <section id="easyfwgenerator">
+      <title id="easyfwgenerator.title">Easy Firewall Generator</title>
+      <indexterm zone="easyfwgenerator">
+        <primary>Easy Firewall Generator</primary>
+      </indexterm>
+      <indexterm zone="easyfwgenerator">
+        <primary>Graphical user interfaces</primary>
+	<secondary>Easy Firewall Generator</secondary>
+      </indexterm>
+ 
+      
+      <para>
+Easy Firewall Generator is another interesting development when it comes to 
+iptables and netfilter. Basically, Easy Firewall Generator is a PHP webpage 
+where you specify options and specifics of your firewall, and once all of the 
+configurations are done, you click a button, and the webpage spits out an 
+iptables ruleset that you can utilize.
+      </para>
+      
+      <para>
+The script contains all the basic rules, and more specific ones to contain 
+strange patterns in packets. It also contains specific IP sysctl changes that 
+may be needed, loads necessary modules, et cetera. The whole ruleset is also 
+written in a redhat init.d format.
+      </para>
+      
+      <para>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/easyfwgen.eps" format=eps>
+          </imageobject>
+          <imageobject>
+            <imagedata fileref="images/easyfwgen.jpg" format=jpg>
+          </imageobject>
+        </mediaobject>
+      </para>
+      
+      <para>
+This screenshot shows one of the final stages of configuring the firewall 
+script that is about to be created by the script. You can find more 
+information, and a working version of the Easy Firewall Generator at <ulink 
+url="http://easyfwgen.morizot.net/">http://easyfwgen.morizot.net/</ulink>.
+      </para>
+    
+    </section>
+    
+    <section id="guis.whatsnext">
+      <title id="guis.whatsnext.title">What's next?</title>
+      
+      <para>
+In this chapter we have looked closer at what can be done with some different 
+graphical user interfaces, and other user interfaces as well. Note that there 
+are several more user interfaces around on the market. This chapter has mainly 
+given you an idea of the different types of firewall administration interfaces 
+around on the market. Most of them are open source and free to use, while some 
+will cost a bit of money to get full support or functionality from. 
+      </para>
+      
+    </section>
+   
+  </chapter>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,260 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Saving and restoring large
+ rule-sets</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="PREVIOUS"
+TITLE="What's next?"
+HREF="x4931.htm"><LINK
+REL="NEXT"
+TITLE="Drawbacks with restore"
+HREF="x4987.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x4931.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x4987.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="SAVEANDRESTORE"
+></A
+>Chapter 8. Saving and restoring large
+ rule-sets</H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Table of Contents</B
+></DT
+><DT
+><A
+HREF="c4938.htm#SPEEDCONSIDERATIONS"
+>Speed considerations</A
+></DT
+><DT
+><A
+HREF="x4987.htm"
+>Drawbacks with restore</A
+></DT
+><DT
+><A
+HREF="x5017.htm"
+>iptables-save</A
+></DT
+><DT
+><A
+HREF="x5063.htm"
+>iptables-restore</A
+></DT
+><DT
+><A
+HREF="x5100.htm"
+>What's next?</A
+></DT
+></DL
+></DIV
+><P
+>The iptables package comes with two more tools that 
+are very useful, specially if you are dealing with larger rule-sets. These 
+two tools are called iptables-save and 
+iptables-restore and are used to save and restore 
+rule-sets to a specific file-format that looks quite a bit different from 
+the standard shell code that you will see in the rest of this tutorial.
+  </P
+><DIV
+CLASS="TIP"
+><P
+></P
+><TABLE
+CLASS="TIP"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/tip.gif"
+HSPACE="5"
+ALT="Tip"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>iptables-restore can be used together with scripting languages. The big problem 
+is that you will need to output the results into the stdin of iptables-restore. 
+If you are creating a very big ruleset (several thousand rules) this might be 
+a very good idea, since it will be much faster to insert all the new rules. 
+For example, you would then run make_rules.sh | 
+iptables-restore. 
+   </P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="SPEEDCONSIDERATIONS"
+>Speed considerations</A
+></H1
+><P
+>One of the largest reasons for using the iptables-save 
+and iptables-restore commands is that they will speed 
+up the loading and saving of larger rule-sets considerably. The main 
+problem with running a shell script that contains  
+iptables rules is that each invocation of 
+iptables within the script will first extract the 
+whole rule-set from the Netfilter kernel space, and after this, it will 
+insert or append rules, or do whatever change to the rule-set that is
+needed by this specific command. Finally, it will insert the new rule-set 
+from its own memory into kernel space. Using a shell script, this is done 
+for each and every rule that we want to insert, and for each time we do 
+this, it takes more time to extract and insert the rule-set.
+   </P
+><P
+>To solve this problem, there is the iptables-save and 
+restore commands. The iptables-save 
+command is used to save the rule-set into a specially formatted text-file, 
+and the iptables-restore command is used to load this 
+text-file into kernel again. The best parts of these commands is that they 
+will load and save the rule-set in one single request.  
+iptables-save will grab the whole rule-set from kernel 
+and save it to a file in one single movement. 
+iptables-restore will upload that specific rule-set to 
+kernel in a single movement for each table. In other words, instead of 
+dropping the rule-set out of kernel some 30,000 times, for really large 
+rule-sets, and then upload it to kernel again that many times, we can now 
+save the whole thing into a file in one movement and then upload the 
+whole thing in as little as three movements depending on how many tables 
+you use.
+   </P
+><P
+>As you can understand, these tools are definitely something for you if 
+you are working on a huge set of rules that needs to be inserted. However, 
+they do have drawbacks that we will discuss more in the next section.
+   </P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x4931.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x4987.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>What's next?</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Drawbacks with restore</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

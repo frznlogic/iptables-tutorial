@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Letting DHCP requests through iptables</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="Common problems and questions"
+HREF="a12684.htm"><LINK
+REL="PREVIOUS"
+TITLE="Internet Service Providers who use assigned IP addresses"
+HREF="x12802.htm"><LINK
+REL="NEXT"
+TITLE="mIRC DCC problems"
+HREF="x12842.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x12802.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Appendix B. Common problems and questions</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x12842.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="LETTINGDHCPREQUESTS"
+>Letting DHCP requests through iptables</A
+></H1
+><P
+>   This is a fairly simple task really, once you get to know how
+DHCP works, however, you must be a little bit cautious
+with what you do let in and what you do not let in. First of all, we should know
+that DHCP works over the UDP
+protocol. Hence, this is the first thing to look for. Second, we should check
+which interface we get and send the request from. For example, if our
+eth0 interface is set up with
+DHCP, we should not allow DHCP
+requests on eth1. To make the rule a bit more specific,
+we only allow the actual UDP ports used by
+DHCP, which should be ports 67 and 68.  These are the
+criteria that we choose to match packets on, and that we allow. The rule would
+now look like this:
+   </P
+><PRE
+CLASS="SCREEN"
+>$IPTABLES  -I INPUT -i $LAN_IFACE -p udp --dport 67:68 --sport \
+     67:68 -j ACCEPT
+   </PRE
+><P
+>   Do note that we allow all traffic to and from UDP
+port 67 and 68 now, however, this should not be such a huge problem since it
+only allows requests from hosts doing the connection from port 67 or 68 as well.
+This rule could, of course, be even more restrictive, but it should be enough to
+actually accept all DHCP requests and updates without
+opening up too large of holes. If you are concerned, this rule could of course 
+be made even more restrictive.
+   </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x12802.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x12842.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Internet Service Providers who use assigned IP addresses</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="a12684.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>mIRC DCC problems</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

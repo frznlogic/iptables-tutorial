@@ -1,0 +1,553 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>TCP options</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="PREVIOUS"
+TITLE="ICMP types"
+HREF="a12854.htm"><LINK
+REL="NEXT"
+TITLE="Other resources and links"
+HREF="a13413.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="APPENDIX"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="a12854.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="a13413.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="APPENDIX"
+><H1
+><A
+NAME="TCPOPTIONS"
+></A
+>Appendix D. TCP options</H1
+><P
+>This appendix is a simple and brief list of all the
+TCP options that are officially recognized. These
+references and numbers were all retreived from the <A
+HREF="a13413.htm#IANA.ORG"
+><I
+>Internet Assigned 
+Numbers Authority</I
+></A
+> website. The master file can be found at
+<A
+HREF="http://www.iana.org/assignments/tcp-parameters"
+TARGET="_top"
+>this
+location</A
+>. The full contact details of the people referenced in this
+document has been removed, so to create less workload for them hopefully.
+    </P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.TCPOPTIONS"
+></A
+><P
+><B
+>Table D-1. TCP Options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="40"
+ALIGN="CENTER"><COL
+WIDTH="40"
+ALIGN="CENTER"><COL
+WIDTH="51"
+ALIGN="CENTER"><COL
+WIDTH="40"
+ALIGN="CENTER"><COL
+WIDTH="1*"
+ALIGN="LEFT"><COL
+WIDTH="96"
+ALIGN="LEFT"><THEAD
+><TR
+><TH
+>Copy</TH
+><TH
+>Class</TH
+><TH
+>Number</TH
+><TH
+>Value</TH
+><TH
+>Name</TH
+><TH
+>Reference</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>0</TD
+><TD
+>0</TD
+><TD
+>0</TD
+><TD
+>0</TD
+><TD
+>EOOL - End of Options List</TD
+><TD
+>[RFC791, JBP]</TD
+></TR
+><TR
+><TD
+>0</TD
+><TD
+>0</TD
+><TD
+>1</TD
+><TD
+>1</TD
+><TD
+>NOP - No Operation</TD
+><TD
+>[RFC791, JBP]</TD
+></TR
+><TR
+><TD
+>1</TD
+><TD
+>0</TD
+><TD
+>2</TD
+><TD
+>130</TD
+><TD
+>SEC - Security</TD
+><TD
+>[RFC1108]</TD
+></TR
+><TR
+><TD
+>1</TD
+><TD
+>0</TD
+><TD
+>3</TD
+><TD
+>131</TD
+><TD
+>LSR - Loose Source Route</TD
+><TD
+>[RFC791, JBP]</TD
+></TR
+><TR
+><TD
+>0</TD
+><TD
+>2</TD
+><TD
+>4</TD
+><TD
+>68</TD
+><TD
+>TS - Time Stamp</TD
+><TD
+>[RFC791, JBP]</TD
+></TR
+><TR
+><TD
+>1</TD
+><TD
+>0</TD
+><TD
+>5</TD
+><TD
+>133</TD
+><TD
+>E-SEC - Extended Security</TD
+><TD
+>[RFC1108]</TD
+></TR
+><TR
+><TD
+>1</TD
+><TD
+>0</TD
+><TD
+>6</TD
+><TD
+>134</TD
+><TD
+>CIPSO  - Commercial Security</TD
+><TD
+>[???]</TD
+></TR
+><TR
+><TD
+>0</TD
+><TD
+>0</TD
+><TD
+>7</TD
+><TD
+>7</TD
+><TD
+>RR - Record Route</TD
+><TD
+>[RFC791, JBP]</TD
+></TR
+><TR
+><TD
+>1</TD
+><TD
+>0</TD
+><TD
+>8</TD
+><TD
+>136</TD
+><TD
+>SID - Stream ID</TD
+><TD
+>[RFC791, JBP]</TD
+></TR
+><TR
+><TD
+>1</TD
+><TD
+>0</TD
+><TD
+>9</TD
+><TD
+>137</TD
+><TD
+>SSR - Strict Source Route</TD
+><TD
+>[RFC791, JBP]</TD
+></TR
+><TR
+><TD
+>0</TD
+><TD
+>0</TD
+><TD
+>10</TD
+><TD
+>10</TD
+><TD
+>ZSU - Experimental Measurement</TD
+><TD
+>[ZSu]</TD
+></TR
+><TR
+><TD
+>0</TD
+><TD
+>0</TD
+><TD
+>11</TD
+><TD
+>11</TD
+><TD
+>MTUP - MTU Probe</TD
+><TD
+>[RFC1191]*</TD
+></TR
+><TR
+><TD
+>0</TD
+><TD
+>0</TD
+><TD
+>12</TD
+><TD
+>12</TD
+><TD
+>MTUR - MTU Reply</TD
+><TD
+>[RFC1191]*</TD
+></TR
+><TR
+><TD
+>1</TD
+><TD
+>2</TD
+><TD
+>13</TD
+><TD
+>205</TD
+><TD
+>FINN - Experimental Flow Control</TD
+><TD
+>[Finn]</TD
+></TR
+><TR
+><TD
+>1</TD
+><TD
+>0</TD
+><TD
+>14</TD
+><TD
+>142</TD
+><TD
+>VISA - Experimental Access Control</TD
+><TD
+>[Estrin]</TD
+></TR
+><TR
+><TD
+>0</TD
+><TD
+>0</TD
+><TD
+>15</TD
+><TD
+>15</TD
+><TD
+>ENCODE - ???</TD
+><TD
+>[VerSteeg]</TD
+></TR
+><TR
+><TD
+>1</TD
+><TD
+>0</TD
+><TD
+>16</TD
+><TD
+>144</TD
+><TD
+>IMITD - IMI Traffic Descriptor</TD
+><TD
+>[Lee]</TD
+></TR
+><TR
+><TD
+>1</TD
+><TD
+>0</TD
+><TD
+>17</TD
+><TD
+>145</TD
+><TD
+>EIP - Extended Internet Protocol</TD
+><TD
+>[RFC1385]</TD
+></TR
+><TR
+><TD
+>0</TD
+><TD
+>2</TD
+><TD
+>18</TD
+><TD
+>82</TD
+><TD
+>TR - Traceroute</TD
+><TD
+>[RFC1393]</TD
+></TR
+><TR
+><TD
+>1</TD
+><TD
+>0</TD
+><TD
+>19</TD
+><TD
+>147</TD
+><TD
+>ADDEXT - Address Extension</TD
+><TD
+>[Ullmann IPv7]</TD
+></TR
+><TR
+><TD
+>1</TD
+><TD
+>0</TD
+><TD
+>20</TD
+><TD
+>148</TD
+><TD
+>RTRALT - Router Alert</TD
+><TD
+>[RFC2113]</TD
+></TR
+><TR
+><TD
+>1</TD
+><TD
+>0</TD
+><TD
+>21</TD
+><TD
+>149</TD
+><TD
+>SDB - Selective Directed Broadcast</TD
+><TD
+>[Graff]</TD
+></TR
+><TR
+><TD
+>1</TD
+><TD
+>0</TD
+><TD
+>22</TD
+><TD
+>150</TD
+><TD
+>NSAPA - NSAP Addresses</TD
+><TD
+>[Carpenter]</TD
+></TR
+><TR
+><TD
+>1</TD
+><TD
+>0</TD
+><TD
+>23</TD
+><TD
+>151</TD
+><TD
+>DPS - Dynamic Packet State</TD
+><TD
+>[Malis]</TD
+></TR
+><TR
+><TD
+>1</TD
+><TD
+>0</TD
+><TD
+>24</TD
+><TD
+>152</TD
+><TD
+>UMP - Upstream Multicast Pkt.</TD
+><TD
+>[Farinacci]</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="a12854.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="a13413.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>ICMP types</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Other resources and links</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

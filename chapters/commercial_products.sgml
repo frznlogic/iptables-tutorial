@@ -1,0 +1,156 @@
+  <chapter id="commercialproducts">
+    <title id="commercialproducts.title">Commercial products based on Linux, 
+iptables and netfilter</title>
+    <indexterm zone="commercialproducts">
+      <primary>Commercial products</primary>
+    </indexterm>
+
+
+    <para>
+This section was added so that corporations may have their products tested and
+added to this tutorial. If you are a company and would like to have your
+products tested and reviewed in this section, you are more than welcome to
+contact the author through usual channels (see the top of this tutorial). Mind
+you that this section is not the definite place to look for product testing.
+It is rather a try to offer something to all of the corporate producers of
+Linux based products, and who contribute to the development of
+<systemitem>GNU/Linux</systemitem> software. 
+    </para>
+
+    <para>
+If someone feels that their product has been badly reviewed here, they are
+more than welcome to contact the author for a more complete description of the
+problem, or to have their revised product possibly re-reviewed with newer
+firmwares etc. This might change, since the author doesn't know how popular
+this review section will be. 
+    </para>
+
+    <section id="ingate1200">
+      <title id="ingate1200.title">Ingate Firewall 1200</title>
+      <indexterm zone="ingate1200">
+        <primary>Commercial products</primary>
+        <secondary>Ingate Firewall 1200</secondary>
+      </indexterm>
+      <indexterm zone="ingate1200">
+        <primary>Ingate</primary>
+      </indexterm>
+      <indexterm zone="ingate1200">
+        <primary>Ingate</primary>
+        <secondary>Ingate Firewall 1200</secondary>
+      </indexterm>
+
+
+      <para>
+In short, the <link linkend="ingate">InGate Firewall 1200</link> is a
+commercial firewall product. To be fairly honest, they are definitely in the
+pricey range and not for most/any home-users. However, you get what you pay
+for, and this is an excellent product in other words. Before we go any
+further, it should be noted that the InGate firewalls are hardware and
+software solutions. Basically it is a very small computer running a modified
+Linux kernel. Of course, you will pretty much never see that it is actually
+running Linux (except for naming conventions in the interface, and so forth).
+      </para>
+      
+      <para>
+A lot of effort has been put into creating a nicely advanced webinterface to 
+configure and administrate the firewall from. The <link linkend="ingate">InGate 
+1200 firewall</link> has 2 10/100 Mbps Ethernet connectors and the larger 
+versions has more (up to 6 10/100/1000 Mbps Ethernet connectors and 2 mini Gbic 
+ports).
+      </para>
+      
+      <para>
+They also have <link linkend="sip">SIP</link> traversal support and <link
+linkend="sip">SIP</link> support for Internet telephony, and built in support
+for <link linkend="tls">TLS</link>. The 1200 came with 2 SIP user licenses,
+and the number differs depending on which firewall/SIParator you buy. The user
+interface for handling <link linkend="sip">SIP</link> is excellent and very
+intuitive, though it does use quite a lot of tech heavy jargon. It might be a
+good idea to keep the manual around in other words, which might actually be
+true whatever you are doing on this machine, for multiple reasons really. The
+manual is excellently written, and it might also be very hard to understand
+the interface before you get used to the highly technical language they have
+chosen to use. The manual is 250+ pages and available both in English and
+Swedish as of this writing, and as I've already said, very well written.
+      </para>
+      
+      <para>
+On top of this, the <link linkend="ingate">InGate</link> firewalls has <link 
+linkend="rfc2401">ipsec</link> based <systemitem>VPN</systemitem> and
+<systemitem>QoS</systemitem> support. The <link linkend="rfc2401">ipsec</link> 
+based <systemitem>VPN</systemitem> should be interoperable with all other <link 
+linkend="rfc2401">ipsec</link> implementations, including "Road Warrior" roaming. 
+      </para>
+      
+      <para>
+The device also has a very simple to setup logging facility. The machine can
+either log locally, or via <systemitem>syslog</systemitem> and/or
+<systemitem>mail</systemitem>. The local logging facility has exceptionally
+good and finegrained search capabilities through the logs. My only problem
+with the local logging facility is that the search engine might be a little
+bit too slow. This is actually my main and only concern with the whole
+firewall, the whole user interface is a bit slow, and sometimes it jumps to
+the main page after editing. This might have been fixed in newer versions
+however. All things considered, this isn't a bad fault at all, and it could
+have been much worse than a slow user interface/weird linking.
+      </para>
+      
+      <para>
+The first time I tried the test machine that I got, I borked the configuration
+pretty badly (I.e., I inverted the interfaces among other things). Because of
+this, my original setup time was around 4-5 hours before I could reach the
+Internet. If I hadn't done these initial errors, the original configuration
+time would probably have been around 1 hour or so. Of course, this can only be
+expected when using a new and unknown (to you) interface. 
+      </para>
+      
+      <para>
+The default values are very good. In other words, they are non-existant except 
+for the most basic options. The first thing you do, is to set the IP address of 
+the device via a "magic ping" (set the device mac address to an IP address and 
+then ping the IP address - this must be done locally). The opposite ethernet 
+port is per default turned off, until you turn it on, and no configuration 
+except the most basic is done by the InGate developers (log groups and so on).
+      </para>
+      
+      <para>
+In conclusion, this is one of the best commercial firewalls I have seen on the 
+market. The only real flaw is that the user interface  is a tad slow and that 
+the device is rather high priced. The pros of the device far far outweighs most 
+cost issues that any company would have, and the simplicity of not having to 
+scratch install a system of your own could actually make this a simpler and 
+cheaper device to set up than a scratch installed system for most companies - 
+especially if the process consists of a large quantity of firewalls and the 
+administrators are experienced in other InGate products. Of course, this is 
+always the case I assume!
+      </para>
+
+    </section>
+
+    <section>
+      <title>What's next?</title>
+
+      <para>
+This chapter has discussed some different commercial firewalling products
+based on iptables, netfilter and linux. This list is much, much longer than
+what you have seen in this chapter. However, for me to try them out, I must
+have something to test to begin with. If you know of a product that you think
+I should have in this section, why not either give me access to it for a
+couple of days, or call the producer and see if they wouldn't like to send me
+a sample/demo copy?
+      </para>
+
+      <para>
+Well, this was the last chapter. What's left is just the different appendices.
+Some of them contains some rather interesting information that didn't quite
+fit into any specific chapter, and others are just generic tables, and so
+forth. If you have any further interest in the area, there is tons and tons of
+material to read, and why not join the mailinglists available at the netfilter
+website? Or why not start developing for iptables and netfilter? I hope you
+have enjoyed reading this document and that you have been able to set some of
+it to the real world test. 
+      </para>
+
+    </section>
+
+  </chapter>

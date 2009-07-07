@@ -1,0 +1,208 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>iptables-restore</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="Saving and restoring large
+ rule-sets"
+HREF="c4938.htm"><LINK
+REL="PREVIOUS"
+TITLE="iptables-save"
+HREF="x5017.htm"><LINK
+REL="NEXT"
+TITLE="What's next?"
+HREF="x5100.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x5017.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 8. Saving and restoring large
+ rule-sets</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x5100.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="IPTABLES-RESTORE"
+>iptables-restore</A
+></H1
+><P
+>The iptables-restore command is used to restore the 
+iptables rule-set that was saved with the 
+iptables-save command. It takes all the input from 
+standard input and can't load from files as of writing this, 
+unfortunately. This is the command syntax for iptables-restore:
+   </P
+><P
+>    <P
+>iptables-restore [-c] [-n]</P
+>
+   </P
+><P
+>The -c argument restores the byte and packet counters 
+and must be used if you want to restore counters that were previously saved 
+with iptables-save. This argument may also be written 
+in its long form --counters.
+   </P
+><P
+>The -n argument tells 
+iptables-restore to not overwrite the previously 
+written rules in the table, or tables, that it is writing to. The default 
+behavior of iptables-restore is to flush and destroy 
+all previously inserted rules. The short -n argument 
+may also be replaced with the longer format --noflush.
+   </P
+><P
+>To load a rule-set with the iptables-restore command, we 
+could do this in several ways, but we will mainly look at the simplest 
+and most common way here.
+   </P
+><PRE
+CLASS="SCREEN"
+>    cat /etc/iptables-save | iptables-restore -c
+   </PRE
+><P
+>The following will also work:
+   </P
+><PRE
+CLASS="SCREEN"
+>     iptables-restore -c &lt; /etc/iptables-save
+   </PRE
+><P
+>This would cat the rule-set located within the 
+<TT
+CLASS="FILENAME"
+>/etc/iptables-save</TT
+> file and then pipe it to 
+iptables-restore which takes the rule-set on the 
+standard input and then restores it, including byte and packet counters. 
+It is that simple to begin with. This command could be varied until 
+oblivion and we could show different piping possibilities, however, this 
+is a bit out of the scope of this chapter, and hence we will skip that 
+part and leave it as an exercise for the reader to experiment with.
+   </P
+><P
+>The rule-set should now be loaded properly to kernel and everything should 
+work. If not, you may possibly have run into a bug in these commands. 
+   </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x5017.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x5100.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>iptables-save</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c4938.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>What's next?</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

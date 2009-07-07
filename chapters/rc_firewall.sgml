@@ -1,0 +1,1474 @@
+ <chapter id="rcfirewallfile">
+  <title id="rcfirewallfile.title">rc.firewall file</title>
+  <indexterm zone="rcfirewallfile">
+    <primary>rc.firewall explanation</primary>
+  </indexterm>
+  <indexterm zone="rcfirewallfile">
+    <primary>Example scripts</primary>
+    <secondary>rc.firewall.txt</secondary>
+  </indexterm>
+
+  <para>
+This chapter will deal with an example firewall setup and how the script 
+file could look. We have used one of the basic setups and dug deeper
+into how it works and what we do in it. This should be used to get a basic idea
+on how to solve different problems and what you may need to think about before
+actually putting your scripts to work. It could be used as is with some
+changes to the variables, but is not suggested since it may not work perfectly
+together with your network setup. As long as you have a very basic setup
+however, it will very likely run quite smooth with just a few fixes to it.
+  </para>
+
+  <note>
+   <para>
+note that there might be more efficient ways of making the rule-set,
+however, the script has been written for readability so that everyone can
+understand it without having to know too much BASH scripting before reading
+this
+    </para>
+  </note>
+
+  <section id="examplercfirewall">
+   <title id="examplercfirewall.title">example rc.firewall</title>
+   <indexterm zone="examplercfirewall">
+     <primary>Example scripts</primary>
+     <secondary>Structure</secondary>
+   </indexterm>
+   <indexterm zone="examplercfirewall">
+     <primary>Example scripts</primary>
+     <secondary>Structure</secondary>
+     <seealso>Example structure</seealso>
+   </indexterm>
+ 
+   <para>
+OK, so you have everything set up and are ready to check out an example
+configuration script. You should at least be if you have come this far. This
+example <link linkend="rcfirewalltxt" endterm="rcfirewalltxt.title"></link> 
+(also included in the <link linkend="examplecode" endterm="examplecode.title"></link> 
+appendix) is fairly large but not a lot of comments in it. Instead of looking 
+for comments, I suggest you read through the script file to get a basic hum 
+about how it looks, and then you return here to get the nitty gritty about the 
+whole script.
+   </para>
+
+  </section>
+
+  <section id="explanationofrcfirewall">
+   <title id="explanationofrcfirewall.title">explanation of rc.firewall</title>
+
+   <section id="configoptions">
+    <title id="configoptions.title">Configuration options</title>
+    <indexterm zone="configoptions">
+      <primary>Example structure</primary>
+      <secondary>Configuration</secondary>
+    </indexterm>
+    <indexterm zone="configoptions">
+      <primary>$INET_IP</primary>
+    </indexterm>
+    <indexterm zone="configoptions">
+      <primary>Interface</primary>
+    </indexterm>
+    <indexterm zone="configoptions">
+      <primary>LAN</primary>
+    </indexterm>
+    <indexterm zone="configoptions">
+      <primary>DHCP</primary>
+    </indexterm>
+    <indexterm zone="configoptions">
+      <primary>PPPoE</primary>
+    </indexterm>
+ 
+    <para>
+    The first section you should note within the example <link 
+linkend="rcfirewalltxt" endterm="rcfirewalltxt.title"></link> is the 
+configuration section. This should always be changed since it contains the 
+information that is vital to your actual configuration. For example, your IP 
+address will always change, hence it is available here. The 
+<command>$INET_IP</command> should always be a fully valid IP address, if you 
+got one (if not, then you should probably look closer at the 
+<link linkend="rcDHCPfirewalltxt" endterm="rcDHCPfirewalltxt.title"></link>, 
+however, read on since this script will introduce a lot of interesting stuff 
+anyways). Also, the <command>$INET_IFACE</command> variable should point to 
+the actual device used for your Internet connection. This could be
+<systemitem>eth0</systemitem>, <systemitem>eth1</systemitem>,
+<systemitem>ppp0</systemitem>, <systemitem>tr0</systemitem>, etc just to
+name a few possible device names.
+    </para>
+
+    <para>
+    This script does not contain any special configuration options for DHCP or
+PPPoE, hence these sections are empty. The same goes for all sections that are
+empty, they are, however, left there so you can spot the differences between the
+scripts in a more efficient way. If you need these parts, then you could always
+create a mix of the different scripts, or (brace yourself) create your own from
+scratch.
+    </para>
+
+    <para>
+    The <systemitem>Local Area Network</systemitem> section contains most of the
+configuration options for your <systemitem>LAN</systemitem>, which are
+necessary. For example, you need to specify the <systemitem>IP
+address</systemitem> of the physical interface connected to the
+<systemitem>LAN</systemitem> as well as the <systemitem>IP range</systemitem>
+which the <systemitem>LAN</systemitem> uses and the interface that the box is
+connected to the <systemitem>LAN</systemitem> through.
+    </para>
+
+    <para>
+    Also, as you may see there is a Localhost configuration section. We do
+provide it, however you will with 99% certainty not change any of the values
+within this section since you will almost always use the 127.0.0.1
+<systemitem>IP address</systemitem> and the interface will almost certainly be
+named <systemitem>lo</systemitem>. Also, just below the Localhost configuration,
+you will find a brief section that pertains to the iptables. Mainly, this
+section only consists of the <command>$IPTABLES</command> variable, which will
+point the script to the exact location of the <command>iptables</command>
+application. This may vary a bit, and the default location when compiling the
+iptables package by hand is <filename>/usr/local/sbin/iptables</filename>.
+However, many distributions put the actual application in another location such
+as <filename>/usr/sbin/iptables</filename> and so on.
+    </para>
+
+   </section>
+
+   <section id="initialloading">
+    <title id="initialloading.title">Initial loading of extra modules</title>
+    <indexterm zone="initialloading">
+      <primary>Modules</primary>
+    </indexterm>
+    <indexterm zone="initialloading">
+      <primary>Modules</primary>
+      <secondary>IRC</secondary>
+    </indexterm>
+    <indexterm zone="initialloading">
+      <primary>Modules</primary>
+      <secondary>FTP</secondary>
+    </indexterm>
+    <indexterm zone="initialloading">
+      <primary>Modules</primary>
+      <secondary>H.323</secondary>
+    </indexterm>
+    <indexterm zone="initialloading">
+      <primary>Modules</primary>
+      <secondary>Patch-o-matic</secondary>
+    </indexterm>
+    <indexterm zone="initialloading">
+      <primary>Basics</primary>
+      <secondary>Modules</secondary>
+      <seealso>Modules</seealso>
+    </indexterm>
+
+    <para>
+    First, we see to it that the module dependencies files are up
+to date by issuing a <command>/sbin/depmod -a</command> command. After
+this we load the modules that we will require for this script. Always avoid
+loading modules that you do not need, and if possible try to avoid having
+modules lying around at all unless you will be using them. This is for security
+reasons, since it will take some extra effort to make additional rules this
+way. Now, for example, if you want to have support for the
+<command>LOG</command>, <command>REJECT</command> and
+<command>MASQUERADE</command> targets and don't have this compiled statically
+into your kernel, we load these modules as follows:
+    </para>
+
+    <para>
+    <screen>
+<command>
+/sbin/insmod ipt_LOG
+/sbin/insmod ipt_REJECT
+/sbin/insmod ipt_MASQUERADE
+</command>
+    </screen>
+    </para>
+
+    <caution>
+     <para>
+     In these scripts we forcedly load the modules, which could lead to
+failures of loading the modules. If a module fails to load, it could depend
+upon a lot of factors, and it will generate an error message. If some of the
+more basic modules fail to load, its biggest probable error is that the module,
+or functionality, is statically compiled into the kernel. For further
+information on this subject, read the <link linkend="moduleproblems"
+endterm="moduleproblems.title"></link> section in the <link
+linkend="commonproblems" endterm="commonproblems.title"></link> appendix.
+     </para>
+    </caution>
+
+
+    <para>
+    Next is the option to load <computeroutput>ipt_owner</computeroutput>
+module, which could for example be used to only allow certain users to make
+certain connections, etc. I will not use that module in this example but
+basically, you could allow only <systemitem>root</systemitem> to do
+<systemitem>FTP</systemitem> and <systemitem>HTTP</systemitem> connections to
+redhat.com and <command>DROP</command> all the others. You could also disallow
+all users but your own user and root to connect from your box to the Internet.
+Might be boring for others, but you will be a bit more secure to bouncing
+hacker attacks and attacks where the hacker will only use your host as an
+intermediate host. For more information about the
+<computeroutput>ipt_owner</computeroutput> match, look at the <link
+linkend="OwnerMatch" endterm="OwnerMatch.title"></link> section within the
+<link linkend="HowARuleIsBuilt" endterm="HowARuleIsBuilt.title"></link>
+chapter.
+    </para>
+
+    <para>
+    We may also load extra modules for the state matching code here. All modules
+that extend the state matching code and connection tracking code are called
+<systemitem>ip_conntrack_*</systemitem> and <systemitem>ip_nat_*</systemitem>.
+Connection tracking helpers are special modules that tell the kernel how to
+properly track the specific connections. Without these so called helpers, the
+kernel would not know what to look for when it tries to track specific
+connections. The <systemitem>NAT</systemitem> helpers on the other hand, are
+extensions of the connection tracking helpers that tell the kernel what to look
+for in specific packets and how to translate these so the connections will
+actually work. For example, <systemitem>FTP</systemitem> is a complex protocol
+by definition, and it sends connection information within the actual payload of
+the packet. So, if one of your <systemitem>NAT</systemitem>ed boxes connect to
+a <systemitem>FTP</systemitem> server on the Internet, it will send its own
+local network <systemitem>IP address</systemitem> within the payload of the
+packet, and tell the <systemitem>FTP</systemitem> server to connect to that
+<systemitem>IP address</systemitem>. Since this local network address is not
+valid outside your own network, the <systemitem>FTP</systemitem> server will not
+know what to do with it and hence the connection will break down. The
+<systemitem>FTP NAT</systemitem> helpers do all of the translations within these
+connections so the <systemitem>FTP</systemitem> server will actually know where
+to connect. The same thing applies for <systemitem>DCC</systemitem> file
+transfers (sends) and chats. Creating these kind of connections requires the
+<systemitem>IP address</systemitem> and ports to be sent within the
+<systemitem>IRC protocol</systemitem>, which in turn requires some translation
+to be done. Without these helpers, some <systemitem>FTP</systemitem> and
+<systemitem>IRC</systemitem> stuff will work no doubt, however, some other
+things will not work. For example, you may be able to receive files over
+<systemitem>DCC</systemitem>, but not be able to send files. This is due to how
+the <systemitem>DCC</systemitem> starts a connection. First off, you tell the
+receiver that you want to send a file and where he should connect to. Without
+the helpers, the <systemitem>DCC</systemitem> connection will look as if it
+wants the receiver to connect to some host on the receiver's own local network.
+In other words, the whole connection will be broken. However, the other way
+around, it will work flawlessly since the sender will (most probably) give you
+the correct address to connect to.
+    </para>
+
+    <note>
+     <para>If you are experiencing problems with mIRC DCCs over your firewall
+and everything works properly with other IRC clients, read the <link
+linkend="mircdcc" endterm="mircdcc.title"></link> section in the <link
+linkend="commonproblems" endterm="commonproblems.title"></link> appendix.
+     </para>
+    </note>
+
+    <para>
+As of this writing, there is only the option to load modules which add support
+for the <systemitem>FTP</systemitem> and <systemitem>IRC</systemitem>
+protocols. For a long explanation of these conntrack and nat modules, read the
+<link linkend="commonproblems" endterm="commonproblems.title"></link>
+appendix. There are also <systemitem>H.323</systemitem> conntrack helpers within
+the <systemitem>patch-o-matic</systemitem>, as well as some other conntrack as
+well as <systemitem>NAT</systemitem> helpers. To be able to use these helpers,
+you need to use the <systemitem>patch-o-matic</systemitem> and compile your own
+kernel. For a better explanation on how this is done, read the <link
+linkend="preparations" endterm="preparations.title"></link> chapter.
+    </para>
+
+    <note>
+     <para>
+Note that you need to load the <systemitem>ip_nat_irc</systemitem> and
+<systemitem>ip_nat_ftp</systemitem> if you want <systemitem>Network Address
+Translation</systemitem> to work properly on any of the
+<systemitem>FTP</systemitem> and <systemitem>IRC</systemitem> protocols. You
+will also need to load the <systemitem>ip_conntrack_irc</systemitem> and
+<systemitem>ip_conntrack_ftp</systemitem> modules before actually loading the
+<systemitem>NAT</systemitem> modules. They are used the same way as the
+conntrack modules, but it will make it possible for the computer to do
+<systemitem>NAT</systemitem> on these two protocols.
+     </para>
+    </note>
+
+   </section>
+
+   <section id="procsetup">
+    <title id="procsetup.title">proc set up</title>
+    <indexterm zone="procsetup">
+      <primary>Proc set up</primary>
+    </indexterm>
+    <indexterm zone="procsetup">
+      <primary>Basics</primary>
+      <secondary>Proc set up</secondary>
+    </indexterm>
+    <indexterm zone="procsetup">
+      <primary>File</primary>
+      <secondary>Ip_forward</secondary>
+    </indexterm>
+    <indexterm zone="procsetup">
+      <primary>File</primary>
+      <secondary>Ip_dynaddr</secondary>
+    </indexterm>
+ 
+    <para>
+At this point we start the <systemitem>IP forwarding</systemitem> by
+echoing a 1 to <filename>/proc/sys/net/ipv4/ip_forward</filename> in this
+fashion:
+    </para>
+
+    <para>
+     <command>echo "1" > /proc/sys/net/ipv4/ip_forward</command>
+    </para>
+
+    <warning>
+     <para>
+     It may be worth a thought where and when we turn on the
+<systemitem>IP forwarding</systemitem>. In this script and all others
+within the tutorial, we turn it on before actually creating any kind of
+<systemitem>IP filters</systemitem> (i.e., <command>iptables</command>
+rule-sets). This will lead to a brief period of time where the firewall
+will accept forwarding of any kind of traffic for everything between a
+millisecond to a minute depending on what script we are running and on
+what box. This may give malicious people a small time-frame to actually get
+through our firewall. In other words, this option should really be turned
+on <emphasis>after</emphasis> creating all firewall rules, however, I have
+chosen to turn it on before loading any rules to maintain consistency with
+the script breakdown currently used in all scripts.
+     </para>
+    </warning>
+
+    <para>
+In case you need dynamic <systemitem>IP</systemitem> support, for example if
+you use <systemitem>SLIP</systemitem>, <systemitem>PPP</systemitem> or
+<systemitem>DHCP</systemitem> you may enable the next option,
+<filename>ip_dynaddr</filename> by doing the following :
+    </para>
+
+    <para>
+     <command>echo "1" > /proc/sys/net/ipv4/ip_dynaddr</command>
+    </para>
+
+    <para>
+If there is any other options you might need to turn on you should follow
+that style. There's other documentation on how to do these things and this
+is out of the scope of this documentation. There is a good but rather brief
+document about the proc system available within the kernel, which is also
+available within the <link linkend="otherresources"
+endterm="otherresources.title"></link> appendix. The <link
+linkend="otherresources" endterm="otherresources.title"></link> appendix is
+generally a good place to start looking when you have specific areas that you
+are looking for information on, that you do not find here.
+    </para>
+
+    <note>
+     <para>
+     The <filename>rc.firewall.txt</filename> script, and all other scripts
+contained within this tutorial, do contain a small section of non-required proc
+settings. These may be a good primer to look at when something is not working
+exactly as you want it to, however, do not change these values before actually
+knowing what they mean.
+     </para>
+    </note>
+
+   </section>
+
+   <section id="displacement">
+    <title id="displacement.title">Displacement of rules to different chains</title>
+    <indexterm zone="displacement">
+      <primary>Displacement</primary>
+    </indexterm>
+    <indexterm zone="displacement">
+      <primary>Basics</primary>
+      <secondary>Displacement</secondary>
+    </indexterm>
+
+
+    <para>
+    This section will briefly describe my choices within the tutorial
+regarding user specified chains and some choices specific to the
+<filename>rc.firewall.txt</filename> script. Some of the paths I have
+chosen to go here may be wrong from one or another aspect. I hope to
+point these aspects and possible problems out to you when and where they
+occur. Also, this section contains a brief look back to the <link
+linkend="traversingoftables" endterm="traversingoftables.title"></link>
+chapter. Hopefully, this will remind you a little bit of how the specific
+tables and chains are traversed in a real live example.
+    </para>
+
+    <para> I have displaced all the different user-chains in the fashion I
+have to save as much CPU as possible but at the same time put the main
+weight on security and readability. Instead of letting a
+<systemitem>TCP</systemitem> packet traverse
+<systemitem>ICMP</systemitem>, <systemitem>UDP</systemitem> and
+<systemitem>TCP</systemitem> rules, I simply match all
+<systemitem>TCP</systemitem> packets and then let the
+<systemitem>TCP</systemitem> packets traverse a user specified chain.
+This way we do not get too much overhead out of it all. The following
+picture will try to explain the basics of how an incoming packet traverses
+Netfilter. With these pictures and explanations, I wish to explain and
+clarify the goals of this script. We will not discuss any specific details
+yet, but instead further on in the chapter. This is a really trivial
+picture in comparison to the one in the <link linkend="traversingoftables"
+endterm="traversingoftables.title"></link> chapter where we discussed the
+whole traversal of chains and tables in depth.
+    </para>
+
+    <para>
+     <mediaobject>
+      <imageobject>
+       <imagedata fileref="images/packet_traverse.eps" format=eps>
+      </imageobject>
+      <imageobject>
+       <imagedata fileref="images/packet_traverse.jpg" format=jpg>
+      </imageobject>
+     </mediaobject>
+    </para>
+
+    <indexterm zone="displacementdhcp">
+      <primary>DHCP</primary>
+    </indexterm>
+    <indexterm zone="displacementdhcp">
+      <primary>SLIP</primary>
+    </indexterm>
+    <indexterm zone="displacementdhcp">
+      <primary>PPP</primary>
+    </indexterm>
+    <para id="displacementdhcp">
+    Based upon this picture, let us make clear what our goals are. This whole
+example script is based upon the assumption that we are looking at a scenario
+containing one local network, one firewall and an Internet connection connected
+to the firewall. This example is also based upon the assumption that we have a
+static <systemitem>IP</systemitem> to the Internet (as opposed to
+<systemitem>DHCP</systemitem>, <systemitem>PPP</systemitem> and
+<systemitem>SLIP</systemitem> and others). In this case, we also want to allow
+the firewall to act as a server for certain services on the Internet, and we
+trust our local network fully and hence we will not block any of the traffic
+from the local network. Also, this script has as a main priority to only allow
+traffic that we explicitly want to allow. To do this, we want to set default
+policies within the chains to <systemitem>DROP</systemitem>. This will
+effectively kill all connections and all packets that we do not explicitly allow
+inside our network or our firewall.
+
+    </para>
+
+    <para>
+    In the case of this scenario, we would also like to let our local network do
+connections to the Internet. Since the local network is fully trusted, we want
+to allow all kinds of traffic from the local network to the Internet. However,
+the Internet is most definitely not a trusted network and hence we want to
+block them from getting to our local network. Based upon these general
+assumptions, let's look at what we need to do and what we do not need and want
+to do.
+    </para>
+
+    <para>
+     <mediaobject>
+      <imageobject>
+       <imagedata fileref="images/packet_traverse_FORWARD.eps" format=eps>
+      </imageobject>
+      <imageobject>
+       <imagedata fileref="images/packet_traverse_FORWARD.jpg" format=jpg>
+      </imageobject>
+     </mediaobject>
+    </para>
+
+    <indexterm zone="displacementsnat">
+      <primary>SNAT target</primary>
+    </indexterm>
+    <indexterm zone="displacementsnat">
+      <primary>POSTROUTING</primary>
+    </indexterm>
+    <indexterm zone="displacementsnat">
+      <primary>Chain</primary>
+      <secondary>FORWARD</secondary>
+    </indexterm>
+ 
+    <para id="displacementsnat">
+    First of all, we want the local network to be able to connect to the
+Internet, of course. To do this, we will need to <systemitem>SNAT</systemitem>
+all packets since none of the local computers have real IP addresses. All of
+this is done within the <systemitem>POSTROUTING</systemitem> chain, which is
+created last in this script. This means that we will also have to do some
+filtering within the <systemitem>FORWARD</systemitem> chain since we will
+otherwise allow outsiders full access to our local network. We trust our local
+network to the fullest, and because of that we specifically allow all traffic
+from our local network to the Internet. Since no one on the Internet should be
+allowed to contact our local network computers, we will want to block all
+traffic from the Internet to our local network except already established and
+related connections, which in turn will allow all return traffic from the
+Internet to our local network.
+    </para>
+
+    <para>
+     <mediaobject>
+      <imageobject>
+       <imagedata fileref="images/packet_traverse_INPUT.eps" format=eps>
+      </imageobject>
+      <imageobject>
+       <imagedata fileref="images/packet_traverse_INPUT.jpg" format=jpg>
+      </imageobject>
+     </mediaobject>
+    </para>
+
+    <indexterm zone="displacementinput">
+      <primary>Chain</primary>
+      <secondary>INPUT</secondary>
+    </indexterm>
+    <indexterm zone="displacementinput">
+      <primary>Chain</primary>
+      <secondary>OUTPUT</secondary>
+    </indexterm>
+    <indexterm zone="displacementinput">
+      <primary>Http</primary>
+    </indexterm>
+    <indexterm zone="displacementinput">
+      <primary>Ssh</primary>
+    </indexterm>
+    <indexterm zone="displacementinput">
+      <primary>Identd</primary>
+    </indexterm>
+ 
+    <para id="displacementinput">
+    As for our firewall, we may be a bit low on funds perhaps, or we just want
+to offer a few services to people on the Internet. Therefore, we have decided
+to allow <systemitem>HTTP</systemitem>, <systemitem>FTP</systemitem>,
+<systemitem>SSH</systemitem> and <systemitem>IDENTD</systemitem> access to the
+actual firewall. All of these protocols are available on the actual firewall,
+and hence it should be allowed through the <systemitem>INPUT</systemitem> chain,
+and we need to allow the return traffic through the
+<systemitem>OUTPUT</systemitem> chain. However, we also trust the local network
+fully, and the loopback device and <systemitem>IP address</systemitem> are also
+trusted. Because of this, we want to add special rules to allow all traffic from
+the local network as well as the loopback network interface. Also, we do not
+want to allow specific packets or packet headers in specific conjunctions, nor
+do we want to allow some IP ranges to reach the firewall from the Internet. For
+instance, the <systemitem>10.0.0.0/8</systemitem> address range is reserved for
+local networks and hence we would normally not want to allow packets from such a
+address range since they would with 90% certainty be spoofed. However, before we
+implement this, we must note that certain Internet Service Providers actually
+use these address ranges within their own networks. For a closer discussion of
+this, read the <link linkend="commonproblems"
+endterm="commonproblems.title"></link> chapter.
+    </para>
+
+    <para>
+Since we have an <systemitem>FTP</systemitem> server running on the server, as
+well as the fact we want to traverse as few rules as possible, we add a rule
+which lets all established and related traffic through at the top of the
+<systemitem>INPUT</systemitem> chain. For the same reason, we want to split the
+rules down into sub-chains. By doing this, our packets will hopefully only need
+to traverse as few rules as possible. By traversing less rules, we make the
+rule-set less time-consuming for each packet, and reduce latency within the
+network.
+    </para>
+
+    <para>
+    In this script, we choose to split the different packets down by their
+protocol family, for example <systemitem>TCP</systemitem>,
+<systemitem>UDP</systemitem> or <systemitem>ICMP</systemitem>. All
+<systemitem>TCP</systemitem> packets traverse a specific chain named
+<systemitem>tcp_packets</systemitem>, which will contain rules for all
+<systemitem>TCP</systemitem> ports and protocols that we want to allow. Also, we
+want to do some extra checking on the <systemitem>TCP</systemitem> packets, so
+we would like to create one more subchain for all packets that are accepted for
+using valid port numbers to the firewall. This chain we choose to call the
+<systemitem>allowed</systemitem> chain, and should contain a few extra checks
+before finally accepting the packet. As for <systemitem>ICMP</systemitem>
+packets, these will traverse the <systemitem>icmp_packets</systemitem> chain.
+When we decided on how to create this chain, we could not see any specific needs
+for extra checks before allowing the <systemitem>ICMP</systemitem> packets
+through if we agree with the type and code of the <systemitem>ICMP</systemitem>
+packet, and hence we accept them directly. Finally, we have the UDP packets which
+need to be dealt with. These packets, we send to the
+<systemitem>udp_packets</systemitem> chain which handles all incoming
+<systemitem>UDP</systemitem> packets. All incoming <systemitem>UDP</systemitem>
+packets should be sent to this chain, and if they are of an allowed type we
+should accept them immediately without any further checking.
+    </para>
+
+    <para>
+Since we are running on a relatively small network, this box is also used as a
+secondary workstation and to give some extra leeway for this, we want to allow
+certain specific protocols to make contact with the firewall itself, such as
+<command>speak freely</command> and <command>ICQ</command>.
+    </para>
+
+    <para>
+     <mediaobject>
+      <imageobject>
+       <imagedata fileref="images/packet_traverse_OUTPUT.eps" format=eps>
+      </imageobject>
+      <imageobject>
+       <imagedata fileref="images/packet_traverse_OUTPUT.jpg" format=jpg>
+      </imageobject>
+     </mediaobject>
+    </para>
+
+    <indexterm zone="displacementoutput">
+      <primary>ACCEPT target</primary>
+    </indexterm>
+
+    <para id="displacementoutput">
+    Finally, we have the firewalls <systemitem>OUTPUT</systemitem> chain. Since
+we actually trust the firewall quite a lot, we allow pretty much all traffic
+leaving the firewall. We do not do any specific user blocking, nor do we do any
+blocking of specific protocols. However, we do not want people to use this box
+to spoof packets leaving the firewall itself, and hence we only want to allow
+traffic from the IP addresses assigned to the firewall itself. We would most
+likely implement this by adding rules that <systemitem>ACCEPT</systemitem> all
+packets leaving the firewall in case they come from one of the <systemitem>IP
+addresses</systemitem> assigned to the firewall, and if not they will be dropped
+by the default policy in the <systemitem>OUTPUT</systemitem> chain.
+    </para>
+
+   </section>
+
+   <section id="defaultpolicies">
+    <title id="defaultpolicies.title">Setting up default policies</title>
+    <indexterm zone="defaultpolicies">
+      <primary>Policy</primary>
+    </indexterm>
+    <indexterm zone="defaultpolicies">
+      <primary>Basics</primary>
+      <secondary>Policy</secondary>
+    </indexterm>
+
+    <para>
+Quite early on in the process of creating our rule-set, we set up the default
+policies. We set up the default policies on the different chains with a fairly
+simple command, as described below.
+    </para>
+
+    <para>
+     <cmdsynopsis>
+      <command>iptables</command>
+      <arg>-P <arg choice="req">chain</arg> <arg choice="req">policy</arg></arg>
+     </cmdsynopsis>
+    </para>
+
+    <para>
+The default policy is used every time the packets do not match a rule in the
+chain. For example, let's say we get a packet that matches no single rule in our
+whole rule-set. If this happens, we must decide what should happen to the packet
+in question, and this is where the default policy comes into the picture. The
+default policy is used on all packets that does not match with any other rule in
+our rule-set.
+    </para>
+
+    <caution>
+     <para>
+     Do be cautious with what default policy you set on chains in other
+tables since they are simply not made for filtering, and it may lead to very
+strange behaviors.
+     </para>
+    </caution>
+
+   </section>
+
+
+   <section id="settingupuser">
+    <title id="settingupuser.title">Setting up user specified chains in the filter table</title>
+    <indexterm zone="settingupuser">
+      <primary>User specified chains</primary>
+    </indexterm>
+    <indexterm zone="settingupuser">
+      <primary>Basics</primary>
+      <secondary>User specified chains</secondary>
+    </indexterm>
+
+    <para>
+Now you have a good picture of what we want to accomplish with this firewall, so
+let us get on to the actual implementation of the rule-set. It is now high time
+that we take care of setting up all the rules and chains that we wish to create
+and to use, as well as all of the rule-sets within the chains.
+    </para>
+
+    <para>
+After this, we create the different special chains that we want to use
+with the <command>-N</command> command. The new chains are created and set up
+with no rules inside of them. The chains we will use are, as previously
+described, <systemitem>icmp_packets</systemitem>,
+<systemitem>tcp_packets</systemitem>,
+<systemitem>udp_packets</systemitem> and the
+<systemitem>allowed</systemitem> chain, which is used by the
+<systemitem>tcp_packets</systemitem> chain. Incoming packets on
+<command>$INET_IFACE</command>, of <systemitem>ICMP</systemitem> type, will be
+redirected to the chain <systemitem>icmp_packets</systemitem>. Packets of
+<systemitem>TCP</systemitem> type, will be redirected to the
+<systemitem>tcp_packets</systemitem> chain and incoming packets of
+<systemitem>UDP</systemitem> type from <command>$INET_IFACE</command> go to
+<systemitem>udp_packets</systemitem> chain. All of this will be
+explained more in detail in the <link linkend="inputchain"
+endterm="inputchain.title"></link> section below. To create a chain is quite
+simple and only consists of a short declaration of the chain as this:
+    </para>
+
+    <para>
+     <cmdsynopsis>
+      <command>iptables</command>
+      <arg>-N <replaceable>chain</replaceable></arg>
+     </cmdsynopsis>
+    </para>
+
+    <para>
+In the upcoming sections we will have a closer look at each of the
+user defined chains that we have by now created. Let us have a closer look at
+how they look and what rules they contain and what we will accomplish within
+them.
+    </para>
+
+    <section id="badtcppackets">
+    <title id="badtcppackets.title">The bad_tcp_packets chain</title>
+    <indexterm zone="badtcppackets">
+      <primary>Bad_tcp_packets</primary>
+    </indexterm>
+    <indexterm zone="badtcppackets">
+      <primary>TCP</primary>
+    </indexterm>
+    <indexterm zone="badtcppackets">
+      <primary>SYN</primary>
+    </indexterm>
+    <indexterm zone="badtcppackets">
+      <primary>State match</primary>
+      <secondary>NEW</secondary>
+    </indexterm>
+    <indexterm zone="badtcppackets">
+      <primary>State match</primary>
+      <secondary>INVALID</secondary>
+    </indexterm>
+    <indexterm zone="badtcppackets">
+      <primary>REJECT target</primary>
+    </indexterm>
+
+     <para>
+     The <systemitem>bad_tcp_packets</systemitem> chain is devoted to contain
+rules that inspect incoming packets for malformed headers or other problems. As
+it is, we have only chosen to include a packet filter which blocks all incoming
+<systemitem>TCP</systemitem> packets that are considered as
+<command>NEW</command> but do not have the <systemitem>SYN</systemitem> bit
+set, as well as a rule that blocks 
+<systemitem>SYN</systemitem>/<systemitem>ACK</systemitem> packets that are 
+considered <systemitem>NEW</systemitem>. This chain could be used to check 
+for all possible inconsistencies, such as above or <emphasis>XMAS</emphasis> 
+port-scans etc. We could also add rules that looks for state 
+<command>INVALID</command>.
+     </para>
+
+     <para>
+     If you want to fully understand the NEW not SYN, you need to look at the
+<link linkend="newnotsyn" endterm="newnotsyn.title"></link> section in the
+<link linkend="commonproblems" endterm="commonproblems.title"></link> appendix
+regarding state NEW and non-SYN packets getting through other rules. These
+packets could be allowed under certain circumstances but in 99% of the cases we
+wouldn't want these packets to get through. Hence, we log them to our logs and
+then we DROP them.
+     </para>
+
+     <para>
+The reason that we <systemitem>REJECT</systemitem>
+<systemitem>SYN/ACK</systemitem> packets that are 
+considered <systemitem>NEW</systemitem> is also very simple. It is described
+in more depth in the <link linkend="synackandnew"
+endterm="synackandnew.title"></link> section in the <link
+linkend="commonproblems" endterm="commonproblems.title"></link> appendix.
+Basically, we do this out of courtesy to other hosts, since we will prevent
+them from being attacked in a sequence number prediction attack. 
+     </para>
+     
+    </section>
+
+
+    <section id="allowedchain">
+    <title id="allowedchain.title">The allowed chain</title>
+
+     <para>
+If a packet comes in on <command>$INET_IFACE</command> and is of
+<systemitem>TCP</systemitem> type, it travels through the
+<systemitem>tcp_packets</systemitem> chain and if the connection is against a
+port that we want to allow traffic on, we want to do some final
+checks on it to see if we actually do want to allow it or not. All of these
+final checks are done within the <systemitem>allowed</systemitem> chain.
+     </para>
+
+    <para>
+First of all, we check if the packet is a <systemitem>SYN</systemitem> packet.
+If it is a <systemitem>SYN</systemitem> packet, it is most likely to be the
+first packet in a new connection so, of course, we allow this. Then we check if
+the packet comes from an <command>ESTABLISHED</command> or
+<command>RELATED</command> connection, if it does, then we, again of course,
+allow it. An <command>ESTABLISHED</command> connection is a connection that has
+seen traffic in both directions, and since we have seen a
+<systemitem>SYN</systemitem> packet, the connection then must be in state
+<command>ESTABLISHED</command>, according to the state machine. The last rule in
+this chain will <command>DROP</command> everything else. In this case this
+pretty much means everything that has not seen traffic in both directions, 
+i.e., we didn't reply to the <systemitem>SYN</systemitem> packet, or they are
+trying to start the connection with a non <systemitem>SYN</systemitem> packet.
+There is <emphasis>no</emphasis> practical use of not starting a connection
+with a <systemitem>SYN</systemitem> packet, except to port scan people pretty
+much. There is no currently available
+<systemitem>TCP</systemitem>/<systemitem>IP</systemitem> implementation that
+supports opening a <systemitem>TCP</systemitem> connection with something else
+than a <systemitem>SYN</systemitem> packet to my knowledge, hence,
+<command>DROP</command> it since it is 99% sure to be a port scan.
+    </para>
+
+    <note>
+      <para>
+The rule regarding <command>ESTABLISHED,RELATED</command> packets is actually
+redundant in this script and will not be used, but has been included for the
+sake of being complete. The rule that will be used is placed at the top of the
+<systemitem>INPUT</systemitem> chain, and contains
+<command>ESTABLISHED,RELATED</command> as well.
+      </para>
+    </note>
+
+   </section>
+
+   <section id="tcpchain">
+    <title id="tcpchain.title">The TCP chain</title>
+    <indexterm zone="tcpchain">
+      <primary>TCP</primary>
+    </indexterm>
+    <indexterm zone="tcpchain">
+      <primary>tcp_chain</primary>
+    </indexterm>
+    <indexterm zone="tcpchain">
+      <primary>State match</primary>
+      <secondary>ESTABLISHED</secondary>
+    </indexterm>
+    <indexterm zone="tcpchain">
+      <primary>State match</primary>
+      <secondary>RELATED</secondary>
+    </indexterm>
+
+    <para>
+The <systemitem>tcp_packets</systemitem> chain specifies what ports are allowed 
+to use on the firewall from the Internet. There is, however, even more checks 
+to do, hence we send each and every one of the packets on to the allowed chain, 
+which we described previously.
+    </para>
+
+    <para>
+<command>-A tcp_packets</command> tells <command>iptables</command> in which
+chain to add the new rule, the rule will be added to the end of the chain.
+<command>-p TCP</command> tells it to match <systemitem>TCP</systemitem> packets
+and <command>-s 0/0</command> matches all source addresses from 0.0.0.0 with
+netmask 0.0.0.0, in other words <emphasis>all</emphasis> source addresses. This
+is actually the default behavior but I am using it just to make everything as
+clear as possible. <command>--dport 21</command> means destination port
+21, in other words if the packet is destined for port 21 they also match. If all
+the criteria are matched, then the packet will be targeted for the
+<systemitem>allowed</systemitem> chain. If it doesn't match any of the rules,
+they will be passed back to the original chain that sent the packet to the
+<systemitem>tcp_packets</systemitem> chain.
+    </para>
+
+    <para>
+As it is now, I allow <systemitem>TCP</systemitem> port 21, or
+<systemitem>FTP</systemitem> control port, which is used to control
+<systemitem>FTP</systemitem> connections and later on I also allow all
+<command>RELATED</command> connections, and that way we allow PASSIVE and ACTIVE
+connections since the <systemitem>ip_conntrack_ftp</systemitem> module is,
+hopefully, loaded. If we do not want to allow <systemitem>FTP</systemitem> at
+all, we can unload the <systemitem>ip_conntrack_ftp</systemitem> module and
+delete the <command>$IPTABLES -A tcp_packets -p TCP -s 0/0 --dport
+21 -j allowed</command> line from the <filename>rc.firewall.txt</filename> file.
+    </para>
+
+    <para>
+Port 22 is <systemitem>SSH</systemitem>, which is much better than allowing
+telnet on port 23 if you want to allow anyone from the outside to use a shell on
+your box at all. Note that you are dealing with a firewall. It is always a bad
+idea to give others than yourself any kind of access to a firewall box.
+Firewalls should always be kept to a bare minimum and no more.
+    </para>
+
+    <para>
+Port 80 is <systemitem>HTTP</systemitem>, in other words your web server, delete
+it if you do not want to run a web server directly on your firewall.
+    </para>
+
+    <para>
+And finally we allow port 113, which is <systemitem>IDENTD</systemitem> and
+might be necessary for some protocols like IRC, etc to work properly. Do note
+that it may be worth it to use the <command>oidentd</command> package if you
+<systemitem>NAT</systemitem> several hosts on your local network.
+<command>oidentd</command> has support for relaying
+<systemitem>IDENTD</systemitem> requests on to the correct boxes within your
+local network.
+    </para>
+
+    <para>
+If you feel like adding more open ports with this script, well, it should
+be quite obvious how to do that by now. Just cut and paste one of the other
+lines in the <systemitem>tcp_packets</systemitem> chain and change it to the
+port you want to open.
+    </para>
+
+   </section>
+
+   <section id="udppacketschain">
+    <title id="udppacketschain.title">The UDP chain</title>
+    <indexterm zone="udppacketschain">
+      <primary>UDP</primary>
+    </indexterm>
+    <indexterm zone="udppacketschain">
+      <primary>udp_packets</primary>
+    </indexterm>
+    <indexterm zone="udppacketschain">
+      <primary>UDP match</primary>
+    </indexterm>
+    <indexterm zone="udppacketschain">
+      <primary>DNS</primary>
+    </indexterm>
+    <indexterm zone="udppacketschain">
+      <primary>NTP</primary>
+    </indexterm>
+    <indexterm zone="udppacketschain">
+      <primary>ACCEPT target</primary>
+    </indexterm>
+    <indexterm zone="udppacketschain">
+      <primary>LOG target</primary>
+    </indexterm>
+    <indexterm zone="udppacketschain">
+      <primary>DROP target</primary>
+    </indexterm>
+
+    <para>
+If we do get a <systemitem>UDP</systemitem> packet on the
+<systemitem>INPUT</systemitem> chain, we send them on to
+<systemitem>udp_packets</systemitem> where we once again do a match for
+the <systemitem>UDP</systemitem> protocol with <command>-p UDP</command> and
+then match everything with a source address of 0.0.0.0 and netmask 0.0.0.0, in
+other words everything again. Except this time, we only accept specific
+<systemitem>UDP</systemitem> ports that we want to be open for hosts on the
+Internet. Do note that we do not need to open up holes depending on the sending
+hosts source port, since this should be taken care of by the state machine. We
+only need to open up ports on our host if we are to run a server on any
+<systemitem>UDP</systemitem> port, such as <systemitem>DNS</systemitem> etc.
+Packets that are entering the firewall and that are part of an already
+established connection (by our local network) will automatically be accepted
+back in by the <systemitem>--state ESTABLISHED,RELATED</systemitem> rules at
+the top of the <systemitem>INPUT</systemitem> chain.
+    </para>
+
+    <para>
+As it is, we do not <command>ACCEPT</command> incoming
+<systemitem>UDP</systemitem> packets from port 53, which is what we use to do
+<systemitem>DNS</systemitem> lookups. The rule is there, but it is per
+default commented out. If you want your firewall to act as a
+<systemitem>DNS</systemitem> server, uncomment this line.
+    </para>
+
+    <para>
+I personally also allow port 123, which is <systemitem>NTP</systemitem> or
+<systemitem>network time protocol</systemitem>. This protocol is used to set
+your computer clock to the same time as certain other time servers which have
+<emphasis>very</emphasis> accurate clocks. Most of you probably do not
+use this protocol and hence I am not allowing it per default. The same thing
+applies here, however, the rule is there and it is simple to uncomment to get it
+working.
+    </para>
+
+    <para>
+We do not currently allow port 2074, which is used for certain real-time
+<emphasis>multimedia</emphasis> applications like <command>speak
+freely</command> which you can use to talk to other people in real-time by using
+speakers and a microphone, or even better, a headset. If you would like to
+use this, you could turn it on quite simply by removing the comment.
+
+    </para>
+
+    <para>
+Port 4000 is the <systemitem>ICQ</systemitem> protocol. This should be an
+extremely well known protocol that is used by the Mirabilis application named
+<command>ICQ</command>. There are at least 2-3 different <command>ICQ</command>
+clones for Linux and it is one of the most widely used chat programs in the
+world. I doubt there is any further need to explain what it is.
+    </para>
+
+    <para> 
+At this point, two extra rules are available if you are experiencing a lot
+of log entries due to different circumstances. The first rule will block
+broadcast packets to destination ports 135 through 139. These are used by
+<systemitem>NetBIOS</systemitem>, or <systemitem>SMB</systemitem> for most
+Microsoft users. This will block all log entries we may get from iptables
+logging Microsoft network activity on the outside of our firewall.
+The second rule was also created to take care of excessive logging problems, 
+but instead takes care of <systemitem>DHCP</systemitem> queries from the 
+outside. This is specifically true if your outside network consists of a 
+non-switched Ethernet type of network, where the clients receive their 
+<systemitem>IP addresses</systemitem> by <systemitem>DHCP</systemitem>. During 
+these circumstances, you could wind up with a lot of logs from just that.
+    </para>
+
+    <note>
+     <para>
+Do note that the last two rules are specifically opted out since some 
+people may be interested in these kind of logs. If you are experiencing 
+problems with excessive legit logging, try to drop these types of packages 
+at this point. There are also more rules of this type just before the log 
+rules in the <systemitem>INPUT</systemitem> chain.
+     </para>
+    </note>
+
+   </section>
+
+   <section id="icmpchain">
+    <title id="icmpchain.title">The ICMP chain</title>
+    <indexterm zone="icmpchain">
+      <primary>ICMP</primary>
+    </indexterm>
+    <indexterm zone="icmpchain">
+      <primary>icmp_packets</primary>
+    </indexterm>
+    <indexterm zone="icmpchain">
+      <primary>ICMP match</primary>
+    </indexterm>
+    <indexterm zone="icmpchain">
+      <primary>TTL</primary>
+    </indexterm>
+    <indexterm zone="icmpchain">
+      <primary>State match</primary>
+      <secondary>RELATED</secondary>
+    </indexterm>
+    <indexterm zone="icmpchain">
+      <primary>Chain</primary>
+      <secondary>INPUT</secondary>
+    </indexterm>
+    <indexterm zone="icmpchain">
+      <primary>RFC</primary>
+      <secondary>792</secondary>
+    </indexterm>
+
+    <para>
+This is where we decide what <systemitem>ICMP</systemitem> types to
+allow. If a packet of <systemitem>ICMP</systemitem> type comes in on
+eth0 on the <systemitem>INPUT</systemitem> chain, we then redirect it
+to the <computeroutput>icmp_packets</computeroutput> chain as explained
+before. Here we check what kind of <systemitem>ICMP</systemitem> types
+to allow. For now, I only allow incoming <systemitem>ICMP</systemitem>
+<systemitem>Echo requests</systemitem>, <systemitem>TTL equals 0 during
+transit</systemitem> and <systemitem>TTL equals 0 during
+reassembly</systemitem>. The reason that we do not allow any other ICMP types
+per default here, is that almost all other ICMP types should be covered by the
+RELATED state rules.
+    </para>
+
+    <note>
+     <para>
+If an ICMP packet is sent as a reply to an already existing packet or 
+packet stream it is considered RELATED to the original stream. For more 
+information on the states, read the <link linkend="statemachine" 
+endterm="statemachine.title"></link> chapter.
+     </para>
+    </note>
+
+    <para>
+The reason that I allow these <systemitem>ICMP</systemitem> packets
+is as follows, Echo Requests are used to request an echo reply, which in turn
+is used to mainly ping other hosts to see if they are available on any of the
+networks. Without this rule, other hosts will not be able to ping us to see if
+we are available on any network connection. Do note that some people would tend
+to erase this rule, since they simply do not want to be seen on the Internet.
+Deleting this rule will effectively render any pings to our firewall totally
+useless from the Internet since the firewall will simply not respond to them.
+    </para>
+
+    <para>
+Time Exceeded (i.e., <systemitem>TTL equals 0 during transit</systemitem> and
+<systemitem>TTL equals 0 during reassembly</systemitem>), is allowed in the
+case we want to trace-route some host or if a packet gets its Time To Live set
+to 0, we will get a reply about this. For example, when you trace-route
+someone, you start out with <systemitem>TTL</systemitem> = 1, and it gets
+down to 0 at the first hop on the way out, and a Time Exceeded is sent back
+from the first gateway en route to the host we are trying to trace-route, then
+<systemitem>TTL</systemitem> = 2 and the second gateway sends Time Exceeded,
+and so on until we get an actual reply from the host we finally want to get
+to. This way, we will get a reply from each host on our way to the actual host
+we want to reach, and we can see every host in between and find out what host
+is broken.
+    </para>
+
+    <para>
+For a complete listing of all <systemitem>ICMP</systemitem> types, see the
+<link linkend="icmptypes" endterm="icmptypes.title"></link> appendix . For more
+information on <systemitem>ICMP</systemitem> types and their usage, i suggest
+reading the following documents and reports:
+
+    </para>
+
+    <para>
+     <itemizedlist>
+      <listitem>
+       <para>
+<link linkend="rfc792" endterm="rfc792.title"></link> by J. Postel.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </para>
+
+    <note>
+     <para>
+As a side-note, I might be wrong in blocking some of these
+<systemitem>ICMP</systemitem> types for you, but in my case, everything works
+perfectly while blocking all the <systemitem>ICMP</systemitem> types that
+I do not allow.
+     </para>
+    </note>
+
+    </section>
+
+   </section>
+
+   <section id="inputchain">
+    <title id="inputchain.title">INPUT chain</title>
+    <indexterm zone="inputchain">
+      <primary>Chain</primary>
+      <secondary>INPUT</secondary>
+    </indexterm>
+    <indexterm zone="inputchain">
+      <primary>bad_tcp_packets</primary>
+    </indexterm>
+    <indexterm zone="inputchain">
+      <primary>State match</primary>
+      <secondary>ESTABLISHED</secondary>
+    </indexterm>
+    <indexterm zone="inputchain">
+      <primary>State match</primary>
+      <secondary>RELATED</secondary>
+    </indexterm>
+
+    <para>
+The <systemitem>INPUT</systemitem> chain, as I have written it, uses mostly
+other chains to do the hard work. This way we do not get too much load from
+iptables, and it will work much better on slow machines which might otherwise
+drop packets at high loads. This is done by checking for specific details that
+should be the same for a lot of different packets, and then sending those
+packets into specific user specified chains. By doing this, we can split down
+our rule-set to contain much less rules that need to be traversed by each
+packet and hence the firewall will be put through a lot less overhead by packet
+filtering.
+
+    </para>
+
+    <para>
+First of all we do certain checks for bad packets. This is done by sending all
+<systemitem>TCP packets</systemitem> to the
+<systemitem>bad_tcp_packets</systemitem> chain. This chain contains a few rules
+that will check for badly formed packets or other anomalies that we do not want
+to accept. For a full explanation of the 
+<systemitem>bad_tcp_packets</systemitem> chain, take a look in the 
+<link linkend="badtcppackets" endterm="badtcppackets.title"></link> section in 
+this chapter.
+    </para>
+
+    <para>
+At this point we start looking for traffic from generally trusted networks.
+These include the local network adapter and all traffic coming from
+there, all traffic to and from our <systemitem>loopback</systemitem> interface,
+including all our currently assigned <systemitem>IP addresses</systemitem> (this
+means all of them, including our <systemitem>Internet IP address</systemitem>).
+As it is, we have chosen to put the rule that allows
+<systemitem>LAN</systemitem> activity to the firewall at the top, since our
+local network generates more traffic than the Internet connection. This allows
+for less overhead used to try and match each packet with each rule and it is
+always a good idea to look through what kind of traffic mostly traverses the
+firewall. By doing this, we can shuffle around the rules to be more efficient,
+leading to less overhead on the firewall and less congestion on your network.
+    </para>
+
+    <para>
+Before we start touching the "real" rules which decide what we allow from the
+Internet interface and not, we have a related rule set up to reduce our
+overhead. This is a state rule which allows all packets part of an already
+<systemitem>ESTABLISHED</systemitem> or <systemitem>RELATED</systemitem> stream
+to the Internet <systemitem>IP address</systemitem>. This rule has an equivalent
+rule in the allowed chain, which are made rather redundant by this rule, which
+will be evaluated before the <systemitem>allowed</systemitem> ones are. However,
+the <command>--state ESTABLISHED,RELATED</command> rule in the allowed chain has
+been retained for several reasons, such as people wanting to cut and paste the
+function.
+    </para>
+
+    <para>
+After this, we match all <systemitem>TCP</systemitem> packets in the
+<systemitem>INPUT</systemitem> chain that comes in on the
+<command>$INET_IFACE</command> interface, and send those to the
+<computeroutput>tcp_packets</computeroutput>, which was previously described.
+Now we do the same match for <systemitem>UDP</systemitem> packets on the
+<command>$INET_IFACE</command> and send those to the
+<systemitem>udp_packets</systemitem> chain, and after this all
+<systemitem>ICMP</systemitem> packets are sent to the
+<systemitem>icmp_packets</systemitem> chain. Normally, a firewall would be
+hardest hit by <systemitem>TCP</systemitem> packets, than
+<systemitem>UDP</systemitem> and last of them all <systemitem>ICMP</systemitem>
+packets. This is in normal case, mind you, and it may be wrong for you. The
+absolute same thing should be looked upon here, as with the network specific
+rules. Which causes the most traffic? Should the rules be thrown around to
+generate less overhead? On networks sending huge amounts of data, this
+is an absolute necessity since a <systemitem>Pentium III</systemitem> 
+equivalent machine may be brought to its knees by a simple rule-set containing
+100 rules and a single 100mbit <systemitem>Ethernet</systemitem> card running
+at full capacity if the rule-set is badly written. This is an important piece
+to look at when writing a rule-set for your own local network.
+    </para>
+
+    <para>
+At this point we have one extra rule, that is per default opted out, that 
+can be used to get rid of some excessive logging in case we have some 
+Microsoft network on the outside of our Linux firewall. Microsoft clients 
+have a bad habit of sending out tons of multicast packets to the 
+224.0.0.0/8 range, and hence we have the opportunity to block those 
+packets here so we don't fill our logs with them. There are also two more 
+rules doing something similar to tasks in the 
+<systemitem>udp_packets</systemitem> chain described in the <link 
+linkend="udppacketschain" endterm="udppacketschain.title"></link>.
+    </para>
+
+    <para>
+Before we hit the default policy of the <systemitem>INPUT</systemitem>
+chain, we log it so we may be able to find out about possible problems and/or
+bugs. Either it might be a packet that we just do not want to allow or it might
+be someone who is doing something bad to us, or finally it might be a problem in
+our firewall not allowing traffic that should be allowed. In either case we want
+to know about it so it can be dealt with. Though, we do not log more than 3
+packets per minute as we do not want to flood our logs with crap which in turn
+may fill up our whole logging partition, also we set a prefix to all log entries
+so we know where it came from.
+    </para>
+
+    <para>
+Everything that has not yet been caught will be <command>DROP</command>ed by
+the default policy on the  <systemitem>INPUT</systemitem> chain. The default
+policy was set quite some time back, in the <link linkend="defaultpolicies"
+endterm="defaultpolicies.title"></link> section, in this chapter.
+    </para>
+
+   </section>
+
+   <section id="forwardchain">
+    <title id="forwardchain.title">FORWARD chain</title>
+    <indexterm zone="forwardchain">
+      <primary>Chain</primary>
+      <secondary>FORWARD</secondary>
+    </indexterm>
+    <indexterm zone="forwardchain">
+      <primary>LAN</primary>
+    </indexterm>
+    <indexterm zone="forwardchain">
+      <primary>$LAN_IFACE</primary>
+    </indexterm>
+    <indexterm zone="forwardchain">
+      <primary>DROP target</primary>
+    </indexterm>
+    <indexterm zone="forwardchain">
+      <primary>LOG target</primary>
+    </indexterm>
+    <indexterm zone="forwardchain">
+      <primary>Policy</primary>
+    </indexterm>
+
+    <para>
+The <systemitem>FORWARD</systemitem> chain contains quite a few rules in this
+scenario. We have a single rule which sends all packets to the
+<systemitem>bad_tcp_packets</systemitem> chain, which was also used in the
+<systemitem>INPUT</systemitem> chain as described previously. The
+<systemitem>bad_tcp_packets</systemitem> chain is constructed in such a fashion
+that it can be used recycled in several calling chains, regardless of what
+packet traverses it.
+    </para>
+
+    <para>
+After this first check for bad <systemitem>TCP</systemitem> packets, we have
+the main rules in the <systemitem>FORWARD</systemitem> chain. The first rule
+will allow all traffic from our <command>$LAN_IFACE</command> to any other
+interface to flow freely, without restrictions. This rule will in other words
+allow all traffic from our <systemitem>LAN</systemitem> to the Internet. The
+second rule will allow <command>ESTABLISHED</command> and
+<command>RELATED</command> traffic back through the firewall. This will in
+other words allow packets belonging to connections that were initiated from
+our internal network to flow freely back to our local network. These rules are
+required for our local network to be able to access the Internet, since the
+default policy of the <systemitem>FORWARD</systemitem> chain was previously
+set to <command>DROP</command>. This is quite clever, since it will allow
+hosts on our local network to connect to hosts on the Internet, but at the
+same time block hosts on the Internet from connecting to the hosts on our
+internal network.
+    </para>
+
+    <para>
+    Finally we also have a logging rule which will log packets that are not
+allowed in one or another way to pass through the
+<systemitem>FORWARD</systemitem> chain. This will most likely show one or
+another occurrence of a badly formed packet or other problem. One cause may be
+hacker attacks, and others may be malformed packets. This is exactly the same
+rule as the one used in the <systemitem>INPUT</systemitem> chain except for the
+logging prefix, <command>"IPT FORWARD packet died: "</command>. The logging
+prefix is mainly used to separate log entries, and may be used to distinguish
+log entries to find out where the packet was logged from and some header
+options.
+    </para>
+
+   </section>
+
+   <section id="outputchain">
+    <title id="outputchain.title">OUTPUT chain</title>
+    <indexterm zone="outputchain">
+      <primary>Chain</primary>
+      <secondary>OUTPUT</secondary>
+    </indexterm>
+    <indexterm zone="outputchain">
+      <primary>$LOCALHOST_IP</primary>
+    </indexterm>
+    <indexterm zone="outputchain">
+      <primary>$STATIC_IP</primary>
+    </indexterm>
+    <indexterm zone="outputchain">
+      <primary>$LAN_IP</primary>
+    </indexterm>
+    <indexterm zone="outputchain">
+      <primary>DROP target</primary>
+    </indexterm>
+
+    <para>
+Since I know that there is pretty much no one but me using this box which is
+partially used as a Firewall and a workstation currently, I allow almost
+everything that goes out from it that has a source address
+<command>$LOCALHOST_IP</command>, <command>$LAN_IP</command> or
+<command>$STATIC_IP</command>. Everything else might be spoofed in some fashion,
+even though I doubt anyone that I know would do it on my box. Last of all we log
+everything that gets dropped. If it does get dropped, we will most
+definitely want to know about it so we may take action against the problem.
+Either it is a nasty error, or it is a weird packet that is spoofed. Finally we
+<command>DROP</command> the packet in the default policy.
+    </para>
+   </section>
+
+   <section id="preroutingchain">
+    <title id="preroutingchain.title">PREROUTING chain of the nat table</title>
+    <indexterm zone="preroutingchain">
+      <primary>Chain</primary>
+      <secondary>PREROUTING</secondary>
+    </indexterm>
+    <indexterm zone="preroutingchain">
+      <primary>Chain</primary>
+      <secondary>FORWARD</secondary>
+    </indexterm>
+    <indexterm zone="preroutingchain">
+      <primary>DNAT target</primary>
+    </indexterm>
+
+    <para>
+The <systemitem>PREROUTING</systemitem> chain is pretty much what it says, it
+does network address translation on packets before they actually hit the
+routing decision that sends them onward to the <systemitem>INPUT</systemitem>
+or <systemitem>FORWARD</systemitem> chains in the filter table. The only
+reason that we talk about this chain in this script is that we once again feel
+obliged to point out that you should not do any filtering in it. The
+<systemitem>PREROUTING</systemitem> chain is only traversed by the first packet
+in a stream, which means that all subsequent packets will go totally unchecked
+in this chain. As it is with this script, we do not use the
+<systemitem>PREROUTING</systemitem> chain at all, however, this is the place we
+would be working in right now if we wanted to do <systemitem>DNAT</systemitem>
+on any specific packets, for example if you want to host your <systemitem>web
+server</systemitem> within your local network. For more information about the
+<systemitem>PREROUTING</systemitem> chain, read the <link
+linkend="traversingoftables" endterm="traversingoftables.title"></link> chapter.
+    </para>
+
+    <caution>
+     <para>
+     The <systemitem>PREROUTING</systemitem> chain should not be used for any
+filtering since, among other things, this chain is only traversed by the first
+packet in a stream. The <systemitem>PREROUTING</systemitem> chain should be used
+for network address translation only, unless you really know what you are
+doing.
+     </para>
+    </caution>
+
+   </section>
+
+
+   <section id="startingsnat">
+    <title id="startingsnat.title">Starting SNAT and the POSTROUTING chain</title>
+    <indexterm zone="startingsnat">
+      <primary>SNAT target</primary>
+    </indexterm>
+    <indexterm zone="startingsnat">
+      <primary>Chain</primary>
+      <secondary>POSTROUTING</secondary>
+    </indexterm>
+    <indexterm zone="startingsnat">
+      <primary>NAT</primary>
+    </indexterm>
+    <indexterm zone="startingsnat">
+      <primary>MASQUERADE target</primary>
+    </indexterm>
+
+    <para> So, our final mission would be to get the <systemitem>Network
+Address Translation</systemitem> up, correct? At least to me. First of all
+we add a rule to the <systemitem>nat</systemitem> table, in the
+<systemitem>POSTROUTING</systemitem> chain that will
+<systemitem>NAT</systemitem> all packets going out on our interface
+connected to the Internet. For me this would be
+<systemitem>eth0</systemitem>. However, there are specific variables added
+to all of the example scripts that may be used to automatically configure
+these settings. The <command>-t</command> option tells
+<command>iptables</command> which table to insert the rule in, in this
+case the <systemitem>nat</systemitem> table. The -A command tells us that
+we want to Append a new rule to an existing chain named
+<systemitem>POSTROUTING</systemitem> and <command>-o $INET_IFACE</command>
+tells us to match all outgoing packets on the
+<command>INET_IFACE</command> interface (or <systemitem>eth0</systemitem>,
+per default settings in this script) and finally we set the target to
+<command>SNAT</command> the packets. So all packets that match this rule
+will be <systemitem>SNAT'ed</systemitem> to look
+as if they came from your Internet interface. Do note that you must set which
+IP address to give outgoing packets with the
+<command>--to-source</command> option sent to the SNAT target.
+    </para>
+
+    <para>
+    In this script we have chosen to use the <command>SNAT</command>
+target instead of <command>MASQUERADE</command> for a couple of reasons.
+The first one is that this script was supposed to run on a firewall that
+has a static <systemitem>IP address</systemitem>. A follow up reason to
+the first one, would hence be that it is faster and more efficient to use
+the <systemitem>SNAT</systemitem> target if possible. Of course, it was
+also used to show how it would work and how it would be used in a real
+live example. If you do not have a static <systemitem>IP
+address</systemitem>, you should definitely give thought to use the
+<command>MASQUERADE</command> target instead which provides a simple and
+easy facility that will also do <systemitem>NAT</systemitem> for you, but
+that will automatically grab the <systemitem>IP address</systemitem> that
+it should use. This takes a little bit extra computing power, but it may
+most definitely be worth it if you use <systemitem>DHCP</systemitem> for
+instance. If you would like to have a closer look at how the
+<command>MASQUERADE</command> target may look, you should look at the
+<link linkend="rcDHCPfirewalltxt"
+endterm="rcDHCPfirewalltxt.title"></link> script.
+    </para>
+   </section>
+
+  </section>
+
+  <section>
+    <title>What's next?</title>
+
+    <para>
+This chapter has explained some of the layout of the different scripts, but
+specifically the <filename>rc.firewall.txt</filename> script. The layout and
+inner workings of scripts described here and those found in other places can
+differ tremenduously. Everyone has their own coding style and how we write
+rulesets or code or scripts differ from person to person, and the style you've
+seen here is my style. 
+    </para>
+
+    <para>
+The next chapter will give some brief introductions to the different scripts
+available within this document. They will give you some basic idea what
+scenarios the scripts where written for, and then you should hopefully have
+taught yourself enough to grasp the rest of the scripts on your own. All of
+these scripts are also available for download on the main site of this
+document. 
+    </para>
+  </section>
+
+ </chapter>

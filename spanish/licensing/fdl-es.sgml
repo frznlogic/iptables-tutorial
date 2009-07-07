@@ -1,0 +1,609 @@
+<appendix id="gfdles">
+<title>Licencia de Documentación Libre GNU</title>
+<!-- - GNU Project - Free Software Foundation (FSF) -->
+<!-- LINK REV="made" HREF="mailto:webmasters@gnu.org" -->
+
+
+  <!-- sect1>
+    <title>GNU Free Documentation License</title -->
+
+    <para>Versión 1.1, Marzo de 2000</para>
+
+    <blockquote>
+      <para>
+Derechos de Autor (C) 2000 Free Software Foundation, Inc.
+59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+Se permite la copia y distribución de copias literales
+de este documento de licencia, pero no se permiten cambios.
+      </para>
+    </blockquote>
+
+<note>
+<para>
+<emphasis>Traducción a Español de la GNU Free Document License 1.1 (GFDL)</emphasis>
+</para>
+
+<para>Los autores de esta traducción son:</para>
+
+<para>
+  <itemizedlist>
+    <listitem>
+      <para>
+        Igor Támara: <ulink url="mailto:ikksATbigfootDOTcom">ikks@bigfoot.com</ulink>
+      </para>
+    </listitem>
+
+    <listitem>
+      <para>
+        Pablo Reyes: <ulink url="mailto:reyes_pabloAThotmailDOTcom">reyes_pablo@hotmail.com</ulink>
+      </para>
+    </listitem>
+  </itemizedlist>
+</para>
+
+<para>
+Esta es una traducción no oficial de la GNU Free Document License
+(GFDL), versión 1.1 a Español. No ha sido publicada por la
+Free Software Foundation, y no establece legalmente los términos de
+distribución para trabajos que usen la GFDL -- sólo el texto
+de la versión original en Inglés de la GFDL lo hace. Sin
+embargo, esperamos que esta traducción ayudaré a hablantes de
+español a entender mejor la GFDL.
+</para>
+
+<para>
+This is an unofficial translation of the GNU Free Document License (GFDL)
+into Spanish. It was not published by the Free Software Foundation, and does
+not legally state the distribution terms for works that uses the GFDL --only
+the original English text of the GFDL does that. However, we hope that this
+translation will help Spanish speakers understand the GFDL better.
+</para>
+
+<para>
+La versión original de la GFDL esta disponible en:
+<ulink url="http://www.gnu.org/copyleft/fdl.html">http://www.gnu.org/copyleft/fdl.html</ulink>
+</para>
+</note>
+
+  <sect1 label="0">
+    <title>PREÁMBULO</title>
+
+    <para>
+El propósito de esta licencia es permitir que un manual, libro de texto,
+u otro documento escrito sea "libre" en el sentido de libertad: asegurar a
+todo el mundo la libertad efectiva de copiarlo y redistribuirlo, con o sin
+modificaciones, de manera comercial o no. En segundo término, esta licencia
+preserva para el autor o para quien publica una manera de obtener
+reconocimiento por su trabajo, al tiempo que no se considera responsable de
+las modificaciones realizadas por terceros,
+lo cual significa que los trabajos derivados del documento deben a su
+vez ser libres en el mismo sentido. Complementa la Licencia Pública General
+GNU, que es una licencia de copyleft diseñada para el software libre.
+    </para>
+
+    <para>
+Hemos diseñado esta Licencia para usarla en manuales de software libre, ya
+que el software libre necesita documentación libre: Un programa libre debe
+venir con los manuales que ofrezcan la mismas libertades que da el software.
+Pero esta licencia no se limita a manuales de software; puede ser usada para
+cualquier trabajo textual, sin tener en cuenta su temática o si se publica
+como libro impreso. Recomendamos esta licencia principalmente para trabajos
+cuyo fin sea instructivo o de referencia.
+    </para>
+  </sect1>
+
+  <sect1 label="1" id="applicability-es">
+    <title>APLICABILIDAD Y DEFINICIONES</title>
+
+    <para>
+Esta Licencia se aplica a cualquier manual u otro documento que contenga
+una nota del propietario de los derechos que indique que puede ser distribuido
+bajo los términos de la Licencia. El "Documento", en adelante, se refiere a
+culquiera de dichos manuales o trabajos. Cualquier miembro del público es un
+como "Usted".
+    </para>
+
+    <para>
+Una "Versión Modificada" del Documento significa cualquier trabajo que
+contenga el Documento o una porción del mismo, ya sea una copia literal o
+con modificaciones y/o traducciones a otro idioma.
+    </para>
+
+    <para>
+Una "Sección Secundaria" es un apéndice titulado o una sección preliminar
+al prólogo del Documento que tiene que ver exclusivamente con la relación de
+quien publica, o con los autores del Documento, o con el tema general del
+Documento (o asuntos relacionados) y cuyo contenido no entre directamente en
+tal tema general. (Por ejemplo, si el Documento es en parte un texto de
+matemáticas, una Sección Secundaria puede no explicar matemáticas). La
+relación puede ser un asunto de conexión histórica, o de posición egal,
+comercial, filosófica, ética o política con el tema o la materia del texto.
+    </para>
+
+    <para>
+Las "Secciones Invariantes" son ciertas Secciones Secundarias cuyos títulos
+son denominados como Secciones Invariantes en la nota que indica que el
+documento es liberado bajo esta licencia.
+    </para>
+
+    <para>
+Los "Textos de Cubierta" son ciertos pasajes cortos de texto que se listan,
+como Textos de Título o Textos al respaldo de la página de
+tí, en la nota que indica que el documento es liberado bajo esta
+Licencia.
+    </para>
+
+    <para>
+Una copia "Transparente" del Documento, significa una copia para lectura
+en máquina, representada en un formato cuya especificación está disponible
+al público general, cuyos contenidos pueden ser vistos y editados
+directamente con editores de texto genéricos o (para imágenes compuestas
+por pixeles) con programas genéricos de dibujo o (para dibujos) con algún
+editor gráfico ampliamente disponible, y que sea adecuado para exportar a
+formateadores de texto o para traducción automática a una variedad de
+formatos adecuados para ingresar a formateadores de texto. Una copia
+hecha en un formato de un archivo que no sea Transparente, cuyo formato
+ha sido diseñado para impedir o dificultar subsecuentes modificaciones
+posteriores por parte de los lectores no es Transparente. Una copia que no
+es "Transparente" es llamada "Opaca".
+    </para>
+
+    <para>
+Como ejemplos de formatos adecuados para copias Transparentes están el
+ASCII plano sin formato, formato de Texinfo, formato de LaTeX, SGML o XML
+usando un DTD disponible publicamente, y HTML simple que siga los estándares,
+diseñado para modificaciones humanas. Los formatos Opacos incluyen
+PostScript, PDF, formatos propietarios que pueden ser leídos y editados
+unicamente en procesadores de palabras propietarios, SGML o XML para los
+cuáles los DTD y/o herramientas de procesamiento no están disponibles
+generalmente, y el HTML generado por máquinas, producto de algún procesador de
+palabras solo para propósitos de salida.
+    </para>
+
+    <para>
+La "Pagina de Título" en un libro impreso significa, la pagina de titulo
+misma, más las páginas siguientes que sean necesaria para mantener,
+legiblemente, el material que esta Licencia requiere en la página de titulo.
+Para trabajos en formatos que no tienen página de título como tal, "Página
+de Título" significa el texto cercano a la aparición más prominente del
+título del trabajo, precediendo el comienzo del cuerpo del trabajo.
+    </para>
+  </sect1>
+
+  <sect1 label="2" id="verbatim-es">
+    <title>COPIA LITERAL</title>
+
+<para>
+Puede copiar y distribuir el Documento en cualquier medio, sea en forma
+comercial o no, siempre y cuando esta Licencia, las notas de derecho de autor,
+y la nota de licencia que indica que esta Licencia se aplica al Documento se
+reproduzca en todas las copias, y que usted no adicione ninguna otra condición
+a las expuestas en en esta Licencia. Usted no puede usar medidas técnicas para
+obstruir o controlar la lectura o copia posterior de las copias que usted haga
+o distribuya. Sin embargo, usted puede aceptar compensación a cambio de las
+copias. Si distribuye un número suficientemente grande de copias también
+deberá seguir las condiciones de la sección 3.
+</para>
+
+<para>
+También puede prestar copias, bajo las mismas condiciones establecidas
+anteriormente, y puede exhibir copias publicamente.
+</para>
+  </sect1>
+
+  <sect1 label="3" id="copying-es">
+    <title>COPIADO EN CANTIDAD</title>
+
+<para>
+Si publica copias impresas del Documento que sobrepasen las 100, y la nota
+de Licencia del Documento exige Textos de Cubierta, debe incluir las copias
+con cubiertas que lleven en forma clara y legible, todos esos Textos de
+Cubierta: Textos de título en la portada, y Textos al respaldo de la
+página de tílo. Ambas cubiertas deben identificarlo a Usted
+clara y legiblemente como quien publica tales copias. La portada
+debe mostrar el título completo con todas las palabras igualmente prominentes
+y visibles. Además puede adicionar otro material en la cubierta. Las copias
+con cambios limitados en las cubiertas, siempre que preserven el título del
+Documento y satisfagan estas condiciones, pueden considerarse como copias
+literales.
+</para>
+
+<para>
+Si los textos requeridos para la cubierta son muy voluminosos para que
+ajusten legiblemente, debe colocar los primeros (tantos como sea razonable
+colocar) en la cubierta real y continuar el resto en páginas adyacentes.
+</para>
+
+<para>
+Si publica o distribuye copias Opacas del Documento cuya cantidad exceda
+las 100, debe incluir una copia Transparente, que pueda ser leída por una
+máquina, con cada copia Opaca o entregar en o con cada copia Opaca una
+dirección en una red de computadores accesible publicamente que contenga una
+copia completa Transparente del Documento, sin material adicional, a la cual
+el público en general de la red pueda acceder a bajar anónimamente sin
+cargo usando protocolos públicos y estandarizados. Si usted hace uso de la
+última opción, deberá tomar medidas necesarias, cuando comience la
+distribución de las copias Opacas en cantidad, para asegurar que esta copia
+Transparente permanecerá accesible en el sitio por lo menos un año después
+de su última distribución de copias Opacas (directamente o a través de sus
+agentes o distribuidores) de esa edición al público.
+</para>
+
+<para>
+Se solicita, aunque no es requisito, que contacte a los autores del
+Documento antes de redistribuir cualquier gran número de copias, para
+darle la oportunidad de que le provean una versión actualizada del
+Documento.
+</para>
+  </sect1>
+
+  <sect1 label="4" id="modifications-es">
+    <title>MODIFICACIONES</title>
+
+<para>
+Puede copiar y distribuir una Versión Modificada del Documento bajo las
+condiciones de las seccions 2 y 3 anteriores, siempre que usted libere la
+Versión Modificada bajo esta misma Licencia, con la Versión Modificada
+haciendo el rol del Documento, por lo tanto licenciando la distribución y
+modificación de la Versión Modificada a quienquiera posea una copia de
+esta. Además, debe hacer lo siguiente en la Versión Modificada:
+</para>
+
+    <orderedlist numeration="upperalpha">
+      <listitem><para>Usar en la Página de Título (y en las cubiertas,
+ si hay alguna) un título distinto al del Documento, y de versiones
+ anteriores (que deberían, si hay alguna, estar listados en la sección de
+ Historia del Documento). Puede usar el mismo título de versiones
+ anteriores al original siempre y cuando quien publicó originalmente
+ otorge permiso.</para>
+      </listitem>
+
+      <listitem><para>Listar en la Página de Título, como autores, una o más
+ personas o entidades responsables por la autoría o las modificaciones en
+ la Versión Modificada, junto con por lo menos cinco de los autores
+ principales del Documento (Todos sus autores principales, si hay menos de
+ cinco).</para>
+      </listitem>
+
+      <listitem><para>Incluir en la Página de Título el nombre de quién
+ publica la Versión Modificada, como quien publica.</para>
+      </listitem>
+
+      <listitem><para>Preservar todas las notas de derechos de autor del
+ Documento.</para>
+      </listitem>
+
+      <listitem><para>Adicionar una nota de derecho de autor apropiada a
+ sus modificaciones, adyacente a las otras notas de derecho de autor.</para>
+      </listitem>
+
+      <listitem><para>Incluir, immediatamente después de la nota de
+ derecho de autor, una nota de licencia dando el permiso público para usar
+ la Versión Modificada bajo los términos de esta Licencia, de la forma
+ mostrada en el anexo al final de este documento.</para>
+      </listitem>
+
+      <listitem><para>Preservar en esa nota de licencia el listado
+ completo de Secciones Invariantes y de los Textos de Cubiertas que
+ sean requeridos como se especifique en la nota de Licencia del
+ Documento.</para>
+      </listitem>
+
+      <listitem><para>Incluir una copia sin modificación de esta
+ Licencia.</para>
+      </listitem>
+
+      <listitem><para>Preservar la sección llamada "Historia", y su
+ título, y adicionar a esta una sección estableciendo al menos el título,
+ el año,los nuevos autores, y quién publique la Versión Modificada como reza
+ en la Página de Título. Si no hay una sección titulada "Historia" en el
+ Documento, crear una estableciendo el título, el año, los autores y quieng
+ publicó el Documento como reza en la Página de Título, añadiendo además
+ una sección describiendo la Versión Modificada como se estableció en la
+ oración anterior.</para>
+      </listitem>
+
+      <listitem><para>Preservar la localización en red, si hay , dada en
+ la Documentación para acceso público a una copia Transparente del
+ Documento, tanto como las otras direcciones de red dadas en el Documento
+ para versiones anteriores en las cuáles estuviese basado. Estas pueden
+ ubicarse en la sección "Historia". Se puede omitir la ubicación en red
+ para un trabajo que sea publicado por lo menos cuatro años antes que el
+ Documento mismo, o si quien publica originalmente la versión da permiso
+ explícitamente.</para>
+      </listitem>
+
+      <listitem><para>En cualquier sección titulada "Agradecimientos" o
+ "Dedicatorias", preservar el título de la sección, y preservar en la
+ sección toda la sustancia y el tono de los agradeimientos y/o dedicatorias
+ de cada contribuyente que estén incluídas.</para>
+      </listitem>
+
+      <listitem><para>Preservar todas las Secciones Invariantes del
+ Documento, sin alterar su texto ni sus títulos. Números de sección o el
+ equivalente no son considerados parte de los títulos de la sección.</para>
+      </listitem>
+
+      <listitem><para>Borrar cualquier sección titulada "Aprobaciones".
+ Tales secciones no pueden estar incluidas en las Versiones
+ Modificadas.</para>
+      </listitem>
+
+      <listitem><para>No retitular ninguna sección existente como
+ "Aprobaciones" o conflictuar con el título de alguna Sección
+ Invariante.</para>
+      </listitem>
+    </orderedlist>
+    
+<para>
+Si la Versión Modificada incluye secciones o apendices nuevos o
+preliminares al prólogo que califiquen como Secciones Secundarias y contienen
+material no copiado del Documento, puede opcionalmente designar algunas o
+todas esas secciones como invariantes. Para hacerlo, adicione sus títulos a
+la lista de Secciones Invariantes en la nota de licencia de la Versión
+Modificada. Tales títulos deben ser distintos de cualquier otro título de
+sección.
+</para>
+
+<para>
+Puede adicionar una sección titulada "Aprobaciones", siempre que contenga
+unicamente aprobaciones de su Versión Modificada por varias fuentes--por
+ejemplo, observaciones de peritos o que el texto ha sido aprobado por una
+organización como la definición oficial de un estándar.
+</para>
+
+<para>
+Puede adicionar un pasaje de hasta cinco palabras como un Texto de Portada,
+y un pasaje de hasta 25 palabras al respaldo de la página de
+título al final de la lista de Textos de Cubierta en la Versión
+Modificada. Solamente un pasaje de Texto de Portada y uno al respaldo de la
+página de título puede ser adicionado por (o a manera de
+arreglos hechos por) una entidad. Si el Documento ya incluye un texto de
+cubierta para la misma portada o al respaldo de la portada, previamente
+adicionado por usted o por arreglo hecho por la misma entidad, a nombre de
+la cual usted está actuando, usted no puede adicionar otro; pero puede
+reemplazar el anterior, con permiso explícito de quien publicó previamente
+y agregó el texto anterior
+</para>
+
+<para>
+El(los) autor(es) y quien(es) publica(n) el Documento no dan con esta
+Licencia permiso para usar sus nombres para publicidad o para asegurar o
+implicar aprobación de cualquier Versión Modificada.
+</para>
+  </sect1>
+
+  <sect1 label="5" id="combiningdocs-es">
+    <title>COMBINANDO DOCUMENTOS</title>
+
+<para>
+Puede combinar el Documento con otros documentos liberados bajo esta
+Licencia, bajo los términos definidos en la sección 4 anterior para versiones
+modificadas, siempre que incluya en la combinación todas las Secciones
+Invariantes de todos los documentos originales, sin modificar, y listadas
+todas como Secciones Invariantes del trabajo combinado en su nota de
+licencia.
+</para>
+
+<para>
+El trabajo combinado necesita contener solamente una copia de esta
+Licencia, y múltiples Seccions Invariantes idénticas pueden ser reemplazadas
+por una sola copia. Si hay múltiples Secciones Invariantes con el mismo
+nombre pero con contenidos diferentes, haga el título de cada una de estas
+secciones único adicionándole al final del mismo, entre paréntesis, el
+nombre del autor o de quien publicó originalmente esa sección, si es
+conocido, o si no, un número único. Haga el mismo ajuste a los títulos de
+sección en la lista de Secciones Invariantes en la nota de licencia del
+trabajo combinado.
+</para>
+
+<para>
+En la combinación, debe combinar cualquier sección titulada "Historia" de
+los varios documentos originales, formando una sección titulada "Historia"; de
+la misma forma combine cualquier seción titulada "Agradecimientos", y
+cualquier sección titulada "Dedicatorias". Debe borrar todas las secciones
+tituladas "Aprobaciones."
+</para>
+  </sect1>
+
+  <sect1 label="6" id="collectionsofdocs-es">
+    <title>COLECCIONES DE DOCUMENTOS</title>
+
+<para>
+Puede hacer una colección consistente del Documento y otros documentos
+liberados bajo esta Licencia, y reemplazar las copias individuales de esta
+Licencia en los varios documentos con una sola copia que esté incluida en la
+colección, siempre que siga las reglas de esta Licencia para cada copia
+literal de cada uno de los documentos en cualquiera de los demás aspectos.
+</para>
+
+<para>
+Puede extraer un solo documento de una de tales colecciones, y distribuirlo
+individualmente bajo esta Licencia, siempre que inserte una copia de esta
+Licencia en el documento extraido, y siga esta Licencia en todos los otros
+aspectos concernientes a la copia literal de tal documento.
+</para>
+  </sect1>
+
+  <sect1 label="7" id="aggregation-es">
+    <title>AGREGACIÓN CON TRABAJOS INDEPENDENTES</title>
+    
+<para>
+Una recopilación del Documento o de sus derivados con otros documentos o
+trabajos separados o independientes, en cualquier tipo de distribución o medio
+de almacenamiento, no como un todo, cuenta como una Versión Modificada del
+Documento, siempre que no se aleguen derechos de autor por la recopilación.
+Tal recopilación es llamada un "agregado", y esta
+Licencia no aplica a los otros trabajos auto-contenidos así recopilados con
+el Documento, o a cuenta de haber sido recopilados, si no son
+ellos mismos trabajos derivados del Documento.
+</para>
+
+<para>
+Si el requerimiento de la sección 3 sobre el Texto de Cubierta es aplicable a
+estas copias del Documento, entonces si el Documento es menor que un cuarto
+del agregado entero, los Textos de Cubierta del Documento pueden ser
+colocados en cubiertas que enmarquen solamente el Documento entre el agregado.
+De otra forma deben aparecer en cubiertas enmarcando todo el
+agregado.
+</para>
+  </sect1>
+
+  <sect1 label="8" id="translation-es">
+    <title>TRADUCCIÓN</title>
+
+<para>
+La Traducción es considerada como una clase de modificación, Así que puede
+distribuir traducciones del Documento bajo los términos de la sección 4.
+Reemplazar las Secciones Invariantes con traducciones requiere permiso
+especial de los dueños de derecho de autor, pero usted puede incluir
+traducciones de algunas o todas las Secciones Invariantes adicionalmente a
+las versiones originales de tales Secciones Invariantes. Puede incluir una
+traducción de esta Licencia siempre que incluya también la versión en
+Inglés de esta Licencia. En caso de un desacuerdo entre la traducción y la
+versión original en Inglés de esta Licencia, la versión original en Inglés
+prevalecerá.
+</para>
+  </sect1>
+
+  <sect1 label="9" id="termination-es">
+    <title>TERMINACIÓN</title>
+    
+<para>
+No se puede copiar, modificar, sublicenciar, o distribuir el Documento
+excepto por lo permitido expresamente bajo esta Licencia. Cualquier otro
+intento de copia, modificación, sublicenciamiento o distribución del Documento
+es nulo, y serán automáticamente terminados sus derechos bajo esa licencia.
+Sin embargo, los terceros que hayan recibido copias, o derechos, de su
+parte bajo esta Licencia no tendrán por terminadas sus licencias siempre que
+tales personas o entidades se encuentren en total conformidad con la licencia
+original.
+</para>
+  </sect1>
+
+  <sect1 label="10" id="futurerevisions-es">
+    <title>REVISIONES FUTURAS DE ESTA LICENCIA</title>
+
+<para>
+La Free Software Foundation puede publicar versiones nuevas y revisadas de
+la Licencia de Documentación Libre GNU de tiempo en tiempo. Tales nuevas
+versiones serán similares en espíritu a la presente versión, pero pueden
+diferir en detalles para solucionar nuevos problemas o intereses. Vea
+http://www.gnu.org/copyleft/.
+</para>
+
+<para>
+Cada versión de la Licencia tiene un número de versión que la distingue. Si
+el Documento especifica que se aplica una versión numerada en particular de
+esta licencia o "cualquier versión posterior", usted tiene la opción
+de seguir los términos y condiciones de la versión especificada o cualquiera
+posterior que haya sido publicada (no como un borrador) por la Free Software
+Foundation. Si el Documento no especifica un número de versión de esta
+Licencia, puede escoger cualquier versión que haya sido publicada(no como un
+borrador) por la Free Software Foundation.
+</para>
+  </sect1>
+
+  <sect1 label="" id="howtousethislicense-es">
+    <title>Cómo usar esta Licencia para sus documentos</title>
+
+<para>
+Para usar esta licencia en un documento que usted haya escrito, incluya una
+copia de la Licencia en el documento y ponga el siguiente derecho de autor y
+nota de licencia justo después de la página de título:
+</para>
+
+<screen>
+  Derecho de Autor (c) AÑO SU NOMBRE.
+  Se otorga permiso para copiar, distribuir y/o modificar este documento
+  bajo los términos de la Licencia de Documentación Libre GNU, Versión 1.1
+  o cualquier otra versión posterior publicada por la Free Software
+  Foundation; con las Secciones Invariantes siendo LISTE SUS TÍTULOS, con
+  los Textos de Portada siendo LISTELO, y con los Textos al respaldo de la
+  página de título siendo LISTELOS. Una copia de la licencia
+  es incluida en la sección titulada "Licencia de Documentación Libre GNU".
+</screen>
+
+<para>
+Si no tiene Secciones Invariantes, escriba "Sin Secciones Invariantes" en
+vez de decir cuáles son invariantes. Si no tiene Texto de Portada,
+escriba "Sin Texto de Portada" en vez de "con los Textos de Portada siendo
+LISTELO"; e igualmente para los Textos al respaldo de la página de
+título.
+</para>
+
+<para>
+Si su documento contiene ejemplos de código de programa no triviales,
+recomendamos liberar estos ejemplos en paralelo bajo su elección de licencia
+de software libre, tal como la Licencia Pública General GNU
+(<command>GNU General Public License</command>), para permitir su uso en
+software libre.
+</para>
+
+  </sect1>
+
+  <sect1 label="" id="notasdeltraductor-es">
+    <title>Notas de la traducción</title>
+
+<para>
+1. <emphasis>copyleft</emphasis>: es un nuevo término acuñado por GNU. Nace de un
+juego de palabras en Inglés, en vez de "copyright" usan "copyleft", indicando
+que no se restringe la copia, sino por el contrario se permite mientras que
+el derecho a seguir copiando no se restrinja. <ulink url="http://www.gnu.org/copyleft/copyleft.es.html">
+http://www.gnu.org/copyleft/copyleft.es.html</ulink>
+</para>
+
+<para>
+2. <emphasis>licenciatario</emphasis>: a quien se le otorga la licencia.
+</para>
+
+<para>
+Traducción:
+</para>
+<para>
+  <itemizedlist>
+    <listitem>
+      <para>
+        Igor Támara: <ulink url="mailto:ikksATbigfootDOTcom">ikks@bigfoot.com</ulink>
+      </para>
+    </listitem>
+
+    <listitem>
+      <para>
+        Pablo Reyes: <ulink url="mailto:reyes_pabloAThotmailDOTcom">reyes_pablo@hotmail.com</ulink>
+      </para>
+    </listitem>
+  </itemizedlist>
+</para>
+
+<para>
+Revisión 1 (25.May.2000): Vladimir Támara Patiño <ulink url="mailto:vtamaraATgnuDOTorg">vtamara@gnu.org</ulink>
+</para>
+
+<para>
+Copyright (C) 2000 - 2004 GNU España
+</para>
+
+<para>
+Se permite la copia textual y distribución de este artículo en su totalidad,
+por cualquier medio, siempre y cuando se mantenga esta nota de copyright.
+</para>
+  </sect1>
+
+</appendix>
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: sgml
+sgml-omittag:nil
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-parent-document: ("referenz.sgml" "appendix")
+sgml-exposed-tags:nil
+sgml-local-ecat-files:nil
+sgml-local-catalogs: CATALOG
+sgml-validate-command: "nsgmls -s referenz.sgml"
+ispell-skip-sgml: t
+End:
+-->

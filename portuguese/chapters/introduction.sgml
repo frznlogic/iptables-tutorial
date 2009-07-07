@@ -1,0 +1,170 @@
+ <chapter id="intro">
+  <title>Introdução</title>
+
+  <section>
+   <title>Sobre o autor</title>
+	<para>Eu sou uma pessoa com muitos computadores antigos nas mãos. Eu
+tenho minha própria <systemitem>REDE</systemitem> e quero que todas as 
+minhas máquinas estejam conectadas na Internet, e ao mesmo tempo fazendo
+minha <systemitem>REDE</systemitem> bastante segura. O novo iptables nesse 
+quesito é um bom upgrade do antigo ipchains. Com o ipchains, você podia 
+fazer uma rede bastante segura derrubando todos os pacotes entrantes não 
+destinados para algumas portas. No entanto, coisas como 
+<systemitem>FTP</systemitem> passivo ou <systemitem>DCC</systemitem> 
+saintes no <systemitem>IRC</systemitem> podiam causar problemas. Eles 
+designam portas no servidor, informam o cliente sobre isto, e depois permitem
+que o cliente se conecte.
+	</para>
+	<para>
+No começo eu encontrei alguns problemas com o código do iptables, e em alguns
+aspectos achei que o código não estava pronto para ser colocado em produção. Hoje,
+eu recomendo a todos que utilizam o ipchains ou até mesmo o mais antigo ipfwadm etc.,
+para atualizar, a não ser que estejam felizes com o que o código que está sendo 
+utilizando atualmente, e que seja capaz de fazer tudo o que necessitem que faça.
+   </para>
+
+  </section>
+
+  <section>
+   <title>Dedicatórias</title>
+
+   <para>
+Antes de mais nada eu gostaria de dedicar esse documento à minha maravilhosa namorada
+Ninel. Ela tem me ajudado mais to que eu nunca poderei ajudá-la em todos os sentidos. 
+<quote>Eu somente desejo que possa fazê-la tão feliz quanto você me faz.</quote>
+   </para>
+
+   <para>
+Em segundo lugar, eu gostaria de dedicar esse trabalho a todos os desenvolvedores e
+mantenedores que tem trabalhado duramente no Linux. São pessoas como estas que fazem
+este maravilhoso sistema operacional possível.
+   </para>
+
+  </section>
+
+  <section>
+   <title>Porque esse documento foi escrito</title>
+   <para>
+Bem, eu encontrei um grande espaço vazio entre os HOWTO's aí fora, faltando informações
+sobre as funções do iptables e do Netfilter nos novos kerneis do Linux 2.4.x. Entre outras
+coisas, eu tentarei responder a questões que algumas pessoas podem ter sobre as novas
+possibilidades como <foreignphrase>state matching</foreignphrase>. Agora é possível permitir 
+<systemitem>FTP</systemitem> passivo para seu servidor, mas sem permitir 
+<systemitem>DCC</systemitem> sainte de <systemitem>IRC</systemitem>, como exemplo? Eu vou 
+ilustrar isto com um exemplo no arquivo 
+<ulink 
+url="http://iptables-tutorial.frozentux.net/scripts/rc.firewall.txt">rc.firewall.txt</ulink>
+ que poderá ser usado nos seus scripts em <filename>/etc/rc.d/</filename>. 
+Sim, para vocês que reconheceram esse arquivo, ele foi originalmente baseado no HOWTO de <foreignphrase>masquerading</foreignphrase>.
+   </para>
+
+   <para> 
+Também, existe um pequeno script que pode ser usado no caso de você estragar tudo
+como eu fiz durante a configuração, está disponível como: 
+<ulink 
+url="http://iptables-tutorial.frozentux.net/scripts/rc.flush-iptables.txt">rc.flush-iptables.txt</ulink>.
+   </para>
+
+  </section>
+
+  <section>
+   <title>Como foi escrito</title>
+
+   <para>
+Eu consultei Marc Boucher e outros do time principal do Netfilter. Muitos
+agradecimentos para eles pelo seu trabalho e por sua ajuda nesse tutorial,
+que eu escrevo e mantenho em boingworld.com. Este documento irá guiar você
+passo a passo pelo processo de configuração e ajudá-lo a entender mais sobre 
+o pacote iptables. Irei basear a maior parte das coisas aqui no arquivo de 
+exemplo <filename>rc.firewall</filename>, já que acho este exemplo uma boa 
+maneira para aprender a usar o iptables. Eu decidi apenas acompanhar os 
+<foreignphrase>chains</foreignphrase> básicos e de lá aprofundar em cada uma dos 
+<foreignphrase>chains</foreignphrase> de maneira cruzada em cada direção. Desta 
+maneira o tutorial é um pouco mais difícil para acompanhar, no entanto desta 
+maneira é mais lógico. Sempre que você encontrar algo que for difícil de entender, 
+você sempre poderá recorrer a este tutorial.
+   </para>
+
+  </section>
+
+  <section>
+   <title>Como ler esse documento</title>
+
+   <para>
+Esse documento foi escrito puramente para que pessoas possam começar a
+entender o mundo maravilhoso do iptables. Não foi concebido para conter
+informações sobre bugs específicos de segurança no iptables ou netfilter. Se
+você encontrar bugs peculiares ou comportamentos estranhos no iptables ou em 
+quaisquer subcomponentes, você deverá entrar em contato com o mailing list do
+netfilter e contá-los sobre o problema e eles poderão dizer se este é um bug 
+de verdade ou se já foi corrigido. Raramente são encontrados bugs relacionados 
+a segurança no iptables ou no netfilter, no entanto, de vez em quando um ou 
+outro acaba ocorendo. Estes são devidamente mostrados na página principal do 
+<ulink url="http://www.netfilter.org">netfilter</ulink>, e lá é onde você deverá
+encontrar informações sobre tais tópicos.
+   </para>
+
+   <para>
+O de cima também implica que os <foreignphrase>rulesets</foreignphrase> disponíveis 
+com esse tutorial não são escritos para lidar com os bugs dentro do netfilter. 
+O propósito principal deles é simplesmente mostrar como usar as regras em uma 
+forma simples que lida com todos os problemas que iremos encontrar. Por exemplo, 
+este tutorial não irá cobrir como devemos fechar a porta HTTP pela simples razão 
+que o Apache é vulnerável na versão 1.2.12 (Isso é realmente visto, mas não por esta razão).
+   </para>
+
+   <para>
+Esse documento foi escrito simplesmente para dar a todos um bom e claro início
+sobre como começar a usar o iptables, mas ao mesmo tempo foi criado 
+para ser o mais completo possível. Não contém quaisquer <foreignphrase>targets</foreignphrase> 
+ou <foreignphrase>matches</foreignphrase> que são encontrados no <emphasis>patch-o-matic</emphasis> 
+pela simples razão que iria necessitar muito esforço para manter a lista atualizada. 
+Se você necessitar de informações sobre o atualizações no <emphasis>apatch-o-matic</emphasis>, 
+você deverá ler as informações que vem com <emphasis>patch-o-matic</emphasis> bem como 
+as outras documentações disponíveis no site do 
+<ulink url="http://www.netfilter.org">netfilter</ulink>. 
+   </para>
+
+  </section>
+
+  <section>
+   <title>Termos usados neste documento</title>
+
+   <para>
+Este documento contém poucos termos que devem precisar de explicações
+mais detalhadas antes de que você os veja. Esta seção tentará cobrir 
+os termos mais óbvios e como eu escolhi usá-los dentro desse documento.
+   </para>
+
+	<glosslist>
+    <glossentry>
+ 	  <glossterm>Stream</glossterm>
+	  <glossdef>
+	   <para>
+Este termo se refere a conexão que envia e recebe pacotes
+que são relacionados entre si de alguma maneira. Basicamente, eu usei
+este termo para qualquer tipo de conexão que envia 2 pacotes ou mais em
+ambas as direções. Em TCP isso pode significar uma conexão que envia um 
+SYN e responde com um SYN/ACK, mas ele também pode significar a conexão 
+que envia um SYN e então responde com com um ICMP Host unreachable. Em 
+outras palavras, eu uso esse termo muito frequentemente.
+      </para>
+     </glossdef>
+    </glossentry>
+    <glossentry>
+     <glossterm>State</glossterm>
+     <glossdef>
+      <para>
+Esse termo se refere ao estado em que um pacote se encontra, tanto 
+de acordo com <ulink 
+url="http://iptables-tutorial.frozentux.net/other/rfc793.txt">
+RFC 793 - Transmission Control Protocol</ulink> quanto com os states 
+usandos no netfilter/iptables no lado do usuário.
+      </para>
+     </glossdef>
+    </glossentry>
+ 	</glosslist>
+ </section>
+
+ </chapter>
+

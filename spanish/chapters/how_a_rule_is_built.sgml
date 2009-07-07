@@ -1,0 +1,3392 @@
+ <chapter id="howaruleisbuilt">
+  <title id="howaruleisbuilt.title">Cómo se escribe una regla</title>
+
+  <para>
+En este capítulo se desarrollará en profundidad cómo escribir tus propias
+reglas. Una regla puede definirse como las instrucciones que seguirá el
+cortafuegos al bloquear o permitir diferentes conexiones y paquetes en una
+cadena específica. Cada línea que escribas y añadas a una cadena se debe
+considerar una regla. También repasaremos las comparaciones básicas que tienes
+disponibles y cómo utilizarlas, así como los diferentes objetivos disponibles y cómo puedes
+crear nuevos objetivos (es decir, nuevas sub-cadenas).
+  </para>
+
+  <section id="basics">
+   <title id="basics.title">Conceptos Básicos</title>
+
+   <para>
+Como ya se ha dicho, cada regla es una línea que lee el núcleo para saber qué
+hacer con un paquete. Si todos los criterios (o comparaciones) se cumplen,
+entonces se ejecuta la instrucción objetivo (o salto). Normalmente deberías
+escribir tus reglas con una estructura similar a ésta:
+   </para>
+
+   <para>
+    <cmdsynopsis>
+     <command>iptables</command>
+     <arg>-t <replaceable>tabla</replaceable></arg>
+     <arg choice=plain>comando</arg>
+     <arg>comparación (match)</arg>
+     <arg>objetivo/salto (target/jump)</arg>
+    </cmdsynopsis>
+   </para>
+
+   <para>
+En ningún sitio se especifica que la instrucción objetivo (el salto) deba ser
+la última función de la línea. Sin embargo, deberías seguir esta estructura
+para conseguir que sea lo más legible posible. De todas formas, la mayoría de
+las reglas que veas se han escrito de esta forma. Así pues, si lees un
+script de otra persona, lo más seguro es que reconozcas la estructura y
+entiendas fácilmente la regla.
+   </para>
+
+   <para>
+Si quieres utilizar cualquier otra tabla que no sea la estándar, puedes
+especificarla en la parte que dice [tabla]. Sin embargo, no es
+necesario especificar qué tabla usar, puesto que por defecto
+<command>iptables</command> utiliza la tabla <systemitem>filter</systemitem>
+(filtro) para incluir todos los comandos. Tampoco es preciso que especifiques
+la tabla justo en ese punto de la regla. La verdad es que puede estar casi en
+cualquier parte de la línea. De todas formas, está más o menos aceptado que se
+especifique la tabla al principio.
+   </para>
+
+   <para>
+Eso sí, debes tener en cuenta que el comando debería ser siempre lo primero,
+o a lo sumo justo detrás de la especificación de la tabla. Se emplea el
+"comando" para decirle al programa qué hacer, como por ejemplo insertar o
+añadir una regla al final de una cadena, o borrar una regla. Veremos ésto
+en detalle más adelante.
+   </para>
+
+   <para>
+La comparación es la parte de la regla enviada al núcleo que especifica el
+carácter concreto del paquete, lo cual lo diferencia de todos los demás
+paquetes. Aquí es dónde se puede determinar de qué dirección IP viene el
+paquete, de qué interfaz de red, la IP destino, el puerto, el protocolo o
+cualquier cosa. Hay un montón de comparaciones diferentes que pueden emplearse
+y que se verán en detalle en este capítulo.
+   </para>
+
+   <para>
+Por último tenemos el objetivo del paquete. Si todas las comparaciones se
+cumplen para un paquete, le decimos al núcleo qué hacer con él. Por ejemplo,
+podemos hacer que envíe el paquete a otra cadena que hayamos creado y que es
+parte de esta tabla. Podemos hacer que deseche el paquete y no haga nada más
+con él, o podemos enviar una respuesta específica al remitente. También
+estudiaremos los detalles en este capítulo.
+   </para>
+
+  </section>
+
+  <section id="tables">
+   <title id="tables.title">Tablas</title>
+
+   <para>
+La opción <command>-t</command> especifica qué tabla utilizar. Por defecto se
+emplea la tabla <systemitem>filter</systemitem>, aunque se puede usar
+cualquiera de las siguientes tablas (ten en cuenta que este es un corto
+resumen del capítulo <link linkend="traversingoftables"
+endterm="traversingoftables.title"></link>):
+   </para>
+
+   <table frame=all id="table.tables">
+    <title id="table.tables.title">Tablas</title>
+    <tgroup cols=2 align=left colsep=1 rowsep=1>
+    <colspec colwidth="1*">
+    <colspec colwidth="5*">
+      <thead>
+       <row>
+        <entry>Tabla</entry>
+        <entry>Descripción</entry>
+       </row>
+      </thead>
+      <tbody>
+       <row>
+        <entry>nat</entry>
+        <entry>La tabla <systemitem>nat</systemitem> se emplea principalmente
+        para la traducción de direcciones de red (<systemitem>Network Address
+        Translation</systemitem>). Los paquetes que son filtrados por esta
+        tabla acaban con sus IPs modificadas, de acuerdo con nuestras reglas
+        (las de la tabla). De todos los paquetes de un mismo flujo, sólo el primero pasa por esta
+        tabla: asumiendo que se permite el paso del primer paquete de un flujo,
+        al resto de paquetes del ese flujo se les aplican automáticamente las
+        mismas acciones realizadas con el primer paquete
+        (sus IPs son "<systemitem>NAT</systemitem>-eadas" o filtradas por la
+        tabla <systemitem>NAT</systemitem>; o se enmascaran; ...).
+        En otras palabras, sólo
+        el primer paquete pasa por la tabla NAT y al resto del flujo se le
+        trata exactamente igual sin necesidad de pasar por la tabla. Esta es la
+        razón principal por la que no deberías hacer ningún filtrado en esta
+        tabla, y lo comentaremos en detalle más adelante. La cadena
+        <systemitem>PREROUTING</systemitem> se emplea para modificar los
+        paquetes en cuanto llegan al cortafuegos. La cadena
+        <systemitem>OUTPUT</systemitem> se utiliza para modificar los paquetes
+        generados localmente (es decir, en el cortafuegos) antes de tomar la
+        decisión de enrutado (direccionamiento). Por último la cadena
+        <systemitem>POSTROUTING</systemitem> se usa para modificar los paquetes
+        que están a punto de abandonar el cortafuegos.</entry>
+       </row>
+       <row>
+        <entry>mangle</entry>
+        <entry>Esta tabla se emplea principalmente para "retocar" paquetes.
+        Entre otras cosas, se puede cambiar el contenido de diferentes paquetes
+        y el de sus cabeceras. Por ejemplo, se pueden cambiar los campos
+        <command>TTL</command>, <command>TOS</command> o <command>MARK</command>.
+        Se debe tener en cuenta, sin embargo, que modificar el campo
+        <command>MARK</command> no es realmente un cambio del paquete, pero se
+        establece su valor para el paquete dentro del espacio del núcleo. Otras
+        reglas o programas pueden usar ese valor más adelante para filtrar o
+        efectuar un enrutado avanzado; tc es un ejemplo. La tabla consta de
+        cinco cadenas: <systemitem>PREROUTING</systemitem>,
+        <systemitem>POSTROUTING</systemitem>, <systemitem>OUTPUT</systemitem>,
+        <systemitem>INPUT</systemitem> y <systemitem>FORWARD</systemitem>.
+        <systemitem>PREROUTING</systemitem> se emplea para modificar los
+        paquetes en cuanto llegan al cortafuegos y antes de que alcancen la
+        decisión de enrutado. <systemitem>POSTROUTING</systemitem> se emplea
+        para modificar los paquetes en cuanto las decisiones de enrutado se han
+        tomado. <systemitem>OUTPUT</systemitem> se emplea para modificar los
+        paquetes generados localmente, antes de que alcancen la decisión de
+        enrutado. <systemitem>INPUT</systemitem> se emplea para modificar
+        paquetes que se han redirigido al ordenador local, pero antes de que la
+        aplicación del espacio de usuario llegue a ver la información.
+        <systemitem>FORWARD</systemitem> se emplea para modificar paquetes que
+        acaban de pasar por la primera decisión de enrutado, pero antes de que
+        lleguen a la última decisión de enrutado. Ten en cuenta que esta tabla
+        no puede emplearse para cualquier tipo de traducción de direcciones de
+        red (<systemitem>Network Address Translation</systemitem>) o
+        enmascaramiento (<systemitem>Masquerading</systemitem>): la tabla nat
+        es la que tiene esa función.</entry>
+       </row>
+       <row>
+        <entry>filter</entry>
+        <entry>La tabla <systemitem>filter</systemitem> se debería emplear
+        exclusivamente para filtrar paquetes. Por ejemplo, se pueden
+        <command>DROP</command> (desechar), <command>LOG</command> (añadir a un
+        registro de sucesos), <command>ACCEPT</command> (aceptar) o
+        <command>REJECT</command> (rechazar) paquetes sin problemas, igual que
+        en el resto de tablas. Tenemos tres cadenas en esta tabla: la primera
+        (<systemitem>FORWARD</systemitem>) se usa para todos los paquetes que
+        no se generan localmente y que no están destinados a nuestra máquina
+        (el cortafuegos, en otras palabras). <systemitem>INPUT</systemitem> se
+        emplea en todos los paquetes que se destinan a nuestra máquina (el
+        cortafuegos), mientras que <systemitem>OUTPUT</systemitem> se emplea
+        para todos los paquetes generados localmente.</entry>
+       </row>
+     </tbody>
+     </tgroup>
+    </table>
+
+    <para>
+Todo lo anterior debería haber aclarado los conceptos básicos sobre las tres
+tablas diferentes que hay disponibles. Deben usarse para propósitos
+completamente diferentes y además deberías saber cómo utilizar cada una de las cadenas existentes. Si
+no comprendes cómo se usan, es fácil que introduzcas un agujero en el
+cortafuegos que tarde o temprano descubrirá y explotará alguien. Ya se han
+discutido en profundidad las tablas y cadenas en
+<link linkend="traversingoftables" endterm="traversingoftables.title"></link>.
+Si no lo entiendes a la perfección, te recomiendo que vuelvas a leerlo hasta
+que lo comprendas totalmente.
+   </para>
+
+  </section>
+
+  <section id="commands">
+   <title id="commands.title">Comandos</title>
+   <para>
+En esta sección trataremos los distintos comandos y qué se puede hacer con
+ellos. Un comando le indica a <command>iptables</command> qué hacer con el
+resto de la regla que enviamos al analizador. Normalmente desearemos añadir o
+eliminar algo en una tabla determinada. En iptables están disponibles los
+siguientes comandos:
+   </para>
+
+   <table frame=all id="table.commands">
+    <title id="table.commands.title">Comandos</title>
+    <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+     <colspec colwidth="1*">
+     <colspec colwidth="6*">
+
+      <tbody>
+       <row>
+        <entry>Comando</entry>
+        <entry><command>-A</command>, <command>--append</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A INPUT ...</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Este comando añade la regla al final de la cadena. La regla
+        siempre se pondrá la última en el conjunto de reglas y lógicamente se
+        comprobará la última, a no ser que posteriormente añadas más reglas con este mismo
+        comando.</entry>
+       </row>
+       <row>
+        <entry>Comando</entry>
+        <entry><command>-D</command>, <command>--delete</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry>
+          <command>iptables -D INPUT --dport 80 -j DROP</command>,
+          <command>iptables -D INPUT 1</command>
+        </entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Este comando borra una regla de la cadena. Esto puede hacerse de
+        dos maneras: bien introduciendo la regla completa a comparar (como en
+        el ejemplo anterior), bien especificando el número de regla que deseas eliminar.
+        Si empleas el primer método, deberás escribir exactamente lo mismo
+        que haya en la cadena a borrar. Si empleas el segundo método, deberás señalar el
+        número exacto que tiene la regla en la cadena: las reglas están
+        numeradas progresivamente desde la primera, empezando con el
+        número 1.</entry>
+       </row>
+       <row>
+        <entry>Comando</entry>
+        <entry><command>-R</command>, <command>--replace</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -R INPUT 1 -s 192.168.0.1 -j DROP</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Este comando sustituye la entrada existente en la línea
+        especificada. Funciona de la misma forma que el comando
+        <command>--delete</command>, pero en lugar de eliminar completamente la
+        entrada, la sustituye por una nueva. El uso más habitual de este comando
+        puede ser la experimentación con iptables.</entry>
+       </row>
+       <row>
+        <entry>Comando</entry>
+        <entry><command>-I</command>, <command>--insert</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -I INPUT 1 --dport 80 -j ACCEPT</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Se inserta una regla en la posición de la cadena que
+        especifiquemos. En el ejemplo anterior se insertará en la posición nº 1
+        en la cadena <systemitem>INPUT</systemitem>, por lo que a
+        partir de entonces será la primera regla en esa cadena.</entry>
+       </row>
+       <row>
+        <entry>Comando</entry>
+        <entry><command>-L</command>, <command>--list</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -L INPUT</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Este comando ofrece una lista de todas las entradas de la cadena especificada.
+        En el ejemplo la lista mostrará todas las entradas de la cadena
+        <systemitem>INPUT</systemitem>. Sin embargo está permitido no
+        especificar ninguna cadena en particular, con lo cual el comando listará
+        todas las cadenas de la tabla especificada (para especificar tablas, lee
+        la sección <link linkend="tables" endterm="tables.title"></link>). El
+        resultado final depende de otras opciones enviadas al analizador, como
+        pueden ser <command>-n</command>, <command>-v</command>, etc.</entry>
+       </row>
+       <row>
+        <entry>Comando</entry>
+        <entry><command>-F</command>, <command>--flush</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -F INPUT</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Este comando elimina todas las reglas de una cadena, comenzando
+        desde la que se ha especificado. Es equivalente a borrar cada regla una
+        a una, pero bastante más rápido. Se puede emplear sin opciones, con lo
+        que borrará todas las reglas de todas las cadenas en la tabla
+        especificada.</entry>
+       </row>
+       <row>
+        <entry>Comando</entry>
+        <entry><command>-Z</command>, <command>--zero</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -Z INPUT</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Este comando obliga a comenzar desde cero a todos los contadores
+        de una cadena especificada, o de todas las cadenas de una tabla. Si has
+        utilizado la opción <command>-v</command> del comando
+        <command>-L</command>, probablemente habrás visto el contador de
+        paquetes al principio de cada campo. Para "poner a cero" este contador,
+        utiliza la opción <command>-Z</command>. Esta función hace lo mismo que
+        <command>-L</command>, salvo que <command>-Z</command> no hace ningún
+        listado de las reglas. Si se emplean juntas <command>-L</command> y
+        <command>-Z</command> (lo cual es correcto), las cadenas serán listadas
+        primero y luego los contadores se reiniciarán (se pondrán a cero).</entry>
+       </row>
+       <row>
+        <entry>Comando</entry>
+        <entry><command>-N</command>, <command>--new-chain</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -N allowed</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Este comando hace que el núcleo cree una nueva cadena con el
+        nombre especificado en la cadena especificada. En el ejemplo anterior
+        se crea una cadena llamada <command>allowed</command>. Ten en cuenta
+        que no puede haber ninguna cadena ni ningún objetivo con el mismo nombre.</entry>
+       </row>
+       <row>
+        <entry>Comando</entry>
+        <entry><command>-X</command>, <command>--delete-chain</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -X allowed</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Este comando borra de la tabla la cadena especificada. Para que
+        funcione, no debe haber ninguna regla que esté relacionada con la
+        cadena que se va a borrar. En otras palabras, deberás borrar o cambiar
+        todas las reglas que tengan algún vínculo con esa cadena antes de
+        borrarla. Si se usa el comando sin opciones, todas las cadenas creadas
+        por el usuario serán eliminadas y sólo permanecerán aquellas que
+        pertenezcan a la tabla especificada, es decir, aquellas que se instalan
+        con iptables. A modo de ejemplo, si escribimos
+        <command>iptables --delete-chain -t filter</command> lo que
+        conseguiremos será eliminar todas las cadenas "de usuario" de la tabla
+        filter, permaneciendo las cadenas por defecto de esta tabla; si, en
+        cambio, escribimos <command>iptables --delete-chain</command>, iptables
+        considera que especificamos la tabla por defecto (la tabla filter), con
+        lo cual el resultado será exactamente el mismo que en el ejemplo
+        anterior.
+        </entry>
+       </row>
+       <row>
+        <entry>Comando</entry>
+        <entry><command>-P</command>, <command>--policy</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -P INPUT DROP</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Este comando hace que el núcleo establezca la política u
+        objetivo por defecto en una cadena. Todos los paquetes que no coincidan
+        con ninguna regla emplearán esa política de la cadena. Los objetivos
+        permitidos son: <command>DROP</command> y <command>ACCEPT</command>
+        (pueden haber más; envíame un correo si es así).
+        </entry>
+       </row>
+       <row>
+        <entry>Comando</entry>
+        <entry><command>-E</command>,  <command>--rename-chain</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -E allowed disallowed</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>El comando <command>-E</command> hace que
+        <command>iptables</command> cambie el nombre de una cadena del primer
+        al segundo nombre. En el ejemplo anterior cambiaríamos el nombre de la
+        cadena de <varname>allowed</varname> (permitido) a
+        <varname>disallowed</varname> (no permitido). Ten en cuenta que ésto no
+        afecta a la forma de actuar de la tabla, sino que es simplemente un
+        cambio cosmético.</entry>
+       </row>
+     </tbody>
+     </tgroup>
+    </table>
+
+    <para>
+Siempre deberías escribir una línea completa de comando, a no ser que sólo
+quieras ver la ayuda de <command>iptables</command> o conocer la versión del
+comando. Para mostrar la versión, emplea la opción <command>-v</command> y
+para la ayuda, usa la opción <command>-h</command>. Vamos, como siempre.
+    </para>
+
+    <para>
+Ahora vamos a ver unas cuantas opciones que pueden usarse con varios comandos.
+Observarás que se indica con qué comandos se pueden emplear y qué resultados
+ofrecen. Ten en cuenta que no se incluye ninguna opción que afecte a reglas o
+comparaciones. Estas otras opciones se verán en profundidad más adelante.
+    </para>
+
+    <table frame=all id="table.options">
+     <title id="table.options.title">Opciones</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+       <row>
+        <entry>Opción</entry>
+        <entry><command>-v</command>, <command>--verbose</command></entry>
+       </row>
+       <row>
+        <entry>Comandos con los que se emplea</entry>
+        <entry><command>--list</command>, <command>--append</command>,
+        <command>--insert</command>, <command>--delete</command>,
+        <command>--replace</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Este comando ofrece una salida detallada (completa, descriptiva) y se emplea
+        principalmente con el comando <command>--list</command>. En este caso
+        se mostrará la dirección de la interfaz, las opciones de la regla y las
+        máscaras TOS. Asímismo, también se incluyen los contadores de bytes y
+        paquetes para cada regla. Estos contadores emplean las abreviaturas K
+        (x1,000), M (x1,000,000) y G (x1,000,000,000). Para obtener el tamaño
+        exacto, puedes emplear la opción <command>-x</command>, descrita más
+        adelante. Si se usa esta opción con los comandos
+        <command>--append</command>, <command>--insert</command>,
+        <command>--delete</command> o <command>--replace</command>, el programa
+        mostrará información detallada sobre cómo se ha interpretado la regla,
+        si se ha insertado correctamente, etc.</entry>
+       </row>
+
+       <row>
+        <entry>Opción</entry>
+        <entry><command>-x</command>, <command>--exact</command></entry>
+       </row>
+       <row>
+        <entry>Comandos con los que se emplea</entry>
+        <entry><command>--list</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Esta opción expande las numeraciones, o sea, no se emplean los
+        múltiplos K, M o G, si no que se ven los paquetes y bytes exactos de
+        los contadores de la regla en cuestión. Esta opción sólo es útil
+        con el comando <command>--list</command> y no tiene ningún
+        interés en los demás comandos.</entry>
+       </row>
+
+       <row>
+        <entry>Opción</entry>
+        <entry><command>-n</command>, <command>--numeric</command></entry>
+       </row>
+       <row>
+        <entry>Comandos con los que se emplea</entry>
+        <entry><command>--list</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Esta opción muestra valores numéricos: las direcciones IP y los
+        puertos se listarán con sus números y no con sus nombres de servidor,
+        red o aplicación. Sólo se utiliza con <command>--list</command> e ignora
+        la opción por defecto de traducir todos los valores numéricos a
+        servidores y nombres (donde sea posible).</entry>
+       </row>
+
+       <row>
+        <entry>Opción</entry>
+        <entry><command>--line-numbers</command></entry>
+       </row>
+       <row>
+        <entry>Comandos con los que se emplea</entry>
+        <entry><command>--list</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Empleando esta opción con <command>--list</command>, cada regla
+        se listará con su número de línea. Puede ser conveniente saber qué número tiene
+        cada regla al insertar reglas. Esta opción sólo tiene efecto con el
+        comando <command>--list</command>.</entry>
+       </row>
+
+       <row>
+        <entry>Opción</entry>
+        <entry><command>-c</command>, <command>--set-counters</command></entry>
+       </row>
+       <row>
+        <entry>Comandos con los que se emplea</entry>
+        <entry><command>--insert</command>, <command>--append</command>,
+        <command>--replace</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Esta opción se usa cuando se crea o modifica una regla de forma
+        que se reinicializan sus contadores de paquetes y bytes.
+        La sintaxis sería algo así: <command>--set-counters 20 4000</command>,
+        lo cual le diría al núcleo que fijara el contador de paquetes a 20 y el
+        contador de bytes a 4000.</entry>
+       </row>
+
+       <row>
+        <entry>Opción</entry>
+        <entry><command>--modprobe</command></entry>
+       </row>
+       <row>
+        <entry>Comandos con los que se emplea</entry>
+        <entry>Todos</entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Esta opción se emplea para indicarle a <command>iptables</command>
+        qué módulo utilizar al probar módulos o al añadirlos al núcleo. Se puede
+        usar por ejemplo cuando el comando <command>modprobe</command> no está
+        en ningún directorio de la ruta de búsqueda. De esta forma el programa
+        sabrá qué hacer si se necesita un módulo que no se ha cargado
+        previamente. Esta opción se puede utilizar con todos los comandos</entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+  </section>
+
+  <section id="matches">
+   <title id="matches.title">Comparaciones ("matches")</title>
+   <para>
+En esta sección hablaremos sobre las comparaciones. He decidido agrupar las
+comparaciones en cinco categorías diferentes: para empezar tenemos las
+<emphasis>comparaciones genéricas</emphasis>, que pueden usarse en todas las
+reglas; a continuación vienen las <emphasis>comparaciones TCP</emphasis> que
+sólo pueden aplicarse a los paquetes <systemitem>TCP</systemitem>; después
+vienen las <emphasis>comparaciones UDP</emphasis> y las
+<systemitem>comparaciones ICMP</systemitem>, que sólo se aplican a paquetes
+<systemitem>UDP</systemitem> e <systemitem>ICMP</systemitem> respectivamente;
+por último queda un grupo de comparaciones especiales, como las de estado, las de propietario,
+comparaciones límite, etc. Este último grupo se ha clasificado en subcategorías,
+aunque en realidad no tienen por qué ser comparaciones diferentes. Espero que
+esta clasificación sea razonable y todo el mundo pueda entenderla.
+   </para>
+
+   <section id="genericmatches">
+    <title id="genericmatches.title">Comparaciones genéricas</title>
+    <para>
+Una comparación genérica es un tipo de comparación que está siempre disponible,
+sea cual sea el protocolo con el que trabajemos y sin importar qué extensiones
+de comparación se hayan cargado: no se necesitan parámetros especiales para
+emplearlas. He incluído aquí la comparación <command>--protocol</command>, aunque
+podría parecer más adecuado que estuviera en las comparaciones de protocolo.
+Por ejemplo, si queremos emplear una <systemitem>comparación TCP</systemitem>,
+necesitaremos usar la comparación <command>--protocol</command> con la opción
+<systemitem>TCP</systemitem>. Sin embargo <command>--protocol</command> también
+es una comparación por sí misma, ya que puede usarse para comparar protocolos
+específicos. Las siguientes comparaciones siempre están disponibles.
+   </para>
+
+   <table frame=all id="table.genericmatches">
+    <title id="table.genericmatches.title">Comparaciones genéricas</title>
+    <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+     <colspec colwidth="1*">
+     <colspec colwidth="6*">
+
+      <tbody>
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>-p</command>, <command>--protocol</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A INPUT -p tcp</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Esta comparación se emplea para comprobar la presencia de
+        los siguientes protocolos: <systemitem>TCP</systemitem>,
+        <systemitem>UDP</systemitem>, <systemitem>ICMP</systemitem> o sus
+        respectivos valores numéricos, tal como se especifican en el archivo
+        <link linkend="protocolstxt">
+        endterm="protocolstxt.title></link>. Si no puede identificar uno de éllos devolverá un error.
+        El protocolo puede corresponder a uno de los tres
+        mencionados, aunque también puede corresponder a TODOS (ALL). "ALL"
+        significa que se corresponde con todos los protocolos (TCP, UDP e ICMP).
+        El comando también acepta listas
+        de protocolos delimitados por comas, por ej. <command>udp,tcp</command>
+        que buscaría paquetes <systemitem>UDP</systemitem> y <systemitem>TCP</systemitem>.
+        Si a esta comparación se le especifica el valor cero (0) será como si
+        se especificaran TODOS (ALL) los protocolos (éste es el valor por
+        defecto si no se usa la comparación <command>--protocol</command>).
+        También se puede invertir la comparación con el símbolo
+        <command>!</command>; o sea que <command>--protocol ! tcp</command>
+        quiere decir que se tienen que comparar todos los protocolos excepto
+        el TCP (o sea, <systemitem>UDP</systemitem>
+        e <systemitem>ICMP</systemitem>).
+        </entry>
+       </row>
+
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>-s</command>, <command>--src</command>, <command>--source</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A INPUT -s 192.168.1.1</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Esta es la comparación del origen, que se basa en la dirección
+        IP de origen de los paquetes. El uso genérico compara direcciones IP
+        únicas, como <emphasis>192.168.1.1</emphasis>. Sin embargo también
+        acepta máscaras de red en un formato de "bit" CIDR, especificando el
+        número de unos (1) en la parte izquierda de la máscara de red: cada
+        número es el equivalente decimal de un número binario de 8 bits, en el
+        que la combinación de "1"s y "0"s en cadenas de ocho números, equivale a un
+        valor decimal; por ej., 8 unos seguidos en binario equivalen a 255 y si
+        tenemos "8 unos, punto, 8 unos, punto, 8 unos, punto, 8 ceros", en
+        notación decimal, la que todos gastamos, tenemos "255.255.255.0". Ésto
+        significa que podemos indicar <emphasis>/24</emphasis> (tres veces ocho, sumados) para emplear una
+        máscara de red <emphasis>255.255.255.0</emphasis>. Así podemos comparar
+        rangos completos de direcciones IP, como nuestras redes locales o
+        segmentos de red tras un cortafuegos, especificándolo más o menos
+        así: <emphasis>192.168.0.0/24</emphasis> (con ello se buscarían paquetes
+        que cayeran dentro del rango <emphasis>192.168.0.1</emphasis>-
+        <emphasis>192.168.0.254</emphasis>). Otra forma de hacerlo es con una
+        máscara de red tradicional: <emphasis>255.255.255.255</emphasis> (es
+        decir, <emphasis>192.168.0.0/255.255.255.0</emphasis>). También se puede
+        invertir la comparación escribiendo el símbolo <command>!</command>: si
+        empleamos una comparación como <command>--source ! 192.168.0.0/24</command>,
+        lo que conseguiremos es comparar todos los paquetes que NO provengan del
+        rango <emphasis>192.168.0.x</emphasis>. Por defecto se comparan todas
+        las direcciones.</entry>
+       </row>
+
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>-d</command>, <command>--dst</command>, <command>--destination</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A INPUT -d 192.168.1.1</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>La comparación <command>--destination</command> (destino) se usa
+        en función de la dirección/direcciones de destino de los paquetes. Se
+        emplea casi igual que la comparación <command>--source</command> y tiene
+        la misma sintaxis, excepto que se basa en saber a dónde se dirijen los paquetes.
+        Para comparar un rango de direcciones IP, podemos especificar una
+        máscara de forma "ortodoxa" o indicando el número de unos (1) contados
+        desde la parte izquierda de la máscara de red (como en
+        <command>--source</command>, la notación CIDR se basa en números
+        binarios, formados con ristras de unos y ceros que equivalen a números
+        decimales). Por ej.: <emphasis>192.168.0.0/255.255.255.0</emphasis> y
+        <emphasis>192.168.0.0/24</emphasis> son equivalentes. También se puede
+        invertir la comparación con el símbolo <command>!</command>, o sea que
+        <command>--destination ! 192.168.0.1</command> buscará todos los
+        paquetes que no vayan destinados a la dirección IP <emphasis>192.168.0.1</emphasis>.</entry>
+       </row>
+
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>-i</command>, <command>--in-interface</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A INPUT -i eth0</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Esta comparación la emplearemos para reconocer a través de qué
+        interfaz proviene un paquete entrante. Esta opción sólo es válida en
+        las cadenas <systemitem>INPUT</systemitem>, <systemitem>FORWARD</systemitem>
+        y <systemitem>PREROUTING</systemitem>, devolviendo un error si se usa
+        en cualquier otro sitio. Si no especificamos una interfaz concreta, por
+        defecto se asume el valor <command>+</command>, que se emplea para
+        comparar una cadena de letras y números; o sea que por defecto el núcleo
+        comparará todos los paquetes sin importarle a través de qué interfaz
+        vienen. El símbolo <command>+</command> también puede añadirse al tipo
+        de interfaz, de forma que <command>eth+</command> revisará los paquetes
+        que entren por cualquier tarjeta de red Ethernet. También es posible
+        invertir el significado de esta opción con ayuda del símbolo <command>!</command>.
+        La línea tendrá una sintaxis parecida a: <command>-i ! eth0</command>,
+        que aceptará los paquetes de todas las interfaces Ethernet por donde
+        llegan datos, excepto la interfaz <systemitem>eth0</systemitem>.</entry>
+       </row>
+
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>-o</command>, <command>--out-interface</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A FORWARD -o eth0</command></entry>
+       </row>
+       <row>
+        <entry>Explicación</entry>
+        <entry>Esta comparación se emplea con los paquetes que están a punto de
+        abandonar la interfaz de salida. Ten en cuenta que esta comparación
+        sólo está disponible en las cadenas <systemitem>OUTPUT</systemitem>,
+        <systemitem>FORWARD</systemitem> y <systemitem>POSTROUTING</systemitem>,
+        de hecho son justo las opuestas a las de la comparación
+        <command>--in-interface</command>. Aparte de ésto, ambas funcionan
+        prácticamente igual. La extensión <command>+</command> implica
+        comparar todas las tarjetas del mismo tipo, es decir <command>eth+</command>
+        controlará todas las tarjetas <systemitem>eth</systemitem> y de forma
+        similar los demás casos. Para invertir el significado de la comparación
+        puedes usar el símbolo <command>!</command> de la misma forma que en
+        <command>--in-interface</command>. Si no se especifica ninguna
+        comparación <command>--out-interface</command>, por defecto se comparan
+        todas las tarjetas, independientemente de dónde vaya el paquete.</entry>
+       </row>
+
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>-f</command>, <command>--fragment</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A INPUT -f</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Esta comparación se emplea para chequear la segunda y la tercera
+        partes de un paquete fragmentado. La razón de ello es que cuando existen
+        paquetes fragmentados no hay manera de saber ni las direcciones de
+        origen/destino de los paquetes, ni los tipos <systemitem>ICMP</systemitem>,
+        ni otros tantos detalles necesarios. Además los paquetes fragmentados
+        pueden emplearse en ciertos casos como armas de ataque contra otros
+        ordenadores. Fragmentos de paquetes como éstos no serán chequeados por otras reglas y
+        por éllo se ha creado esta comparación. Como viene siendo habitual, esta
+        opción puede combinarse con el símbolo <command>!</command>; sin embargo
+        en este caso el símbolo debe preceder a la comparación, es decir
+        <command>! -f</command>. Cuando esta comparación se invierte, se
+        comparan sólo las cabeceras de los paquetes y/o los paquetes no fragmentados.
+        O lo que es lo mismo, en cualquier paquete fragmentado se comparará el
+        primer fragmento, pero no el segundo, ni el tercero, ... Asímismo se
+        comparará cualquier paquete no fragmentado durante la
+        transmisión. Recuerda que siempre puedes usar las muy buenas opciones
+        de defragmentación que hay en el núcleo. Por otra parte, si usas el
+        seguimiento de conexiones te darás cuenta que no aparece ningún paquete
+        fragmentado, puesto que se procesan los fragmentos antes de que lleguen
+        a cualquier tabla o cadena de <command>iptables</command>.</entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section id="implicitmatches">
+    <title id="implicitmatches.title">Comparaciones implícitas</title>
+
+    <para>
+Esta sección describe las comparaciones que se cargan implícitamente, o sea, de
+forma totalmente automática, como por ejemplo cuando se compara
+<command>--protocol tcp</command> sin ningún criterio añadido. Actualmente
+hay tres grupos de comparaciones implícitas, uno para cada uno de los tres
+protocolos principales. Son las <emphasis>comparaciones TCP</emphasis>,
+<emphasis>comparaciones UDP</emphasis> y <emphasis>comparaciones ICMP</emphasis>.
+El grupo de comparaciones basadas en <systemitem>TCP</systemitem> contiene un
+conjunto de criterios singulares que sólo están disponibles para los paquetes
+<systemitem>TCP</systemitem>. De la misma manera actúan los criterios de los
+grupos para <systemitem>UDP</systemitem> e <systemitem>ICMP</systemitem>. Por otra
+parte, pueden haber comparaciones explícitas que se carguen cuando se les
+indica (explícitamente) y lógicamente estas comparaciones no son automáticas,
+si no que debes especificarlas correctamente. Para ésto deberás emplear la opción
+<command>-m</command> o <command>--match</command>, que explicaré más adelante.
+   </para>
+
+   <section id="tcpmatches">
+    <title id="tcpmatches.title">Comparaciones TCP</title>
+
+    <para>
+Estas comparaciones son específicas del protocolo y sólo están disponibles al
+trabajar con paquetes y flujos <systemitem>TCP</systemitem>. Para emplearlas
+debes indicar <command>--protocol tcp</command> en la línea de comandos antes
+de empezar a utilizarlas. Por ello <command>--protocol tcp</command> debe estar
+a la izquierda de las comparaciones específicas del protocolo. Como ya se ha
+dicho, estas comparaciones se cargan automáticamente.
+    </para>
+
+    <table frame=all id="table.tcpmatches">
+     <title id="table.tcpmatches.title">Comparaciones TCP</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>--sport</command>, <command>--source-port</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A INPUT -p tcp --sport 22</command></entry>
+       </row>
+
+       <row>
+        <entry>Descripción</entry>
+        <entry>Esta comparación se emplea para comparar paquetes basándose en
+        su dirección de origen. Si no se indica nada se comparan todos los
+        puertos origen. La comparación puede tener un nombre de servicio o bien
+        el número de un puerto. Si especificas un nombre de servicio, éste debe
+        existir en el fichero <link linkend="servicestxt"
+        endterm="servicestxt.title"></link>, puesto que <command>iptables</command>
+        emplea este archivo para interpretar los nombres de los servicios. Si
+        especificas el puerto por su número, la regla se cargará ligeramente
+        más rápido, ya que <command>iptables</command> no tiene que buscar el
+        nombre de servicio. Sin embargo, la comparación puede llegar a ser un
+        poco más difícil de leer que si emplearas el nombre del servicio. Si
+        estás escribiendo un conjunto de reglas de 200 ó más reglas, ciertamente
+        deberías usar números de puerto, puesto que la diferencia es realmente
+        notable (en una máquina lenta, esto puede significar hasta 10 segundos
+        de diferencia si has configurado un conjunto de unas 1000 reglas).
+        También puedes usar la comparación <command>--source-port</command>
+        para comparar cualquier rango de puertos, como por ej.
+        <command>--source-port 22:80</command>, en que se compararán los
+        paquetes que provengan de los puertos 22 a 80. Si se omite el primer
+        puerto del rango, se asume que quieres empezar por el 0 (es una
+        opción implícita), o sea que <command>--source-port :80</command>
+        buscará paquetes que provengan de los puertos 0 a 80. Y de la misma
+        forma, si el último puerto es el que se omite, implícitamente se
+        está designando el puerto 65535; así, <command>--source-port 22:</command>
+        implicará buscar paquetes que provengan de cualquier puerto entre el
+        22 y el 65535. Si inviertes el orden de los puertos, si no los
+        especificas de menor a mayor, iptables interpreta automáticamente el
+        rango "correcto": si escribes <command>--source-port 80:22</command>,
+        iptables interpretará <command>--source-port 22:80</command>. Por ello,
+        si por algún motivo lo que realmente deseas es el rango desde el puerto
+        80 hasta el 65535 y desde el 0 al 22 (lo que puede entenderse por
+        80:22), debes hacer uso del símbolo <command>!</command>, con lo que
+        escribirás <command>--source-port ! 23:79</command>. Date cuenta que
+        a primera vista la única diferencia es el símbolo de exclamación, pero
+        el significado varía mucho (en este caso se ignoran todos los puertos
+        entre el 23 y el 79, como deseábamos). Asímismo con
+        <command>--source-port ! 22</command> se compararán todos los paquetes
+        excepto aquellos que provengan del puerto 22. Debes saber también que
+        esta comparación no acepta puertos múltiples o rangos de puertos
+        múltiples separados por comas. Para mayor información sobre este tema,
+        léete la extensión de comparación multipuerto.</entry>
+       </row>
+
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>--dport</command>, <command>--destination-port</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A INPUT -p tcp --dport 22</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Esta comparación busca paquetes <systemitem>TCP</systemitem>
+        basándose en el puerto de destino. Utiliza la misma sintaxis que la
+        comparación <command>--source-port</command>, por lo que acepta puertos,
+        rangos de puertos e inversiones. También "corrije" el orden de los
+        rangos de puertos (80:22 se leerá 22:80) y se asumen los valores 0 y
+        65535 en caso de no indicar el primer o el último puerto,
+        respectivamente (:80 y 22: , respectivamente). Esta comparación tampoco
+        acepta puertos o rangos múltiples separados por comas (para eso está
+        la extensión de comparación multipuerto).</entry>
+       </row>
+
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>--tcp-flags</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -p tcp --tcp-flags SYN,FIN,ACK SYN</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Esta comparación busca en las banderas (flags) de los paquetes
+        <systemitem>TCP</systemitem>. Para empezar la comparación lee una
+        lista de banderas para comparar (una máscara) y después lee una lista
+        de banderas que deben estar establecidas con el valor 1, o sea estar activadas. Ambas
+        listas deben estar delimitadas por comas. La comparación reconoce las
+        banderas <systemitem>SYN</systemitem>, <systemitem>ACK</systemitem>,
+        <systemitem>FIN</systemitem>, <systemitem>RST</systemitem>,
+        <systemitem>URG</systemitem> y <systemitem>PSH</systemitem>, además de interpretar las palabras
+        ALL (todas) y NONE (ninguna). ALL y NONE casi no necesitan explicación:
+        ALL significa que se deben emplear todas las banderas, mientras que
+        NONE significa no usar ninguna bandera para la comparación. De aquí que
+        <command>--tcp-flags ALL NONE</command> signifique que se deben chequear
+        todas las banderas <systemitem>TCP</systemitem> y comprobar si ninguna
+        de ellas está activada. Esta opción también puede ser
+        invertida por el símbolo <command>!</command>, es decir, si se
+        especifica <command>! SYN,FIN,ACK SYN</command>, lo que se obtiene es
+        una comparación que busque todos los paquetes que tengan activados
+        los bits <systemitem>ACK</systemitem> y <systemitem>FIN</systemitem>,
+        pero no el bit <systemitem>SYN</systemitem>: la máscara de búsqueda incluye las banderas 
+        SYN, FIN y ACK, por lo que se chequearán sólo estas banderas; entonces, si fuera una búsqueda directa,
+        se determinaría si la bandera SYN está activada, al contrario que las FIN y ACK, que al no incluirse en
+        la segunda lista deberían estar desactivadas; sin embargo, al ser una comparación
+        invertida se buscará que FIN y ACK sí estén activadas y que SYN no esté activada.
+        Date cuenta también que las comas no deben incluir espacios (puedes ver la sintaxis correcta en
+        el ejemplo de arriba).</entry>
+       </row>
+
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>--syn</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -p tcp --syn</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Se puede decir que la comparación <command>--syn</command> es una
+        reliquia de los días de ipchains y que permanece para garantizar la
+        compatibilidad con viejas reglas y para facilitar la transición de
+        ipchains a iptables. Se usa para comparar paquetes que tengan activado
+        el bit <systemitem>SYN</systemitem> y que no tengan activados los bits <systemitem>ACK</systemitem>
+        y <systemitem>RST</systemitem>. Es decir, hace lo mismo
+        que la comparación <command>--tcp-flags SYN,RST,ACK SYN</command>. Estos
+        paquetes se emplean principalmente para solicitar nuevas conexiones a
+        un servidor. Si bloqueas estos paquetes lo que consigues en la práctica
+        es bloquear cualquier intento de conexión desde el exterior. Sin embargo,
+        no habrás bloqueado las conexiones hacia el exterior y este fallo es el
+        que explotan muchos ataques de hoy en día (por ej., "hackear"/romper
+        la integridad y seguridad de un servicio legítimo y a partir de ahí
+        instalar un programa o ejecutable similar que permita iniciar una
+        conexión existente hacia tu host, en lugar de abrir un nuevo puerto
+        en el host). Esta comparación también puede ser invertida con el
+        sígno de exclamación (<command>!</command>) de esta forma:
+        <command>! --syn</command>. Ésto hace que se reconozcan los paquetes
+        con los bits <systemitem>RST</systemitem> o <systemitem>ACK</systemitem>
+        activados, o sea, los paquetes de una conexión ya establecida.</entry>
+       </row>
+
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>--tcp-option</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -p tcp --tcp-option 16</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Esta comparación se emplea para filtrar paquetes dependiendo de
+        sus opciones <systemitem>TCP</systemitem>. Una <systemitem>Opción TCP</systemitem>
+        (<systemitem>TCP Option</systemitem>) es una parte específica de la
+        cabecera de cada paquete que consta de 3 campos diferentes. El primero
+        tiene un tamaño de 8 bits y nos dice qué Opciones se emplean en el flujo.
+        El segundo también es de 8 bits y nos dice qué tamaño tiene el campo
+        de opciones. La razón para que exista este campo indicando el
+        tamaño es que las <systemitem>Opciones TCP</systemitem> son, valga
+        la redundancia, opcionales. Para seguir los estándares no necesitamos
+        implementar todas las opciones, sinó que simplemente podemos mirar qué tipo
+        de opción es y si la soportamos, puesto que de no soportarla miraremos
+        cuál es el tamaño del campo y entonces ignoraremos esta parte de los datos
+        del paquete. Esta comparación se emplea para buscar diferentes opciones
+        <systemitem>TCP</systemitem> dependiendo de sus valores decimales.
+        También puede ser invertido con <command>!</command>, de forma que la
+        comparación busque todas las opciones pero ignore la opción indicada. Para ver una lista completa con
+        todas las opciones échale un vistazo a
+        <link linkend="ietf" endterm="ietf.title"></link>, que mantiene una
+        lista de todos los números estándar empleados en Internet.</entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+
+   <section id="udpmatches">
+    <title id="udpmatches.title">Comparaciones UDP</title>
+
+    <para>
+Esta sección describe las comparaciones que sólo trabajarán con paquetes
+<systemitem>UDP</systemitem>. En cuanto especificas la comparación
+<command>--protocol UDP</command>, las opciones se cargan implícitamente (sin
+que haga falta indicarlas) y automáticamente ya están disponibles. Recuerda que
+los paquetes <systemitem>UDP</systemitem> no están orientados a la conexión y
+por éllo no existen banderas para establecer su valor en el paquete de forma
+que indiquen cuál es la utilidad del datagrama (como abrir o cerrar una
+conexión) o si únicamente sirven para enviar datos. Asímismo, tampoco requieren
+ningún tipo de reconocimiento: si se pierden, simplemente se han perdido (si no
+tenemos en cuenta los mensajes de error <systemitem>ICMP</systemitem>). Ésto significa que
+hay muchas menos comparaciones con las que trabajar en paquetes <systemitem>UDP</systemitem>,
+comparados con los paquetes <systemitem>TCP</systemitem>. Cabe destacar que la
+máquina de estados trabaja con todo tipo de paquetes, a pesar de que los paquetes
+<systemitem>UDP</systemitem> e <systemitem>ICMP</systemitem> se entienden como
+protocolos sin conexión. Más aún, la máquina de estados trabaja prácticamente
+igual con los paquetes <systemitem>UDP</systemitem> que con los <systemitem>TCP</systemitem>.
+    </para>
+
+    <table frame=all id="table.udpmatches">
+     <title id="table.udpmatches.title">Comparaciones UDP</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>--sport</command>, <command>--source-port</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A INPUT -p udp --sport 53</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Esta comparación trabaja exactamente igual que su homónima en
+        <systemitem>TCP</systemitem> y se emplea para hacer comparaciones basadas
+        en los puertos <systemitem>UDP</systemitem> de origen. Acepta rangos de
+        puertos, puertos únicos e inversiones, con la misma sintaxis que lo hace
+        la homónima en <systemitem>TCP</systemitem>: para especificar un rango
+        indicarás el puerto inicial y el final (por ej. 22:80), con lo cual se
+        compararán los puertos <systemitem>UDP</systemitem> incluídos entre ambos
+        (desde el 22 hasta el 80, en el ejemplo); si el valor inicial se omite
+        se asumirá el valor 0; si se omite el puerto final, se asume el puerto
+        65535; si el puerto con valor más alto se indica antes que el puerto
+        con valor más bajo, iptables entenderá el rango inverso (si se escribe
+        80:22, se entiende 22:80). Las comparaciones con un único puerto
+        <systemitem>UDP</systemitem> serán similares al ejemplo inicial. Para
+        invertir la selección de puertos, añade el símbolo de exclamación
+        <command>!</command>, como en <command>--source-port ! 53</command>
+        (con ello se compararán todos los puertos excepto el 53). La comparación
+        puede interpretar nombres de servicios, siempre que estén disponibles
+        en el archivo <link linkend="servicestxt" endterm="servicestxt.title"></link>.
+        Sin embargo, no se aceptan puertos múltiples ni rangos múltiples separados por
+        comas. Para más información sobre este tema léete la extensión de
+        comparaciones multipuerto.</entry>
+       </row>
+
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>--dport</command>, <command>--destination-port</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A INPUT -p udp --dport 53</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Podemos decir lo mismo en ésta y en la comparación anterior. Es
+        exactamente lo mismo que su homónima en <systemitem>TCP</systemitem>,
+        a excepción que aquí se comparan puertos <systemitem>UDP</systemitem>:
+        compara paquetes basados en su puerto <systemitem>UDP</systemitem> de
+        destino. Acepta rangos de puertos, puertos únicos e inversiones.
+        Para reconocer un sólo puerto, usarás por ej.
+        <command>--destination-port 53</command>; en cambio, para invertir la
+        selección usarás <command>--destination-port ! 53</command>. En el
+        primer caso la comparación buscará todos los paquetes dirigidos al
+        puerto 53, mientras que en el segundo caso (el invertido) se buscarán
+        todos los paquetes excepto los dirigidos al puerto 53. En el caso
+        de un rango de puertos, puedes escribir <command>--destination-port 8:19</command>,
+        con lo cual se captarán todos los paquetes dirigidos a los puertos
+        comprendidos entre el 8 y el 19. Si se omite el primer puerto, se
+        asume el valor 0. Si por el contrario se omite el segundo, se asumirá
+        el valor 65535. Si se invierte el orden de los puertos (19:8), el
+        programa los reordena automáticamente (se convierte en 8:19). Esta
+        comparación no admite puertos y rangos múltiples (para ello existe
+        la extensión de comparación multipuerto).</entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+
+   <section id="icmpmatches">
+    <title id="icmpmatches.title">Comparaciones ICMP</title>
+
+    <para>
+Los paquetes <systemitem>ICMP</systemitem> son incluso más efímeros, tienen
+una vida más corta, que los paquetes <systemitem>UDP</systemitem>, dado que
+no están orientados a la conexión. El protocolo <systemitem>ICMP</systemitem>
+se usa principalmente para comunicación de errores, control de conexiones y
+tareas similares. <systemitem>ICMP</systemitem> no es un protocolo subordinado
+al protocolo IP, sinó más bien un protocolo que mejora al protocolo IP y le
+ayuda a gestionar los errores. Las cabeceras de los paquetes <systemitem>ICMP</systemitem>
+son muy similares a las cabeceras IP, pero presentan varias diferencias. La
+principal característica de este protocolo es la cabecera de "tipo", la cual
+nos indica para qué es el paquete. Por ejemplo, si intentamos acceder a una
+dirección IP inaccesible, normalmente recibiremos un <computeroutput>ICMP host
+unreachable</computeroutput> (mensaje ICMP de host inalcanzable) como respuesta. Para
+ver una lista completa de los "tipos" <systemitem>ICMP</systemitem>, lee el
+apéndice <link linkend="icmptypes" endterm="icmptypes.title"></link>. Sólo hay
+una comparación específica para paquetes <systemitem>ICMP</systemitem> y es de
+esperar que sea suficiente con élla. Esta comparación se carga implícitamente
+al emplear la comparación <command>--protocol ICMP</command> y tenemos acceso
+a ella automáticamente. Recuerda que todas las comparaciones genéricas se pueden
+usar con ella, por lo que nos podemos centrar en las direcciones de origen y
+destino.
+    </para>
+
+    <table frame=all id="table.icmpmatches">
+     <title id="table.icmpmatches.title">Comparaciones ICMP</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>--icmp-type</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A INPUT -p icmp --icmp-type 8</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Esta comparación se usa para especificar el <systemitem>tipo
+        ICMP</systemitem> a comparar. Los <systemitem>tipos ICMP</systemitem>
+        se pueden especificar por su valor numérico o por su nombre. Los valores
+        numéricos están definidos en el RFC 792. Para obtener un listado
+        completo de los nombres <systemitem>ICMP</systemitem>, ejecuta
+        <command>iptables --protocol icmp --help</command> en la línea de
+        comandos o mira en el apéndice <link linkend="icmptypes"
+        endterm="icmptypes.title"></link>. Esta comparación también puede ser
+        invertida con el símbolo <command>!</command>, como en
+        <command>--icmp-type ! 8</command>. Ten en cuenta que algunos
+        <systemitem>tipos ICMP</systemitem> están obsoletos, mientras que otros
+        pueden ser "peligrosos" para un host desprotegido, puesto que pueden
+        (entre otras cosas) redirigir paquetes a lugares incorrectos.</entry>
+       </row>
+
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+   </section>
+
+
+   <section id="explicitmatches">
+    <title id="explicitmatches.title">Comparaciones explícitas</title>
+    <para>
+Las comparaciones explícitas son aquellas que se deben cargar específicamente
+con la opción <command>-m</command> o <command>--match</command>. Por ej., las
+comparaciones de estado exigen añadir la directiva <command>-m state</command>
+antes de introducir la comparación que deseas usar. Algunas de estas
+comparaciones pueden ser específicas de un protocolo. Otras pueden ser
+independientes de los protocolos, como las de los estados de conexión:
+<command>NEW</command> (NUEVO; el primer paquete de una conexión que todavía no
+está establecida), <command>ESTABLISHED</command> (ESTABLECIDO; una conexión
+que ya está registrada en el núcleo), <command>RELATED</command> (RELACIONADO;
+una nueva conexión que ha sido creada por otra conexión ya establecida y más
+antigua), etc. Existen unas cuantas, por otra parte, que pueden haber
+evolucionado con propósitos experimentales o de prueba, o simplemente para
+mostrar de qué es capaz iptables. Ésto significa que no todas
+estas comparaciones tienen una aplicación directa o "útil" a primera vista. Sin embargo es
+perfectamente posible que en tu caso concreto encuentres utilidad a alguna
+comparación específica. Además, cada vez hay más con cada nueva versión de
+<command>iptables</command> y que les encuentres utilidad dependerá en gran
+medida de tu imaginación y tus necesidades. La diferencia entre comparaciones
+cargadas implícita o explícitamente es que las implícitas se cargarán
+automáticamente cuando, por ej., compares las propiedades de los paquetes
+<systemitem>TCP</systemitem>, mientras que las explícitas nunca se cargarán
+automáticamente: es tarea enteramente tuya que descubras y actives las
+comparaciones explícitas.
+    </para>
+
+   <section id="limitmatch">
+    <title id="limitmatch.title">Comparación Límite</title>
+
+    <para>
+La comparación <command>limit</command> (límite o limitación) debe ser cargada
+de forma explícita mediante la opción <command>-m limit</command>. Como ejemplo
+típico, esta comparación puede usarse para limitar el registro de actividad
+de reglas específicas. Ésto es, puedes comprobar que los paquetes no hayan
+excedido un determinado valor, a partir del cual se limita el registro de ese
+evento en cuestión. Imagina un límite de tiempo: puedes limitar las veces que
+una regla puede ser alcanzada en un periodo de tiempo dado, como cuando quieres
+minimizar los efectos de un "ataque de denegación de servicio por desbordamiento"
+(<emphasis>DoS</emphasis>). Éste es su principal uso, pero hay más, por supuesto.
+La comparación también puede ser invertida escribiendo el símbolo <command>!</command>
+antes de la comparación límite: <command>-m limit ! --limit 5/s</command>, que
+quiere decir que todos los paquetes se compararán después de sobrepasar el
+límite de 5 veces por segundo.
+    </para>
+
+    <para>
+Para ampliar la explicación, se puede decir que es básicamente como un
+"monedero virtual". Consideremos un monedero del que sacamos X monedas para
+gastar y al que introducimos monedas cada cierto tiempo. X se define dependiendo
+de cuántos paquetes recibimos que concuerdan con la comparación, por lo que
+suponiendo que son 3 paquetes, sacaremos del monedero 3 monedas en esa unidad
+de tiempo. La opción <command>--limit</command> nos dice con cuántos paquetes
+(monedas) rellenaremos el monedero por unidad de tiempo, mientras que
+<command>--limit-burst</command> indica la cantidad de monedas iniciales del
+monedero, así como cuántas de esas monedas admite el monedero.
+Así pues, escribiendo <command>--limit 3/minute --limit-burst 5</command>,
+crearemos un "monedero" con 5 "monedas"; si recibimos a continuación 5 paquetes
+seguidos que concuerden con la comparación, como resultado el "monedero" se
+vaciará. Tras 20 segundos, el "monedero" se rellena con otra "moneda"
+(recordemos que se rellena a razón de 3 por minuto) y a ese ritmo seguirá
+"rellenándose" hasta que se alcance el tope impuesto por el
+<command>--limit-burst</command> o hasta que sean usadas y el "monedero" vuelva
+a estar vacío.
+    </para>
+
+    <para>
+Vamos a ver otro ejemplo algo más realista para aclarar mejor el funcionamiento:
+    </para>
+
+    <orderedlist numeration="arabic">
+      <listitem>
+        <para>
+Creamos una regla que contenga la siguiente comparación: -m limit --limit 5/second --limit-burst 10/second.
+El contador se establece con un valor inicial de 10. Cada paquete que coincida con el filtro de
+la regla resta una unidad al contador.
+        </para>
+      </listitem>
+
+      <listitem>
+        <para>
+Recibimos una serie de paquetes (1-2-3-4-5-6-7-8-9-10) que coinciden con la regla, todos éllos en 1/1000 de segundo.
+        </para>
+      </listitem>
+
+      <listitem>
+        <para>
+Ahora el contador está a cero ("vacío") y los paquetes que coincidan con la regla
+no serán filtrados por ésta y saltarán a la siguiente regla si existe, o en caso de no existir
+seguirán la política por defecto de la cadena.
+        </para>
+      </listitem>
+
+      <listitem>
+        <para>
+Por cada 1/5 de segundo sin paquetes que coincidan, el contador aumenta una unidad hasta
+el valor máximo de 10. 1 segundo después de haber recibido los 10 paquetes anteriores, volveremos
+a aceptar hasta 5 paquetes seguidos.
+        </para>
+      </listitem>
+
+      <listitem>
+        <para>
+Y por supuesto, el contador irá descontando 1 unidad por cada paquete correcto que se reciba.
+        </para>
+      </listitem>
+    </orderedlist>
+
+    <table frame=all id="table.limitmatch">
+     <title id="table.limitmatch.title">Opciones de comparación límite</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>--limit</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A INPUT -m limit --limit 3/hour</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Mediante esta opción se establece el valor más alto del ratio
+        medio de comparaciones positivas para la comparación <command>limit</command>.
+        Se especifica mediante un valor numérico y un valor opcional de medida del tiempo.
+        Las unidades de tiempo aceptadas actualmente son:
+        <command>/second</command> (segundo), <command>/minute</command>
+        (minuto), <command>/hour</command> (hora) y <command>/day</command>
+        (día). El valor por defecto es de 3 cada hora, o lo que es lo mismo
+        <command>3/hour</command>. Así pues, con esta opción se consigue
+        indicar a <command>limit</command> cuántas veces se le permite actuar a
+        la comparación por unidad de tiempo (por cada minuto, por ej.).</entry>
+       </row>
+
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>--limit-burst</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A INPUT -m limit --limit-burst 5</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Mediante esta opción le dices a <command>iptables</command>
+        el número máximo de paquetes que concuerden con la comparación en un
+        tiempo determinado. Este número (la cantidad de paquetes que han llegado a la comparación) disminuye en una unidad por cada unidad
+        de tiempo (definida por la opción <command>--limit</command>) en que
+        el evento no se presenta (no llega ningún paquete), hasta llegar al valor mínimo (1). Si se
+        repite el evento (empiezan a llegar paquetes), el contador se va incrementando hasta que llega al tope
+        establecido por <command>--limit-burst</command>, para volver a empezar (si no llegan paquetes el contador disminuye, mientras que cuando van llegando aumenta hasta el umbral definido por --limit-burst).
+        El valor por defecto es 5. La manera más simple de comprobar cómo
+        funciona esta opción es utilizando el ejemplo <link
+        linkend="limit-matchtxt" endterm="limit-matchtxt.title"></link>.
+        Con él podrás comprobar por tí mismo cómo funciona simplemente enviando
+        pings a diferentes intervalos de tiempo y con diferentes valores tope.
+        Todas las respuestas de eco (echo replies) serán bloqueadas hasta que
+        se vuelva a alcanzar el umbral límite.
+       </entry>
+      </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section id="macmatch">
+    <title id="macmatch.title">Comparación MAC</title>
+
+    <para>
+La comparación <systemitem>MAC</systemitem> (<systemitem>Ethernet Media Access
+Control</systemitem>, o control de acceso a tarjetas Ethernet) se usa
+para comparar paquetes en función de su <systemitem>dirección MAC de origen</systemitem>
+[MAC source address; ésta es la dirección física de la tarjeta de red Ethernet:
+se trata de un código registrado en el hardware de la tarjeta que la hace única
+frente a todas las demás tarjetas fabricadas y por fabricar, es decir, no
+debería haber dos tarjetas Ethernet con la misma dirección MAC]. Por ahora esta
+comparación está un poco limitada, aunque en el futuro es posible que
+evolucione y sea más útil. Insistamos un poco: esta comparación SÓLO compara paquetes en función de su dirección MAC de ORIGEN.
+    </para>
+
+    <note>
+     <para>
+Ten en cuenta que para usar este módulo lo cargamos explícitamente con la
+opción <command>-m mac</command>. Y digo ésto porque mucha gente se pregunta
+si la opción correcta no debería ser <command>-m mac-source</command>, pero no
+es el caso.
+     </para>
+    </note>
+
+    <table frame=all id="table.macmatch">
+     <title id="table.macmatch.title">Opciones de la comparación MAC</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>--mac-source</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A INPUT -m mac --mac-source 00:00:00:00:00:01</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Como ya se ha dicho, esta comparación se emplea para buscar
+        paquetes basándose en su <systemitem>dirección MAC de origen</systemitem>.
+        La <systemitem>dirección MAC</systemitem> indicada debe tener el
+        siguiente aspecto: <emphasis>XX:XX:XX:XX:XX:XX</emphasis>, pues de lo
+        contrario no sería correcta (el programa la consideraría una dirección
+        "ilegal"). La comparación también puede ser invertida con <command>!</command>,
+        y se parecerá a <command>--mac-source ! 00:00:00:00:00:01</command>. En
+        este ejemplo se aceptarán todos los paquetes excepto aquellos que
+        provengan de la tarjeta Ethernet especificada (la que tenga la dirección
+        MAC 00:00:00:00:00:01). Ten en cuenta que las direcciones MAC sólo se
+        emplean en las redes de tipo Ethernet, por lo que sólo será viable emplear la
+        comparación con tarjetas Ethernet. Además, sólo será válida en las
+        cadenas <systemitem>PREROUTING</systemitem>, <systemitem>FORWARD</systemitem>
+        e <systemitem>INPUT</systemitem> y en ninguna más.</entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section id="markmatch">
+    <title id="markmatch.title">Comparación Mark</title>
+
+    <para>
+Esta extensión se emplea para comparar paquetes basándose en las marcas que
+tengan establecidas. Una <command>marca</command> (<command>mark</command>)
+es un campo especial mantenido por el núcleo, que se asocia a los paquetes
+mientras viajan por el ordenador. Las marcas pueden usarse por diferentes
+rutinas del núcleo para tareas como la configuración y el filtrado del tráfico.
+Hoy por hoy sólo existe una manera de establecer una marca en Linux y ésta es
+mediante el objetivo <command>MARK</command> en <command>iptables</command>.
+Anteriormente se establecía con el objetivo <command>FWMARK</command> de
+<command>ipchains</command> y por éllo hay gente que todavía se refiere a
+<command>FWMARK</command> en tareas avanzadas de enrutado. El campo "marca"
+se establece mediante un número entero positivo de entre los 4.294.967.296 valores
+posibles en un entorno de 32 bits. O sea, que es más bien difícil que puedas
+verte limitado por este valor durante bastante tiempo.
+    </para>
+
+    <table frame=all id="table.markmatch">
+     <title id="table.markmatch.title">Opciones de la comparación de marca</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>--mark</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -t mangle -A INPUT -m mark --mark 1</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Empleamos la comparación para buscar paquetes que hayan sido
+        marcados con anterioridad. Las marcas pueden establecerse gracias al
+        objetivo <command>MARK</command>, que será tratado en la próxima
+        sección. Todos los paquetes que atraviesan <systemitem>Netfilter</systemitem>
+        reciben un campo de marca (<systemitem>mark field</systemitem>) especial
+        y se asocian a él. Cabe destacar que este "<systemitem>mark field</systemitem>"
+        no se propaga ni dentro ni fuera del paquete, sinó que permanece en el
+        ordenador que lo creó. Si el <systemitem>campo marca</systemitem>
+        coincide con la marca, entonces hay concordancia. El <systemitem>campo
+        marca</systemitem> es un número entero positivo, por lo que pueden
+        haber un máximo de 4.294.967.296 marcas diferentes (en entornos de
+        32 bits). También puedes utilizar una máscara en la marca, con lo cual
+        su aspecto se podrá parecer a <command>--mark 1/1</command>. Si se
+        especifica la máscara se efectuará una suma lógica (AND) con la marca
+        especificada antes de ejecutar la comparación.</entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section id="multiportmatch">
+    <title id="multiportmatch.title">Comparación Multipuerto</title>
+
+    <para>
+La extensión <command>multiport</command> se emplea para especificar puertos
+múltiples y rangos de puertos múltiples. Si no tuviéramos la funcionalidad de
+esta comparación, necesitaríamos escribir múltiples reglas del mismo tipo
+simplemente para comparar diferentes puertos no contiguos (que no se pueden
+especificar mediante un rango).
+    </para>
+
+    <note>
+     <para>
+No puedes emplear la comparación estándar de puertos junto a la comparación
+múltiple de puertos en la misma regla; por ej., no puedes escribir:
+<command>--sport 1024:63353 -m multiport --dport 21,23,80</command>, puesto que
+simplemente no funcionarán las dos a la vez, sinó que iptables ejecutará el
+primer elemento de la regla e ignorará el otro (en este caso ignorará la comparación
+multipuerto).
+     </para>
+    </note>
+
+    <table frame=all id="table.multiportmatch">
+     <title id="table.multiportmatch.title">Opciones de comparación multipuerto</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>--source-port</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A INPUT -p tcp -m multiport --source-port 22,53,80,110</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Mediante esta comparación se buscarán los puertos de origen
+        indicados, que serán como máximo 15. Los puertos se delimitarán mediante
+        comas, como en el ejemplo. La comparación sólo se puede emplear
+        conjuntamente con las comparaciones <command>-p tcp</command> o
+        <command>-p udp</command>. Básicamente es una versión ampliada de la
+        comparación estándar <command>--source-port</command>.</entry>
+       </row>
+
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>--destination-port</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A INPUT -p tcp -m multiport --destination-port 22,53,80,110</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>De la misma forma que la anterior, se comparan puertos múltiples,
+        aunque esta vez son los puertos de destino de los paquetes. También
+        presenta el límite de una lista con un máximo de 15 puertos y sólo
+        puede utilizarse junto a <command>-p tcp</command> o <command>-p udp</command>.</entry>
+
+       </row>
+
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>--port</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A INPUT -p tcp -m multiport --port 22,53,80,110</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Esta extensión puede emplearse para comparar paquetes basándose
+        en su puerto de origen/destino. Funciona igual que las dos anteriores,
+        con las mismas limitaciones, pero con la diferencia de que sólo se
+        aceptarán paquetes que provengan y se destinen al mismo puerto; en el
+        ejemplo estaríamos hablando de paquetes que provengan del puerto 22 y
+        vayan al puerto 22, provengan del 53 y vayan al 53, etc.</entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section id="ownermatch">
+    <title id="ownermatch.title">Comparación Propietario (Owner)</title>
+
+    <para>
+La extensión <command>owner</command> se emplea para comparar paquetes en
+función de la identidad del proceso que los creó. Se puede especificar como
+la identificación (ID) del proceso del usuario que ejecutó la orden
+en cuestión; este usuario puede ser el grupo, el proceso, la sesión o el
+comando en sí mismo. Esta extensión se creó originalmente para demostrar de qué
+es capaz <command>iptables</command>. La comparación <command>owner</command>
+sólo funciona en la cadena <systemitem>OUTPUT</systemitem> por razones obvias:
+es prácticamente imposible encontrar alguna información sobre la identidad del
+proceso que envió el paquete desde el otro extremo y menos aún si existe algún
+punto intermedio entre el origen y el destino. Incluso en la cadena
+<systemitem>OUTPUT</systemitem> no tiene un comportamiento muy fiable, pues
+ciertos paquetes pueden no tener un propietario (como ocurre por ejemplo con
+las diferentes <systemitem>respuestas ICMP</systemitem>, ya que éstas nunca
+serán aceptadas por la comparación).
+    </para>
+
+    <table frame=all id="table.ownermatch">
+     <title id="table.ownermatch.title">Opciones de comparación de propietario</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>--uid-owner</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A OUTPUT -m owner --uid-owner 500</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>En esta comparación se aceptarán todos los paquetes que hayan sido
+        generados por el usuario especificado (en inglés se habla de <computeroutput>User
+        ID</computeroutput> o <computeroutput>UID</computeroutput>, siendo 500 la ID del ejemplo). Así pues, con esta regla podemos
+        filtrar paquetes dependiendo del usuario que los haya creado. Una
+        utilidad podría ser bloquear cualquier intento de abrir una conexión
+        fuera del cortafuegos, siempre que el usuario no sea el administrador
+        ("superuser", "su" o "root"). Otro posible uso sería bloquear a cualquier
+        usuario que intente enviar paquetes por el puerto <systemitem>HTTP</systemitem>
+        excepto al usuario <computeroutput>http</computeroutput> (con lo que
+        minimizamos los ataques de troyanos que trabajen a través de ese puerto).</entry>
+       </row>
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>--gid-owner</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A OUTPUT -m owner --gid-owner 0</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>En este caso se compara el grupo al que pertenece el usuario que
+        crea el paquete (en inglés, <computeroutput>Group ID</computeroutput> o
+        <computeroutput>GID</computeroutput>). Con esta opción podemos bloquear a todos los usuarios que no
+        pertenezcan al grupo <computeroutput>network</computeroutput>, de forma
+        que sólo éstos últimos puedan acceder a Internet; o como ya se ha dicho
+        antes, permitir sólo a los miembros del grupo <computeroutput>http</computeroutput>
+        crear paquetes que salgan por el puerto <systemitem>HTTP</systemitem>.
+        </entry>
+       </row>
+
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>--pid-owner</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A OUTPUT -m owner --pid-owner 78</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>En este caso se comparan los paquetes en función del número de
+        proceso que lo generó (en inglés, <systemitem>Process ID</systemitem> o
+        <systemitem>PID</systemitem>). Esta comparación es un poco más
+        complicada de usar, pero un ejemplo podría ser al querer limitar el envío de
+        paquetes por el puerto <systemitem>HTTP</systemitem>: suponiendo que el
+        proceso número 78 (PID 78) sea el único que debe tener permiso, escribiendo la
+        regla del ejemplo lo lograríamos, eso sí, siempre y cuando este proceso no
+        esté dividido en varios procesos paralelos (threaded). Para facilitar
+        las cosas, podemos escribir un pequeño script que capte el <systemitem>PID</systemitem>
+        del demonio deseado desde la salida generada por el comando <command>ps</command> y cree
+        una regla para ese PID. A modo de ejemplo tienes una regla
+        en <link linkend="pid-ownertxt" endterm="pid-ownertxt.title"></link>.</entry>
+       </row>
+
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>--sid-owner</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A OUTPUT -m owner --sid-owner 100</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Como en el resto del grupo, esta comparación busca paquetes
+        basándose en la identificación de sesión empleada por el programa que
+        genera los paquetes (en inglés, <systemitem>Session ID</systemitem> o
+        <systemitem>SID</systemitem>). El valor del SID de un proceso es el
+        del proceso mismo y todos los subprocesos creados a partir de él. Estos
+        subprocesos pueden ser procesos paralelos (threads) o "hijos" del
+        proceso original. A modo de ejemplo, en un equipo con el
+        <systemitem>HTTPD</systemitem> dividido en procesos paralelos, todos
+        estos procesos <systemitem>HTTPD</systemitem> "hijos" deberían tener el
+        mismo <systemitem>SID</systemitem> que su proceso "padre" (el proceso
+        <systemitem>HTTPD</systemitem> original); la mayoría de los demonios
+        <systemitem>HTTPD</systemitem> funcionan de esta manera, como Apache
+        y Roxen, por citar alguno. Para mostrártelo tienes a tu disposición
+        un pequeño script llamado <link linkend="sid-ownertxt"
+        endterm="sid-ownertxt.title"></link>. Con unos cuantos retoques
+        este script podría ejecutarse cada hora de forma que compruebe si el
+        <systemitem>HTTPD</systemitem> realmente está en marcha, arrancándolo
+        si no es así y en ese caso modificando adecuadamente la cadena
+        <systemitem>OUTPUT</systemitem>.</entry>
+        </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section id="statematch">
+     <title id="statematch.title">Comparación de Estado</title>
+
+    <para>
+La extensión <command>state</command> (estado) se emplea conjuntamente con el
+código de seguimiento de conexiones (connection tracking) del núcleo. La
+comparación de estado accede a la máquina de seguimiento de conexiones y
+averigua en qué estado se encuentra el paquete. Éste procedimiento funciona
+con prácticamente todos los protocolos, incluyendo aquellos que no poseen
+estado, como el <systemitem>ICMP</systemitem> y el <systemitem>UDP</systemitem>.
+En cualquier caso por defecto habrá un intervalo de espera para la conexión, a
+partir del cual será eliminada de la base de datos de seguimiento de conexiones.
+La comparación se debe cargar explícitamente añadiendo <command>-m state</command>
+a la regla, teniendo acceso a partir de entonces a una nueva comparación llamada
+"estado". El concepto de comparación de estado se trata en profundidad en el
+capítulo <link linkend="statemachine" endterm="statemachine.title"></link>, ya
+que es un tema bastante extenso.
+    </para>
+
+    <table frame=all id="table.statematches">
+     <title id="table.statematches.title">Comparaciones de Estado</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>--state</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A INPUT -m state --state RELATED,ESTABLISHED</command>
+        </entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>
+        Esta opción le indica a la comparación <command>state</command> (estado)
+        qué paquetes deben ser comparados, en función de sus estados. Por ahora hay 4 estados que puedan
+        ser utilizados: <command>INVALID</command>, <command>ESTABLISHED</command>,
+        <command>NEW</command> y <command>RELATED</command> (inválido,
+        establecido, nuevo y relacionado, respectivamente). <command>INVALID</command>
+        implica que el paquete no está asociado a ningún flujo o conexión
+        conocida y que puede contener datos o cabeceras erróneas.
+        <command>ESTABLISHED</command> indica que el paquete pertenece a una
+        conexión ya establecida, totalmente válida y que "ha visto" un flujo de paquetes en ambas
+        direcciones. <command>NEW</command> significa que el paquete ha
+        creado o está creando una nueva conexión, o que está asociado a una
+        conexión que todavía no "ha visto" paquetes en ambas direcciones. Por último,
+        <command>RELATED</command> es para paquetes que empiezan una nueva
+        conexión pero están asociados a otra conexión ya establecida (como puede
+        ocurrir en una <systemitem>transferencia de datos FTP</systemitem>, o
+        en un <systemitem>error ICMP</systemitem> asociado a una conexión
+        <systemitem>TCP</systemitem> o <systemitem>UDP</systemitem>). Ten en
+        cuenta que el estado <command>NEW</command> ignora los bits
+        <systemitem>SYN</systemitem> en los paquetes <systemitem>TCP</systemitem>
+        que están intentando empezar una nueva conexión, por lo que no debe ser
+        usado sin modificar en los casos en que exista sólo un cortafuegos y
+        no haya balance de carga entre diferentes cortafuegos. Sin embargo,
+        pueden haber circunstancias donde ésto sea útil. Para mayor información
+        sobre cómo utilizarlo, lee el capítulo <link linkend="statemachine"
+        endterm="statemachine.title"></link>.</entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section id="tosmatch">
+    <title id="tosmatch.title">Comparación TOS</title>
+
+    <para>
+La comparación <command>TOS</command> puede emplearse para comparar paquetes
+basándose en su <systemitem>campo TOS</systemitem> (<systemitem>TOS field</systemitem>).
+<systemitem>TOS</systemitem> es la abreviatura de <systemitem>Type Of Service</systemitem>
+(Tipo de Servicio), tiene un tamaño de 8 bits y se encuentra en las
+cabeceras IP. Esta comparación se carga explícitamente cuando añadimos
+<command>-m tos</command> a la regla. El Tipo de Servicio se suele usar para
+informar a los hosts intermedios por los que van pasando los paquetes de la llegada de un
+flujo y de su contenido (bueno, en realidad no hace eso, pero informa sobre
+cualquier requerimiento específico del flujo, como por ej. si tiene que
+reenviarse lo más rápidamente posible, o si necesita que se le permita contener
+tanta información como sea posible). De qué manera manejen los routers y
+administradores esa información depende exclusivamente de éllos. La mayoría
+la ignora, mientras que algunos intentan manejar los flujos y datos de la manera
+más acorde a la información del <systemitem>TOS</systemitem>.
+     </para>
+
+
+    <table frame=all id="table.tosmatches">
+     <title id="table.tosmatches.title">Comparaciones TOS</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>--tos</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A INPUT -p tcp -m tos --tos 0x16</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Esta comparación se usa tal como se ha descrito y puede filtrar
+        paquetes en función de su <systemitem>campo TOS</systemitem> y la
+        información que contiene. Ésto es de utilidad, entre otras cosas, al
+        trabajar conjuntamente con <command>iproute2</command> y con funciones
+        avanzadas de Linux, marcando paquetes para un uso posterior. La
+        comparación reconoce como opción un valor hexadecimal o también numérico,
+        aunque posiblemente también acepte uno de los nombres resultantes de
+        ejecutar "<command>iptables -m tos -h</command>". En el momento de
+        escribir el tutorial, se reconocen los siguientes
+        nombres/valores/valores hexadecimales:
+
+        <computeroutput>Minimize-Delay 16 (0x10)</computeroutput>,
+        <computeroutput>Maximize-Throughput 8 (0x08)</computeroutput>,
+        <computeroutput>Maximize-Reliability 4 (0x04)</computeroutput>,
+        <computeroutput>Minimize-Cost 2 (0x02)</computeroutput> y
+        <computeroutput>Normal-Service 0 (0x00)</computeroutput>.
+
+        <computeroutput>Minimize-Delay</computeroutput> se refiere a minimizar
+        el retardo en dar curso a los paquetes (ejemplos de servicios estándar
+        que lo requieren son <systemitem>telnet</systemitem>, <systemitem>SSH</systemitem>
+        y <systemitem>FTP-control</systemitem>).
+        
+        <computeroutput>Maximize-Throughput</computeroutput> implica un
+        rendimiento tan grande como sea posible (un protocolo estándar podría
+        ser <systemitem>FTP-data</systemitem>).
+        
+        <computeroutput>Maximize-Reliability</computeroutput> pide que se
+        maximice la fiabilidad de una conexión y que se empleen líneas tan
+        fiables como sea posible (por ej. para <systemitem>BOOTP</systemitem> y
+        <systemitem>TFTP</systemitem>).
+
+        <computeroutput>Minimize-Cost</computeroutput> pide que se minimice el
+        coste de paquetes que atraviesan cada vínculo intermedio hasta el
+        cliente o el servidor (por ej. encontrando la ruta que cueste menos de
+        atravesar; algunos protocolos que podrían requerir ésto son
+        <systemitem>RTSP</systemitem> (Real Time Stream Control Protocol) y
+        otros protocolos de transporte de flujos de video/radio).
+        
+        <computeroutput>Normal-Service</computeroutput>, por último, podría
+        servir para cualquier protocolo que no tenga necesidades especiales.</entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section id="ttlmatch">
+    <title id="ttlmatch.title">Comparación TTL</title>
+
+    <para>
+La comparación <command>TTL</command> se emplea para filtrar paquetes en
+función de su campo <systemitem>TTL</systemitem> (Time To Live, "tiempo de
+vida"), el cual se encuentra en las cabeceras IP. Este campo contiene 8 bits
+de datos y su valor va disminuyendo en una unidad cada vez que el paquete es
+procesado por un host intermedio entre el host origen y el destinatario. Si
+el valor <systemitem>TTL</systemitem> llega a ser 0, se transmite al
+remitente un mensaje informándole del problema. Este mensaje es un
+<systemitem>ICMP</systemitem> tipo 11 código 0 (el TTL ha tomado valor nulo
+durante el tránsito) o código 1 (el TTL ha tomado valor nulo durante el
+reensamblaje). Esta comparación únicamente efectúa un filtrado dependiendo
+del valor del <systemitem>TTL</systemitem> de los paquetes, pero sin cambiar
+nada. Para cargar esta comparación, necesitas añadir <command>-m ttl</command>
+a la regla.
+    </para>
+
+
+    <table frame=all id="table.ttlmatches">
+     <title id="table.ttlmatches.title">Comparaciones TTL</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+
+       <row>
+        <entry>Comparación</entry>
+        <entry><command>--ttl</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A OUTPUT -m ttl --ttl 60</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Con esta opción se especifica el valor <systemitem>TTL</systemitem>
+        a comparar. Este valor será de tipo numérico y se comparará con el valor
+        presente en cada uno de los paquetes. No hay inversión posible y no hay
+        otras opciones. A modo de ejemplo, se puede emplear para efectuar
+        chequeos en busca de fallos (debug) en tu red local, como podrían ser hosts de la red
+        local que parecen tener problemas para conectar con otros hosts situados
+        en Internet; o también se puede emplear para encontrar posibles troyanos
+        que se hayan introducido en tu red. Sin embargo su uso es relativamente
+        limitado y su utilidad depende principalmente de tu imaginación. Por
+        ejemplo, se pueden encontrar hosts con valores anormales de <systemitem>TTL</systemitem>
+        (debidos posiblemente a una pila <systemitem>TCP/IP</systemitem> mal
+        implementada, o a una simple mala configuración).</entry>
+
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+    </section>
+
+   </section>
+
+   <section id="uncleanmatch">
+    <title id="uncleanmatch.title">Comparación "Unclean" ("sucio")</title>
+
+    <para>
+La comparación <command>unclean</command> no tiene opciones y sólo necesita
+que sea cargada explícitamente cuando quieras usarla. Sin embargo, debes tener
+en cuenta que se considera experimental y puede que no funcione bien en todo
+momento, así como tampoco se preocupará de todos los paquetes "sucios" o todos
+los problemas. La comparación "unclean" intenta filtrar paquetes que
+parecen malformados o inusuales, como aquellos paquetes con cabeceras
+incorrectas, checksums (sumas de verificación) incorrectos, ... Este filtro puede
+utilizarse, por ejemplo, para desechar (<command>DROP</command>) conexiones y para buscar
+flujos incorrectos; pero debes recordar que al no funcionar siempre
+correctamente, puede cortar conexiones correctas o legales.
+    </para>
+
+   </section>
+
+  </section>
+
+  <section id="targets">
+   <title id="targets.title">Objetivos/Saltos (Targets/Jumps)</title>
+    <para>
+Cuando la comparación de una regla encuentra un paquete que coincide con las
+condiciones que impone (tal como hemos visto hasta ahora), se recurre al
+objetivo/salto dónde se le indica a la regla qué debe hacer con ese paquete.
+Hay dos objetivos básicos que trataremos primero: <command>ACCEPT</command> y
+<command>DROP</command>, pero antes de empezar veamos brevemente cómo se
+efectúa un salto.
+    </para>
+
+    <para>
+La orden de salto se ejecuta de la misma manera que la orden de objetivo,
+excepto en que el salto necesita que exista una cadena dentro de la misma tabla
+a la que pueda dirigirse. Para crear una cadena, tal como ya se ha explicado,
+se utiliza el comando <command>-N</command>. Por ejemplo, supongamos que
+queremos crear una cadena en la tabla "filter" llamada <command>tcp_packets</command>,
+por lo que escribiremos:
+    </para>
+
+    <screen>
+<command>iptables -N tcp_packets</command>
+    </screen>
+
+    <para>
+A partir de entonces podremos referirnos a esa cadena para efectuar un salto
+siempre que lo necesitemos:
+    </para>
+
+    <screen>
+<command>iptables -A INPUT -p tcp -j tcp_packets</command>
+    </screen>
+
+    <para>
+De esta forma todos los paquetes TCP saltarán desde la cadena <command>INPUT</command>
+hasta la cadena <command>tcp_packets</command> y serán filtrados por élla. Si algún
+paquete llega al final de la cadena y no ha habido una concordancia (el paquete no
+presenta coincidencias con las reglas de la cadena), volverá a
+la cadena original (en nuestro caso la cadena INPUT) justo después de la regla
+que originó el salto y seguirá pasando por el resto de reglas de esta cadena.
+Por el contrario, si alguna de las reglas de la cadena "tcp_packets" acepta
+(<command>ACCEPT</command>) los paquetes, éstos efectuarán el salto/objetivo
+de la regla y seguirán su curso por el resto de cadenas, sin pasar
+nunca por el resto de reglas de la cadena de origen (INPUT). Para mayor información
+de cómo los paquetes atraviesan las tablas y cadenas, léete el capítulo
+<link linkend="traversingoftables" endterm="traversingoftables.title"></link>.
+    </para>
+
+    <para>
+Por otra parte, los objetivos especifican la acción a ejecutar con el paquete
+en cuestión. Así, se podrá aceptar (<command>ACCEPT</command>) o desechar
+(<command>DROP</command>) el paquete dependiendo de lo que queramos hacer.
+Existen además otra serie de acciones que podemos querer hacer con el paquete,
+y las describiremos más adelante. Debes tener en cuenta que saltar a un
+objetivo puede dar diferentes resultados, dependiendo del que se trate. Algunos
+objetivos harán que el paquete deje de atravesar una cadena específica y todas
+las superiores a élla, como se ha descrito antes (buenos ejemplos de éllo son
+<command>DROP</command> y <command>ACCEPT</command>): las reglas que son paradas
+no pasarán ninguna regla más, ni de esa misma cadena, ni de ninguna cadena
+"superior" a élla (superiores serán aquellas que han producido saltos hacia
+la cadena actual: la cadena A produce un salto a la cadena B y ésta última a la
+cadena C, donde el paquete se para en alguna regla y por tanto deja de atravesar
+la cadena C y sus superiores, la A y la B). Otros objetivos pueden efectuar
+alguna acción sobre el paquete, después del cual éste continuará pasando
+por el resto de reglas. Por ejemplo tenemos los objetivos <command>LOG</command>,
+<command>ULOG</command> y <command>TOS</command>: con éllos podemos registrar
+los paquetes, modificarlos y después pasárselos a otras reglas en el mismo
+conjunto de cadenas. Podemos querer hacer ésto para, por ejemplo, poder
+modificar tanto el valor del <systemitem>TTL</systemitem> como el del
+<systemitem>TOS</systemitem> de un paquete/flujo específico. Algunos objetivos
+aceptan opciones adicionales (qué valor <systemitem>TOS</systemitem> utilizar,
+...), mientras otros no necesitan opciones obligatoriamente (aunque se puedan
+incluir si se desea, como ocurre con los prefijos de los registros, los puertos que
+se enmascararán, ...). Intentaremos incluir todos estos
+puntos tal como describamos los objetivos, así que empecemos a ver qué tipo
+de objetivos hay.
+    </para>
+
+   <section id="accepttarget">
+    <title id="accepttarget.title">Objetivo ACCEPT</title>
+
+    <para>
+Este objetivo no necesita ninguna opción adicional. En cuanto la especificación
+de la comparación es satisfecha por un paquete y se indica ACCEPT (aceptar)
+como objetivo, la regla se acepta y el paquete no continúa atravesando ni la
+cadena actual, ni cualquier otra de la misma tabla. Advierte sin embargo que
+un paquete que haya sido aceptado por una cadena todavía podría atravesar las
+cadenas de otras tablas y podría ser desechado en éllas. Para emplear este
+objetivo no hay más que indicar <command>-j ACCEPT</command>.
+    </para>
+
+   </section>
+
+   <section id="dnattarget">
+    <title id="dnattarget.title">Objetivo DNAT</title>
+
+    <para>
+El objetivo <command>DNAT</command> se emplea para efectuar traducciones de
+direcciones de red de destino (<systemitem>Destination Network Address
+Translation</systemitem>), que significa que se emplea para reescribir la
+dirección <envar>IP de destino</envar> de un paquete. Con este objetivo en la
+regla, en cuanto un paquete coincide con la comparación, él y todos los paquetes
+pertenecientes a ese mismo flujo de datos verán modificada su dirección de
+destino y serán redirigidos a la red/host/dispositivo adecuado. Este objetivo
+puede ser extremadamente útil cuando, por ej., tienes un host ejecutando el
+servidor web dentro de una red local (<emphasis>LAN</emphasis>), pero sin una
+IP real que ofrecerle y que sea válida en Internet. Entonces puedes indicarle
+al cortafuegos que cuando lleguen paquetes dirigidos a su propio puerto
+<systemitem>HTTP</systemitem> los reenvíe hacia el servidor web real dentro de la red local.
+También se pueden especificar todo un rango de direcciones IP de destino y el
+mecanismo <command>DNAT</command> escogerá aleatoriamente la dirección IP de
+destino para cada flujo de datos. Mediante este sistema seremos capaces de
+abordar una especie de balance de carga.
+    </para>
+
+    <para>
+Observa que el objetivo <command>DNAT</command> sólo está disponible en las
+cadenas <systemitem>PREROUTING</systemitem> y <systemitem>OUTPUT</systemitem>
+de la tabla <systemitem>nat</systemitem>, así como aquellas cadenas a las que
+las dos anteriores hayan dirigido un salto (es decir, cualquier cadena a la
+que se haya saltado desde una de las dos mencionadas). Insistimos en que las
+cadenas que contengan objetivos <command>DNAT</command> no pueden usarse desde
+otras cadenas, como podría ser el caso de la cadena <systemitem>POSTROUTING</systemitem>.
+    </para>
+
+    <table frame=all id="table.dnattarget">
+     <title id="table.dnattarget.title">Objetivo DNAT</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+
+       <row>
+        <entry>Opción</entry>
+        <entry><command>--to-destination</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -t nat -A PREROUTING -p tcp -d 15.45.23.67
+        --dport 80 -j DNAT --to-destination 192.168.1.1-192.168.1.10</command>
+        </entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>La opción <command>--to-destination</command> le indica al
+        mecanismo <systemitem>DNAT</systemitem> qué <systemitem>IP de Destino</systemitem>
+        establecer en la cabecera IP y dónde enviar los paquetes que concuerden
+        con el filtro. El ejemplo anterior enviará todos los paquetes destinados
+        a la dirección IP 15.45.23.67 a un rango de direcciones <emphasis>LAN</emphasis>,
+        en este caso el rango 192.168.1.1 a 192.168.1.10. Ten en cuenta que, tal
+        como se ha dicho, un flujo concreto siempre usará el mismo host,
+        mientras que a cada flujo se le asignará aleatoriamente una dirección IP a la que
+        siempre serán destinados todos los paquetes de ese flujo. También se podría haber
+        especificado una sola dirección IP, en cuyo caso siempre estaríamos
+        conectados al mismo host. También podemos añadir un puerto o rango de
+        puertos a los que será redirigido el tráfico. Para ello sólo tenemos que
+        añadir el puerto o rango de puertos después de ":", como en
+        <command>--to-destination 192.168.1.1:80</command> para un puerto único,
+        o como en <command>--to-destination 192.168.1.1:80-100</command> para
+        un rango de puertos. Como puedes ver, la sintaxis es la misma
+        para los objetivos <command>DNAT</command> y <command>SNAT</command>,
+        aunque es evidente que los resultados de uno y otro son totalmente
+        diferentes. Por otra parte, las especificaciones de puertos sólo son
+        válidas en aquellas reglas dónde se especifiquen los protocolos TCP o
+        UDP en la opción <command>--protocol</command>.
+        </entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+    <para>
+Puesto que el objetivo <command>DNAT</command> exige bastante trabajo para
+funcionar correctamente, he decidido ampliar la explicación sobre cómo usarlo.
+Para empezar estudiaremos un pequeño ejemplo acerca de cómo deberían hacerse las
+cosas normalmente: queremos publicar nuestro sitio web aprovechando nuestra
+conexión a Internet, aunque sólo tenemos una dirección IP y el <systemitem>servidor HTTP</systemitem>
+se encuentra en nuestra red interna. El cortafuegos tiene la dirección IP
+externa <command>$INET_IP</command>, nuestro <systemitem>servidor HTTP</systemitem>
+tiene la dirección IP interna <command>$HTTP_IP</command> y por último el
+cortafuegos tiene la dirección IP interna <command>$LAN_IP</command>. Lo primero
+que hay que hacer es añadir la siguiente regla a la cadena <systemitem>PREROUTING</systemitem>
+de la tabla nat:
+    </para>
+
+    <screen>
+<command>
+iptables -t nat -A PREROUTING --dst $INET_IP -p tcp --dport 80 -j DNAT --to-destination $HTTP_IP
+</command>
+    </screen>
+
+    <para>
+Desde ahora todos los paquetes que provengan de Internet y se dirijan al puerto
+80 de nuestro cortafuegos, serán redirigidos a nuestro servidor <systemitem>HTTP</systemitem>
+interno. Si lo compruebas desde Internet, todo debería funcionar perfectamente.
+Pero, ¿qué ocurre cuando intentas conectar desde un host de la misma red local
+a la que pertenece el <systemitem>servidor HTTP</systemitem>?. Sencillo,
+simplemente no podrás. En realidad éste es un problema de enrutado: comenzaremos
+estudiando lo que ocurre en el caso normal. Para mantener la estructura del
+ejemplo, consideremos que la máquina externa tiene una dirección IP
+<command>$EXT_BOX</command>.
+    </para>
+
+    <orderedlist>
+
+     <listitem>
+      <para>
+El paquete deja el host (con IP <command>$EXT_BOX</command>) que quiere conectar con la página web
+para dirigirse a <command>$INET_IP</command>.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+El paquete llega al cortafuegos.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+El cortafuegos efectúa la traducción <command>DNAT</command> en el paquete y
+lo envía a través del resto de cadenas.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+El paquete deja el cortafuegos y viaja hacia $HTTP_IP.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+El paquete llega al servidor <systemitem>HTTP</systemitem> y la máquina
+<systemitem>HTTP</systemitem> responde a través del cortafuegos (siempre que
+la base de datos de enrutado tenga definido el cortafuegos como el puente entre
+la red local y <command>$EXT_BOX</command>). En general éste será el puente por
+defecto del servidor <systemitem>HTTP</systemitem>.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+El cortafuegos deshace la traducción que había hecho con <command>DNAT</command>
+sobre el paquete, de forma que parece que es el cortafuegos el que responde.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+El paquete de respuesta viaja de vuelta al cliente <command>$EXT_BOX</command>.
+      </para>
+     </listitem>
+
+    </orderedlist>
+
+    <para>
+Ahora consideremos qué ocurre si el paquete se origina en un cliente de la misma
+red a la que pertenece el servidor <systemitem>HTTP</systemitem>. El cliente
+tiene la dirección IP <command>$LAN_BOX</command>, mientras el resto de máquinas
+mantienen los mismos valores (nombres).
+    </para>
+
+    <orderedlist>
+
+     <listitem>
+      <para>
+El paquete deja <command>$LAN_BOX</command> para dirigirse a <command>$INET_IP</command>.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+El paquete llega al cortafuegos.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+El paquete sufre la traducción <command>DNAT</command> y todas las acciones
+necesarias se toman en consecuencia, si bien al paquete no se le efectúa
+ninguna traducción <command>SNAT</command> y mantiene la misma dirección IP de
+origen.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+El paquete sale del cortafuegos y alcanza el servidor <systemitem>HTTP</systemitem>.
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+El servidor <systemitem>HTTP</systemitem> intenta responder al paquete y
+observa en las bases de datos de enrutado que el paquete viene de una máquina
+local de la misma red, por lo que intenta enviar el paquete directamente a la
+<systemitem>dirección IP de origen</systemitem> (que a partir de ese momento
+se convierte en la <systemitem>dirección IP de destino</systemitem>).
+      </para>
+     </listitem>
+
+     <listitem>
+      <para>
+El paquete llega al cliente, que no sabe qué hacer puesto que el paquete devuelto
+no proviene del host al que envió la petición original. Por éllo el cliente
+desecha el paquete y continúa esperando la respuesta "auténtica".
+      </para>
+     </listitem>
+
+    </orderedlist>
+
+    <para>
+La solución más simple para este problema es efectuar la traducción <command>SNAT</command>
+a todos los paquetes que entren al cortafuegos y a los que sabemos que también
+se les va a aplicar la traducción <command>DNAT</command>. Por ej., consideremos
+la siguiente regla: vamos a efectuar una traducción <systemitem>SNAT</systemitem>
+a los paquetes que entren al cortafuegos y estén destinados a <command>$HTTP_IP</command>
+en el puerto 80, de forma que parecerá que provengan de <command>$LAN_IP</command>.
+Ésto forzará al servidor <systemitem>HTTP</systemitem> a devolver los paquetes
+a través del cortafuegos, que invertirá la traducción <command>DNAT</command>
+y los reenviará al cliente. La regla será algo así:
+    </para>
+
+    <screen>
+<command>
+iptables -t nat -A POSTROUTING -p tcp --dst $HTTP_IP --dport 80 -j SNAT \ --to-source $LAN_IP
+</command>
+    </screen>
+
+    <para>
+Recuerda que la cadena <systemitem>POSTROUTING</systemitem> se procesa en último
+lugar, después del resto de cadenas, por lo que el paquete será "retraducido"
+cuando llegue a esa cadena específica. Por éllo comparamos los paquetes en
+función de su dirección interna.
+    </para>
+
+    <warning>
+     <para>
+Esta última regla afectará seriamente el registro de actividades, por lo que es
+altamente recomendable no emplear este método, si bien el ejemplo todavía es
+válido para aquellos que no pueden permitirse crear una "zona desmilitarizada"
+(DMZ) específica o algo parecido. Lo que ocurrirá es que el paquete llegará
+desde Internet, sus direcciones IP serán traducidas por SNAT y por DNAT,
+llegando por fin al servidor HTTP (por ejemplo). El servidor sólo verá una
+petición que viene del cortafuegos y, por tanto, registrará <emphasis>todas</emphasis>
+las peticiones de Internet como si vinieran del cortafuegos.
+     </para>
+
+     <para>
+También pueden haber consecuencias más serias. Piensa en un servidor SMTP de la
+red local: éste admite peticiones desde la red interna y tienes configurado
+el cortafuegos de forma que redirija el tráfico SMTP hacia el servidor. Lo que
+has creado en la práctica es un servidor SMTP "universal" [en inglés se llama
+"open relay SMTP server", es decir, un servidor de correo que acepta servir
+mensajes que no ha escrito ningún usuario local, ni van destinados a ningún
+usuario local], ¡con un registro de eventos horroroso!
+     </para>
+
+     <para>
+Así pues, será mejor que resuelvas estos problemas configurando un servidor
+DNS distinto y separado para tu red local, o creando una "zona desmilitarizada"
+(DeMilitarized Zone, DMZ) separada de la red interna. Esta última opción es la
+preferida, si es que tienes el dinero necesario para éllo.
+     </para>
+    </warning>
+
+    <para>
+¿Crees que ya está todo solucionado? Bueno, por ahora sí, salvo que consideres
+un último aspecto dentro de todo este cuadro. ¿Qué pasaría si el cortafuegos
+intenta acceder al servidor <systemitem>HTTP</systemitem>? ¿Dónde irá a parar?
+Como puede suponerse, intentará acceder a su propio servidor <systemitem>HTTP</systemitem>
+y no al servidor que hay en <command>$HTTP_IP</command>. Para corregir este
+problema necesitamos añadir una regla <command>DNAT</command> más a la cadena
+<systemitem>OUTPUT</systemitem>. Siguiendo con el ejemplo anterior, la regla
+podría quedar así:
+    </para>
+
+    <screen>
+<command>
+iptables -t nat -A OUTPUT --dst $INET_IP -p tcp --dport 80 -j DNAT \ --to-destination $HTTP_IP
+</command>
+    </screen>
+
+    <para>
+Con esta última regla todo debería funcionar perfectamente: todas aquellas
+redes que no pertenezcan a la misma red del servidor <systemitem>HTTP</systemitem>
+funcionarán como la seda; todos los hosts de la misma red del servidor
+<systemitem>HTTP</systemitem> podrán conectar sin tropiezos; por último, el
+cortafuegos será capaz de efectuar conexiones por sí mismo. Todo funciona bien
+y no tiene por qué haber ningún tipo de problema.
+    </para>
+
+    <note>
+     <para>
+Cabe destacar que estas reglas sólo controlan cómo se efectúan las traducciones
+<systemitem>DNAT</systemitem> y <systemitem>SNAT</systemitem>. Por éllo, quizá
+necesites otras reglas en la tabla "filter" (en la cadena <systemitem>FORWARD</systemitem>)
+para que los paquetes puedan atravesar el resto de cadenas. No olvides que todos
+los paquetes han pasado primero por la cadena <systemitem>PREROUTING</systemitem>
+y pueden haber cambiado sus direcciones de destino debido al <systemitem>DNAT</systemitem>
+de esta última cadena.
+     </para>
+    </note>
+
+   </section>
+
+   <section id="droptarget">
+    <title id="droptarget.title">Objetivo DROP</title>
+
+    <para>
+El objetivo <command>DROP</command> (desechar) hace precisamente éso: desechar o
+"tirar" paquetes y no gastar ni ún segundo más de trabajo del procesador en
+éllos. Un paquete que llegue a una regla, coincida exactamente con el patrón de
+búsqueda de la comparación y sea desechado, será inmediatamente bloqueado. Ten
+en cuenta que esta acción puede llegar a tener en determinadas ocasiones un
+efecto no deseado, ya que puede dejar sockets (conexiones host-hardware)
+"muertos" en cualquier host. Una solución más acertada, cuando se puedan dar
+estas circunstancias, es usar el objetivo <command>REJECT</command> (rechazar),
+especialmente si quieres impedir que los escáners de puertos recojan demasiada
+información privada, como qué puertos tienes filtrados y otros detalles.
+Volviendo al objetivo, si se efectúa la acción <command>DROP</command> a un
+paquete dentro de una subcadena, este paquete ya no será procesado en ninguna de
+las cadenas principales de ninguna tabla: el paquete estará "muerto" de
+inmediato y, como ya se ha dicho antes, el objetivo no enviará ninguna
+información en ninguna dirección, ni siquiera a intermediarios como los routers
+(se puede decir que a partir de la acción de desechar el paquete es como si éste
+nunca hubiera existido).
+    </para>
+
+   </section>
+
+   <section id="logtarget">
+    <title id="logtarget.title">Objetivo LOG</title>
+
+    <para>
+El objetivo <command>LOG</command> se ha diseñado especialmente para registrar
+información detallada sobre los paquetes. Ésto podría considerarse ilegal, o
+simplemente como una forma de buscar defectos y fallos. Este objetivo ofrece
+información específica sobre los paquetes, como la mayoría de las cabeceras IP
+y otros datos considerados interesantes. Ésto se consigue a través del servicio
+de registro del núcleo, normalmente <command>syslogd</command>, y puede ser
+leída directamente con los registros de <command>dmesg</command>, o bien
+mediante otros programas. Es un objetivo excelente para depurar y afinar tus
+conjuntos de reglas, puesto que puedes ver qué paquetes van dónde y qué reglas
+se aplican en qué paquetes. También puede ser una gran idea usar el objetivo
+<command>LOG</command> en lugar del objetivo <command>DROP</command> mientras
+estás testeando una regla de la que no estás seguro al 100% en un cortafuegos
+en servicio que esté usando más gente, pues un error en el conjunto de reglas
+puede causar problemas severos de conectividad a todos los usuarios. Y si estás
+generando un registro realmente extenso, puede que encuentres interesante el
+objetivo <command>ULOG</command>, ya que puede escribir los registros
+directamente en bases de datos como las de <systemitem>MySQL</systemitem>.
+    </para>
+
+    <note>
+     <para>
+Si obtienes registros de eventos directamente en pantalla y no es éso lo que
+quieres, no busques el problema en <command>iptables</command> o en
+<systemitem>Netfilter</systemitem>, sinó más bien en la configuración de tu
+<command>syslogd</command> (lo más probable es que el problema esté en el
+fichero <filename>/etc/syslog.conf</filename>). Para información sobre este
+tipo de problema, repásate la ayuda escribiendo en la línea de comando:
+<command>man syslog.conf</command>.
+     </para>
+    </note>
+
+    <para>
+El objetivo <command>LOG</command> hoy por hoy tiene 5 opciones que pueden ser
+interesantes si necesitas información específica, o si quieres establecer
+diferentes opciones con valores específicos. Las explicamos a continuación.
+    </para>
+
+    <table frame=all id="table.logtarget">
+     <title id="table.logtarget.title">Opciones del objetivo LOG</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+
+       <row>
+        <entry>Opción</entry>
+        <entry><command>--log-level</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A FORWARD -p tcp -j LOG --log-level debug</command>
+        </entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Esta es la opción con la que le indicas a <command>iptables</command>
+        y a <command>syslog</command> qué nivel de registro utilizar. Para ver
+        una lista completa de niveles de registro, léete el manual de
+        <filename>syslog.conf</filename>. Normalmente se presentan los
+        siguientes niveles de registro (o prioridades, como normalmente se les suele
+        llamar): <systemitem>debug</systemitem>, <systemitem>info</systemitem>,
+        <systemitem>notice</systemitem>, <systemitem>warning</systemitem>,
+        <systemitem>warn</systemitem>, <systemitem>err</systemitem>,
+        <systemitem>error</systemitem>, <systemitem>crit</systemitem>,
+        <systemitem>alert</systemitem>, <systemitem>emerg</systemitem> y
+        <systemitem>panic</systemitem>. El nivel <systemitem>error</systemitem>
+        es el mismo que <systemitem>err</systemitem>, <systemitem>warn</systemitem>
+        es lo mismo que <systemitem>warning</systemitem> y <systemitem>panic</systemitem>
+        es lo mismo que <systemitem>emerg</systemitem>. Sin embargo la primera
+        opción de cada pareja se considera obsoleta y está condenada a
+        desaparecer, por lo que no uses <systemitem>error</systemitem>,
+        <systemitem>warn</systemitem> ni <systemitem>panic</systemitem>. La
+        prioridad define la severidad del mensaje registrado. Todos los
+        mensajes se registran a través del servicio ofrecido por el núcleo. O
+        sea que escribiendo <command>kern.=info /var/log/iptables</command>
+        en tu fichero <filename>syslog.conf</filename> y dejando a continuación
+        que todos tus mensajes de <command>LOG</command> de <command>iptables</command>
+        usen el nivel de información de registro (info), causará que todos los mensajes
+        aparezcan en el fichero <filename>/var/log/iptables</filename>. Recuerda
+        que también pueden haber otros mensajes de otras partes del núcleo que
+        utilicen la prioridad de información. Si quieres conocer más detalles
+        acerca del registro, te recomiendo que leas los manuales de
+        <command>syslog</command> y <filename>syslog.conf</filename>, así como
+        otros COMOs (HOWTOs) y ayudas publicadas en Internet.
+        </entry>
+       </row>
+
+       <row>
+        <entry>Opción</entry>
+        <entry><command>--log-prefix</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A INPUT -p tcp -j LOG --log-prefix "INPUT packets"</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Esta opción le dice a <command>iptables</command> que añada un
+        prefijo específico a todos los mensajes del registro, lo cual es útil
+        al emplear aplicaciones como <command>grep</command> para efectuar un
+        seguimiento de problemas específicos y de registros generados por
+        diferentes reglas. El prefijo puede tener hasta 29 caracteres,
+        incluyendo espacios en blanco y otros caracteres especiales.
+        </entry>
+       </row>
+
+       <row>
+        <entry>Opción</entry>
+        <entry><command>--log-tcp-sequence</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A INPUT -p tcp -j LOG --log-tcp-sequence</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Esta opción añadirá los números de la <systemitem>Secuencia TCP</systemitem>
+        (<systemitem>TCP Sequence</systemitem>) a cada mensaje registrado. El
+        número de la <systemitem>Secuencia TCP</systemitem> es un número
+        especial que identifica a cada paquete e indica dónde encaja dentro de una
+        <systemitem>secuencia TCP</systemitem>, además de cómo debe ser
+        reensamblado un flujo. Ten en cuenta que esta opción constituye un
+        riesgo de seguridad si los registros pueden ser leídos por usuarios no
+        autorizados o hasta por el resto del mundo. De la misma forma es un
+        riesgo el acceso no autorizado a cualquier registro que contenga datos generados por
+        <command>iptables</command>.
+        </entry>
+       </row>
+
+       <row>
+        <entry>Opción</entry>
+        <entry><command>--log-tcp-options</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A FORWARD -p tcp -j LOG --log-tcp-options</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Esta opción registra las diferentes opciones presentes en las
+        cabeceras de los paquetes <systemitem>TCP</systemitem> y puede ser útil
+        cuando se intentan depurar los fallos o lo que pudiera llegar a ir mal.
+        La opción no tiene ninguna variable ni nada parecido, como le
+        ocurre a la mayoría de opciones de <command>LOG</command>.
+        </entry>
+       </row>
+
+       <row>
+        <entry>Opción</entry>
+        <entry><command>--log-ip-options</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A FORWARD -p tcp -j LOG --log-ip-options</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Con la opción <command>--log-ip-options</command> registraremos
+        la mayoría de opciones presentes en las cabeceras de los paquetes IP.
+        Trabaja exactamente igual que la opción <command>--log-tcp-options</command>,
+        salvo porque trabaja sobre las opciones IP. Ésto puede ser útil al
+        tratar de depurar o perseguir determinados delincuentes, además de para
+        corregir errores (de la misma forma que la anterior opción).
+        </entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section id="marktarget">
+    <title id="marktarget.title">Objetivo MARK</title>
+
+     <para>
+El objetivo <command>MARK</command> se usa para establecer marcas (marks) de
+<command>Netfilter</command> asociadas a paquetes específicos. Este objetivo
+sólo es válido en la tabla <systemitem>mangle</systemitem> y no funcionará
+fuera de élla. Los valores de las marcas pueden usarse conjuntamente con las
+capacidades de enrutado avanzado de Linux, de forma que se envíen diferentes
+paquetes por diferentes rutas y que se les pueda indicar que usen diferentes disciplinas para
+hacer cola (qdisc), ... Para mayor información acerca del enrutado avanzado,
+pásate por <link linkend="lartc" endterm="lartc.title"></link>. Ten en cuenta
+que el valor de la marca no se establece en el paquete mismo, sinó que es un
+valor asociado al paquete dentro del núcleo. Dicho de otro modo: no puedes
+esperar que estableciendo una "<command>MARK</command>a" en un paquete, ese
+valor permanezca en otro host. Si es éso lo que buscas, mejor mira en el
+objetivo <command>TOS</command>, que modificará el <systemitem>valor TOS</systemitem>
+de la cabecera IP.
+     </para>
+
+
+
+    <table frame=all id="table.marktarget">
+     <title id="table.marktarget.title">Opciones del objetivo MARK</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+
+       <row>
+        <entry>Opción</entry>
+        <entry><command>--set-mark</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -t mangle -A PREROUTING -p tcp --dport 22 -j MARK --set-mark 2</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>La opción <command>--set-mark</command> se necesita para
+        establecer una marca, que tomará un valor entero. Por ejemplo, podemos
+        establecer una marca con un valor "2" en un flujo específico de paquetes,
+        o en todos los paquetes de un host específico, y efectuar un enrutado
+        avanzado sobre ese flujo/host para incrementar o disminuir el ancho de banda
+        de la red, ...
+        </entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section id="masqueradetarget">
+    <title id="masqueradetarget.title">Objetivo MASQUERADE</title>
+
+    <para>
+El objetivo <command>MASQUERADE</command> se usa básicamente de la misma forma
+que el objetivo <command>SNAT</command>, pero sin requerir ninguna opción
+<command>--to-source</command>. La razón es que el objetivo <command>MASQUERADE</command>
+se creó para trabajar, por ej., con conexiones telefónicas estándar (dial-up),
+o con conexiones <systemitem>DHCP</systemitem>, que obtienen direcciones IP
+dinámicas al conectar a la red en cuestión. Ésto quiere decir que sólo debes
+usar el objetivo <command>MASQUERADE</command> con conexiones IP asignadas
+dinámicamente, en las que antes de conectar con el ISP no sabemos la dirección que tendremos. Si tienes una
+conexión IP estática, debes emplear el objetivo <command>SNAT</command> en su
+lugar.
+    </para>
+
+    <para>
+Enmascarar una conexión significa que estableces la dirección IP
+utilizada por una tarjeta de red específica, en lugar de utilizar la opción
+<command>--to-source</command>, por lo que la dirección IP se obtiene
+automáticamente de la información de la tarjeta específica. El objetivo
+<command>MASQUERADE</command> también tiene la particularidad de que
+las conexiones se olvidan, se pierden, cuando una interfaz se viene abajo (o
+como se suele decir, "se cuelga"), lo cual es extremadamente bueno si "matamos"
+una interfaz específica. En este caso, si hubiéramos utilizado el objetivo
+<command>SNAT</command>, podríamos haber llegado a tener un montón de datos
+viejos de seguimiento de conexión, que podrían haber estado "flotando" por la
+memoria durante días, devorando casi toda la memoria de seguimiento de
+conexiones. Así pues el enmascaramiento es, en general, la opción adecuada al
+trabajar con líneas telefónicas estándar, dónde probablemente se nos asignará
+una IP diferente cada vez que conectemos. En estos casos al desconectar la conexión se pierde
+totalmente, puesto que se nos asigna una IP diferente al reconectar, por lo que
+resulta bastante tonto mantener las entradas existentes del seguimiento de conexiones.
+    </para>
+
+    <para>
+A pesar de todo, es posible usar el objetivo <command>MASQUERADE</command> en
+lugar del <command>SNAT</command> aunque tengas una IP estática, si bien no
+es conveniente puesto que genera un gasto extra de recursos y pueden haber
+futuras inconsistencias que desbaratarán tus scripts y los harán "inútiles".
+    </para>
+
+    <para>
+Recuerda que el objetivo <command>MASQUERADE</command> sólo es válido en la
+cadena <systemitem>POSTROUTING</systemitem> de la tabla nat, igual que el
+objetivo <command>SNAT</command>. Además, el objetivo <command>MASQUERADE</command>
+acepta una opción, aunque ésta sea opcional.
+    </para>
+
+    <table frame=all id="table.masqueradetarget">
+     <title id="table.masqueradetarget.title">Objetivo MASQUERADE</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+
+       <row>
+        <entry>Opción</entry>
+        <entry><command>--to-ports</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -t nat -A POSTROUTING -p TCP -j MASQUERADE --to-ports 1024-31000</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>La opción <command>--to-ports</command> se utiliza para
+        establecer el puerto o puertos origen de los paquetes salientes. Puedes
+        especificar un solo puerto, como en <command>--to-ports 1025</command>,
+        o puedes especificar un rango de puertos, como en
+        <command>--to-ports 1024-3000</command> (con los puertos inicial y final
+        del rango separados por un guión). Esta forma de indicarlo difiere de
+        la selección por defecto de SNAT, tal como se describe en <link
+        linkend="snattarget" endterm="snattarget.title"></link>. La opción
+        <command>--to-ports</command> sólo es válida si en la regla se
+        especifican los protocolos TCP o UDP mediante la comparación
+        <command>--protocol</command>.</entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+
+   <section id="mirrortarget">
+    <title id="mirrortarget.title">Objetivo MIRROR</title>
+
+    <para>
+El objetivo <command>MIRROR</command> es únicamente experimental y de
+demostración, por lo que estás avisado para no utilizarlo: puede dar como
+resultado bucles infinitos (entre otras lindezas) que desemboquen en serias
+Denegaciones de Servicio (Denial of Service, DoS). Este objetivo se emplea
+para invertir los campos de origen y destino en la cabecera <systemitem>IP</systemitem>
+y después retransmitir el paquete. Esto puede crear efectos
+realmente divertidos y apuesto a que gracias a este objetivo más de un
+endemoniado cracker ha penetrado en su propio ordenador. El resultado de
+utilizar este objetivo es simple, por decirlo de alguna manera: digamos que
+establecemos un objetivo <command>MIRROR</command> para el puerto 80 del
+ordenador A y el host B (que proviene de yahoo.com) quiere acceder al servidor
+<systemitem>HTTP</systemitem> del host A; en estas condiciones el objetivo
+<command>MIRROR</command> devolverá al host de yahoo la página web de su propio
+servidor <systemitem>HTTP</systemitem> en Yahoo.com.
+    </para>
+
+    <para>
+Debes tener en cuenta que el objetivo <command>MIRROR</command> sólo es válido
+cuando se utiliza en las cadenas <systemitem>INPUT</systemitem>,
+<systemitem>FORWARD</systemitem> y <systemitem>PREROUTING</systemitem>, así como
+en aquellas cadenas definidas por uno mismo y que sean llamadas desde alguna de
+las anteriores cadenas. Además, los paquetes salientes derivados de este
+objetivo no pasan por ninguna de las cadenas normales de las tablas filter, nat
+o mangle, lo que puede dar lugar a bucles infinitos y un rosario de problemas
+que pueden derivar en dolores de cabeza imprevistos. Por ejemplo, un host puede
+enviar un paquete camuflado (spoofed) con un <command>TTL</command> de 255 a otro host que utilice el objetivo
+<command>MIRROR</command>, de forma que
+parezca que el paquete viene de un tercer host que también usa el objetivo <command>MIRROR</command>;
+como consecuencia el paquete irá y volverá de un extremo al otro incesantemente,
+hasta que se completen el número de saltos (hops) definidos; si sólo hay un
+salto entre hosts, el paquete irá y vendrá 240-255 veces (no está mal para un
+cracker, pues enviando 1,5 kbytes de datos será capaz de consumir 380 kbytes de
+la conexión; siempre teniendo en cuenta que éste sería el mejor resultado para
+el cracker, script kiddie, novato, o como quiera llamársele).
+    </para>
+
+   </section>
+
+   <section id="queuetarget">
+    <title id="queuetarget.title">Objetivo QUEUE</title>
+
+    <para>
+El objetivo <command>QUEUE</command> se emplea para poner en cola los paquetes
+dirigidos a programas y aplicaciones del Espacio de Usuario. Se usa con
+programas o utilidades que son externos a iptables y puede utilizarse, por ej.,
+en contabilidad de red, o con aplicaciones específicas y avanzadas que filtren
+o den servicios de caché (proxy) a los paquetes. No desarrollaremos este
+objetivo en profundidad, puesto que la programación de esas aplicaciones excede
+los objetivos de este tutorial: para empezar costaría mucho tiempo y además
+esa documentación no tendría nada que ver con la programación de Netfilter e
+iptables; todo ésto debería estar perfectamente descrito en "<link
+linkend="netfilterhackinghowto">COMO Programar Netfilter</link>" (<link
+linkend="netfilterhackinghowto">Netfilter Hacking HOW-TO</link>).
+    </para>
+
+   </section>
+
+   <section id="redirecttarget">
+    <title id="redirecttarget.title">Objetivo REDIRECT</title>
+
+    <para>
+El objetivo <command>REDIRECT</command> sirve para redirigir paquetes y flujos
+hacia la máquina. Ésto quiere decir que podemos redirigir todos los paquetes
+destinados a los puertos <systemitem>HTTP</systemitem> hacia un
+<systemitem>caché HTTP</systemitem> como squid, o hacia nuestro host. Los
+paquetes generados localmente son "mapeados" a la dirección 127.0.0.1, o lo que
+es lo mismo, se reescribe la dirección de destino con la de nuestro host en los
+paquetes que son reenviados o acciones similares. El objetivo <command>REDIRECT</command>
+es extremadamente recomendable si queremos un servicio de caché transparente,
+donde los hosts de la red local ni siquiera advierten que existe un caché
+(proxy).
+    </para>
+
+    <para>
+Como viene siendo habitual, este objetivo sólo funciona en determinadas cadenas,
+que en este caso son <systemitem>PREROUTING</systemitem> y <systemitem>OUTPUT</systemitem>,
+ambas de la tabla nat. Asímismo, también es válido en cualquier cadena creada
+por el usuario, siempre que sea llamada por una de las anteriores cadenas. Y en
+cuanto a las posibles opciones, se reducen a una.
+    </para>
+
+    <table frame=all id="table.redirecttarget">
+     <title id="table.redirecttarget.title">Objetivo REDIRECT</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+
+       <row>
+        <entry>Opción</entry>
+        <entry><command>--to-ports</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 8080</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>La opción <command>--to-ports</command> especifica el puerto o
+        rango de puertos de destino que se debe usar. Sin esta opción, el
+        puerto de destino nunca se modifica. Si deseamos especificar un solo
+        puerto, escribiremos <command>--to-ports 8080</command>, mientras que
+        si deseamos un rango de puertos escribiremos <command>--to-ports
+        8080-8090</command>; en este último caso le estamos indicando al
+        objetivo <command>REDIRECT</command> que redirija los paquetes a los
+        puertos comprendidos entre el 8080 y el 8090. Como supondrás, esta
+        opción sólo está disponible en aquellas reglas que especifiquen el
+        protocolo <systemitem>TCP</systemitem> o bien el <systemitem>UDP</systemitem>
+        con la comparación <command>--protocol</command>, puesto que no tendría
+        sentido en ningún otro lugar.</entry>
+      </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section id="rejecttarget">
+    <title id="rejecttarget.title">Objetivo REJECT</title>
+    <para>
+El objetivo <command>REJECT</command> (rechazar) funciona básicamente igual que
+el objetivo <command>DROP</command>, aunque en este caso sí que se devuelve un
+mensaje de error al host que envió el paquete bloqueado. El objetivo
+<command>REJECT</command>, hoy por hoy, sólo es válido en las cadenas
+<systemitem>INPUT</systemitem>, <systemitem>FORWARD</systemitem> y
+<systemitem>OUTPUT</systemitem> o sus "sub-cadenas"; después de todo, son las
+únicas cadenas donde tiene sentido utilizar este objetivo. De momento sólo hay
+una opción que modifique su forma de trabajar, pero en cambio tiene un montón de
+variables dónde escoger (la mayoría son fáciles de entender, siempre que tengas
+un conocimiento básico sobre <systemitem>TCP/IP</systemitem>).
+     </para>
+
+    <table frame=all id="table.rejecttarget">
+     <title id="table.rejecttarget.title">Objetivo REJECT</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+
+       <row>
+        <entry>Opción</entry>
+        <entry><command>--reject-with</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A FORWARD -p TCP --dport 22 -j REJECT --reject-with tcp-reset</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Esta opción le indica a <command>REJECT</command> qué respuesta
+        devolver al host que envía el paquete que estamos rechazando. Una vez
+        tenemos un paquete que coincide con la comparación de una regla en la
+        que hemos especificado este objetivo, lo primero que hara nuestro host
+        es enviar la respuesta asociada y entonces se desechará el paquete, tal
+        como lo desecharía el objetivo <command>DROP</command>. Hoy por hoy
+        tenemos disponibles los siguientes tipos de rechazo:
+        <computeroutput>icmp-net-unreachable</computeroutput>,
+        <computeroutput>icmp-host-unreachable</computeroutput>,
+        <computeroutput>icmp-port-unreachable</computeroutput>,
+        <computeroutput>icmp-proto-unreachable</computeroutput>,
+        <computeroutput>icmp-net-prohibited</computeroutput> y
+        <computeroutput>icmp-host-prohibited</computeroutput>. El mensaje de
+        error por defecto que se devuelve al host es <command>port-unreachable</command>.
+        Todos los mensajes anteriores son <systemitem>mensajes de error ICMP</systemitem>
+        y pueden definirse a tu gusto. Puedes encontrar información acerca de
+        sus variados propósitos en el apéndice <link linkend="icmptypes" endterm="icmptypes.title"></link>.
+        También tenemos la opción <command>echo-reply</command>, aunque sólo se
+        puede usar con reglas que capten paquetes <systemitem>ICMP ping</systemitem>
+        [cuando el host A hace "ping" sobre el host B, lo que intenta saber es
+        si B está disponible, si (en principio) podría contactar con él]. Por
+        último hay una opción más llamada <command>tcp-reset</command>, que
+        sólo puede usarse junto al protocolo <systemitem>TCP</systemitem>. Esta
+        opción le dice a <command>REJECT</command> que envíe un paquete
+        <systemitem>TCP RST</systemitem> como respuesta. Los paquetes
+        <systemitem>TCP RST</systemitem> se emplean para cerrar de una forma
+        elegante conexiones <systemitem>TCP</systemitem> abiertas. Si quieres
+        saber más sobre <systemitem>TCP RST</systemitem> léete este documento:
+        <link linkend="rfc793" endterm="rfc793.title"></link>. Tal como se
+        describe en el manual de <command>iptables</command> (<command>man
+        iptables</command>), el principal uso de esta opción es bloquear
+        sondeos (pruebas) de identificación, cosa que ocurre frecuentemente al
+        enviar correo a servidores de correo mal configurados, que de otra forma
+        no aceptarán tu correo.
+        </entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section id="returntarget">
+    <title id="returntarget.title">Objetivo RETURN</title>
+
+    <para>
+El objetivo <command>RETURN</command> hará que el paquete que está atravesando
+una cadena pare allí donde se encuentre con el objetivo; si está en una
+"sub-cadena", el paquete continuará atravesando la cadena superior desde donde
+la dejó; si, por el contrario, es una cadena principal (tal como la cadena
+<systemitem>INPUT</systemitem>), se ejecutará la política por defecto sobre el
+paquete. La política por defecto normalmente está definida como <command>ACCEPT</command>,
+<command>DROP</command> o algo similar.
+     </para>
+
+     <para>
+Por ejemplo, un paquete entra en la cadena INPUT y llega a una regla en la que
+coincide con su comparación y que tiene definida la acción <command>--jump
+CADENA_DE_EJEMPLO</command> como objetivo; como consecuencia el paquete empezará a
+atravesar la <command>CADENA_DE_EJEMPLO</command> hasta que llegue a una regla
+donde coincida con la comparación y cuyo objetivo sea <command>--jump RETURN</command>;
+entonces volverá a la cadena <systemitem>INPUT</systemitem> y seguirá desde la
+regla siguiente a la que produjo el salto. Otro ejemplo sería que el paquete
+llegara a una regla de la cadena <systemitem>INPUT</systemitem> y se le
+aplicara la acción <command>--jump RETURN</command>, a consecuencia de lo cual se le
+aplicaría inmediatamente la política por defecto y abandonaría esta cadena, para seguir por el resto de cadenas de la tabla, si las hay.
+    </para>
+
+   </section>
+
+   <section id="snattarget">
+    <title id="snattarget.title">Objetivo SNAT</title>
+
+    <para>
+El objetivo <command>SNAT</command> se emplea para efectuar las traducciones
+de dirección de red de origen (<systemitem>Source Network Address Translation</systemitem>),
+lo cual implica que este objetivo reescribirá la dirección IP de origen en la
+cabecera IP del paquete (ésto es deseable cuando varios hosts tienen que
+compartir una conexión a Internet). Así pues, podemos activar el reenvío de
+paquetes IP a nivel de núcleo y escribir una regla <command>SNAT</command> que
+cambiará la dirección <command>IP de origen</command> de todos los paquetes
+que salgan de la red local, por la dirección <command>IP de origen</command> de
+nuestra conexión a Internet. Si no se efectuara esta traducción, el mundo
+exterior no sabría dónde enviar los paquetes de respuesta, puesto que la mayoría
+de las redes internas utilizan las direcciones IP especificadas por el IANA para
+las redes locales. Si los paquetes llegaran tal cual, nadie sabría quién los ha
+enviado. El objetivo <command>SNAT</command> efectúa todas las traducciones
+necesarias para llevar a cabo esa tarea, haciendo que todos los paquetes que
+salgan de la red local parezca que salen de un host concreto (por ej. el
+cortafuegos).
+    </para>
+
+    <para>
+El objetivo <command>SNAT</command> sólo es válido en la tabla nat y dentro de
+la cadena <systemitem>POSTROUTING</systemitem>. Sólo el primer paquete de una
+conexión es modificado por <command>SNAT</command>, después del cual todos los
+paquetes pertenecientes a la misma conexión serán modificados de la misma manera
+que el primero: el primer paquete llega al cortafuegos y entra en la tabla nat,
+dónde pasa en primer lugar por la cadena PREROUTING y se le modifica la
+dirección de destino con DNAT; a continución llega a la cadena POSTROUTING y
+se le modifica la dirección de origen con SNAT; después sigue su curso a través
+del resto de tablas, cadenas y reglas; en cambio el segundo y siguientes
+paquetes del mismo flujo ni siquiera tocan la tabla nat, sinó que se les aplican
+directamente las mismas traducciones que al primer paquete. Entre otras razones,
+es por esta forma de trabajar de la tabla nat por lo que no se recomienda
+filtrar en élla.
+    </para>
+
+
+    <table frame=all id="table.snattarget">
+     <title id="table.snattarget.title">Objetivo SNAT</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+
+       <row>
+        <entry>Opción</entry>
+        <entry><command>--to-source</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -t nat -A POSTROUTING -p tcp -o eth0 -j
+        SNAT --to-source 194.236.50.155-194.236.50.160:1024-32000</command>
+        </entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>La opción <command>--to-source</command> se emplea para
+        especificar qué dirección origen debe utilizar el paquete. La forma más
+        simple de usar esta opción es indicar la dirección IP que deseamos
+        utilizar como dirección <command>IP de origen</command> en las
+        <command>cabeceras IP</command>. Si desearamos balancear la carga entre
+        varias direcciones IP, podemos utilizar un rango separado por un guión.
+        En el caso del ejemplo anterior el rango se presenta como:
+        194.236.50.155-194.236.50.160. Considerando este rango, la dirección
+        IP de origen de cada flujo que creemos será asignada aleatoriamente
+        a cualquier dirección de las que comprenda el rango y todos los paquetes
+        de cada flujo particular usarán siempre la misma IP; es decir, en el
+        momento de abrir una conexión se crea un flujo de datos al que se le
+        asignará una dirección IP de origen del rango y todos los paquetes de
+        ese flujo tendrán la misma dirección IP de origen; cuando se cree otro
+        flujo se le asignará otra IP que compartirán todos los paquetes del
+        flujo. También podemos especificar a <command>SNAT</command> un rango
+        de puertos, con lo cual todos los puertos de origen serán confinados a
+        los puertos indicados. En el ejemplo anterior esta característica se
+        indica mediante un rango después de "dos puntos", es decir, ":1024-32000".
+        Pero todo ésto sólo es válido si en alguna parte de la comparación se
+        ha especificado -p tcp o -p udp. Además, iptables siempre intentará
+        evitar la alteración de un puerto, pero si dos hosts intentan usar los
+        mismos puertos, iptables le asignará otro puerto a uno de ellos. Si no se
+        especifica ningún rango de puertos, entonces todos los puertos por
+        debajo del 512 se asignarán a otros puertos por debajo del 512 (siempre
+        que sea necesario, claro). De la misma manera, todos los que estén entre
+        los puertos 512 y 1023 serán asignados a puertos por debajo del 1024.
+        Al resto de puertos se les asignará un valor de 1024 o superior. Tal
+        como ya se ha dicho, iptables intentará mantener el puerto origen usado
+        por la estación de trabajo que crea la conexión. Además, fíjate que
+        todo ésto no hace referencia en ningún momento a los puertos de destino,
+        por lo que si un cliente intenta establecer contacto con un servidor
+        <command>HTTP</command> que está fuera del cortafuegos, no se le
+        asignará al puerto <command>FTP control</command>.</entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section id="tostarget">
+    <title id="tostarget.title">Objetivo TOS</title>
+
+    <para>
+El objetivo <command>TOS</command> se emplea para establecer el campo
+<systemitem>Tipo de Servicio</systemitem> (<systemitem>Type of Service</systemitem>)
+de la cabecera IP. Este campo tiene un tamaño de 8 bits y se usa para ayudar a
+direccionar (enrutar) los paquetes. Éste es uno de los campos que pueden usarse
+directamente en <command>iproute2</command> y su subsistema de políticas de
+enrutado. Vale la pena destacar que si controlas varios cortafuegos y
+enrutadores separados, ésta es la única manera de difundir información de
+encaminamiento (enrutado) junto a los paquetes que circulan entre esos
+enrutadores y cortafuegos. Como ya se ha comentado, el objetivo <command>MARK</command>
+(que establece una "<command>MARKa</command>" asociada a un paquete específico)
+sólo está disponible dentro del núcleo y no se puede enviar junto con el paquete.
+Si necesitas enviar información de enrutado con un paquete o flujo específicos,
+debes recurrir al <systemitem>campo TOS</systemitem>, pues se diseñó para éso.
+    </para>
+
+    <para>
+En la actualidad hay muchos enrutadores en Internet que trabajan muy mal con
+este tema, por lo que puede ser bastante inútil intentar modificar el campo
+<systemitem>TOS</systemitem> antes de enviar los paquetes a Internet. Como
+mucho los enrutadores no prestarán atención al <systemitem>campo TOS</systemitem>.
+En el peor de los casos, lo leerán y harán alguna cosa incorrecta. Sin embargo,
+tal como se ha dicho antes, el <systemitem>campo TOS</systemitem> puede ser
+muy útil si tienes una <systemitem>WAN</systemitem> (Red de Área Extensa) o una
+<systemitem>LAN</systemitem> (Red de Área Local) de dimensiones respetables y
+con múltiples enrutadores. De hecho tienes la posibilidad de darle a los
+paquetes diferentes encaminamientos y preferencias, basándote en el valor de
+su <systemitem>TOS</systemitem> (aunque ésto sólo puedas tenerlo bajo control en tu propia red).
+    </para>
+
+    <caution>
+     <para>
+El objetivo <command>TOS</command> sólo es capaz de establecer valores o nombres
+específicos a los paquetes. Estos valores predefinidos se pueden
+encontrar en los archivos del "kernel include" (ficheros de código fuente del
+núcleo), o más exactamente en el archivo <filename>Linux/ip.h</filename>. Las
+razones son muchas y de hecho no deberías necesitar ningún otro valor; sin
+embargo, hay formas de superar esta limitación: para evitar la limitación de
+sólo poder establecer valores nominales (con nombres) a los paquetes, puedes
+usar el parche FTOS disponible en <link linkend="paksecured" endterm="paksecured.title"></link>,
+web mantenida por Matthew G. Marsh; sin embargo, ¡sé extremadamente cauteloso
+con este parche!, pues nunca deberías tener la necesidad de utilizar ningún valor aparte de los
+valores por defecto, a excepción de casos extremos.
+     </para>
+    </caution>
+
+    <note>
+     <para>
+Ten en cuenta que este objetivo sólo es válido dentro de la tabla
+<systemitem>mangle</systemitem> y no puede usarse fuera de élla.
+    </para>
+   </note>
+
+   <note>
+    <para>
+También es importante que entiendas que algunas viejas versiones de iptables
+(1.2.2 o anteriores) proporcionan una implementación incompleta de este
+objetivo y no corrigen la suma de comprobación (checksum) del paquete a la hora
+de modificarlo, por lo que generan mal los paquetes y como resultado necesitan
+una retransmisión. Ésto lo más probable es que obligue a una nueva modificación
+y con éllo que el ciclo vuelva a empezar, dando como resultado que la conexión
+nunca funcione.
+    </para>
+   </note>
+
+    <para>
+El objetivo <command>TOS</command> sólo tiene la opción que explico a
+continuación.
+    </para>
+
+    <table frame=all id="table.tostarget">
+     <title id="table.tostarget.title">Objetivo TOS</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+
+       <row>
+        <entry>Opción</entry>
+        <entry><command>--set-tos</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -t mangle -A PREROUTING -p TCP --dport 22 -j
+        TOS --set-tos 0x10</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Esta opción le dice al procedimiento de modificación <command>TOS</command>
+        qué valor establecer en los paquetes que coincidan con el filtro. Este
+        valor es numérico (hexadecimal o decimal). Como el
+        valor <systemitem>TOS</systemitem> tiene 8 bits, el número estará
+        comprendido entre 0 y 255 (en hexadecimal entre 0x00 y 0xFF). Recuerda
+        que en el objetivo TOS estándar estás limitado a los valores nominales
+        (con nombre) disponibles, que deberían estar más o menos estandarizados.
+        Estos valores estándar son: <computeroutput>Minimize-Delay</computeroutput>
+        [minimizar el retardo] (valor decimal/dec 16, valor hexadecimal/hex 0x10),
+        <computeroutput>Maximize-Throughput</computeroutput> [maximizar el
+        rendimiento] (valor dec 8, valor hex 0x08),
+        <computeroutput>Maximize-Reliability</computeroutput> [maximizar la
+        fiabilidad] (valor dec 4, valor hex 0x04),
+        <computeroutput>Minimize-Cost</computeroutput> [minimizar el coste]
+        (valor dec 2, valor hex 0x02) ó <computeroutput>Normal-Service</computeroutput>
+        [servicio normal] (valor dec 0, valor hex 0x00). El valor por defecto
+        en la mayoría de paquetes es <computeroutput>Normal-Service</computeroutput>,
+        ó 0. Además, obviamente puedes utilizar los nombres en lugar de los
+        valores hexadecimales (y viceversa) para establecer el valor
+        <systemitem>TOS</systemitem>; sin embargo, normalmente se recomienda
+        utilizar el nombre, pues los valores asociados con los nombres pueden
+        cambiar en el futuro. Para ver una lista completa de los "valores
+        descriptivos", ejecuta en la línea de comandos:
+        <command>iptables -j TOS -h</command>. Esta lista se considera completa
+        en la versión 1.2.5 de iptables y debería seguir así por un tiempo.</entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section id="ttltarget">
+    <title id="ttltarget.title">Objetivo TTL</title>
+
+    <caution>
+     <para>
+Este objetivo necesita del parche <command>TTL</command> del patch-o-matic,
+en el directorio raíz, en <link linkend="netfilter.org" 
+endterm="netfilter.org.title"></link>.
+     </para>
+    </caution>
+
+    <para>
+El objetivo <command>TTL</command> se usa para modificar el campo
+<systemitem>Time To Live</systemitem> de la cabecera IP. Una aplicación útil
+para ésto puede ser cambiar todos los valores <systemitem>Time To Live</systemitem>
+al mismo valor en todos los paquetes dirigidos al exterior de la red. Una razón
+para necesitar ésto es que tengas un <emphasis>ISP</emphasis> abusivo que no te permita
+tener más de una máquina conectada a la misma conexión de Internet, y que lo
+persiga activamente. Estableciendo todos los valores <command>TTL</command> al
+mismo valor le harás un poco más difícil (al ISP) darse cuenta de lo que estás
+haciendo. Así pues, podemos establecer el valor <command>TTL</command>
+de todos los paquetes de salida a un valor estandarizado, como 64, que es el
+valor estándar del núcleo de Linux.
+    </para>
+
+    <para>
+Para más información sobre cómo establecer el valor por defecto usado por Linux,
+léete el <link linkend="ip-sysctltxt" endterm="ip-sysctltxt.title"></link>,
+que puedes encontrar en el apéndice <link linkend="otherresources"
+endterm="otherresources.title"></link>.
+    </para>
+
+    <para>
+El objetivo <command>TTL</command> sólo es válido en la tabla <systemitem>mangle</systemitem>
+y en ninguna tabla más. De momento tiene 3 opciones que describo a continuación.
+    </para>
+
+    <table frame=all id="table.ttltarget">
+     <title id="table.ttltarget.title">Objetivo TTL</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+
+       <row>
+        <entry>Opción</entry>
+        <entry><command>--ttl-set</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -t mangle -A PREROUTING -i eth0 -j TTL --ttl-set 64</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>La opción <command>--ttl-set</command> le dice al objetivo
+        <command>TTL</command> qué valor <systemitem>TTL</systemitem> establecer
+        en el paquete. Un valor de referencia bastante correcto podría estar
+        alrededor de 64, un valor ni muy alto ni muy bajo. Lo que
+        no debes hacer es establecer un valor demasiado alto, pues puede afectar
+        a tu red local y además resulta un poco inmoral, puesto que el paquete
+        puede empezar a rebotar entre dos enrutadores mal configurados y cuanto
+        más alto sea el <systemitem>TTL</systemitem>, más ancho de banda
+        consumirá innecesariamente en un caso así. Este objetivo puede emplearse
+        para limitar lo alejados que pueden estar nuestros clientes, como por ej.
+        en el caso de los servidores DNS, dónde no queremos que los clientes
+        estén muy lejos.</entry>
+       </row>
+
+       <row>
+        <entry>Opción</entry>
+        <entry><command>--ttl-dec</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -t mangle -A PREROUTING -i eth0 -j TTL --ttl-dec 1</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>La opción <command>--ttl-dec</command> hace que se decremente
+        el tiempo de vida del paquete una cantidad equivalente al valor indicado
+        tras la opción (en el ejemplo, el decremento indicado es de uno).
+        Así pues, si el TTL de un paquete entrante es de 53 y hemos establecido
+        un decremento <command>--ttl-dec 3</command>, el paquete verá reducido
+        su TTL hasta el valor 49. La razón de esta diferencia estriba en que
+        el código de gestión de redes reducirá automáticamente el TTL en un
+        punto, por lo que el paquete sufrirá un decremento de 3+1,
+        desde 53 hasta 49. Mediante este sistema podemos limitar lo alejados que
+        pueden estar los usuarios de nuestros servicios. Por ejemplo, los
+        usuarios siempre deben usar un DNS cercano, y en consecuencia podemos
+        comparar todos los paquetes que dejen nuestro servidor DNS y reducir
+        el TTL en varias unidades. Por supuesto, la opción <command>--set-ttl</command>
+        es más adecuada para este uso.</entry>
+
+       </row>
+
+       <row>
+        <entry>Opción</entry>
+        <entry><command>--ttl-inc</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -t mangle -A PREROUTING -i eth0 -j TTL --ttl-inc 1</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>La opción <command>--ttl-inc</command> es la opuesta a la
+        anterior, es decir, se incrementa el TTL en una cantidad expresada
+        a continuación de la opción. Ten en cuenta que en este caso el código
+        de gestión de redes también actúa automáticamente reduciendo el TTL en
+        1, por lo que si escribimos <command>--ttl-inc 4</command>, un paquete
+        entrante con un <systemitem>TTL</systemitem> de 53 dejará el host con
+        un valor <systemitem>TTL</systemitem> de 56, ésto es, 53+4-1. Con esta
+        opción podemos hacer nuestro cortafuegos un poco más invisible a los
+        trazadores de rutas (traceroutes), entre otras cosas: al establecer el
+        valor <systemitem>TTL</systemitem> de los paquetes entrantes a un valor
+        más alto, conseguimos que el cortafuegos se oculte a los trazadores.
+        Los trazadores de rutas son utilidades amadas y odiadas al mismo tiempo,
+        puesto que facilitan información excelente sobre problemas con las
+        conexiones y dónde ocurren, si bien al mismo tiempo le ofrecen al
+        hacker/cracker que te haya localizado muy buena información sobre tus
+        conexiones con el exterior. Para ver un buen ejemplo de cómo puedes
+        usarlo, mira el script <link linkend="ttl-inctxt" endterm="ttl-inctxt.title"></link>.</entry>
+
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+   </section>
+
+   <section id="ulogtarget">
+    <title id="ulogtarget.title">Objetivo ULOG</title>
+
+    <para>
+Este objetivo se emplea para proporcionar capacidades de registro en el espacio
+de usuario a los paquetes que concuerden. Si un paquete coincide con la
+comparación del filtro (de la regla) y se ha establecido el objetivo
+<command>ULOG</command>, la información del paquete es difundida mediante una
+"multidifusión" (multicast), junto con el paquete entero, a través de una
+conexión virtual de red (netlink socket). A partir de entonces, uno o varios
+procesos de espacio de usuario pueden subscribirse a varios grupos de
+multidifusión y recibir el paquete. Ésta es una capacidad más completa y
+sofisticada de registro que hasta ahora sólo utilizan iptables y Netfilter y
+que tiene mucha más capacidad para el registro de paquetes. Este objetivo nos
+permite registrar información en bases de datos <systemitem>MySQL</systemitem>,
+entre otras, haciendo más fácil la búsqueda de paquetes específicos y el
+agrupamiento de entradas de registro. Puedes encontrar las aplicaciones de
+espacio de usuario de ULOGD en <link linkend="ulogdsite" endterm="ulogdsite.title"></link>.
+    </para>
+
+    <table frame=all id="table.ulogtarget">
+     <title id="table.ulogtarget.title">Objetivo ULOG</title>
+     <tgroup cols=2 align=left colsep=1 rowsep=1>
+
+      <colspec colwidth="1*">
+      <colspec colwidth="6*">
+
+      <tbody>
+
+       <row>
+        <entry>Opción</entry>
+        <entry><command>--ulog-nlgroup</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A INPUT -p TCP --dport 22 -j ULOG --ulog-nlgroup 2</command></entry>
+
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>La opción <command>--ulog-nlgroup</command> le dice al objetivo
+        <command>ULOG</command> a qué grupo de conexión de red enviar el paquete.
+        Existen 32 grupos de conexión de red, que se especifican con un núemero
+        del 1 al 32, o sea que si queremos contactar con el grupo 5, simplemente
+        escribiremos <command>--ulog-nlgroup 5</command>. El grupo por defecto
+        es el 1.</entry>
+       </row>
+
+       <row>
+        <entry>Opción</entry>
+        <entry><command>--ulog-prefix</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A INPUT -p TCP --dport 22 -j ULOG --ulog-prefix "SSH connection attempt: "</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>La opción <command>--ulog-prefix</command> trabaja igual que el
+        prefijo del objetivo <command>LOG</command> estándar: esta opción le
+        añade un prefijo definido por el usuario a todas las entradas de
+        registro. Este prefijo puede tener hasta 32 caracteres y es realmente
+        útil para diferenciar distintos mensajes de registro y de dónde
+        vienen.</entry>
+       </row>
+
+       <row>
+        <entry>Opción</entry>
+        <entry><command>--ulog-cprange</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A INPUT -p TCP --dport 22 -j ULOG --ulog-cprange 100</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>La opción <command>--ulog-cprange</command> le indica a
+        <command>ULOG</command> cuántos bytes del paquete enviar al demonio de
+        espacio de usuario de <command>ULOG</command>. Si especificamos un valor
+        de 100, copiaremos 100 bytes del total del paquete al espacio de usuario,
+        lo cual en principio incluirá la cabecera completa, más algunos datos
+        básicos del paquete. Si por el contrario especificamos 0, se copiará el
+        paquete entero al espacio de usuario sin importar su tamaño. El valor
+        por defecto es 0, y por lo tanto se copiará el paquete completo al
+        espacio de usuario.</entry>
+       </row>
+
+       <row>
+        <entry>Opción</entry>
+        <entry><command>--ulog-qthreshold</command></entry>
+       </row>
+       <row>
+        <entry>Ejemplo</entry>
+        <entry><command>iptables -A INPUT -p TCP --dport 22 -j ULOG --ulog-qthreshold 10</command></entry>
+       </row>
+       <row>
+        <entry>Descripción</entry>
+        <entry>Esta opción indica el número de paquetes a poner en cola dentro
+        del núcleo antes de enviar realmente los datos al espacio de usuario.
+        Por ejemplo, si establecemos un umbral de 10 como en el ejemplo, el
+        núcleo acumulará 10 paquetes antes de transmitirlos al espacio de
+        usuario mediante un sólo mensaje multi-parte. El valor por defecto es
+        1 a causa de la compatibilidad con versiones más antiguas (el demonio
+        del espacio de usuario no sabía cómo manejar mensajes multi-parte).
+        </entry>
+       </row>
+
+     </tbody>
+     </tgroup>
+    </table>
+
+    </section>
+
+  </section>
+ </chapter>

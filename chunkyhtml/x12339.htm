@@ -1,0 +1,213 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>rc.flush-iptables.txt</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="Example scripts"
+HREF="c11777.htm"><LINK
+REL="PREVIOUS"
+TITLE="rc.test-iptables.txt"
+HREF="x12321.htm"><LINK
+REL="NEXT"
+TITLE="Limit-match.txt"
+HREF="x12368.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x12321.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 14. Example scripts</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x12368.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="RCFLUSH-IPTABLESTXT"
+>rc.flush-iptables.txt</A
+></H1
+><P
+>The <A
+HREF="http://iptables-tutorial.frozentux.net/scripts/rc.flush-iptables.txt"
+TARGET="_top"
+>rc.flush-iptables.txt</A
+> script should not really be called
+a script in itself. The <A
+HREF="http://iptables-tutorial.frozentux.net/scripts/rc.flush-iptables.txt"
+TARGET="_top"
+>rc.flush-iptables.txt</A
+>  script will reset and flush
+all your tables and chains. The script starts by setting the default policies
+to ACCEPT on the INPUT,
+OUTPUT and FORWARD chains of
+the filter table. After this we reset the default
+policies of the PREROUTING,
+POSTROUTING and OUTPUT
+chains of the nat table. We do this first so we won't
+have to bother about closed connections and packets not getting through. This
+script is intended for actually setting up and troubleshooting your firewall,
+and hence we only care about opening the whole thing up and resetting it to
+default values.
+    </P
+><P
+>After this we flush all chains first in the filter
+table and then in the NAT table. This way we know there
+are no redundant rules lying around anywhere. When all of this is done, we jump
+down to the next section where we erase all the user specified chains in the
+NAT and filter tables. When
+this step is done, we consider the script done. You may consider adding rules
+to flush your mangle table if you use it.
+    </P
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>One final word on this issue. Certain people have mailed me asking me to
+put this script into the original rc.firewall script using Red Hat Linux
+syntax where you type something like rc.firewall start and the script starts.
+However, I will not do that since this is a tutorial and should be used as a
+place to fetch ideas mainly and it shouldn't be filled up with shell scripts
+and strange syntax. Adding shell script syntax and other things makes the
+script harder to read as far as I am concerned and the tutorial was written
+with readability in mind and will continue being so.
+     </P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x12321.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x12368.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>rc.test-iptables.txt</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c11777.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Limit-match.txt</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

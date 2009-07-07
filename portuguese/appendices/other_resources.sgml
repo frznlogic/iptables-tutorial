@@ -1,0 +1,142 @@
+ <appendix id="otherresources">
+  <title id="otherresources.title">Other resources and links</title>
+  <para>
+Here is a list of links to resources and where I have gotten information
+from, etc :
+  </para>
+
+  <para>
+   <itemizedlist>
+    <listitem id="ip-sysctltxt">
+     <para>
+      <ulink
+url="http://iptables-tutorial.frozentux.net/other/ip-sysctl.txt"
+id="ip-sysctltxt.title">ip-sysctl.txt</ulink> - from the 2.4.14 kernel. A
+little bit short but a good reference for the IP networking controls and what
+they do to the kernel.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      <ulink
+url="http://iptables-tutorial.frozentux.net/other/ip_dynaddr.txt">
+ip_dynaddr.txt</ulink> - from the 2.4.14 kernel. A really short
+reference to the ip_dynaddr settings available via sysctl and the proc
+filesystem.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      <ulink
+url="http://iptables-tutorial.frozentux.net/other/iptables.html">
+iptables.8</ulink> - The iptables 1.2.4 man page. This is an HTML'ized
+version of the man page which is an excellent reference when reading/writing
+iptables rulesets. Always have it at hand.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      <ulink
+url="http://www.netfilter.org/">http://www.netfilter.org/</ulink>
+ - The official <command>netfilter</command> and <command>iptables</command>
+site. It is a must for everyone wanting to set up <command>iptables</command>
+and <command>netfilter</command> in linux.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      <ulink
+url="http://www.netfilter.org/netfilter-faq.html">http://www.netfilter.org/netfilter-faq.html</ulink>
+- The official <command>netfilter</command> <emphasis>Frequently Asked
+Questions</emphasis>. Also a good place to stat at when wondering what
+<command>iptables</command> and <command>netfilter</command> is about.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      <ulink
+url="http://www.netfilter.org/unreliable-guides/packet-filtering-HOWTO/index.html">http://www.netfilter.org/unreliable-guides/packet-filtering-HOWTO/index.html</ulink>
+- Rusty Russells Unreliable Guide to packet filtering. Excellent documentation
+about basic packet filtering with <command>iptables</command> written by one of
+the core developers of <command>iptables</command> and
+<command>netfilter</command>.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      <ulink
+url="http://www.netfilter.org/unreliable-guides/NAT-HOWTO/index.html">http://www.netfilter.org/unreliable-guides/NAT-HOWTO/index.html</ulink>
+- Rusty Russells Unreliable Guide to Network Address Translation. Excellent
+documentation about <systemitem>Network Address Translation</systemitem> in
+<command>iptables</command> and <command>netfilter</command> written by one of
+the core developers, Rusty Russell.
+     </para>
+    </listitem>
+    <listitem id="netfilterhacking">
+     <para>
+      <ulink
+url="http://www.netfilter.org/unreliable-guides/netfilter-hacking-HOWTO/index.html">http://www.netfilter.org/unreliable-guides/netfilter-hacking-HOWTO/index.html</ulink>
+- Rusty Russells Unreliable Netfilter Hacking HOWTO. One of the few
+documentations on how to write code in the <command>netfilter</command> and
+<command>iptables</command> userspace and kernel space codebase. This was also
+written by Rusty Russell.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      <ulink
+url="http://www.linuxguruz.org/iptables/">http://www.linuxguruz.org/iptables/</ulink>
+ - Excellent linkpage with links to most of the pages on the internet
+about <command>iptables</command> and <command>netfilter</command>. Also
+maintains a list of different <systemitem>iptables scripts</systemitem> for
+different purposes.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <ulink url="http://www.islandsoft.net/veerapen.html">http://www.islandsoft.net/veerapen.html</ulink> -
+Excellent discussion on automatic hardening of <command>iptables</command> and
+how to make small changes that will make your computer automatically add hostile
+sites to a special banlist in <command>iptables</command>.
+     </para>
+    </listitem>
+
+        <listitem>
+     <para>
+      <ulink
+url="http://kalamazoolinux.org/presentations/20010417/conntrack.html">
+http://kalamazoolinux.org/presentations/20010417/conntrack.html</ulink> - This
+presentation contains an excellent explanation of the conntrack modules and
+their work in netfilter. If you are interested in more documentation on
+conntrack, this is a "must read".
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <ulink url="http://www.docum.org">http://www.docum.org</ulink> -
+Excellent information about the <systemitem>CBQ</systemitem>,
+<command>tc</command> and the <command>ip</command> commands in Linux. One of
+the few sites that has any information at all about these programs. Maintained
+by Stef Coene.
+     </para>
+    </listitem>
+
+    <listitem id="netfilterlist">
+     <para>
+      <ulink
+url="http://lists.samba.org/mailman/listinfo/netfilter">http://lists.samba.org/mailman/listinfo/netfilter</ulink>
+- The official netfilter mailing-list. Extremely useful in case you have
+questions about something not covered in this document or any of the other
+links here.
+     </para>
+    </listitem>
+   </itemizedlist>
+  </para>
+
+  <para>
+And of course the <command>iptables</command> source, documentation and
+individuals who helped me.
+  </para>
+ </appendix>

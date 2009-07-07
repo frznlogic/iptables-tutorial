@@ -1,0 +1,250 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>REDIRECT target</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="Iptables targets and jumps"
+HREF="c8815.htm"><LINK
+REL="PREVIOUS"
+TITLE="QUEUE target"
+HREF="x10045.htm"><LINK
+REL="NEXT"
+TITLE="REJECT target"
+HREF="x10122.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x10045.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 11. Iptables targets and jumps</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x10122.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="REDIRECTTARGET"
+>REDIRECT target</A
+></H1
+><P
+>The REDIRECT target is used to redirect packets and streams
+to the machine itself. This means that we could for example
+REDIRECT all packets destined for the
+HTTP ports to an HTTP proxy
+like squid, on our own host. Locally generated packets are mapped to the
+127.0.0.1 address. In other words, this rewrites the destination address to
+our own host for packets that are forwarded, or something alike. The
+REDIRECT target is extremely good to use when we want, for
+example, transparent proxying, where the <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>LAN</I
+></SPAN
+> hosts do not
+know about the proxy at all.
+    </P
+><P
+>    Note that the REDIRECT target is only valid within the
+PREROUTING and OUTPUT chains
+of the nat table. It is also valid within user-defined chains that are only
+called from those chains, and nowhere else. The REDIRECT
+target takes only one option, as described below.
+    </P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.REDIRECTTARGET"
+></A
+><P
+><B
+>Table 11-13. REDIRECT target options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Option</TD
+><TD
+>--to-ports</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -t nat -A PREROUTING -p tcp --dport 80 -j
+REDIRECT --to-ports 8080</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>The --to-ports option specifies the
+destination port, or port range, to use. Without the
+--to-ports option, the destination port is never altered.
+This is specified, as above, --to-ports 8080 in case we only
+want to specify one port. If we would want to specify a port range, we would do
+it like --to-ports 8080-8090, which tells the
+REDIRECT target to redirect the packets to the ports 8080
+through 8090. Note that this option is only available in rules specifying the
+TCP or UDP protocol with the
+--protocol matcher, since it wouldn't make any sense 
+anywhere else.</P
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Works under Linux kernel 2.3, 2.4, 2.5 and 2.6.
+      </P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x10045.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x10122.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>QUEUE target</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c8815.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>REJECT target</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

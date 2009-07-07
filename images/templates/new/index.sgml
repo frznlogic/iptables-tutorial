@@ -1,0 +1,71 @@
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook V4.1//EN" [
+<!ENTITY icmp-address-mask-header SYSTEM "icmp-address-mask-header.sgml">
+<!ENTITY icmp-basic-header SYSTEM "icmp-basic-header.sgml">
+<!ENTITY icmp-destination-unreachable-header SYSTEM "icmp-destination-unreachable-header.sgml">
+<!ENTITY icmp-echo-header SYSTEM "icmp-echo-header.sgml">
+<!ENTITY icmp-information-header SYSTEM "icmp-information-header.sgml">
+<!ENTITY icmp-parameter-problem-header SYSTEM "icmp-parameter-problem-header.sgml">
+<!ENTITY icmp-redirect-header SYSTEM "icmp-redirect-header.sgml">
+<!ENTITY icmp-source-quench-header SYSTEM "icmp-source-quench-header.sgml">
+<!ENTITY icmp-time-exceeded-header SYSTEM "icmp-time-exceeded-header.sgml">
+<!ENTITY icmp-timestamp-header SYSTEM "icmp-timestamp-header.sgml">
+<!ENTITY ip-header SYSTEM "ip-header.sgml">
+<!ENTITY sctp-chunk-abort-header SYSTEM "sctp-chunk-abort-header.sgml">
+<!ENTITY sctp-chunk-cookie-ack-header SYSTEM "sctp-chunk-cookie-ack-header.sgml">
+<!ENTITY sctp-chunk-cookie-echo-header SYSTEM "sctp-chunk-cookie-echo-header.sgml">
+<!ENTITY sctp-chunk-data-header SYSTEM "sctp-chunk-data-header.sgml">
+<!ENTITY sctp-chunk-error-header SYSTEM "sctp-chunk-error-header.sgml">
+<!ENTITY sctp-chunk-heartbeat-ack-header SYSTEM "sctp-chunk-heartbeat-ack-header.sgml">
+<!ENTITY sctp-chunk-heartbeat-header SYSTEM "sctp-chunk-heartbeat-header.sgml">
+<!ENTITY sctp-chunk-init-ack-header SYSTEM "sctp-chunk-init-ack-header.sgml">
+<!ENTITY sctp-chunk-init-ack-param-state-cookie-header SYSTEM "sctp-chunk-init-ack-param-state-cookie-header.sgml">
+<!ENTITY sctp-chunk-init-header SYSTEM "sctp-chunk-init-header.sgml">
+<!ENTITY sctp-chunk-init-param-host-name-header SYSTEM "sctp-chunk-init-param-host-name-header.sgml">
+<!ENTITY sctp-chunk-init-param-ipv4-header SYSTEM "sctp-chunk-init-param-ipv4-header.sgml">
+<!ENTITY sctp-chunk-init-param-ipv6-header SYSTEM "sctp-chunk-init-param-ipv6-header.sgml">
+<!ENTITY sctp-chunk-sack-header SYSTEM "sctp-chunk-sack-header.sgml">
+<!ENTITY sctp-chunks-generic-fields SYSTEM "sctp-chunks-generic-fields.sgml">
+<!ENTITY sctp-chunk-shutdown-ack-header SYSTEM "sctp-chunk-shutdown-ack-header.sgml">
+<!ENTITY sctp-chunk-shutdown-complete-header SYSTEM "sctp-chunk-shutdown-complete-header.sgml">
+<!ENTITY sctp-chunk-shutdown-header SYSTEM "sctp-chunk-shutdown-header.sgml">
+<!ENTITY sctp-common-header SYSTEM "sctp-common-header.sgml">
+<!ENTITY sctp-generic-header SYSTEM "sctp-generic-header.sgml">
+<!ENTITY tcp-header SYSTEM "tcp-header.sgml">
+<!ENTITY template-header SYSTEM "template-header.sgml">
+<!ENTITY udp-header SYSTEM "udp-header.sgml">
+]><book><toc></toc><chapter><title>Headers</title>
+&icmp-address-mask-header;
+&icmp-basic-header;
+&icmp-destination-unreachable-header;
+&icmp-echo-header;
+&icmp-information-header;
+&icmp-parameter-problem-header;
+&icmp-redirect-header;
+&icmp-source-quench-header;
+&icmp-time-exceeded-header;
+&icmp-timestamp-header;
+&ip-header;
+&sctp-chunk-abort-header;
+&sctp-chunk-cookie-ack-header;
+&sctp-chunk-cookie-echo-header;
+&sctp-chunk-data-header;
+&sctp-chunk-error-header;
+&sctp-chunk-heartbeat-ack-header;
+&sctp-chunk-heartbeat-header;
+&sctp-chunk-init-ack-header;
+&sctp-chunk-init-ack-param-state-cookie-header;
+&sctp-chunk-init-header;
+&sctp-chunk-init-param-host-name-header;
+&sctp-chunk-init-param-ipv4-header;
+&sctp-chunk-init-param-ipv6-header;
+&sctp-chunk-sack-header;
+&sctp-chunks-generic-fields;
+&sctp-chunk-shutdown-ack-header;
+&sctp-chunk-shutdown-complete-header;
+&sctp-chunk-shutdown-header;
+&sctp-common-header;
+&sctp-generic-header;
+&tcp-header;
+&template-header;
+&udp-header;
+</chapter></book>

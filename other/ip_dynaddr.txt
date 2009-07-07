@@ -1,0 +1,65 @@
+IP dynamic address hack-port v0.03-rst2
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ This stuff allows diald ONESHOT connections to get established by
+ dynamically changing packet source address (and socket's if local procs).
+ It is implemented for TCP diald-box connections(1) and IP_MASQuerading(2).
+
+ If enabled[*] and forwarding interface address has changed:
+   1)  Socket (and packet) source address is rewritten ON RETRANSMISSIONS
+       while in SYN_SENT state (diald-box processes).
+   2)  Out-bounded MASQueraded source address changes ON OUTPUT (when
+       internal host does retransmission) until a packet from outside
+       is received by the tunnel. This is specially helpful for auto
+       dialup links (diald), where the "actual" outgoing address is
+       unknown at the moment the link is going up. So, the *same*
+       (local AND masqueraded) connections requests that bring the link
+       up will be able to get established.
+
+ If you enable the RST-provoking mode, then the source address will
+ be changed, even if the socket is established. This means we send
+ an incorrect packet out, which causes the remote host to kill our
+ socket. This is the desired behaviour, because such a socket is
+ doomed anyway, and the earlier it dies, the better.  This prevents
+ the dial-on-demand connection from being kept up by a dead connection,
+ and tells the application that the connection was lost.
+
+ With the RST-provoking mode enabled it happens packets with the address
+ of another interface as source are rewritten and get a new source address
+ this way. If you have asymetric routing and the other interfaces have
+ static addresses enabling the work-around might[**] help you.
+
+ [*] At boot, by default no address rewriting is attempted.
+ [**] This code is currently totaly untested.
+
+ The values for the ip_dynaddr sysctl are:
+
+   1:  To enable:
+   2:  To enable verbosity:
+   4:  To enable RST-provoking:
+   8:  To enable asymetric routing work-around
+
+ Flags can be combined by adding them. Common settings
+ would be:
+
+   To switch off special handling of dynamic addresses (default)
+      # echo 0 > /proc/sys/net/ipv4/ip_dynaddr
+   To enable rewriting in quiet mode:
+      # echo 1 > /proc/sys/net/ipv4/ip_dynaddr
+   To enable rewriting in verbose mode:
+      # echo 3 > /proc/sys/net/ipv4/ip_dynaddr
+   (for backwards compatibility you can also use)
+      # echo 2 > /proc/sys/net/ipv4/ip_dynaddr
+   To enable quiet RST-provoking mode:
+      # echo 5 > /proc/sys/net/ipv4/ip_dynaddr
+   To enable verbose RST-provoking mode:
+      # echo 7 > /proc/sys/net/ipv4/ip_dynaddr
+   To enable quiet RST-provoking mode with asymetric routing work-around:
+      # echo 13 > /proc/sys/net/ipv4/ip_dynaddr
+   To enable verbose RST-provoking mode with asymetric routing work-around:
+      # echo 15 > /proc/sys/net/ipv4/ip_dynaddr
+
+ Enjoy!
+
+ -- Juanjo  <jjciarla@raiz.uncu.edu.ar>
+ (with RST-provoking mode by Erik Corry <erik@arbat.com> and asymetric routing
+  work-around by Michael Mueller <Michael.Mueller4@post.rwth-aachen.de>)

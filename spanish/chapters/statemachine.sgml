@@ -1,0 +1,1023 @@
+ <chapter id="statemachine">
+  <title id="statemachine.title">La máquina de estados</title>
+
+  <para>
+Este capítulo trata sobre la máquina de estados y la explica detalladamente, de
+forma que llegarás a comprender cómo trabaja. También hay una gran cantidad de
+ejemplos que clarifican cómo son tratados los estados por la máquina de estados:
+estos ejemplos nos ayudarán a entenderlo todo de la manera más práctica posible.
+  </para>
+
+  <section id="statemachineintroduction">
+   <title id="statemachineintroduction.title">Introducción</title>
+
+   <para>
+La máquina de estados es una parte especial de iptables que no debería llamarse
+así ("máquina de estados"), puesto que en realidad es una máquina de seguimiento
+de conexiones. Sin embargo, mucha gente la conoce por el primer nombre. A lo
+largo del capítulo utilizaré ambos nombres como si fueran equivalentes, aunque
+ésto no debería ocasionar demasiados problemas. El seguimiento de conexiones
+se efectúa para que la estructura de Netfilter sepa cuál es el estado de cada
+conexión específica. Los cortafuegos que trabajan de esta manera normalmente
+se denominan "stateful firewalls" (cortafuegos que consideran las peticiones y
+respuestas de una máquina como una única conexión de un mismo flujo de datos;
+podríamos traducirlo como "cortafuegos de flujos"), mientras que los que no lo
+hacen se denominan "non-stateful firewalls" (cada petición es independiente,
+aunque provenga de la misma máquina; podríamos traducirlo como "cortafuegos de
+conexiones"). Los cortafuegos de tipo "stateful" son mucho más seguros, pues nos
+permiten elaborar conjuntos de reglas mucho más precisos.
+   </para>
+
+   <para>
+En iptables los paquetes se pueden relacionar con las conexiones mediante cuatro
+"estados" diferentes: <command>NEW</command> (nuevo), <command>ESTABLISHED</command>
+(establecido), <command>RELATED</command> (relacionado) e <command>INVALID</command>
+(inválido o no válido). Los trataremos en profundidad más adelante. Mediante la
+comparación <command>--state</command> podemos controlar fácilmente qué o quién
+tiene permiso para iniciar nuevas sesiones.
+   </para>
+
+   <para>
+Todo el seguimiento de las conexiones la realiza una estructura especial del
+núcleo llamada "conntrack". El "conntrack" puede cargarse como módulo o como
+una parte más del núcleo, pero sea como sea la mayoría de las veces necesitaremos y pediremos un
+seguimiento de conexiones más específico que el que proporciona por defecto el
+motor del conntrack. Por éllo, hay unas partes específicas que se encargan de
+los protocolos <systemitem>TCP</systemitem>, <systemitem>UDP</systemitem> o
+<systemitem>ICMP</systemitem>, entre otros. Estos módulos captan información
+específica, única, de los paquetes, de forma que pueden mantener un seguimiento
+de cada flujo de datos. La información que recopilan los módulos se utiliza para
+indicarle al conntrack en qué estado se encuentra el flujo en cada momento. Por
+ejemplo, los flujos <systemitem>UDP</systemitem> normalmente se identifican
+y distinguen por su <systemitem>dirección IP de destino</systemitem>,
+su <systemitem>dirección IP de origen</systemitem>, su <systemitem>puerto de
+destino</systemitem> y su <systemitem>puerto de origen</systemitem>.
+   </para>
+
+   <para>
+En anteriores núcleos teníamos la posibilidad de ejecutar o parar la
+desfragmentación de paquetes, sin embargo, desde que se introdujeron iptables y Netfilter
+y en particular desde que se introdujo el seguimiento de conexiones, esta opción
+fue eliminada. La razón es que el seguimiento de conexiones no funciona
+correctamente sin defragmentar los paquetes, por lo que se ha introducido
+en el conntrack y el proceso se realiza automáticamente. No se puede
+parar si no paramos también el seguimiento de conexiones. En otras palabras,
+desde el momento en que se emplea el seguimiento de conexiones, se emplea la
+desfragmentación de paquetes.
+   </para>
+
+   <para>
+Todo el seguimiento de conexiones se efectúa en la cadena <systemitem>PREROUTING</systemitem>,
+excepto los paquetes generados localmente, que son controlados en la cadena
+<systemitem>OUTPUT</systemitem>. Ésto significa que iptables realizará todo el
+recálculo de estados en estas dos cadenas de la tabla Nat: si somos nosotros
+los que enviamos el paquete inicial del flujo, su estado se establece como
+<command>NEW</command> (nuevo) en la cadena <systemitem>OUTPUT</systemitem>,
+mientras que al recibir el paquete de retorno (el que "contesta" al paquete
+inicial) el estado del flujo se cambia a <command>ESTABLISHED</command>
+(establecido) en la cadena <systemitem>PREROUTING</systemitem>. Por el contrario,
+si el primer paquete no lo hemos originado nosotros, el estado NEW se establece
+en la cadena <systemitem>PREROUTING</systemitem>.
+   </para>
+
+   </section>
+
+   <section id="theconntrackentries">
+    <title id="theconntrackentries.title">Las "entradas" del conntrack</title>
+
+    <para>
+Entendamos como "entrada" el registro que mantiene el conntrack de cada
+conexión y toda la información necesaria correspondiente a esa conexión. Así pues,
+veamos una entrada del conntrack tal como la podríamos encontrar en
+<filename>/proc/net/ip_conntrack</filename> y aprendamos a interpretarla (en
+este fichero encontraremos un listado de todas las entradas presentes en la
+base de datos del conntrack). Si tienes cargado el módulo <systemitem>ip_conntrack</systemitem>,
+un "<command>cat</command>" de <filename>/proc/net/ip_conntrack</filename>
+podría parecerse a:
+    </para>
+
+     <screen>
+tcp      6 117 SYN_SENT src=192.168.1.6 dst=192.168.1.9 sport=32775 \
+     dport=22 [UNREPLIED] src=192.168.1.9 dst=192.168.1.6 sport=22 \
+     dport=32775 use=2
+     </screen>
+
+    <para>
+Este ejemplo contiene toda la información que el módulo conntrack mantiene para
+saber en qué estado se encuentra una conexión determinada. Para empezar tenemos
+el protocolo, que en este caso es el tcp. A continuación tenemos la misma
+información en su notación decimal equivalente ("6"). Después viene el tiempo
+de vida restante para esta entrada en particular: en el ejemplo a esta conexión
+le quedan 117 segundos, que irán disminuyendo hasta que se vea más tráfico
+perteneciente a la conexión. Cuando llega ese nuevo tráfico el contador se
+establece de nuevo a su valor por defecto (valor que depende del estado en que
+se encuentra la conexión en el momento de recibir nuevos paquetes). Sigue la
+información del estado actual en que se encuentra la entrada. En el ejemplo estamos
+viendo un paquete que se encuentra en el estado <computeroutput>SYN_SENT</computeroutput>.
+El valor interno de una conexión es ligeramente distinto a los empleados
+externamente por <command>iptables</commanD>. El valor <computeroutput>SYN_SENT</computeroutput>
+nos dice que tenemos delante una conexión que sólo a visto un paquete
+<systemitem>TCP SYN</systemitem> en una dirección. Después vemos la
+<systemitem>dirección IP de origen</systemitem>, la <systemitem>dirección IP de
+destino</systemitem>, el <systemitem>puerto de origen</systemitem>  y el
+<systemitem>puerto de destino</systemitem>. En este punto vemos una clave
+específica que nos indica que no hemos visto ningún tráfico de retorno para esta
+conexión. Para terminar, vemos los datos que esperamos en los paquetes de
+retorno: las direcciones de origen y destino (que están invertidas respecto a
+las anteriores, ya que el paquete será devuelto hacia nosotros) y los puertos
+de origen y destino (también invertidos respecto a los anteriores). Así pues,
+éstos son los valores que podrían ser de nuestro interés.
+    </para>
+
+    <para>
+Las entradas del seguimiento de conexiones pueden tomar diferentes valores,
+todos éllos especificados en las cabeceras ("headers") disponibles en los
+archivos <filename>linux/include/netfilter-ipv4/ip_conntrack*.h</filename>.
+Estos valores dependen del subprotocolo <systemitem>IP</systemitem> que estemos
+usando. Los protocolos <systemitem>TCP</systemitem>, <systemitem>UDP</systemitem>
+o <systemitem>ICMP</systemitem> toman los valores por defecto especificados en
+<filename>linux/include/netfilter-ipv4/ip_conntrack.h</filename>. Lo
+estudiaremos en detalle al revisar cada protocolo, sin embargo, no ahondaremos
+demasiado en este capítulo puesto que sólo se utilizan dentro del conntrack.
+Por otra parte, según cambia el estado también cambia el valor por defecto del
+tiempo que debe transcurrir hasta eliminar la conexión (el "contador de vida
+restante de la conexión" explicado anteriormente).
+    </para>
+
+    <note>
+     <para>
+Desde hace poco hay un nuevo parche en el "patch-o-matic" de iptables llamado
+"tcp-window-tracking". Este parche añade, entre otras cosas, todos los tiempos
+límite mencionados a variables especiales del "sysctl", con lo que se pueden
+cambiar (los tiempos) al instante, mientras el sistema está en marcha. Gracias
+a ésto ya no es necesario recompilar el núcleo cada vez que se deseen cambiar los
+límites de los contadores de tiempo.
+     </para>
+
+     <para>
+Estos límites se pueden modificar utilizando llamadas al sistema específicas que
+se encuentran disponibles en el directorio <filename>/proc/sys/net/ipv4/netfilter</filename>.
+Concretamente debes buscar las variables <filename>/proc/sys/net/ipv4/netfilter/ip_ct_*</filename>.
+     </para>
+    </note>
+
+    <para>
+Cuando una conexión ha visto tráfico en ambas direcciones, se modificará su
+entrada del conntrack eliminando la clave <computeroutput>[UNREPLIED]</computeroutput>
+(que nos indica que la conexión no ha visto tráfico en ambas direcciones) y
+añadiendo (casi al final de la entrada) la clave <computeroutput>[ASSURED]</computeroutput>.
+Esta clave nos dice que la conexión está asegurada y por éllo no será eliminada
+si alcanzamos el límite máximo de conexiones simultáneas soportadas por el
+conntrack, todo lo contrario a aquellas que no están marcadas como
+<computeroutput>[ASSURED]</computeroutput>, que sí serán borradas al alcanzar
+el límite de conexiones. El número de conexiones mantenidas en la tabla del
+seguimiento de conexiones depende de una variable, que puede establecerse a
+través de las funciones de ip-sysctl en los núcleos Linux más recientes. El valor por
+defecto de esta variable depende en gran medida de la cantidad de memoria que
+tengas instalada: para 128 MB de RAM tendrás un máximo de 8192 entradas, mientras
+que con 256 MB de RAM llegarás hasta las 16376 entradas. Puedes ver y modificar
+estos valores a través de la propiedad
+<filename>/proc/sys/net/ipv4/ip_conntrack_max</filename>.
+    </para>
+
+    </section>
+
+    <section id="userlandstates">
+     <title id="userlandstates.title">Estados del espacio de usuario</title>
+
+     <para>
+Como has podido ver, los paquetes pueden tomar distintos estados dentro del
+núcleo, dependiendo del protocolo considerado. Sin embargo, fuera del núcleo
+sólo tenemos los cuatro estados descritos anteriormente. Principalmente estos estados se pueden
+emplear junto a la comparación de estados (state match), con lo cual esta comparación
+será capaz de diferenciar paquetes en función del estado en que se encuentren dentro
+del seguimiento de conexiones. Los estados válidos son: <command>NEW</command>,
+<command>ESTABLISHED</command>, <command>RELATED</command> e
+<command>INVALID</command>. La siguiente tabla explica brevemente cada posible
+estado:
+     </para>
+
+     <table id="table.userlandstates">
+      <title id="table.userlandstates.title">Estados de espacio de usuario</title>
+      <tgroup cols=2 align=left colsep=1 rowsep=1>
+      <colspec colwidth="1*">
+      <colspec colwidth="5*">
+       <thead>
+        <row>
+         <entry>Estado</entry>
+         <entry>Explicación</entry>
+        </row>
+       </thead>
+       <tbody>
+
+       <row>
+        <entry>NEW</entry>
+        <entry>
+El estado <command>NEW</command> (nuevo) nos indica que el paquete es el primero
+que vemos. Esto significa que el primer paquete que el módulo conntrack vea en
+una conexión será etiquetado de esta manera. Por ejemplo, si vemos un paquete
+<systemitem>SYN</systemitem> que además es el primero de una conexión, coincidirá
+con el criterio del conntrack y será etiquetado como "nuevo". Sin embargo, el
+primer paquete puede que no sea un paquete <systemitem>SYN</systemitem> y aún
+así ser considerado como <command>NEW</command>. Este comportamiento puede
+llevar a determinados problemas en determinados casos, pero también puede ser
+extremadamente útil si necesitamos captar conexiones perdidas de otros
+cortafuegos, o si una conexión a excedido su tiempo de espera, pero en realidad
+no ha sido cerrada.
+        </entry>
+       </row>
+
+       <row>
+        <entry>ESTABLISHED</entry>
+        <entry>
+El estado "<command>ESTABLISHED</command>" (establecido) ha visto tráfico en ambas
+direcciones y por tanto admitirá continuamente los paquetes de ese flujo. Las
+conexiones "establecidas" son bastante fáciles de comprender: el único requisito
+para alcanzar el estado "<command>ESTABLISHED</command>" es que un host envíe
+un paquete y obtenga una respuesta del otro host. El estado "<command>NEW</command>"
+(nuevo) cambiará al estado "establecido" en cuanto llegue un paquete de respuesta
+al cortafuegos (o cuando este paquete pase por el cortafuegos). Los mensajes de
+error <systemitem>ICMP</systemitem>, las redirecciones, ..., también se pueden
+considerar como "<command>ESTABLISHED</command>", si hemos enviado un paquete
+que a su vez genera el mensaje de error <systemitem>ICMP</systemitem>.
+        </entry>
+       </row>
+
+       <row>
+        <entry>RELATED</entry>
+        <entry>
+El estado "<command>RELATED</command>" (relacionado) es uno de los más complejos.
+Una conexión se considera "relacionada" cuando está ligada a otra conexión ya
+"establecida". Por este motivo, para que una conexión se considere en estado
+"<command>RELATED</command>" primero debemos tener otra conexión en estado
+"<command>ESTABLISHED</command>": la conexión "establecida" generará una
+conexión externa a la conexión principal, y esta nueva conexión será considerada
+como "relacionada" siempre que el módulo conntrack pueda entender que está
+relacionada con la principal. Un buen ejemplo: las conexiones
+<systemitem>FTP-data</systemitem> son consideradas como relacionadas con el puerto
+de control FTP (<systemitem>FTP control</systemitem>); otro ejemplo son las
+conexiones <systemitem>DCC</systemitem> generadas con el <systemitem>IRC</systemitem>.
+Puede utilizarse para permitir las respuestas <systemitem>ICMP</systemitem>, las
+transferencias <systemitem>FTP</systemitem> y los <systemitem>DCC</systemitem>s
+(protocolos de conexión Directa de Cliente a Cliente) a través del cortafuegos.
+Ten en cuenta que muchos protocolos <systemitem>TCP</systemitem> (además de
+algunos <systemitem>UDP</systemitem>) que dependen de este mecanismo son
+bastante complejos y envían información de la conexión conjuntamente con la
+carga de datos de los segmentos <systemitem>TCP</systemitem> o <systemitem>UDP</systemitem>,
+por lo que requieren de módulos de ayuda especiales para ser correctamente
+interpretados.
+</entry>
+       </row>
+
+       <row>
+        <entry>INVALID</entry>
+        <entry>
+El estado "<command>INVALID</command>" (inválido) implica que el paquete no
+puede ser identificado o que no tiene ningún estado. Ésto puede ser debido a
+varias razones, como que el sistema se ha quedado sin memoria disponible, o a
+mensajes <systemitem>ICMP</systemitem> de error que no responden a ninguna
+conexión conocida. Normalmente es una buena idea eliminar (<command>DROP</command>)
+todo aquello que se encuentre en este estado.
+        </entry>
+       </row>
+
+       </tbody>
+      </tgroup>
+     </table>
+
+     <para>
+Los anteriores estados pueden usarse conjuntamente con la comparación
+<command>--state</command> para diferenciar paquetes en función de su estado en el
+seguimiento de conexiones. Ésto es lo que hace que la máquina de estados sea tan
+increíblemente fuerte y eficiente para nuestro cortafuegos. En el pasado,
+frecuentemente nos veíamos obligados a abrir todos los puertos por encima del
+1024 para permitir el tráfico de retorno a nuestra red local. Con la máquina de
+estados funcionando ya no es necesario, pues podemos abrir el cortafuegos sólo
+para el tráfico de retorno, no para todo tipo de tráfico.
+     </para>
+
+  </section>
+
+  <section id="tcpconnections">
+   <title id="tcpconnections.title">Conexiones TCP</title>
+
+   <para>
+En esta sección y las siguientes vamos a repasar en profundidad los estados y
+cómo son gestionados para cada uno de los tres protocolos básicos:
+<systemitem>TCP</systemitem>, <systemitem>UDP</systemitem> e <systemitem>ICMP</systemitem>. Asimismo,
+veremos cómo se gestionan por defecto las conexiones si no se pueden incluir
+en ninguno de los anteriores protocolos. Empezaremos con el protocolo
+<systemitem>TCP</systemitem>, ya que es un protocolo de "flujos" en sí mismo
+(stateful protocol: como ya se ha explicado en la introducción, "stateful"
+implicaría que todos los paquetes de un mismo flujo son
+considerados como la misma cosa, como un todo que llega "en porciones"); además
+contiene muchos detalles interesantes respecto a la máquina de estados en
+iptables.
+   </para>
+
+   <para>
+Una conexión <systemitem>TCP</systemitem> siempre se inicia con el "apretón de
+manos en tres pasos" (3-way handshake), que establece y negocia la conexión
+sobre la que se enviarán los datos. La sesión entera se inicia con un paquete
+<systemitem>SYN</systemitem>, seguido por un paquete <systemitem>SYN/ACK</systemitem>
+y finalmente por un paquete <systemitem>ACK</systemitem>, para confirmar el
+establecimiento de la sesión (1-"hola, ¿quieres hablar conmigo?", 2-"de acuerdo",
+3-"bien, pues empecemos"). En este momento la conexión se establece y está
+preparada para empezar a enviar datos. El gran problema es: ¿cómo maneja el
+seguimiento de conexiones todo este tráfico? En realidad de una forma bastante
+simple.
+   </para>
+
+   <para>
+Al menos en lo que concierne al usuario, el seguimiento de conexiones trabaja
+más o menos de la misma manera para todo tipo de conexiones. Échale un vistazo
+al gráfico de abajo para ver exactamente en qué estado entra el flujo durante
+las diferentes fases de la conexión. Como puedes observar, desde el punto de vista del usuario el código del
+seguimiento de conexiones realmente no acompaña al flujo de la conexión
+<systemitem>TCP</systemitem>. Una vez ha
+visto un paquete (el <systemitem>SYN</systemitem>), considera la conexión como nueva
+(<command>NEW</command>). En cuanto ve el paquete de retorno (<systemitem>SYN/ACK</systemitem>),
+considera la conexión como establecida (<command>ESTABLISHED</command>). Si
+piensas en éllo un momento, entenderás por qué: con esta particular forma de
+trabajar puedes permitir a los paquetes <command>NEW</command> y <command>ESTABLISHED</command>
+que abandonen tu red local, pero permitiendo únicamente a las conexiones
+<command>ESTABLISHED</command> que vuelvan a la red local y funcionen
+correctamente. Por el contrario, si la máquina de seguimiento de conexiones
+tuviera que considerar todo establecimiento de conexión como <command>NEW</command>,
+no seríamos capaces de detener los intentos de conexión desde el exterior hacia
+nuestra red local, puesto que tendríamos que permitir el retorno de todos los paquetes
+<command>NEW</command>. Para complicarlo todo un poco más, existen varios
+estados internos más dentro del núcleo que se usan para las conexiones
+<systemitem>TCP</systemitem>, pero que no están disponibles en el espacio de
+usuario. Básicamente siguen los estándares de estados especificados en
+<link linkend="rfc793" endterm="rfc793.title"></link>,
+páginas 21-23 (en inglés).
+Los tendremos en cuenta un poco más adelante en esta misma sección.
+   </para>
+
+   <para>
+    <mediaobject>
+     <imageobject>
+      <imagedata fileref="images/state-tcp-connecting.eps" format=eps>
+     </imageobject>
+     <imageobject>
+      <imagedata fileref="images/state-tcp-connecting.jpg" format=jpg>
+     </imageobject>
+    </mediaobject>
+   </para>
+
+   <para>
+Como puedes ver, desde el punto de vista del usuario es bastante simple. Sin
+embargo, desde el punto de vista del núcleo el esquema es un poco más complejo.
+Veamos un ejemplo que ilustra a la perfección cómo cambian los estados de la
+conexión en la tabla <filename>/proc/net/ip_conntrack</filename>. El primer
+estado es registrado a la recepción del primer paquete <systemitem>SYN</systemitem>
+de una conexión.
+   </para>
+
+   <screen>
+tcp      6 117 SYN_SENT src=192.168.1.5 dst=192.168.1.35 sport=1031 \
+     dport=23 [UNREPLIED] src=192.168.1.35 dst=192.168.1.5 sport=23 \
+     dport=1031 use=1
+   </screen>
+
+   <para>
+Como puedes ver en la entrada anterior, tenemos un estado concreto en el cual
+un paquete SYN ha sido enviado (se establece la bandera <computeroutput>SYN_SENT</computeroutput>)
+y que todavía no ha recibido ninguna respuesta (de ahí la bandera
+<computeroutput>[UNREPLIED]</computeroutput>). El siguiente estado interno se
+alcanzará cuando se vea un paquete en la otra dirección.
+   </para>
+
+   <screen>
+tcp      6 57 SYN_RECV src=192.168.1.5 dst=192.168.1.35 sport=1031 \
+     dport=23 src=192.168.1.35 dst=192.168.1.5 sport=23 dport=1031 \
+     use=1
+   </screen>
+
+   <para>
+En este caso hemos recibido el correspondiente paquete <systemitem>SYN/ACK</systemitem>
+como respuesta. En cuanto llega, el estado cambia una vez más, esta vez a
+<computeroutput>SYN_RECV</computeroutput>: indica que el paquete <systemitem>SYN</systemitem>
+original llegó correctamente y que el paquete <systemitem>SYN/ACK</systemitem>
+de retorno también ha atravesado correctamente el cortafuegos. Además, esta
+entrada del seguimiento de conexiones ya ha visto tráfico en ambas direcciones
+y por éllo se considera que ha obtenido respuesta. Este hecho no es explícito,
+pero se considera asumido de la misma forma que ocurría con la bandera
+<computeroutput>[UNREPLIED]</computeroutput> anterior. El último paso se dará
+cuando veamos el paquete <systemitem>ACK</systemitem> final del "apretón de
+manos" (3-way handshake).
+   </para>
+
+   <screen>
+tcp      6 431999 ESTABLISHED src=192.168.1.5 dst=192.168.1.35 \
+     sport=1031 dport=23 src=192.168.1.35 dst=192.168.1.5 \
+     sport=23 dport=1031 use=1
+   </screen>
+
+   <para>
+En este último ejemplo ya hemos visto el paquete <systemitem>ACK</systemitem>
+final y la conexión a entrado en el estado <command>ESTABLISHED</command>
+(establecida), al menos hasta donde llega el control de los mecanismos internos
+de iptables. Después de unos pocos paquetes más, la conexión se convertirá en
+<computeroutput>[ASSURED]</computeroutput> ("asegurada"), tal como se ha
+mostrado en la introducción del capítulo.
+   </para>
+
+   <para>
+Cuando una conexión <systemitem>TCP</systemitem> se cierra, lo hace de la
+siguiente manera y tomando los siguientes estados:
+   </para>
+
+   <para>
+    <mediaobject>
+     <imageobject>
+      <imagedata fileref="images/state-tcp-closing.eps" format=eps>
+     </imageobject>
+     <imageobject>
+      <imagedata fileref="images/state-tcp-closing.jpg" format=jpg>
+     </imageobject>
+    </mediaobject>
+   </para>
+
+   <para>
+Como puedes ver, en realidad la conexión nunca se cierra hasta que se envía el
+último paquete <systemitem>ACK</systemitem>. Ten en cuenta que este gráfico
+sólo muestra cómo se cierra una conexión en circunstancias normales. También
+puede cerrarse enviando un paquete <systemitem>RST</systemitem> ("reset", reiniciar) si la
+conexión se tiene que rechazar. En este caso la conexión será cerrada tras un
+periodo de tiempo predeterminado.
+   </para>
+
+   <para>
+En condiciones normales, cuando una conexión <systemitem>TCP</systemitem> se
+cierra, entra en el estado <computeroutput>TIME_WAIT</computeroutput> ("tiempo
+de espera"), que por defecto es de 2 minutos. Este lapso de tiempo se emplea
+para que todos los paquetes que se han quedado "atascados" de alguna manera puedan atravesar
+igualmente el conjunto de reglas, incluso después de que la conexión se haya
+cerrado; de esta forma se dispone de una especie de "buffer"/colchón de tiempo
+para que los paquetes que se han quedado parados en algún enrutador
+congestionado, puedan llegar al cortafuegos o al otro extremo de la conexión sin
+problemas.
+   </para>
+
+   <para>
+Si la conexión se reinicia por un paquete <systemitem>RST</systemitem>, el
+estado cambia a <computeroutput>CLOSE</computeroutput> ("cerrar"). Esta orden
+implica que la conexión por defecto dispone de 10 segundos antes de que se
+cierre definitivamente. Los paquetes <systemitem>RST</systemitem> no piden
+consentimiento de ninguna clase y cortan la conexión directamente.
+   </para>
+
+   <para>
+También hay otros estados además de los que ya se han comentado. A continuación
+tienes la lista completa de los posibles estados que puede tomar un flujo
+<systemitem>TCP</systemitem> y sus tiempos límites.
+   </para>
+
+   <table id="table.internalstates">
+    <title id="table.internalstates.title">Estados internos</title>
+    <tgroup cols=2 align=left colsep=1 rowsep=1>
+    <colspec colwidth="1*">
+    <colspec colwidth="5*">
+     <thead>
+      <row>
+       <entry>Estado</entry>
+       <entry>Tiempo límite</entry>
+      </row>
+     </thead>
+     <tbody>
+
+     <row>
+      <entry>NONE</entry>
+      <entry>30 minutos</entry>
+     </row>
+     <row>
+      <entry>ESTABLISHED</entry>
+      <entry>5 días</entry>
+     </row>
+     <row>
+      <entry>SYN_SENT</entry>
+      <entry>2 minutos</entry>
+     </row>
+     <row>
+      <entry>SYN_RECV</entry>
+      <entry>60 segundos</entry>
+     </row>
+     <row>
+      <entry>FIN_WAIT</entry>
+      <entry>2 minutos</entry>
+     </row>
+     <row>
+      <entry>TIME_WAIT</entry>
+      <entry>2 minutos</entry>
+     </row>
+     <row>
+      <entry>CLOSE</entry>
+      <entry>10 segundos</entry>
+     </row>
+     <row>
+      <entry>CLOSE_WAIT</entry>
+      <entry>12 horas</entry>
+     </row>
+     <row>
+      <entry>LAST_ACK</entry>
+      <entry>30 segundos</entry>
+     </row>
+     <row>
+      <entry>LISTEN></entry>
+      <entry>2 minutos</entry>
+     </row>
+
+     </tbody>
+    </tgroup>
+   </table>
+
+   <para>
+Estos tiempos no son de ninguna manera definitivos, ya que pueden cambiar con
+las revisiones del núcleo, además de poderse cambiar a través del sistema de
+ficheros proc mediante las variables <filename>/proc/sys/net/ipv4/netfilter/ip_ct_tcp_*</filename>.
+Sin embargo, en la práctica los valores por defecto deberían estar bastante bien
+definidos. Los tiempos se indican en "jiffies" (centésimas de segundo), es decir,
+3000 significa 30 segundos.
+   </para>
+
+   <note>
+    <para>
+Ten en cuenta que la parte del espacio de usuario de la máquina de estados no
+se fija en las banderas <systemitem>TCP</systemitem> establecidas en los
+paquetes <systemitem>TCP</systemitem>. Hacer éso normalmente es una mala idea,
+ya que puedes querer permitir que los paquetes en el estado <command>NEW</command>
+puedan atravesar el cortafuegos, pero cuando especificas la bandera <command>NEW</command>
+lo que en la mayoría de las ocasiones quieres permitir son los paquetes
+<systemitem>SYN</systemitem>.
+    </para>
+
+    <para>
+En la implementación actual de los estados no ocurre ésto, ya que incluso un
+paquete sin ningún valor establecido o sin una bandera <systemitem>ACK</systemitem>,
+se considerará como <command>NEW</command>. Este tipo de comparación puede ser
+útil en sistemas con cortafuegos redundantes, pero en general es una malísima
+idea en tu red personal, dónde sólo tienes un cortafuegos. Para evitar este
+comportamiento puedes usar el comando explicado en la sección <link linkend="newnotsyn"
+endterm="newnotsyn.title"></link> del apéndice <link linkend="commonproblems"
+endterm="commonproblems.title"></link>. Otra forma de conseguirlo es instalando
+la extensión <command>tcp-window-tracking</command> que encontrarás en el
+<command>patch-o-matic</command>, que permitirá que el cortafuegos sea capaz de
+hacer el seguimiento de los estados en función de las configuraciones de las
+ventanas <systemitem>TCP</systemitem>.
+    </para>
+   </note>
+
+  </section>
+
+  <section id="udpconnections">
+   <title id="udpconnections.title">Conexiones UDP</title>
+
+   <para>
+Las conexiones <systemitem>UDP</systemitem> son en sí mismas "conexiones sin
+flujo". Existen varias razones para éllo, principalmente porque no implican
+ningún establecimiento o cierre de conexión; más que nada les falta algún tipo de
+secuenciamiento: recibir dos datagramas <systemitem>UDP</systemitem> en un orden
+específico no dice nada acerca del orden en que fueron enviados. Sin embargo es
+posible establecer estados en las conexiones dentro del núcleo. Veamos cómo se
+puede seguir una conexión y cómo podría verse en el conntrack.
+   </para>
+
+   <para>
+    <mediaobject>
+     <imageobject>
+      <imagedata fileref="images/state-udp-connection.eps" format=eps>
+     </imageobject>
+     <imageobject>
+      <imagedata fileref="images/state-udp-connection.jpg" format=jpg>
+     </imageobject>
+    </mediaobject>
+   </para>
+
+   <para>
+Como puedes observar, desde el punto de vista del espacio de usuario la conexión
+se inicia casi exactamente de la misma forma que una conexión <systemitem>TCP</systemitem>.
+Internamente, sin embargo, la información del conntrack es bastante diferente,
+pero intrínsecamente los detalles son los mismos. Para empezar, veamos la
+entrada tras haber enviado el paquete <systemitem>UDP</systemitem> inicial.
+   </para>
+
+   <screen>
+udp      17 20 src=192.168.1.2 dst=192.168.1.5 sport=137 dport=1025 \
+     [UNREPLIED] src=192.168.1.5 dst=192.168.1.2 sport=1025 \
+     dport=137 use=1
+   </screen>
+
+   <para>
+Como puedes ver en los dos primeros valores, se trata de un paquete <systemitem>UDP</systemitem>.
+El primer valor es el nombre del protocolo, mientras que el segundo es el número
+del protocolo. Es lo mismo que se encuentra en las conexiones <systemitem>TCP</systemitem>.
+El tercer valor indica el "tiempo de vida" en segundos que le queda a esta
+entrada de estado. Tras ésto vienen los valores de origen y destino del paquete
+que hemos visto, la bandera <computeroutput>[UNREPLIED]</computeroutput>, que
+nos indica que hasta el momento no ha habido respuesta al paquete, y por fin
+un listado de los valores que se esperan en los paquetes de respuesta. Estos
+últimos valores son los mismos que antes pero en sentido inverso. El tiempo de
+vida ("timeout") por defecto es de 30 segundos.
+   </para>
+
+   <screen>
+udp      17 170 src=192.168.1.2 dst=192.168.1.5 sport=137 \
+     dport=1025 src=192.168.1.5 dst=192.168.1.2 sport=1025 \
+     dport=137 use=1
+   </screen>
+
+   <para>
+En este ejemplo el servidor ya ha visto una respuesta al paquete inicial y la
+conexión se considera <command>ESTABLISHED</command> (establecida). Este detalle
+no se muestra en el seguimiento de conexiones, como puedes ver. La diferencia
+principal es la ausencia de la bandera <computeroutput>[UNREPLIED]</computeroutput>.
+Además el tiempo de vida por defecto a cambiado a 180 segundos: en el ejemplo
+ya han pasado 10 segundos y por eso el valor es 170; en diez segundos más el
+valor disminuirá a 160 y así hasta que se agote el tiempo. Sin embargo, hay un
+detalle que se ha visto antes y que ahora falta: la bandera <computeroutput>[ASSURED]</computeroutput>.
+Para que se establezca esta bandera en el seguimiento de conexiones, debe haber
+habido un mínimo de tráfico en la conexión.
+   </para>
+
+   <screen>
+udp      17 175 src=192.168.1.5 dst=195.22.79.2 sport=1025 \
+     dport=53 src=195.22.79.2 dst=192.168.1.5 sport=53 \
+     dport=1025 [ASSURED] use=1
+   </screen>
+
+   <para>
+En este momento la conexión ya está asegurada. Este ejemplo parece exactamente
+igual que el anterior, excepto por la bandera <computeroutput>[ASSURED]</computeroutput>.
+Si la conexión no es utilizada en 180 segundos, entonces caduca. Este tiempo
+(180 segundos) es un valor relativamente bajo, pero debería ser suficiente para
+la mayoría de los casos. Cada vez que un paquete coincide con los valores
+indicados en el paquete inicial (los valores que se esperan de los paquetes de
+respuesta ya comentados antes) y atraviesa el cortafuegos, el contador vuelve al
+valor por defecto, igual que ocurre con el resto de estados internos.
+   </para>
+
+  </section>
+
+  <section id="icmpconnections">
+   <title id="icmpconnections.title">Conexiones ICMP</title>
+
+   <para>
+Los paquetes <systemitem>ICMP</systemitem> no pueden estar más lejos de ser
+conexiones de flujo (o "stateful connections"), ya que sólo se usan para el
+control de las conexiones y nunca deberían establecer ninguna conexión por sí mismos. Sin embargo, hay cuatro
+tipos <systemitem>ICMP</systemitem> que generarán paquetes de retorno y que
+presentan 2 estados diferentes: estos mensajes <systemitem>ICMP</systemitem>
+pueden tomar los estados <command>NEW</command> (nuevo) y <command>ESTABLISHED</command>
+(establecido). Los tipos <systemitem>ICMP</systemitem> de los que hablamos son:
+<systemitem>Echo request</systemitem> (petición de eco) y su <systemitem>reply</systemitem>
+(respuesta o <systemitem>Echo reply</systemitem>), <systemitem>Timestamp request</systemitem>
+(petición de "marca de tiempo", el valor del momento exacto en que se envía el
+paquete) y su <systemitem>reply</systemitem>, <systemitem>Information request</systemitem>
+(petición de información) y su <systemitem>reply</systemitem>, y por último
+<systemitem>Address mask request</systemitem> (petición de máscara de subred)
+y su <systemitem>reply</systemitem>. De éstos, los tipos <systemitem>timestamp
+request</systemitem> e <systemitem>information request</systemitem> están
+obsoletos y lo más probable es que simplemente se puedan desechar. Sin embargo,
+los mensajes de <systemitem>Echo</systemitem> se emplean en varias
+configuraciones, como hacer "pings" a los hosts. Las peticiones de máscara de
+subred (<systemitem>Address mask requests</systemitem>) no se suelen utilizar,
+pero pueden ser útiles en ocasiones y vale la pena permitirles que atraviesen el
+cortafuegos. Para tener una idea de cómo funciona una conexión de este tipo,
+veamos la siguiente imagen:
+   </para>
+
+   <para>
+    <mediaobject>
+     <imageobject>
+      <imagedata fileref="images/state-icmp-ping.eps" format=eps>
+     </imageobject>
+     <imageobject>
+      <imagedata fileref="images/state-icmp-ping.jpg" format=jpg>
+     </imageobject>
+    </mediaobject>
+   </para>
+
+   <para>
+Como puedes observar, el host envía una petición de eco (<systemitem>echo
+request</systemitem>) al destinatario y el cortafuegos considera el paquete como
+nuevo (<command>NEW</command>). El destinatario responde con una respuesta de
+eco (<systemitem>echo reply</systemitem>) que el cortafuegos considera mediante el
+estado "establecido" (<command>ESTABLISHED</command>). Cuando ya se ha visto la
+primera petición de eco, se crea la siguiente entrada en el <filename>ip_conntrack</filename>.
+   </para>
+
+   <screen>
+icmp     1 25 src=192.168.1.6 dst=192.168.1.10 type=8 code=0 \
+     id=33029 [UNREPLIED] src=192.168.1.10 dst=192.168.1.6 \
+     type=0 code=0 id=33029 use=1
+   </screen>
+
+   <para>
+Como ya te habrás dado cuenta, esta entrada es un poco diferente a las entradas
+estándar para los paquetes <systemitem>TCP</systemitem> y <systemitem>UDP</systemitem>.
+Vemos el protocolo, su número, el tiempo de vida que le queda a la entrada, así
+como las direcciones de origen y destino. La diferencia viene después: tenemos
+3 campos nuevos llamados <computeroutput>type</computeroutput> (tipo),
+<computeroutput>code</computeroutput> (código) e <computeroutput>id</computeroutput>
+(identidad/identificación). En realidad no son nada especiales: el valor
+<computeroutput>type</computeroutput> indica el tipo <systemitem>ICMP</systemitem>
+y el valor <computeroutput>code</computeroutput> indica el código <systemitem>ICMP</systemitem>.
+Todos éllos están disponibles en el apéndice <link linkend="icmptypes"
+endterm="icmptypes.title"></link>. El valor de <computeroutput>id</computeroutput>
+indica el <systemitem>ICMP ID</systemitem>: cada paquete <systemitem>ICMP</systemitem>
+toma un valor ID (de identificación) cuando se envía y al responder el receptor
+también establece este mismo ID; de esta forma al llegar la respuesta al host
+que envió la petición se puede unir esa respuesta a la petición <systemitem>ICMP</systemitem>
+correcta.
+   </para>
+
+   <para>
+En el siguiente campo volvemos a encontrar la bandera <computeroutput>[UNREPLIED]</computeroutput>
+que hemos visto anteriormente. Como entonces, la entrada del seguimiento de
+conexiones que estamos viendo implica que sólo se ha visto tráfico en una
+dirección. Por último vemos los datos que se esperan en el paquete de respuesta
+<systemitem>ICMP</systemitem>, que obviamente son los valores iniciales pero
+invertidos. Por lo que respecta al tipo y al código, se cambian por los valores
+adecuados al paquete de retorno, de forma que una petición de eco se transforma
+en una respuesta de eco, etc. El <systemitem>ICMP ID</systemitem>, lógicamente,
+se mantiene idéntico al paquete de petición.
+   </para>
+
+   <para>
+El paquete de respuesta se considera como <command>ESTABLISHED</command>, tal
+como ya se ha explicado. Sin embargo, sabemos con seguridad que tras la
+respuesta <systemitem>ICMP</systemitem> no habrá absolutamente ningún tráfico
+legal en la misma conexión. Por esta razón la entrada del seguimiento de
+conexiones es destruida en cuanto la respuesta ha atravesado la estructura de
+Netfilter.
+   </para>
+
+   <para>
+En cada uno de los casos anteriores la petición se considera como nueva
+(<command>NEW</command>), mientras que la respuesta se considera como
+establecida (<command>ESTABLISHED</command>). Más exactamente, cuando el
+cortafuegos ve un paquete de petición lo considera como nuevo, mientras que
+cuando el host envía un paquete de respuesta a la petición, se considera como
+establecido.
+   </para>
+
+   <note>
+    <para>
+Ésto implica que el paquete de respuesta debe seguir el criterio
+fijado en la entrada del seguimiento de conexiones, para poder ser considerado
+como establecido, de la misma manera que ocurre en el resto de tipos de tráfico.
+    </para>
+   </note>
+
+   <para>
+Las peticiones ICMP tienen un tiempo de vida por defecto de 30 segundos, que
+puedes cambiar en la entrada <filename>/proc/sys/net/ipv4/netfilter/ip_ct_icmp_timeout</filename>.
+En general éste es un buen valor, ya que permitirá captar la mayoría de paquetes
+en tránsito.
+   </para>
+
+   <para>
+Otra parte importantísima de <systemitem>ICMP</systemitem> es el hecho de que
+se emplea para indicarle a los hosts qué ha pasado con las conexiones
+<systemitem>UDP</systemitem> y <systemitem>TCP</systemitem> o con los intentos
+de conexión. Por este motivo las respuestas ICMP muy a menudo serán reconocidas
+como relacionadas (<command>RELATED</command>) con conexiones o intentos de
+conexión. Un ejemplo sencillo sería el de los mensajes <systemitem>ICMP Host
+unreachable</systemitem> (mensaje de host inalcanzable, no se puede llegar al
+host) e <systemitem>ICMP Network unreachable</systemitem> (mensaje de red
+inalcanzable, no se puede llegar hasta la red). Este tipo de mensajes se envían
+automáticamente de vuelta a nuestro host cuando el paquete no consigue efectuar
+la conexión con un host porque la red o el host de destino están fuera de servicio, de
+manera que el último enrutador (router) que intente conectar con el destino nos
+contestará con un mensaje <systemitem>ICMP</systemitem> diciéndonos lo que
+ocurre. En este caso la respuesta <systemitem>ICMP</systemitem> se considera
+como un paquete relacionado (<command>RELATED</command>). El siguiente gráfico
+debería aclarar lo que ocurre:
+   </para>
+
+   <para>
+    <mediaobject>
+     <imageobject>
+      <imagedata fileref="images/state-tcp-icmp-reply.eps" format=eps>
+     </imageobject>
+     <imageobject>
+      <imagedata fileref="images/state-tcp-icmp-reply.jpg" format=jpg>
+     </imageobject>
+    </mediaobject>
+   </para>
+
+   <para>
+En el ejemplo enviamos un paquete <systemitem>SYN</systemitem> a una dirección
+concreta: ésto es considerado como una nueva conexión (<command>NEW</command>)
+por el cortafuegos. Sin embargo no se puede llegar a la red a la que se está intentando
+enviar el paquete, por lo que un router (el último) nos devuelve un error
+<systemitem>ICMP</systemitem> de red inalcanzable. El código de seguimiento de
+conexiones puede reconocer este paquete como relacionado (<command>RELATED</command>)
+gracias a la entrada ya existente, por lo que la respuesta <systemitem>ICMP</systemitem>
+es correctamente enviada al cliente que generó el paquete inicial y, si todo va
+bien, éste abortará la conexión. Mientras tanto el cortafuegos ya habrá
+eliminado la entrada del seguimiento de conexiones, puesto que sabe que se trata de un
+mensaje de error.
+   </para>
+
+   <para>
+El mismo comportamiento se experimenta con las conexiones <systemitem>UDP</systemitem>
+si tienen problemas como en el caso anterior. Todo mensaje <systemitem>ICMP</systemitem>
+devuelto como respuesta a conexiones <systemitem>UDP</systemitem> es considerado
+como relacionado (<command>RELATED</command>). Observa el siguiente gráfico:
+   </para>
+
+   <para>
+    <mediaobject>
+     <imageobject>
+      <imagedata fileref="images/state-udp-icmp-reply.eps" format=eps>
+     </imageobject>
+     <imageobject>
+      <imagedata fileref="images/state-udp-icmp-reply.jpg" format=jpg>
+     </imageobject>
+    </mediaobject>
+   </para>
+
+   <para>
+En esta ocasión se envía un paquete <systemitem>UDP</systemitem> al host. Esta
+conexión <systemitem>UDP</systemitem> se considera como nueva <command>NEW</command>.
+Sin embargo la red está prohibida administrativamente por algún cortafuegos o
+router antes de llegar a destino y por éllo nuestro cortafuegos recibe un
+mensaje <systemitem>ICMP Network Prohibited</systemitem> (red prohibida). El
+cortafuegos sabe que este mensaje <systemitem>ICMP</systemitem> de error está
+relacionado con la conexión <systemitem>UDP</systemitem> abierta y lo envía
+como un paquete <command>RELATED</command> (relacionado) al cliente. Acto
+seguido, elimina la entrada del seguimiento de conexiones mientras el cliente
+recibe el mensaje y aborta la conexión.
+   </para>
+
+  </section>
+
+  <section id="defaultconnections">
+   <title id="defaultconnections.title">Conexiones por defecto</title>
+
+   <para>
+En algunos casos el conntrack no sabe cómo gestionar un protocolo específico,
+bien sea porque no conoce el protocolo o porque no sabe cómo funciona. En estos
+casos sigue un comportamiento por defecto, como ocurre por ejemplo con
+<systemitem>NETBLT</systemitem>, <systemitem>MUX</systemitem> y <systemitem>EGP</systemitem>.
+El procedimiento seguido es básicamente el mismo que en el seguimiento de las
+conexiones <systemitem>UDP</systemitem>: el primer paquete se considera como
+nuevo (<command>NEW</command>) y el tráfico de respuesta y subsiguiente es
+considerado como establecido (<command>ESTABLISHED</command>).
+   </para>
+
+   <para>
+Cuando se emplea el comportamiento por defecto todos los paquetes afectados
+tendrán el mismo "tiempo de vida" (timeout) por defecto, que se puede establecer
+a través de la variable <filename>/proc/sys/net/ipv4/netfilter/ip_ct_generic_timeout</filename>.
+El valor por defecto es de 600 segundos (10 minutos). En función del tipo de
+tráfico que estés intentando enviar a través de un enlace que utilice este
+comportamiento por defecto, es posible que necesites cambiarlo, especialmente
+si estás conectado a través de satélite o algo similar, pues la comunicación
+puede llegar a tardar bastante tiempo.
+   </para>
+
+  </section>
+
+  <section id="complexprotocols">
+   <title id="complexprotocols.title">Los protocolos complejos y el seguimiento
+   de conexiones</title>
+
+   <para>
+Determinados protocolos son más complejos que otros, lo cual implica que a la
+hora de realizar el seguimiento de conexiones el trabajo será más difícil.
+Buenos ejemplos de éllo son los protocolos <systemitem>ICQ</systemitem>,
+<systemitem>IRC</systemitem> y <systemitem>FTP</systemitem>. Cada uno de éllos
+incluye información dentro del bloque de datos de los paquetes, por lo que para
+funcionar correctamente requieren de asistentes especiales para el seguimiento
+de conexiones.
+   </para>
+
+   <para>
+Empecemos por ejemplo con el procolo <systemitem>FTP</systemitem>. Este
+protocolo comienza abriendo una única conexión llamada sesión "<systemitem>FTP
+control</systemitem>" (sesión de control ftp). En cuanto enviamos comandos a
+través de esta sesión, se abren otros puertos para transportar el resto de datos
+relacionados con esos comandos. Estas conexiones se pueden crear de dos maneras:
+activamente o pasivamente. Cuando una conexión se genera activamente, el cliente
+<systemitem>FTP</systemitem> envía al servidor un puerto y una dirección IP a
+los que conectarse. Tras ésto el cliente <systemitem>FTP</systemitem> abre el
+puerto indicado y el servidor conecta con él desde su propio puerto 20 (conocido
+como "FTP-Data"), enviando datos a través de él.
+   </para>
+
+   <para>
+El problema radica en que el cortafuegos no tiene conocimiento de esas
+conexiones extras, ya que son negociadas a través del bloque de datos que
+transporta el paquete (lo que se conoce como "payload" o carga de información;
+recordemos que a grosso modo un paquete IP tiene una cabecera con información sobre la
+conexión y un bloque de datos que es lo que desea el host que lo recibe).
+Debido a ésto el cortafuegos no será capaz de saber que debería dejar conectarse
+al servidor con el cliente a través de estos puertos concretos.
+   </para>
+
+   <para>
+La solución al problema pasa por añadir un asistente especial al módulo del
+seguimiento de conexiones, que escaneará los datos de la conexión de control
+para detectar sintaxis e información específicas: cuando encuentre la
+información adecuada, la añadirá en una nueva entrada etiquetada como relacionada
+(<command>RELATED</command>) y gracias a esta nueva entrada el servidor ya será
+capaz de efectuar un seguimiento de la conexión. Observa la siguiente imagen
+para entender los estados cuando el servidor <systemitem>FTP</systemitem> ya
+ha creado la conexión con el cliente.
+   </para>
+
+   <para>
+    <mediaobject>
+     <imageobject>
+      <imagedata fileref="images/state-tcp-server-subconn.eps" format=eps>
+     </imageobject>
+     <imageobject>
+      <imagedata fileref="images/state-tcp-server-subconn.jpg" format=jpg>
+     </imageobject>
+    </mediaobject>
+   </para>
+
+   <para>
+El ftp pasivo ("<systemitem>Passive FTP</systemitem>") funciona completamente
+a la inversa: el cliente <systemitem>FTP</systemitem> le indica al servidor que
+quiere determinados datos, a lo que el servidor responde con una dirección IP
+y un puerto a los que conectarse. Tras recibir estos datos, el cliente se
+conectará a ese puerto desde su propio puerto 20 (el puerto FTP-data) y cogerá
+los datos en cuestión. Si tienes un servidor <systemitem>FTP</systemitem> tras
+tu cortafuegos, necesitarás de este módulo además de los módulos estándar de
+iptables para permitir que los clientes desde Internet puedan conectar
+correctamente con tu servidor <systemitem>FTP</systemitem>. De igual forma
+necesitarás el módulo si eres extremadamente restrictivo con tus usuarios y sólo
+quieres dejar que utilicen servidores <systemitem>HTTP</systemitem> y
+<systemitem>FTP</systemitem> de Internet, bloqueando cualquier otro puerto.
+Observa la siguiente imagen y su relación con el ftp pasivo ("Passive
+<systemitem>FTP</systemitem>").
+   </para>
+
+   <para>
+    <mediaobject>
+     <imageobject>
+      <imagedata fileref="images/state-tcp-client-subconn.eps" format=eps>
+     </imageobject>
+     <imageobject>
+      <imagedata fileref="images/state-tcp-client-subconn.jpg" format=jpg>
+     </imageobject>
+    </mediaobject>
+   </para>
+
+   <para>
+Algunos asistentes del conntrack ya están disponibles en el núcleo, más
+concretamente, en el momento de escribir estas líneas los protocolos
+<systemitem>FTP</systemitem> e <systemitem>IRC</systemitem> ya disponen de estos
+asistentes. Si no puedes encontrar en el núcleo los asistentes que necesitas,
+debes echar un vistazo al <systemitem>patch-o-matic</systemitem>, en la sección
+de zona de usuario de iptables: podrás encontrar más asistentes del conntrack,
+como es el caso de los protocolos <systemitem>ntalk</systemitem> o
+<systemitem>H.323</systemitem>. Si no están disponibles en el patch-o-matic,
+todavía dispones de algunas opciones más, como el CVS ("Concurrent Versioning
+System") de iptables, si recientemente a entrado en él. O también puedes ponerte
+en contacto con la lista de correo <link linkend="otherresources">Netfilter-devel</link>
+y preguntar si está disponible. Si no lo está y no está planeado añadirlo, te
+quedas solo y lo más probable es que quieras leer el "CÓMO" de Rusty Russell:
+<link linkend="netfilterhackinghowto">Rusty Russell's Unreliable Netfilter
+Hacking HOW-TO</link> (en inglés), del cual tienes un enlace en el apéndice
+<link linkend="otherresources" endterm="otherresources.title"></link>.
+   </para>
+
+   <para>
+Los asistentes del conntrack pueden ser compilados estáticamente o como módulos
+en el núcleo. Si se compilan como módulos puedes cargarlos con el siguiente
+comando:
+   </para>
+
+   <screen>
+<command>
+modprobe ip_conntrack_*
+</command>
+   </screen>
+
+   <para>
+Ten en cuenta que el seguimiento de conexiones no tiene nada que ver con la
+traducción de direcciones (<systemitem>NAT</systemitem>), por lo que es posible
+que necesites más módulos si también estás "NATeando" (traduciendo) las
+conexiones. Por ejemplo, si quisieras traducir las direcciones y realizar un
+seguimiento de las conexiones <systemitem>FTP</systemitem>, necesitarías
+también el módulo <systemitem>NAT</systemitem>. Todos los asistentes <systemitem>NAT</systemitem>
+tienen el mismo prefijo en su nombre: "ip_nat_", seguido por el nombre del
+asistente en cuestión. Por ejemplo, el asistente para <systemitem>FTP</systemitem>
+con <systemitem>NAT</systemitem> (traducción de direcciones) se llamaría
+<systemitem>ip_nat_ftp</systemitem> y el módulo <systemitem>IRC</systemitem>
+se llamaría <systemitem>ip_nat_irc</systemitem>. Los asistentes del conntrack
+siguen la misma regla de nomenclatura, por lo que el asistente del conntrack
+para <systemitem>IRC</systemitem> se llamaría <systemitem>ip_conntrack_irc</systemitem>,
+mientras que el asistente para <systemitem>FTP</systemitem> sería
+<systemitem>ip_conntrack_ftp</systemitem>.
+   </para>
+
+  </section>
+
+ </chapter>

@@ -1,0 +1,868 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>ICMP headers</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="TCP/IP repetition"
+HREF="c171.htm"><LINK
+REL="PREVIOUS"
+TITLE="ICMP characteristics"
+HREF="x1030.htm"><LINK
+REL="NEXT"
+TITLE="SCTP Characteristics"
+HREF="x1535.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x1030.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 2. TCP/IP repetition</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x1535.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="ICMPHEADERS"
+>ICMP headers</A
+></H1
+><P
+>As already explained, the headers differs a little bit from
+ICMP type to ICMP type. Most
+of the ICMP types are possible to group by their
+headers. Because of this, we will discuss the basic header form first, and
+then look at the specifics for each group of types that should be discussed.
+      </P
+><P
+>        <DIV
+CLASS="MEDIAOBJECT"
+><P
+><IMG
+SRC="images/icmp-basic-headers.jpg"></P
+></DIV
+>
+      </P
+><P
+>All packets contain some basic values from the IP
+headers discussed previously in this chapter. The headers have previously been
+discussed at some length, so this is just a short listing of the headers, with
+a few notes about them.
+      </P
+><P
+></P
+><UL
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Version 
+ - This should always be set
+to 4.
+          </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Internet   Header Length - The length of the header in 32
+bit words.
+          </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Type   of Service - See above. This should be set to 0,
+as this is the only legit setting according to <A
+HREF="a13413.htm#RFC792"
+><I
+>RFC 792 - Internet Control Message Protocol</I
+></A
+>.
+          </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Total 
+ Length - Total length
+of the header and data portion of the packet, counted in octets.
+          </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Identification 
+, Flags and Fragment
+offsets - Ripped from the IP protocol.
+          </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Time 
+ To Live - How many hops
+this packet will survive.
+          </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Protocol 
+ - which version of
+ICMP is being used (should always be 1).
+          </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Header 
+ Checksum - See the
+IP explanation.
+          </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Source 
+ Address - The source
+address from whom the packet was sent. This is not entirely true, since the
+packet can have another source address, than that which is located on the
+machine in question. The ICMP types that can have
+this effect will be noted if so.
+          </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Destination 
+ Address - The
+destination address of the packet.
+          </P
+></LI
+></UL
+><P
+>There are also a couple of new headers that are used by all of the
+ICMP types. The new headers are as follows, this time
+with a few more notes about them:
+      </P
+><P
+></P
+><UL
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Type 
+ - The
+type field contains the ICMP
+type of the packet. This is always different from
+ICMP type to type. For example ICMP
+Destination Unreachable packets will have a type 3 set to it. For
+a complete listing of the different ICMP types, see
+the <A
+HREF="a12854.htm"
+><I
+>ICMP types</I
+></A
+> appendix. This
+field contains 8 bits total.
+          </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Code 
+ - All
+ICMP types can contain different codes as well. Some
+types only have a single code, while others have several codes that they can
+use. For example, the ICMP Destination Unreachable
+(type 3) can have at least code 0, 1, 2, 3, 4 or 5 set. Each code has a
+different meaning in that context then. For a complete listing of the
+different codes, see the <A
+HREF="a12854.htm"
+><I
+>ICMP types</I
+></A
+> appendix. This field is 8 bits in length,
+total. We will discuss the different codes a little bit more in detail for
+each type later on in this section.
+          </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Checksum 
+ - The
+Checksum is a 16 bit field containing a one's
+complement of the ones complement of the headers starting with the
+ICMP type and down. While calculating the checksum,
+the checksum field should be set to zero.
+          </P
+></LI
+></UL
+><P
+>At this point the headers for the different packets start to look different
+also. We will describe the most common ICMP Types one
+by one, with a brief discussion of its headers and different codes.
+      </P
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="ICMPECHO"
+>ICMP Echo Request/Reply</A
+></H2
+><P
+>          <DIV
+CLASS="MEDIAOBJECT"
+><P
+><IMG
+SRC="images/icmp-echo-headers.jpg"></P
+></DIV
+>
+        </P
+><P
+>I have chosen to speak about both the reply and the request of the
+ICMP echo packets here since they are so closely
+related to each other. The first difference is that the echo request is type
+8, while echo reply is type 0. When a host receives a type 8, it replies with
+a type 0.
+        </P
+><P
+>When the reply is sent, the source and
+destination addresses switch places as well. After
+both of those changes has been done, the checksum is
+recomputed, and the reply is sent. There is only one code for both of these
+types, they are always set to 0.
+        </P
+><P
+></P
+><UL
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Identifier 
+ - This is set in the
+request packet, and echoed back in the reply, to be able to keep different
+ping requests and replies together.
+            </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Sequence 
+ number - The sequence number for each host, generally this starts at 1
+and is incremented by 1 for each packet.
+            </P
+></LI
+></UL
+><P
+>The packets also contains a data part. Per default, the data part is generally
+empty, but it can contain a userspecified amount of random data.
+        </P
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="ICMPDESTUNREACH"
+>ICMP Destination Unreachable</A
+></H2
+><P
+>          <DIV
+CLASS="MEDIAOBJECT"
+><P
+><IMG
+SRC="images/icmp-destination-unreachable-headers.jpg"></P
+></DIV
+>
+        </P
+><P
+>The first three fields seen in the image are the same as previously described.
+The Destination Unreachable type has 16 basic codes
+that can be used, as seen below in the list.
+        </P
+><P
+></P
+><UL
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Code 0 - Network unreachable  -
+Tells you if a specific network is currently unreachable.
+            </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Code 1 - Host unreachable  -
+Tells you if a specific host is currently unreachable.
+            </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Code 2 - Protocol unreachable 
+- This code tells you if a specific protocol (tcp, udp, etc) can not be
+reached at the moment.
+            </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Code 3 - Port unreachable  - If
+a port (ssh, http, ftp-data, etc) is not reachable, you will get this
+message.
+            </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Code 4 - Fragmentation needed and DF set  - If a packet needs to be fragmented to be
+delivered, but the Do not fragment bit is set in the packet, the gateway will
+return this message.
+           </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Code 5 - Source route failed  -
+If a source route failed for some reason, this message is returned.
+            </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Code 6 - Destination network unknown  - If there is no route to a specific network,
+this message is returned.
+            </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Code 7 - Destination host unknown  - If there is no route to a specific host,
+this message is returned.
+            </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Code 8 - Source host isolated (obsolete)
+- If a host is isolated, this message should be returned. This code is
+obsoleted today.
+            </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Code 9 - Destination network administratively prohibited
+ - If a network was blocked at a gateway and
+your packet was unable to reach it because of this, you should get this
+ICMP code back.
+              </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Code 10 - Destination host administratively prohibited
+ - If you where unable to reach a host
+because it was administratively prohibited (e.g., routing administration),
+you will get this message back.
+            </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Code 11 - Network unreachable for TOS  - If a network was unreachable because of a
+<SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>bad</I
+></SPAN
+> TOS setting in your packet,
+this code will be generated as a return packet.
+            </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Code 12 - Host unreachable for TOS  - If your packet was unable to reach a host
+because of the TOS of the packet, this is the message
+you get back.
+
+            </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Code 13 - Communication administratively prohibited by filtering
+ - If the
+packet was prohibited by some kind of filtering (e.g., firewalling), we get a
+code 13 back.
+            </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Code 14 - Host precedence violation  - This is sent by the first hop router to
+notify a connected host, to notify the host that the used precedence is not
+permitted for a specific destination/source combination.
+            </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Code 15 - Precedence cutoff in effect  - The first hop router may send this message to
+a host if the datagram it received had a too low precedence level set in it.
+            </P
+></LI
+></UL
+><P
+>On top of this, it also contains a small "data" part, which should be the whole
+Internet header (IP header) and 64 bits of the original IP datagram. If the next
+level protocol contains any ports, etc, it is assumed that the ports should be
+available in the extra 64 bits.
+        </P
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="SOURCEQUENCH"
+>Source Quench</A
+></H2
+><P
+>          <DIV
+CLASS="MEDIAOBJECT"
+><P
+><IMG
+SRC="images/icmp-source-quench-headers.jpg"></P
+></DIV
+>
+        </P
+><P
+>A source quench packet can be sent to tell the originating source of a packet or
+stream of packets to slow down when continuing to send data. Note that gateway
+or destination host that the packets traverses can also be quiet and silently
+discard the packets, instead of sending any source quench packets.
+        </P
+><P
+>This packet contains no extra header except the data portion, which contains the
+internet header plus 64 bits of the original data datagram. This is used to
+match the source quench message to the correct process, which is currently
+sending data through the gateway or to the destination host.
+        </P
+><P
+>All source quench packets have their
+ICMP types set to 4. They have no codes
+except 0.
+        </P
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Today, there are a couple of new possible ways of notifying the sending and
+receiving host that a gateway or destination host is overloaded. One way for
+example is the ECN (Explicit Congestion Notification) system.
+          </P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="REDIRECT"
+>Redirect</A
+></H2
+><P
+>          <DIV
+CLASS="MEDIAOBJECT"
+><P
+><IMG
+SRC="images/icmp-redirect-headers.jpg"></P
+></DIV
+>
+        </P
+><P
+>The ICMP Redirect type is sent in a single case.
+Consider this, you have a network (192.168.0.0/24) with several clients and
+hosts on it, and two gateways. One gateway to a 10.0.0.0/24 network, and a
+default gateway to the rest of the Internet. Now consider if one of the hosts
+on the 192.168.0.0/24 network has no route set to 10.0.0.0/24, but it has the
+default gateway set. It sends a packet to the default gateway, which of course
+knows about the 10.0.0.0/24 network. The default gateway can deduce that it is
+faster to send the packet directly to the 10.0.0.0/24 gateway since the packet
+will enter and leave the gateway on the same interface. The default gateway
+will hence send out a single ICMP Redirect packet to
+the host, telling it about the real gateway, and then sending the packet on to
+the 10.0.0.0/24 gateway. The host will now know about the closest 10.0.0.0/24
+gateway, and hopefully use it in the future.
+        </P
+><P
+>The main header of the Redirect type is the
+Gateway Internet Address field. This field tells the
+host about the proper gateway, which should really be used. The packet also
+contains the IP header of the original packet, and
+the 64 first bits of data in the original packet, which is used to connect it
+to the proper process sending the data.
+        </P
+><P
+>The Redirect type has 4 different codes as well,
+these are the following.
+        </P
+><P
+></P
+><UL
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Code 0 - Redirect for network - Only used for redirects for a whole network 
+(e.g., the example above).
+            </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Code 1 - Redirect for host - Only used for
+redirects of a specific host (e.g., a host route).
+            </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Code 2 - Redirect for TOS and network - Only used
+for redirects of a specific Type of Service and to a
+whole network. Used as code 0, but also based on the
+TOS.
+            </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Code 3 - Redirect for TOS and host - Only used for
+redirects of a specific Type of Service and to a
+specific host. Used as code 1, but also based on the
+TOS in other words.
+            </P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="TTLEQ0"
+>TTL equals 0</A
+></H2
+><P
+>          <DIV
+CLASS="MEDIAOBJECT"
+><P
+><IMG
+SRC="images/icmp-time-exceeded-headers.jpg"></P
+></DIV
+>
+        </P
+><P
+>The TTL equals 0 ICMP type
+is also known as Time Exceeded Message and has type 
+11 set to it, and has 2 ICMP codes available. If the
+TTL field reaches 0 during 
+transit through a gateway or fragment reassembly on the destination host, the 
+packet must be discarded. To notify the sending host of this problem, we can 
+send a TTL equals 0 ICMP
+packet. The sender can then raise the TTL of outgoing 
+packets to this destination if necessary.
+        </P
+><P
+>The packet only contains the extra data portion of the packet. The data field 
+contains the Internet header plus 64 bits of the data of the
+IP packet, so that 
+the other end may match the packet to the proper process. As previously 
+mentioned, the TTL equals 0 type can have two codes.
+        </P
+><P
+></P
+><UL
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Code 0 - TTL equals 0 during transit  -
+This is sent to the sending host if the original packet
+TTL reached 0 when it was forwarded by a gateway.
+            </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Code 1 - TTL equals 0 during reassembly 
+- This is sent if the original packet was fragmented, and
+TTL reached 0 during reassembly of the fragments.
+This code should only be sent from the destination host.
+            </P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="PARAMETERPROBLEM"
+>Parameter problem</A
+></H2
+><P
+>          <DIV
+CLASS="MEDIAOBJECT"
+><P
+><IMG
+SRC="images/icmp-parameter-problem-headers.jpg"></P
+></DIV
+>
+        </P
+><P
+>The parameter problem ICMP
+uses type 12 and it has 2 codes that it uses as well. Parameter
+problem messages are used to tell the sending host that the
+gateway or receiving host had problems understanding parts of the
+IP headers such as errors, or that some required
+options where missing.
+        </P
+><P
+>The parameter problem type contains one special
+header, which is a pointer to the field that caused the error in the original
+packet, if the code is 0 that is. The following codes are available:
+        </P
+><P
+></P
+><UL
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Code 0 - IP header bad (catchall error)  - This is a catchall error message as discussed just above.
+Together with the pointer, this code is used to point to which part of the IP
+header contained an error.
+            </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>Code 1 - Required options missing 
+- If an IP option that is required is missing, this code is used to tell about
+it.
+            </P
+></LI
+></UL
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="TIMESTAMP"
+>Timestamp request/reply</A
+></H2
+><P
+>          <DIV
+CLASS="MEDIAOBJECT"
+><P
+><IMG
+SRC="images/icmp-timestamp-headers.jpg"></P
+></DIV
+>
+        </P
+><P
+>The timestamp type is obsolete these days, but we
+bring it up briefly here. Both the reply and the request has a single code
+(0). The request is type 13 while the reply is type 14. The timestamp packets
+contains 3 32-bit timestamps counting the milliseconds since midnight UT
+(Universal Time). 
+        </P
+><P
+>The first timestamp is the Originate timestamp, which contains the last time
+the sender touched the packet. The receive timestamp is the time that the
+echoing host first touched the packet and the transmit timestamp is the last
+timestamp set just previous to sending the packet.
+        </P
+><P
+>Each timestamp message also contains the same identifiers and sequence numbers 
+as the ICMP echo packets.
+        </P
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="INFORMATIONREQUEST"
+>Information request/reply</A
+></H2
+><P
+>          <DIV
+CLASS="MEDIAOBJECT"
+><P
+><IMG
+SRC="images/icmp-information-headers.jpg"></P
+></DIV
+>
+        </P
+><P
+>The information request and reply types are obsolete since there are protocols 
+on top of the IP protocol that can now take care of
+this when necessary (DHCP, etc). The information
+request generates a reply from any answering host on the network that we are
+attached to.
+        </P
+><P
+>The host that wishes to receive information creates a packet with the source
+address set to the network we are attached to (for example, 192.168.0.0), and
+the destination network set to 0. The reply will contain information about our
+numbers (netmask and ip address).
+         </P
+><P
+>The information request is run through ICMP type 15 while the reply is sent via 
+type 16.
+         </P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x1030.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x1535.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>ICMP characteristics</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c171.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>SCTP Characteristics</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

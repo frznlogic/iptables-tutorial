@@ -1,0 +1,280 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>User-land states</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="The state machine"
+HREF="c4219.htm"><LINK
+REL="PREVIOUS"
+TITLE="The conntrack entries"
+HREF="x4273.htm"><LINK
+REL="NEXT"
+TITLE="TCP connections"
+HREF="x4436.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x4273.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 7. The state machine</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x4436.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="USERLANDSTATES"
+>User-land states</A
+></H1
+><P
+>     As you have seen, packets may take on several different states within the
+kernel itself, depending on what protocol we are talking about. However,
+outside the kernel, we only have the 4 states as described previously. These
+states can mainly be used in conjunction with the state match which will then
+be able to match packets based on their current connection tracking state. The
+valid states are NEW,
+ESTABLISHED, RELATED and
+INVALID. The following table will briefly explain
+each possible state.
+     </P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.USERLANDSTATES"
+></A
+><P
+><B
+>Table 7-1. User-land states</B
+></P
+><TABLE
+BORDER="1"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="96"><COL
+WIDTH="1*"><THEAD
+><TR
+><TH
+>State</TH
+><TH
+>Explanation</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>NEW</TD
+><TD
+>The NEW state tells us that the packet is
+the first packet that we see. This means that the first packet that the
+conntrack module sees, within a specific connection, will be matched. For
+example, if we see a SYN packet and it is the first
+packet in a connection that we see, it will match. However, the packet may as
+well not be a SYN packet and still be considered
+NEW. This may lead to certain problems in some instances,
+but it may also be extremely helpful when we need to pick up lost connections
+from other firewalls, or when a connection has already timed out, but in
+reality is not closed.
+        </TD
+></TR
+><TR
+><TD
+>ESTABLISHED</TD
+><TD
+>The ESTABLISHED state has seen traffic in both
+directions and will then continuously match those packets.
+ESTABLISHED connections are fairly easy to understand. The
+only requirement to get into an ESTABLISHED state is that
+one host sends a packet, and that it later on gets a reply from the other
+host. The NEW state will upon receipt of the reply packet
+to or through the firewall change to the ESTABLISHED state.
+ICMP reply messages can also be
+considered as ESTABLISHED, if we created a packet
+that in turn generated the reply ICMP message.
+        </TD
+></TR
+><TR
+><TD
+>RELATED</TD
+><TD
+>The RELATED state is one of the more tricky
+states. A connection is considered RELATED when it is
+related to another already ESTABLISHED connection. What
+this means, is that for a connection to be considered as
+RELATED, we must first have a connection that is considered
+ESTABLISHED. The ESTABLISHED connection
+will then spawn a connection outside of the main connection. The newly spawned
+connection will then be considered RELATED, if the
+conntrack module is able to understand that it is RELATED.
+Some good examples of connections that can be considered as
+RELATED are the FTP-data
+connections that are considered RELATED to the
+FTP control port, and the
+DCC connections issued through
+IRC. This could be used to allow
+ICMP error messages, FTP
+transfers and DCC's to work properly through the
+firewall. Do note that most TCP protocols and some
+UDP protocols that rely on this mechanism are quite
+complex and send connection information within the payload of the
+TCP or UDP data segments,
+and hence require special helper modules to be correctly understood. 
+        </TD
+></TR
+><TR
+><TD
+>INVALID</TD
+><TD
+>The INVALID state means that the packet 
+can't be identified or that it does not have any state. This may be due to
+several reasons, such as the system running out of memory or
+ICMP error messages that do not respond to any known
+connections. Generally, it is a good idea to DROP
+everything in this state.
+        </TD
+></TR
+><TR
+><TD
+>UNTRACKED</TD
+><TD
+>This is the UNTRACKED state. In brief, if a 
+packet is marked within the raw table with the 
+NOTRACK target, then that packet will show up as 
+UNTRACKED in the state machine. This also means that all 
+RELATED connections will not be seen, so some caution must 
+be taken when dealing with the UNTRACKED connections since 
+the state machine will not be able to see related ICMP 
+messages et cetera.
+        </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>     These states can be used together with the --state
+match to match packets based on their connection tracking state. This is what
+makes the state machine so incredibly strong and efficient for our firewall.
+Previously, we often had to open up all ports above 1024 to let all traffic
+back into our local networks again. With the state machine in place this is
+not necessary any longer, since we can now just open up the firewall for
+return traffic and not for all kinds of other traffic.
+     </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x4273.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x4436.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>The conntrack entries</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c4219.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>TCP connections</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,349 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>ICMP connections</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="The state machine"
+HREF="c4219.htm"><LINK
+REL="PREVIOUS"
+TITLE="UDP connections"
+HREF="x4596.htm"><LINK
+REL="NEXT"
+TITLE="Default connections"
+HREF="x4755.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x4596.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 7. The state machine</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x4755.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="ICMPCONNECTIONS"
+>ICMP connections</A
+></H1
+><P
+>ICMP packets are far from a stateful stream, since
+they are only used for controlling and should never establish any connections.
+There are four ICMP types that will generate return
+packets however, and these have 2 different states. These
+ICMP messages can take the NEW and
+ESTABLISHED states. The ICMP types
+we are talking about are Echo request and
+reply, Timestamp request and
+reply, Information request
+and reply and finally Address mask
+request and reply. Out of these, the
+timestamp request and information
+request are obsolete and could most probably just be dropped.
+However, the Echo messages are used in several setups
+such as pinging hosts. Address mask requests are not
+used often, but could be useful at times and worth allowing. To get
+an idea of how this could look, have a look at the following image.
+   </P
+><P
+>    <DIV
+CLASS="MEDIAOBJECT"
+><P
+><IMG
+SRC="images/state-icmp-ping.jpg"></P
+></DIV
+>
+   </P
+><P
+>As you can see in the above picture, the host sends an echo
+request to the target, which is considered as
+NEW by the firewall. The target then responds with a
+echo reply which the firewall considers as state
+ESTABLISHED. When the first echo request has been seen, the
+following state entry goes into the <TT
+CLASS="FILENAME"
+>ip_conntrack</TT
+>.
+   </P
+><PRE
+CLASS="SCREEN"
+>icmp     1 25 src=192.168.1.6 dst=192.168.1.10 type=8 code=0 \
+     id=33029 [UNREPLIED] src=192.168.1.10 dst=192.168.1.6 \
+     type=0 code=0 id=33029 use=1
+   </PRE
+><P
+>This entry looks a little bit different from the standard states for
+TCP and UDP as you can see.
+The protocol is there, and the timeout, as well as source and destination
+addresses. The problem comes after that however. We now have 3 new fields
+called type,
+code and id.
+They are not special in any way, the type
+field contains the ICMP type and the
+code field contains the
+ICMP code. These are all available in <A
+HREF="a12854.htm"
+><I
+>ICMP types</I
+></A
+> appendix. The final
+id field, contains the ICMP
+ID. Each ICMP packet gets an ID set to
+it when it is sent, and when the receiver gets the
+ICMP message, it sets the same
+ID within the new ICMP
+message so that the sender will recognize the reply and will be able to
+connect it with the correct ICMP request.
+   </P
+><P
+>The next field, we once again recognize as the
+[UNREPLIED] flag, which we have seen before.
+Just as before, this flag tells us that we are currently looking at a
+connection tracking entry that has seen only traffic in one direction.
+Finally, we see the reply expectation for the reply
+ICMP packet, which is the inversion of the original
+source and destination IP addresses. As for the type and code, these are
+changed to the correct values for the return packet, so an echo request is
+changed to echo reply and so on. The ICMP ID is
+preserved from the request packet.
+   </P
+><P
+>The reply packet is considered as being ESTABLISHED, as we
+have already explained. However, we can know for sure that after the
+ICMP reply, there will be absolutely no more legal
+traffic in the same connection. For this reason, the connection tracking entry
+is destroyed once the reply has traveled all the way through the Netfilter
+structure.
+   </P
+><P
+>In each of the above cases, the request is considered as
+NEW, while the reply is considered as
+ESTABLISHED. Let's consider this more closely. When the
+firewall sees a request packet, it considers it as NEW.
+When the host sends a reply packet to the request it is considered
+ESTABLISHED.
+   </P
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Note that this means that the reply packet must match the criterion given by
+the connection tracking entry to be considered as established, just as with
+all other traffic types.
+    </P
+></TD
+></TR
+></TABLE
+></DIV
+><P
+>ICMP requests has a default timeout of 30 seconds, which you can change in the
+<TT
+CLASS="FILENAME"
+>/proc/sys/net/ipv4/netfilter/ip_ct_icmp_timeout</TT
+> entry.
+This should in general be a good timeout value, since it will be able to catch
+most packets in transit.
+   </P
+><P
+>Another hugely important part of ICMP is the fact
+that it is used to tell the hosts what happened to specific
+UDP and TCP connections or
+connection attempts. For this simple reason, ICMP replies will very often be
+recognized as RELATED to original connections or
+connection attempts. A simple example would be the
+ICMP Host unreachable or ICMP Network
+unreachable. These should always be spawned back to our host if
+it attempts an unsuccessful connection to some other host, but the network or
+host in question could be down, and hence the last router trying to reach the
+site in question will reply with an ICMP message
+telling us about it. In this case, the ICMP reply is
+considered as a RELATED packet. The following picture
+should explain how it would look.
+
+   </P
+><P
+>    <DIV
+CLASS="MEDIAOBJECT"
+><P
+><IMG
+SRC="images/state-tcp-icmp-reply.jpg"></P
+></DIV
+>
+   </P
+><P
+>   In the above example, we send out a SYN packet to
+a specific address. This is considered as a NEW connection
+by the firewall. However, the network the packet is trying to reach is
+unreachable, so a router returns a network unreachable
+ICMP error to us. The connection tracking code can
+recognize this packet as RELATED. thanks to the already
+added tracking entry, so the ICMP reply is correctly
+sent to the client which will then hopefully abort. Meanwhile, the firewall
+has destroyed the connection tracking entry since it knows this was an error
+message.
+   </P
+><P
+>The same behavior as above is experienced with UDP
+connections if they run into any problem like the above. All
+ICMP messages sent in reply to
+UDP connections are considered as
+RELATED. Consider the following image.
+   </P
+><P
+>    <DIV
+CLASS="MEDIAOBJECT"
+><P
+><IMG
+SRC="images/state-udp-icmp-reply.jpg"></P
+></DIV
+>
+   </P
+><P
+>This time an UDP packet is sent to the host. This
+UDP connection is considered as
+NEW. However, the network is administratively prohibited by
+some firewall or router on the way over. Hence, our firewall receives a
+ICMP Network Prohibited in return. The firewall knows
+that this ICMP error message is related to the
+already opened UDP connection and sends it as a
+RELATED packet to the client. At this point, the firewall
+destroys the connection tracking entry, and the client receives the
+ICMP message and should hopefully abort.
+
+   </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x4596.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x4755.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>UDP connections</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c4219.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Default connections</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

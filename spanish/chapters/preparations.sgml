@@ -1,0 +1,726 @@
+ <chapter id="preparations">
+  <title id="preparations.title">Preparativos</title>
+
+  <para>
+El objetivo de este capítulo es iniciarte y ayudarte a entender el papel que hoy
+día tienen Netfilter e <command>iptables</command> dentro de Linux. Este
+capítulo debería conseguir que estés listo para experimentar e instalar tu
+cortafuegos. Dándole el tiempo necesario y con la perseverancia adecuada,
+conseguirás que funcione exactamente como desees que lo haga.
+  </para>
+
+  <section id="wheretoget">
+   <title id="wheretoget.title">Dónde conseguir iptables</title>
+
+   <para>
+El paquete de espacio de usuario de <command>iptables</command> se puede
+descargar desde la <ulink url="http://netfilter.samba.org/">página de inicio de
+Netfilter</ulink>. El paquete <command>iptables</command> también utiliza las
+capacidades del espacio del núcleo, las cuales pueden configurarse durante la
+ejecución de <command>make configure</command>. Los pasos necesarios se
+discutirán a continuación.
+   </para>
+  </section>
+
+  <section id="kernelsetup">
+   <title id="kernelsetup.title">Configuración del núcleo (kernel)</title>
+    <para>
+Para ejecutar lo más básico de <command>iptables</command> tienes que configurar
+las siguientes opciones en el núcleo mientras ejecutas <command>make config</command>
+o uno de sus comandos relacionados:
+   </para>
+
+   <para>
+<computeroutput>CONFIG_PACKET</computeroutput> - Esta opción permite que las
+aplicaciones y las utilidades que lo necesiten puedan trabajar directamente con
+distintos periféricos de red. Ejemplos de estas utilidades son tcpdump o
+snort.
+   </para>
+
+   <note>
+    <para>
+En sentido estricto, CONFIG_PACKET no es necesario para que iptables funcione,
+pero puesto que tiene tantos usos diferentes, he decidido incluirlo. Si crees
+que no lo necesitas, no lo incluyas.
+    </para>
+   </note>
+
+   <para>
+<computeroutput>CONFIG_NETFILTER</computeroutput> - Esta opción se requiere
+cuando vas a utilizar tu ordenador como cortafuegos o como puerta de enlace
+(gateway) con Internet. En otras palabras, es imprescindible para que funcione
+cualquier cosa de las que se explican en este tutorial. Entiendo que éso es lo
+que deseas, ya que estás leyendo el tutorial.
+   </para>
+
+   <para>
+Y, por supuesto, necesitas añadir los controladores (drivers) necesarios para
+que tus interfases funcionen correctamente, es decir, el adaptador Ethernet y
+las interfases <systemitem>PPP</systemitem> y <systemitem>SLIP</systemitem>.
+Todo lo anterior sólo añade un poco de lo más básico de iptables. En realidad
+no serás capaz de hacer nada realmente productivo, ya que sólo añade la
+estructura básica al núcleo. Si quieres utilizar las opciones más avanzadas de
+iptables, tendrás que configurar las opciones necesarias en el núcleo. A
+continuación te mostraré las opciones disponibles en una versión 2.4.9 básica
+del núcleo y las explicaré brevemente:
+   </para>
+
+   <para>
+<computeroutput>CONFIG_IP_NF_CONNTRACK</computeroutput> - Este módulo es
+necesario para efectuar el seguimiento de las conexiones. El seguimiento de las
+conexiones lo emplean, entre otros, la traducción de direcciones (<systemitem>NAT</systemitem>)
+y el enmascaramiento (<systemitem>Masquerading</systemitem>). Si necesitas
+proteger con un cortafuegos las máquinas de una red local, definitivamente debes
+marcar esta opción. Por ejemplo, este módulo lo necesita el script <link
+linkend="rcfirewalltxt" endterm="rcfirewalltxt.title"></link> para funcionar.
+   </para>
+
+   <para>
+<computeroutput>CONFIG_IP_NF_FTP</computeroutput> - Este módulo es necesario si
+quieres hacer seguimiento de conexiones en las conexiones <systemitem>FTP</systemitem>.
+Puesto que estas conexiones son bastante difíciles de monitorizar en condiciones
+normales, el conntrack necesita lo que se denomina un asistente y esta opción lo
+compila en el núcleo. Si no añades este módulo no serás capaz de hacer transferencias FTP
+correctamente a través del cortafuegos o la puerta de enlace.
+   </para>
+
+   <para>
+<computeroutput>CONFIG_IP_NF_IPTABLES</computeroutput> - Esta opción es
+necesaria si quieres realizar algún tipo de filtrado, enmascaramiento
+(<systemitem>masquerading</systemitem>) o traducción de direcciones
+(<systemitem>NAT</systemitem>). Añade toda la estructura de identificación
+de iptables al núcleo. Sin ésto, no serás capaz de hacer nada en absoluto con
+iptables.
+   </para>
+
+   <para>
+<computeroutput>CONFIG_IP_NF_MATCH_LIMIT</computeroutput> - Este módulo no es
+imprescindible, pero se emplea en el ejemplo <link linkend="rcfirewalltxt"
+endterm="rcfirewalltxt.title"></link>. Esta opción añade la comparación LIMIT
+(límite), ofreciendo la posibilidad de controlar el número de paquetes por
+minuto que se deben comparar, gobernado por la regla adecuada. Por ejemplo,
+con <command>-m limit --limit 3/minute</command> compararíamos un máximo de 3
+paquetes por minuto. Mediante este módulo también podemos evitar ciertos ataques
+de denegación de servicios (en inglés: Denial of Service attacks, DoS attacks).
+   </para>
+
+   <para>
+<computeroutput>CONFIG_IP_NF_MATCH_MAC</computeroutput> - Este módulo nos
+permite comparar paquetes basándonos en las direcciones físicas <systemitem>MAC</systemitem>:
+cada adaptador de red Ethernet tiene su propia dirección <systemitem>MAC</systemitem>,
+distinta a la de cualquier otro adaptador, aunque sea de la misma marca y modelo.
+Así, por ejemplo podremos bloquear paquetes en función de la dirección
+<systemitem>MAC</systemitem> utilizada y bloquear ordenadores concretos puesto que
+la dirección <systemitem>MAC</systemitem> de esos ordenadores raramente cambia (ya
+que raramente se sustituye el adaptador Ethernet por uno nuevo). No se utiliza
+esta opción ni en el ejemplo <link linkend="rcfirewalltxt" endterm="rcfirewalltxt.title"></link>
+ni en ningún otro sitio.
+   </para>
+
+   <para>
+<computeroutput>CONFIG_IP_NF_MATCH_MARK</computeroutput> - Nos permite utilizar
+la comparación <command>MARK</command>. Por ejemplo, podemos utilizar el
+objetivo <command>MARK</command> para marcar paquetes, de forma que más
+adelante se puedan comparar y filtrar paquetes dependiendo de si tienen la marca
+o no. De hecho esta opción es la comparación <command>MARK</command> y más
+adelante veremos el objetivo <command>MARK</command>.
+   </para>
+
+   <para>
+<computeroutput>CONFIG_IP_NF_MATCH_MULTIPORT</computeroutput> - Este módulo
+permite que comparemos paquetes con un amplio rango de puertos de origen o de
+destino. Normalmente ésto no sería posible, pero con este módulo sí lo es.
+   </para>
+
+   <para>
+<computeroutput>CONFIG_IP_NF_MATCH_TOS</computeroutput> - Con esta comparación
+podemos comparar paquetes en base a su campo <systemitem>TOS</systemitem>, es
+decir, su Tipo de Servicio (<emphasis>Type Of Service</emphasis>). El tipo de
+servicio se puede establecer mediante determinadas reglas en la tabla
+<systemitem>mangle</systemitem> y mediante los comandos ip/tc.
+   </para>
+
+   <para>
+<computeroutput>CONFIG_IP_NF_MATCH_TCPMSS</computeroutput> - Esta opción nos
+ofrece la posibilidad de comparar los paquetes <systemitem>TCP</systemitem>
+en función de su campo <systemitem>MSS</systemitem>.
+   </para>
+
+   <para>
+<computeroutput>CONFIG_IP_NF_MATCH_STATE</computeroutput> - Aquí tenemos una de
+las mayores novedades respecto a <command>ipchains</command>. Con este módulo
+podemos realizar comparaciones por flujos de paquetes (stateful matching).
+Por ejemplo, si en una conexión <systemitem>TCP</systemitem> ya hemos visto
+tráfico en dos direcciones, los paquetes que les sigan serán considerados como
+<command>ESTABLISHED</command> (establecido), aplicándoles por éllo las mismas acciones que a
+los paquetes que iniciaron el flujo. Este módulo se usa ampliamente en el
+ejemplo <link linkend="rcfirewalltxt" endterm="rcfirewalltxt.title"></link>.
+   </para>
+
+   <para>
+<computeroutput>CONFIG_IP_NF_MATCH_UNCLEAN</computeroutput> - Este módulo nos
+brinda la posibilidad de comparar paquetes <systemitem>IP</systemitem>,
+<systemitem>TCP</systemitem>, <systemitem>UDP</systemitem> e <systemitem>ICMP</systemitem>
+que no cumplen con las normas o son inválidos. En condiciones normales se
+desecharán estos paquetes, pero nunca sabremos si son legítimos o no. Además, ten
+en cuenta que esta comparación todavía está en fase experimental y puede que no
+funcione correctamente en todos los casos.
+   </para>
+
+   <para>
+<computeroutput>CONFIG_IP_NF_MATCH_OWNER</computeroutput> - con esta opción
+tendremos la oportunidad de comparar en base al propietario de la conexión. Por
+ejemplo, podremos permitir acceso a Internet únicamente al usuario "root". Este
+módulo se escribió para mostrar lo que se podía lograr con el nuevo
+<command>iptables</command>. Ten en cuenta que esta comparación es experimental
+y puede que no le funcione bien a todo el mundo.
+   </para>
+
+   <para>
+<computeroutput>CONFIG_IP_NF_FILTER</computeroutput> - este módulo
+añade la tabla <systemitem>filter</systemitem> básica que permitirá efectuar
+el filtrado <systemitem>IP</systemitem>. En la tabla <systemitem>filter</systemitem>
+encontraremos las cadenas <systemitem>INPUT</systemitem>, <systemitem>FORWARD</systemitem>
+y <systemitem>OUTPUT</systemitem>. Este módulo es necesario si pretendemos hacer
+algún tipo de filtrado en los paquetes que recibamos y/o enviemos.
+   </para>
+
+   <para>
+<computeroutput>CONFIG_IP_NF_TARGET_REJECT</computeroutput> -
+este objetivo nos permite especificar que se debe enviar un mensaje de error
+<systemitem>ICMP</systemitem> como respuesta a los mensajes entrantes, en lugar
+de simplemente desecharlos e ignorarlos. Ten en cuenta que las conexiones
+<systemitem>TCP</systemitem>, al contrario que las <systemitem>ICMP</systemitem>
+y las <systemitem>UDP</systemitem>, siempre se reinician o rechazan con un
+paquete <systemitem>TCP RST</systemitem>.
+   </para>
+
+   <para>
+<computeroutput>CONFIG_IP_NF_TARGET_MIRROR</computeroutput> -
+sirve para permitir a los paquetes que sean devueltos ("rebotados") al remitente.
+Por ejemplo, si configuramos un objetivo <systemitem>MIRROR</systemitem> en el
+puerto de destino <systemitem>HTTP</systemitem>, en nuestra cadena
+<systemitem>INPUT</systemitem>, y alguien intenta acceder a este puerto, le
+devolveremos sus paquetes y como resultado probablemente acabará viendo su
+propia pagina web inicial (homepage).
+   </para>
+
+   <para>
+<computeroutput>CONFIG_IP_NF_NAT</computeroutput> - este módulo permite que se
+efectúe la traducción de dirección de red (<systemitem>network address
+translation</systemitem>), o <systemitem>NAT</systemitem>, en sus diferentes
+variantes. La opción nos da acceso a la tabla nat en iptables y es necesaria si
+queremos hacer reenvío a puertos (port forwarding), enmascaramiento
+(masquerading), etc. Ten en cuenta que esta opción no es imprescindible para el
+cortafuegos y el enmascaramiento de una <systemitem>LAN</systemitem>, pero deberías
+tenerlo activo a no ser que seas capaz de asignar direcciones IP únicas para
+cada uno de los hosts. Así pues, esta opción es necesaria para que el script de
+ejemplo <link linkend="rcfirewalltxt" endterm="rcfirewalltxt.title"></link>
+funcione correctamente, y es ciertamente imprescindible si no puedes asignar
+direcciones IP únicas a cada host.
+   </para>
+
+   <para>
+<computeroutput>CONFIG_IP_NF_TARGET_MASQUERADE</computeroutput> - este módulo
+añade el objetivo <command>MASQUERADE</command>. Por ejemplo, si no sabemos qué
+dirección IP tenemos para conectar a Internet, ésta será la forma ideal de
+conseguir la IP en vez de utilizar <systemitem>DNAT</systemitem> o <systemitem>SNAT</systemitem>.
+En otras palabras, si utilizamos <systemitem>DHCP</systemitem>,
+<systemitem>PPP</systemitem>, <systemitem>SLIP</systemitem> o cualquier otra
+conexión que nos asigne una IP, necesitamos utilizar este objetivo en lugar de
+<systemitem>SNAT</systemitem>. El enmascaramiento produce una carga en el
+sistema algo mayor que <systemitem>NAT</systemitem>, pero funcionará sin que
+necesitemos conocer previamente la dirección IP.
+   </para>
+
+   <para>
+<computeroutput>CONFIG_IP_NF_TARGET_REDIRECT</computeroutput> - este objetivo es
+útil al emplearlo junto a <systemitem>proxies de aplicación</systemitem>, por
+ejemplo. En vez de dejar simplemente que el paquete pase, lo remapeamos para
+que se dirija a nuestra máquina local. En otras palabras, de esta forma
+tenemos la posibilidad de crear un <systemitem>proxy transparente</systemitem>.
+   </para>
+
+   <para>
+<computeroutput>CONFIG_IP_NF_TARGET_LOG</computeroutput> - esta opción añade el
+objetivo <command>LOG</command> y su funcionalidad a <command>iptables</command>.
+Podemos utilizar este módulo para registrar determinados paquetes en el syslogd
+y así ver qué les está pasando. Ésto sólo ya es inestimable de cara a
+las auditorías de seguridad, forenses o de depuración de errores del script que
+estés escribiendo.
+   </para>
+
+   <para>
+<computeroutput>CONFIG_IP_NF_TARGET_TCPMSS</computeroutput> - esta opción se
+puede emplear para evitar a los Proveedores de Servicios de Internet (ISPs) y a
+los servidores que bloquean los paquetes "<systemitem>ICMP Fragmentation Needed</systemitem>".
+Los efectos de esta acción pueden ser páginas web que no lleguen, pequeños
+correos que sí lleguen mientras que los grandes no lo consigan, las conexiones
+ssh funcionan pero las conexiones scp se pierden ("mueren") tras el saludo
+inicial, ... En estos casos podemos utilizar el objetivo <systemitem>TCPMSS</systemitem>
+para superar el problema ajustando nuestro <systemitem>MSS</systemitem> (tamaño
+máximo de segmento) al <systemitem>PMTU</systemitem> (Path Maximum Transmit Unit,
+unidad máxima de transmisión). De esta forma seremos capaces de trabajar con lo
+que los autores de Netfilter llaman (en la ayuda para la configuración del kernel)
+"criminally brain-dead ISPs or servers", algo así como "servidores o ISPs
+absolutamente descerebrados".
+   </para>
+
+   <para>
+<computeroutput>CONFIG_IP_NF_COMPAT_IPCHAINS</computeroutput> - añade un modo de
+compatibilidad con el obsoleto <command>ipchains</command>. No confíes en este
+módulo como solución a largo plazo para resolver la migración de los núcleos 2.2
+a los 2.4, ya que es probable que desaparezca con la llegada del núcleo 2.6.
+   </para>
+
+   <para>
+<computeroutput>CONFIG_IP_NF_COMPAT_IPFWADM</computeroutput> - módulo de
+compatibilidad con el obsoleto <command>ipfwadm</command>. Ni se te ocurra
+recurrir a este módulo como solución a largo plazo.
+   </para>
+
+   <para>
+Como puedes observar hay un buen puñado de opciones. Acabo de explicar
+brevemente los tipos de comportamiento extras que puedes esperar con cada
+módulo, aunque sólo se trata de las opciones disponibles en un núcleo 2.4.9
+simple, sin ningún extra. Si quieres ver más opciones, te recomiendo que mires
+las funciones existentes en el "<systemitem>patch-o-matic</systemitem>" (POM)
+de la zona de usuario de <systemitem>Netfilter</systemitem>, pues encontrarás
+montones de opciones extras para el núcleo. Los parches del <systemitem>POM</systemitem>
+son opciones extra que supuestamente se añadirán al núcleo en el futuro, pero que
+todavía no se han desarrollado lo suficiente como para añadírselos. Las razones
+pueden ser variadas, como que el parche todavía no sea estable, o que Linus
+Torvalds no pueda mantenerlo, o incluso que no quiera introducir el parche en
+el desarrollo del núcleo por ser todavía experimental.
+   </para>
+
+   <para>
+Necesitarás tener compiladas en el núcleo las opciones siguientes, o bien
+tenerlas como módulos, para que el script <link linkend="rcfirewalltxt"
+endterm="rcfirewalltxt.title"></link> pueda funcionar. Si necesitas ayuda acerca
+del resto de opciones necesarias para los otros scripts, léete el capítulo sobre
+los scripts de ejemplo.
+   </para>
+
+   <itemizedlist mark="opencircle">
+   <listitem>
+   <para>
+   CONFIG_PACKET
+   </para>
+   </listitem>
+   <listitem>
+   <para>
+   CONFIG_NETFILTER
+   </para>
+   </listitem>
+
+   <listitem>
+   <para>
+   CONFIG_IP_NF_CONNTRACK
+   </para>
+   </listitem>
+   <listitem>
+   <para>
+   CONFIG_IP_NF_FTP
+   </para>
+   </listitem>
+   <listitem>
+   <para>
+   CONFIG_IP_NF_IRC
+   </para>
+   </listitem>
+   <listitem>
+   <para>
+   CONFIG_IP_NF_IPTABLES
+   </para>
+   </listitem>
+   <listitem>
+   <para>
+   CONFIG_IP_NF_FILTER
+   </para>
+   </listitem>
+   <listitem>
+   <para>
+   CONFIG_IP_NF_NAT
+   </para>
+   </listitem>
+   <listitem>
+   <para>
+   CONFIG_IP_NF_MATCH_STATE
+   </para>
+   </listitem>
+   <listitem>
+   <para>
+   CONFIG_IP_NF_TARGET_LOG
+   </para>
+   </listitem>
+   <listitem>
+   <para>
+   CONFIG_IP_NF_MATCH_LIMIT
+   </para>
+   </listitem>
+   <listitem>
+   <para>
+   CONFIG_IP_NF_TARGET_MASQUERADE
+   </para>
+   </listitem>
+   </itemizedlist>
+
+   <para>
+Como mínimo necesitarás lo anterior para utilizar el script <link
+linkend="rcfirewalltxt" endterm="rcfirewalltxt.title"></link>. Para el resto de
+scripts explicaré lo que necesitan en sus respectivas secciones. Por el momento
+intentemos centrarnos en el ejemplo principal.
+   </para>
+  </section>
+
+  <section id="userlandsetup">
+   <title id="userlandsetup.title">Configuración de la zona de usuario</title>
+
+   <para>
+Para empezar veremos cómo se compila el paquete <command>iptables</command>. Es
+importante comprender que la mayor parte de la configuración y compilación de
+iptables va de la mano de la configuración y compilación del núcleo (kernel).
+Determinadas distribuciones de Linux vienen con el paquete <command>iptables</command>
+preinstalado, como ocurre por ejemplo con Red Hat. Sin embargo en esta
+distribución por defecto está desactivado y ahora veremos cómo activarlo.
+   </para>
+
+   <section id="compilinguserapps">
+    <title id="compilinguserapps.title">Compilando las aplicaciones de la
+    zona de usuario</title>
+
+    <para>
+Empieza por descomprimir (desempaquetar) el paquete <command>iptables</command>.
+Para este ejemplo hemos utilizado el paquete <emphasis>iptables 1.2.6a</emphasis>
+y el núcleo 2.4 sin extras. Descomprime como es habitual, utilizando el comando
+<command>bzip2 -cd iptables-1.2.6a.tar.bz2 | tar -xvf -</command> (aunque
+también puedes teclear <command>tar -xjvf iptables-1.2.6a.tar.bz2</command>,
+que con las versiones más recientes de <command>tar</command> dará el mismo
+resultado). El paquete debería haberse descomprimido en un nuevo directorio llamado
+<computeroutput>iptables-1.2.6a</computeroutput>. Para una explicación más
+completa de la compilación y la forma de hacer que funcione el programa, léete
+el fichero <filename>iptables-1.2.6a/INSTALL</filename>.
+    </para>
+
+    <para>
+Tras ésto, tienes la opción de configurar e instalar módulos/opciones extra en
+el núcleo. El procedimiento que describiremos sólo comprobará e instalará
+parches estándar que están pendientes de incluirse en el núcleo; existen otros
+parches de tipo experimental que sólo estarán disponibles al seguir otro tipo
+de configuración.
+    </para>
+    <note>
+     <para>
+Algunos de estos parches son realmente experimentales y no sería una buena idea
+instalarlos. Sin embargo, hay montones de comparaciones y objetivos
+extremadamente interesantes en este punto de la instalación, así que no tengas
+miedo de, al menos, echarles un vistazo.
+     </para>
+
+     <para>
+Para empezar a instalar, ejecutaremos un comando similar al siguiente desde el
+directorio raíz del paquete iptables:
+     </para>
+    </note>
+
+    <para>
+     <command>make pending-patches KERNEL_DIR=/usr/src/linux/</command>
+    </para>
+
+    <para>
+La variable <varname>KERNEL_DIR</varname> debería indicar la localización
+actual de tu núcleo. Normalmente este directorio será <filename>/usr/src/linux/</filename>,
+aunque puede ser diferente y lo más probable es que ya sepas dónde se encuentra
+el código fuente del núcleo.
+    </para>
+
+    <note>
+     <para>
+Con el comando anterior sólo añadiremos determinados parches que de todas formas
+están a punto de entrar en el núcleo. Puede que hayan más parches y añadidos
+que los desarrolladores de Netfilter estén a punto de añadir al núcleo, pero que
+todavía no se encuentran listos para dar este paso. Una forma de instalar estos
+extras es mediante el siguiente comando:
+     </para>
+    </note>
+
+    <para>
+<command>make most-of-pom KERNEL_DIR=/usr/src/linux/</command>
+    </para>
+    
+    <para>
+De esta forma se preguntará si se instalan algunos añadidos de lo que en la
+jerga de Netfilter se llaman <command>patch-o-matic</command>, pero eludiendo
+los parches más extremos, ya que pueden causar la desintegración del núcleo.
+Date cuenta que se ha dicho "se preguntará" porque ésto es lo que hará el
+comando: preguntará antes de cambiar algo en el código fuente del núcleo. Para
+poder instalar <emphasis>todo</emphasis> el material presente en el
+<systemitem>patch-o-matic</systemitem> necesitarás ejecutar el siguiente
+comando:
+    </para>
+
+    <para>
+     <command>make patch-o-matic KERNEL_DIR=/usr/src/linux/</command>
+    </para>
+
+    <para>
+No olvides leer completamente la ayuda de cada parche antes de hacer nada.
+Algunos parches destruyen a otros parches, mientras que otros pueden destruir
+el núcleo si se usan junto a otros determinados parches del
+<systemitem>patch-o-matic</systemitem>, etc.
+    </para>
+
+    <note>
+     <para>
+No es imprescindible seguir los pasos anteriores los pasos anteriores, por éllo
+puedes ignorarlos si no quieres "parchear" tu núcleo. Sin embargo, hay cosas
+muy interesantes en el <systemitem>patch-o-matic</systemitem> a las que sería
+conveniente echar un vistazo, por lo que no estaría de más ejecutar los comandos
+aunque sólo fuera para ver lo que contienen.
+     </para>
+    </note>
+
+    <para>
+En este punto ya has terminado la parte de la instalación referida al
+<systemitem>patch-o-matic</systemitem> y es momento de compilar un nuevo núcleo
+utilizando los nuevos parches que hayas añadido al código fuente. No olvides
+configurar de nuevo el núcleo, ya que probablemente los nuevos parches no se
+habrán añadido aún a las opciones configuradas. Por otra parte, si quieres puedes
+compilar primero el programa <command>iptables</command> y dejar para el final
+la compilación del núcleo.
+    </para>
+
+    <para>
+Compila ahora el programa de zona de usuario <command>iptables</command>. Para
+éllo ejecuta el siguiente comando:
+    </para>
+
+    <para>
+     <command>make KERNEL_DIR=/usr/src/linux/</command>
+    </para>
+
+    <para>
+La aplicación de zona de usuario debería compilarse correctamente. Si no es así,
+tendrás que buscar soluciones por tí mismo, o puedes subscribirte a la <link
+linkend="netfilterlist">lista de correo de Netfilter</link> (en inglés),
+dónde tendrás la oportunidad de pedir que alguien te ayude a solucionar tus
+problemas. Puede que haya algo que no vaya bien durante la instalación, pero
+no te preocupes: intenta pensar de manera lógica sobre el problema y averigua
+qué es lo que va mal, o pídele a alguien que te ayude.
+    </para>
+
+    <para>
+Si todo ha ido bien, estarás preparado para instalar los archivos binarios. Para
+éllo, escribe:
+    </para>
+
+    <para>
+<command>make install KERNEL_DIR=/usr/src/linux/</command>
+    </para>
+
+    <para>
+En principio todo debería funcionar en el programa. Para utilizar los cambios
+efectuados en <command>iptables</command> deberías recompilar y reinstalar tu
+núcleo y sus módulos, si es que todavía no lo has hecho. Para una explicación
+más detallada de la instalación a partir del código fuente de las aplicaciones de zona
+de usuario, lee el archivo <filename>INSTALL</filename> que viene con el código
+fuente, pues contiene excelente información sobre todo lo referente a la
+instalación.
+    </para>
+
+   </section>
+
+   <section id="installrh71">
+   <title id="installrh71.title">Instalación en Red Hat 7.1</title>
+
+    <para>
+La distribución Red Hat en su versión 7.1 viene precompilada con un núcleo
+2.4.x que contiene a <systemitem>Netfilter</systemitem> e <command>iptables</command>.
+Además, contiene los programas básicos de zona de usuario, así como los ficheros
+de configuración necesarios para ejecutarlos. Sin embargo, los de Red Hat han
+desactivado el paquete completo y en su lugar utilizan el módulo <command>ipchains</command>
+por compatibilidad con versiones anteriores. Molesto, por no decir otra cosa, y
+fuente de multitud de consultas en las listas de correo preguntando por qué no
+funciona <command>iptables</command>. Así pues, echemos un vistazo a cómo
+desactivar el módulo ipchains y cómo instalar <command>iptables</command> en su
+lugar.
+    </para>
+
+    <note>
+     <para>
+La instalación por defecto de Red Hat 7.1 incluye una decepcionante versión
+antigua de las aplicaciones de zona de usuario, por lo que es posible que desees
+compilar una nueva versión de estas aplicaciones, además de instalar un núcleo
+nuevo y personalizado antes de exigirle el máximo rendimiento a <command>iptables</command>.
+     </para>
+    </note>
+
+    <para>
+Antes de empezar tendrás que desactivar los módulos de <command>ipchains</command>
+de manera que no vuelvan a arrancar de ahora en adelante. Para conseguirlo
+deberás cambiar algunos nombres de fichero en los subdirectorios existentes en
+<filename>/etc/rc.d/</filename>. Con el siguiente comando tendrás suficiente:
+    </para>
+
+    <para>
+     <command>chkconfig --level 0123456 ipchains off</command>
+    </para>
+
+    <para>
+Una vez ejecutado modificarás todos los enlaces virtuales ("soft links") que apuntan
+al script <filename>/etc/rc.d/init.d/ipchains</filename> y los convertirás en K92ipchains. La
+primera letra, que por defecto es una S, le indica a los scripts de inicio que
+se ejecuten. Al cambiarla por una K se le indica a los scripts que terminen el
+servicio, o que no lo ejecuten si no estaba arrancado. De esta forma el servicio
+ya no arrancará nunca.
+    </para>
+
+    <para>
+Sin embargo, para detener un servicio que se está ejecutando en este momento
+necesitamos introducir otro comando: <command>service</command>, que puede
+utilizarse para actuar sobre servicios actualmente en ejecución. Así pues,
+para parar el servicio <command>ipchains</command> escribiremos:
+    </para>
+
+    <para>
+<command>service ipchains stop</command>
+    </para>
+
+    <para>
+Por último, para arrancar el servicio <command>iptables</command> necesitamos
+saber en qué niveles de ejecución ("run-levels") queremos que se inicie.
+Normalmente serán los niveles 2, 3 y 5, que se usan para:
+    </para>
+
+    <para>
+     <itemizedlist mark="opencircle">
+      <listitem>
+       <para>
+       2. Multiusuario sin NFS o lo mismo que el nivel 3 si no existe ninguna red.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+       3. Modo multiusuario completo, es decir, el nivel de ejecución habitual
+          en el que se trabaja.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+       5. X11. Este modo se utiliza cuando al arrancar el sistema entras
+          directamente en las Xwindows (el modo gráfico). Actualmente cada vez
+          son más las distribuciones que entran por defecto en este modo.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </para>
+
+    <para>
+Para conseguir que <command>iptables</command> se ejecute en estos niveles de
+ejecución, escribiremos:
+    </para>
+
+    <para>
+<command>chkconfig --level 235 iptables on</command>
+    </para>
+
+    <para>
+Es decir, instruímos a <command>iptables</command> para que se ejecute en los
+niveles 2, 3 y 5. Si quieres que se ejecute en cualquier otro nivel, deberás
+añadirlo al comando anterior. Sin embargo, ninguno de los otros niveles debería
+usarse para ejecutar iptables, por lo que en realidad no necesitas activarlo
+en éllos: el nivel 1 es el modo monousuario (1 sólo usuario), empleado cuando
+necesitas arreglar una instalación. El nivel 4 no debería usarse y el nivel 6
+es para apagar el ordenador.
+    </para>
+
+    <para>
+Para activar el servicio <command>iptables</command>, ejecutaremos:
+    </para>
+
+    <para>
+     <command>service iptables start</command>
+    </para>
+
+    <para>
+No hay ninguna regla en el script de <command>iptables</command>. Para añadirlas
+en Red Hat 7.1 normalmente se emplean dos métodos. El primero es editar el
+script <filename>/etc/rc.d/init.d/iptables</filename>, teniendo como efecto
+secundario no deseado el hecho de que borrarás todas las reglas si actualizaste el
+paquete iptables mediante un RPM. El otro método consistiría en cargar/crear el
+conjunto de reglas y luego guardarlo con el comando <command>iptables-save</command>,
+de forma que después se carguen automáticamente mediante los scripts rc.d.
+    </para>
+
+    <para>
+Primero explicaremos cómo configurar <command>iptables</command> mediante el
+socorrido método de copiar y pegar al script "init.d" de <command>iptables</command>.
+Para añadir reglas que se tengan que ejecutar cuando el sistema arranca el
+servicio, añádelas en la sección "start)", o en la función "start()". Ten en
+cuenta que si añades las reglas en la sección "start)" no debes olvidar parar
+la función "start()" dentro de esa misma sección "start)". Además, tampoco
+olvides editar la sección "stop)" para indicarle al script qué debe hacer, por
+ejemplo cuando es sistema se esté cerrando (apagando), o cuando se entre en un
+nivel de ejecución que no necesite de <command>iptables</command>. Por último,
+no olvides repasar las secciones "restart" y "condrestart". También debes tener
+en cuenta que todo este trabajo no servirá de nada si, por ejemplo, actualizas
+automáticamente tus paquetes mediante el Red Hat Network, o si actualizas
+mediante el paquete RPM de <command>iptables</command>.
+    </para>
+
+    <para>
+En cuanto al segundo método de realizar la configuración, se basa en los
+siguientes pasos: primero crea un conjunto de reglas en un fichero de script
+de línea de comandos (un script de shell), o bien directamente con <command>iptables</command>,
+que cumpla con tus necesidades y empieza a experimentar con él durante un tiempo.
+Cuando tengas una configuración que funcione correctamente (o al menos que tú
+creas que no tiene errores), utiliza el comando <command>iptables-save</command>.
+Puedes utilizar: <command>iptables-save > /etc/sysconfig/iptables</command>,
+con lo que grabarías el conjunto de reglas en el fichero
+<filename>/etc/sysconfig/iptables</filename>. Este fichero lo usará en el futuro
+el script rc.d de <command>iptables</command> para cargar de nuevo el conjunto
+de reglas. Otra forma de conseguir un resultado equivalente es mediante el
+comando <command>service iptables save</command>, que automáticamente guardará
+el script en el fichero <filename>/etc/sysconfig/iptables</filename>. Así, la próxima vez
+que reinicies el sistema, el script rc.d de <command>iptables</command>
+utilizará el comando <command>iptables-restore</command> para cargar el conjunto
+de reglas desde el fichero <filename>/etc/sysconfig/iptables</filename>.
+Atención: no mezcles ambos métodos, ya que se pueden perjudicar gravemente el
+uno al otro y dejar la configuración del cortafuegos completamente inútil.
+    </para>
+
+    <para>
+Cuando hayas terminado todos estos pasos, puedes desinstalar los paquetes
+<command>ipchains</command> e <command>iptables</command> preinstalados. De
+esta forma no permitiremos al sistema que mezcle las nuevas aplicaciones de zona
+de usuario de <command>iptables</command> con las viejas versiones preinstaladas.
+Sin embargo, este paso sólo es necesario si vas a instalar <command>iptables</command>
+desde el código fuente. No es raro que el paquete nuevo se mezcle con
+el viejo, puesto que la instalación basada en rpm instala el paquete en
+directorios no estándar, de forma que la nueva instalación no sobreescribirá a la vieja. Para
+efectuar la desinstalación, escribe:
+    </para>
+
+    <para>
+<command>rpm -e iptables</command>
+    </para>
+
+    <para>
+Y como no tiene mucho sentido mantener instalado <command>ipchains</command>
+cuando no lo vas a utilizar nunca más, desinstálalo de la misma forma:
+    </para>
+
+    <para>
+<command>rpm -e ipchains</command>
+    </para>
+
+    <para>
+Tras todo ésto, habrás finalizado la actualización del paquete <command>iptables</command>
+mediante el código fuente, habiendo seguido las instrucciones del código. Además
+ningún viejo ejecutable, librería o fichero auxiliar permanecerá instalado.
+    </para>
+   </section>
+
+  </section>
+ </chapter>

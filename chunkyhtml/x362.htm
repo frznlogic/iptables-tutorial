@@ -1,0 +1,326 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>IP characteristics</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="TCP/IP repetition"
+HREF="c171.htm"><LINK
+REL="PREVIOUS"
+TITLE="TCP/IP repetition"
+HREF="c171.htm"><LINK
+REL="NEXT"
+TITLE="IP headers"
+HREF="x430.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c171.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 2. TCP/IP repetition</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x430.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="IPCHARACTERISTICS"
+>IP characteristics</A
+></H1
+><P
+>The IP protocol resides in the
+Internet layer, as we have already said. The
+IP
+protocol is the protocol in the TCP/IP stack that is responsible for letting
+your machine, routers, switches and etcetera, know where a specific packet is
+going. This protocol is the very heart of the whole
+TCP/IP stack, and makes up
+the very foundation of everything in the Internet.
+      </P
+><P
+>The IP protocol encapsulates the
+Transport layer packet with information about which
+Transport layer protocol it came from, what host it
+is going to, and where it came from, and a little bit of other useful
+information. All of this is, of course, extremely precisely standardized, down
+to every single bit. The same applies to every single protocol that we will
+discuss in this chapter.
+      </P
+><P
+>The IP protocol has a couple of basic functionalities
+that it must be able to handle. It must be able to define the datagram, which
+is the next building block created by the transport layer (this may in other
+words be TCP, UDP or
+ICMP for example). The IP
+protocol also defines the Internet addressing system that we use today. This
+means that the IP protocol is what defines how to
+reach between hosts, and this also affects how we are able to route packets,
+of course. The addresses we are talking about are what we generally call an
+IP address. Usually when we talk about
+IP addresses, we talk about dotted quad numbers
+(e.g., <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>127.0.0.1</I
+></SPAN
+>). This is mostly to make the
+IP addresses more readable for the human eye, since
+the IP address is actually just a 32 bit field of 1's
+and 0's (<SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>127.0.0.1</I
+></SPAN
+> would hence be read as
+<SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>01111111000000000000000000000001</I
+></SPAN
+> within the actual
+IP header).
+      </P
+><P
+>The IP protocol has even more magic it must perform
+up it's sleeve. It must also be able to decapsulate and encapsulate the
+IP datagram (IP data) and
+send or receive the datagram from either the Network access
+layer, or the transport layer. This may
+seem obvious, but sometimes it is not. On top of all this, it  has two big
+functions it must perform as well, that will be of quite interest for the
+firewalling and routing community. The IP protocol is
+responsible for routing packets from one host to another, as well as packets
+that we may receive from one host destined for another. Most of the time on
+single network access host, this is a very simple process. You have two
+different options, either the packet is destined for our locally attached
+network, or possibly through a default gateway. but once you start working
+with firewalls or security policies together with multiple network interfaces
+and different routes, it may cause quite some headache for many network
+administrators. The last of the responsibilities for the
+IP protocol is that it must fragment and reassemble
+any datagram that has previously been fragmented, or that needs to be
+fragmented to fit in to the packetsize of this specific network hardware
+topology that we are connected to. If these packet fragments are sufficiently
+small, they may cause a horribly annoying headache for firewall administrators
+as well. The problem is, that once they are fragmented to small enough chunks,
+we will start having problems to read even the headers of the packet, not to
+mention the actual data.
+      </P
+><DIV
+CLASS="TIP"
+><P
+></P
+><TABLE
+CLASS="TIP"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/tip.gif"
+HSPACE="5"
+ALT="Tip"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>As of Linux kernel 2.4 series, and iptables, this should no longer be a problem
+for most linux firewalls. The connection tracking system used by iptables for
+state matching and NAT'ing etc must be able to read
+the packet defragmented. Because of this, conntrack automatically defragments
+all packets before they reach the netfilter/iptables structure in the kernel.
+        </P
+></TD
+></TR
+></TABLE
+></DIV
+><P
+>The IP protocol is also a connectionless protocol,
+which in turn means that IP does not "negotiate" a
+connection. a connection-oriented protocol on the other hand negotiates a
+connection (called a <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>handshake</I
+></SPAN
+>)
+ and then when all data has
+been sent, tears it down. TCP is an example of this
+kind of protocol, however, it is implemented on top of the
+IP protocol. The reason for not being
+connection-oriented
+ just yet are
+several, but among others, a handshake is not required at this time yet since
+there are other protocols that this would add an unnecessarily high overhead
+to, and that is made up in such a way that if we don't get a reply, we know
+the packet was lost somewhere in transit anyways, and resend the original
+request. As you can see, sending the request and then waiting for a specified
+amount of time for the reply in this case, is much preferred over first
+sending one packet to say that we want to open a connection, then receive a
+packet letting us know it was opened, and finally acknowledge that we know
+that the whole connection is actually open, and <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>then</I
+></SPAN
+>
+actually send the request, and after that send another packet to tear the
+connection down and wait for another reply.
+      </P
+><P
+>IP is also known as an
+<SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>unreliable protocol</I
+></SPAN
+>,  or simply put it does not know if a packet was
+received or not. It simply receives a packet from the transport layer and does
+its thing, and then passes it on to the network access
+layer, and then nothing more to it. It may receive a return
+packet, which traverses from network access layer to the
+IP protocol which  does it's thing again, and then
+passes it on upwards to the Transport layer. However,
+it doesn't care if it gets a reply packet, or if the packet was received at
+the other end. Same thing applies for the unreliability of
+IP as for the connectionless-ness, since
+unreliability would require adding an extra reply packet to each packet that
+is sent. For example, let us consider a DNS lookup.
+As it is, we send a DNS
+ request for servername.com. If
+we never receive a reply, we know something went wrong and re-request the
+lookup, but during normal use we would send out one request, and get one reply
+back. Adding reliability to this protocol would mean that the request would
+require two packets (one request, and one confirmation that the packet was
+received) and then two packets for the reply (one reply, and one reply to
+acknowledge the reply was received). In other words, we just doubled the
+amount of packets needed to send, and almost doubled the amount of data needed
+to be transmitted.
+      </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c171.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x430.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>TCP/IP repetition</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c171.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>IP headers</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

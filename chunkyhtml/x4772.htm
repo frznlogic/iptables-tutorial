@@ -1,0 +1,226 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Untracked connections and the raw 
+table</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="The state machine"
+HREF="c4219.htm"><LINK
+REL="PREVIOUS"
+TITLE="Default connections"
+HREF="x4755.htm"><LINK
+REL="NEXT"
+TITLE="Complex protocols and connection tracking"
+HREF="x4809.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x4755.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 7. The state machine</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x4809.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="UNTRACKEDCONNS"
+>Untracked connections and the raw 
+table</A
+></H1
+><P
+>UNTRACKED is a rather special keyword when it comes to 
+connection tracking in Linux. Basically, it is used to match packets that has 
+been marked in the raw table not to be tracked. 
+   </P
+><P
+>The raw table was created specifically for this 
+reason. In this table, you set a NOTRACK mark on packets 
+that you do not wish to track in netfilter.
+   </P
+><DIV
+CLASS="IMPORTANT"
+><P
+></P
+><TABLE
+CLASS="IMPORTANT"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/important.gif"
+HSPACE="5"
+ALT="Important"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Notice how I say packets, not connection, since the mark is actually set for 
+each and every packet that enters. Otherwise, we would still have to do some 
+kind of tracking of the connection to know that it should not be tracked. 
+    </P
+></TD
+></TR
+></TABLE
+></DIV
+><P
+>As we have already stated in this chapter, conntrack 
+and the state machine is rather resource hungry. For this reason, it might 
+sometimes be a good idea to turn off connection tracking and the state machine. 
+   </P
+><P
+>One example would be if you have a heavily trafficked router that you want to 
+firewall the incoming and outgoing traffic on, but not the routed traffic. You 
+could then set the NOTRACK mark on all packets not destined 
+for the firewall itself by ACCEPT'ing all packets with 
+destination your host in the raw table, and then set 
+the NOTRACK for all other traffic. This would then allow 
+you to have stateful matching on incoming traffic for the router itself, 
+but at the same time save processing power from not handling all the crossing 
+traffic.
+   </P
+><P
+>Another example when NOTRACK can be used is if you have 
+a highly trafficked webserver and want to do stateful tracking, but don't want 
+to waste processing power on tracking the web traffic. You could then set up a 
+rule that turns of tracking for port 80 on all the locally owned IP addresses, 
+or the ones that are actually serving web traffic. You could then enjoy 
+statefull tracking on all other services, except for webtraffic which might 
+save some processing power on an already overloaded system.
+   </P
+><P
+>There is however some problems with NOTRACK that you must 
+take into consideration. If a whole connection is set with 
+NOTRACK, then you will not be able to track related 
+connections either, conntrack and 
+nat helpers will simply not work for
+untracked connections, nor will related 
+ICMP errors do. You will have to open up for these 
+manually in other words. When it comes to complex protocols such as 
+FTP and SCTP et cetera, this 
+can be very hard to manage. As long as you are aware of this, you should be 
+able to handle this however.
+   </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x4755.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x4809.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Default connections</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c4219.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Complex protocols and connection tracking</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

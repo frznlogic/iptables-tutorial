@@ -1,0 +1,245 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>rc.UTIN.firewall.txt</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="Example scripts"
+HREF="c11777.htm"><LINK
+REL="PREVIOUS"
+TITLE="rc.DHCP.firewall.txt"
+HREF="x12188.htm"><LINK
+REL="NEXT"
+TITLE="rc.test-iptables.txt"
+HREF="x12321.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x12188.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 14. Example scripts</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x12321.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="RCUTINFIREWALLTXT"
+>rc.UTIN.firewall.txt</A
+></H1
+><P
+>     <DIV
+CLASS="MEDIAOBJECT"
+><P
+><IMG
+SRC="images/rc_UTIN_firewall.jpg"></P
+></DIV
+>
+    </P
+><P
+>    The <A
+HREF="http://iptables-tutorial.frozentux.net/scripts/rc.UTIN.firewall.txt"
+TARGET="_top"
+>rc.UTIN.firewall.txt</A
+> script will in contrast to the other scripts block the
+LAN that is sitting behind us. In other words, we don't
+trust anyone on any networks we are connected to. We also disallow people on our
+LAN to do anything but specific tasks on the Internet.
+The only things we actually allow are POP3,
+HTTP and FTP access to the
+Internet. We also don't trust the internal users to access the firewall more
+than we trust users on the Internet.
+    </P
+><P
+>    The <TT
+CLASS="FILENAME"
+>rc.UTIN.firewall.txt</TT
+> script requires the following
+options to be compiled statically to the kernel, or as modules. Without one or
+more of these, the script will become more or less flawed since parts of the
+script's required functionalities will be unusable. As you change the script you
+use, you could possibly need more options to be compiled into your kernel
+depending on what you want to use.
+    </P
+><P
+></P
+><UL
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>      CONFIG_NETFILTER
+      </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>      CONFIG_IP_NF_CONNTRACK
+      </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>      CONFIG_IP_NF_IPTABLES
+      </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>      CONFIG_IP_NF_MATCH_LIMIT
+      </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>      CONFIG_IP_NF_MATCH_STATE
+      </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>      CONFIG_IP_NF_FILTER
+      </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>      CONFIG_IP_NF_NAT
+      </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>      CONFIG_IP_NF_TARGET_LOG
+      </P
+></LI
+></UL
+><P
+>    This script follows the golden rule to not trust anyone, not
+even our own employees. This is a sad fact, but a large part of the hacks and
+cracks that a company gets hit by are a matter of people from their own staff
+perpetrating the hit. This script will hopefully give you some clues as to what
+you can do with your firewall to strengthen it. It's not very different from
+the original <TT
+CLASS="FILENAME"
+>rc.firewall.txt</TT
+> script, but it does give a few
+hints at what we would normally let through etc.
+    </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x12188.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x12321.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>rc.DHCP.firewall.txt</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c11777.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>rc.test-iptables.txt</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

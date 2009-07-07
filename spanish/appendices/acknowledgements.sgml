@@ -1,0 +1,88 @@
+ <appendix id="acknowledgements">
+  <title id="acknowledgements.title">Agradecimientos</title>
+  <para>
+Quiero agradecer a las siguientes personas su ayuda durante la creación de este
+documento:
+  </para>
+
+  <para>
+   <itemizedlist>
+    <listitem>
+     <para>
+      <ulink url="mailto:fabriceATcelestixDOTcom"><emphasis>Fabrice
+      Marie</emphasis></ulink>, por las grandes correcciones a mis horribles
+      gramática y ortografía. Asímismo un enorme agradecimiento por actualizar
+      el tutorial al formato DocBook con sus "make files" y demás.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <ulink url="mailto:marc+nfATmbsiDOTca"><emphasis>Marc
+      Boucher</emphasis></ulink>, por aclararme algunos aspectos del código de
+      comparación de estados.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <ulink url="mailto:fenATimprobusDOTcom"><emphasis>Frode E.
+      Nyboe</emphasis></ulink>, por mejorar notablemente las reglas de
+      <filename>rc.firewall</filename> e inspirarme mientras reescribía el
+      conjunto de reglas, además de ser quien introdujo el paso por múltiples
+      tablas dentro de un mismo archivo.
+      </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <ulink url="mailto:kakadu_crocATyahooDOTcom"><emphasis>Chapman
+      Brad</emphasis></ulink>, <ulink url="mailto:yallaATynfonaticDOTde"><emphasis>
+      Alexander W. Janssen</emphasis></ulink>, ambos me hicieron ver que estaba
+      equivocado acerca de cómo los paquetes atraviesan el NAT básico y las
+      tablas de filtrado, así como el orden en que aparecen.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <ulink url="mailto:michielbATstackDOTnl"><emphasis>Michiel
+      Brandenburg</emphasis></ulink>, <ulink
+      url="mailto:mylesATpuckDOTnetherDOTnet"><emphasis>Myles
+      Uyema</emphasis></ulink>, por ayudarme con una parte del código de
+      comparación de estados y hacerlo funcionar.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <ulink url="mailto:artechATboingworldDOTcom"><emphasis>Kent `Artech'
+      Stahre</emphasis></ulink>, por ayudarme con los gráficos (eres mejor que
+      muchos de los grafistas que conozco ;) ). También te agradezco por buscar
+      los posibles errores en el tutorial.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+     <emphasis>Anders 'DeZENT' Johansson</emphasis>, por aconsejarme sobre
+     extraños ISPs y algunos otros que utilizan redes reservadas en Internet,
+     o al menos en la Internet que te permiten utilizar.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      <ulink url="mailto:di99smjeATchlDOTchalmersDOTse"><emphasis>Jeremy
+      `Spliffy' Smith</emphasis></ulink>, por darme consejos sobre detalles que
+      podrían confundir a la gente y por probar y buscar errores en el texto.
+     </para>
+    </listitem>
+   </itemizedlist>
+  </para>
+
+  <para>
+Y por supuesto a todo aquel con quien he hablado y pedido opinión acerca del
+tutorial. Perdón por no haber mencionado a todo el mundo.
+  </para>
+ </appendix>

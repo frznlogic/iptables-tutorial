@@ -1,0 +1,327 @@
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook V3.1//EN">
+
+<book>
+ <chapter id="saveandrestore">
+  <title id="saveandrestore.title">Saving and restoring large rulesets</title>
+
+  <para>
+The <command>iptables</command> package comes with two more tools that 
+are very useful, specially if you are dealing with larger rulesets. These 
+two tools are called <command>iptables-save</command> and 
+<command>iptables-restore</command> and are used to save and restore 
+rulesets to a specific fileformat that looks a quite a bit different from 
+the standard shell code that you will see in the rest of this tutorial.
+  </para>
+
+  <section>
+   <title>Speed considerations</title>
+
+   <para>
+One of the largest reasons for using the <command>iptables-save</command> 
+and <command>iptables-restore</command> commands is that they will speed 
+up the loading and saving of larger rulesets considerably. The main 
+problem with running a shell script that contains  
+<command>iptables</command> rules is that each invocation of 
+<command>iptables</command> within the script will first extract the 
+whole ruleset from the netfilter kernel space, and after this, it will 
+insert or append rules, or do whatever change to the ruleset that is
+needed by this specific command. Finally, it will insert the new ruleset 
+from its own memory into kernel space. Using a shell script, this is done 
+for each and every rule that we want to insert, and for each time we do 
+this, it takes more time to extract and insert the ruleset.
+   </para>
+
+   <para>
+To solve this problem, there is the <command>iptables-save</command> and 
+<command>restore</command> commands. The <command>iptables-save</command> 
+command is used to save the ruleset into a specially formatted textfile, 
+and the <command>iptables-restore</command> command is used to load this 
+textfile into kernel again. The best parts of these commands is that they 
+will load and save the ruleset in one single request.  
+<command>iptables-save</command> will grab the whole ruleset from kernel 
+and save it to a file in one single movement. 
+<command>iptables-restore</command> will upload that specific ruleset to 
+kernel in a single movement for each table. In other words, instead of 
+dropping the ruleset out of kernel some 30.000 times, for really large 
+rulesets, and then upload it to kernel again that many times, we can now 
+save the whole thing into a file in one movement and then upload the 
+whole thing in as little as three movements depending on how many tables 
+you use.
+   </para>
+
+   <para>
+As you can understand, these tools are definitely something for you if 
+you are working on a huge set of rules that needs to be inserted. However, 
+they do have drawbacks that we will discuss more in the next section.
+   </para>
+
+  </section>
+
+  <section>
+   <title>Drawbacks with restore</title>
+
+   <para>
+As you may have already wondered, can <command>iptables-restore</command> 
+handle any kind of scripting? So far, no, it can not and it will most 
+probably never be able to. This is the main flaw in using 
+<command>iptables-restore</command> since you will not be able to
+do a huge set of things with these files. For example, what if you have a
+connection that has a dynamically assigned IP address and you want to 
+grab this dynamic IP everytime the computer boots up and then use that 
+value within your scripts? With <command>iptables-restore</command>, this 
+is more or less impossible.
+   </para>
+
+   <para>
+One possibility to get around this is to make a small script which grabs 
+the values you would like to use in the script, then sed the 
+<command>iptables-restore</command> file for specific keywords and replace 
+them with the values collected via the small script. At this point, you 
+could save it to a temporary file, and then use 
+<command>iptables-restore</command> to load the new values. This causes a 
+lot of problems however, and you will be unable to use 
+<command>iptables-save</command> properly since it would probably erase 
+your manually added keywords in the restore script. It is in other words a 
+clumsy solution.
+   </para>
+
+   <para>
+Another solution is to load the <command>iptables-restore</command> 
+scripts first, and then load a specific shell script that inserts more 
+dynamic rules in their proper places. Of course, as you can understand, 
+this is just as clumsy as the first solution. 
+<command>iptables-restore</command> is simply not very well suited for 
+configurations where IP addresses are dynamically assigned to your 
+firewall or where you want different behaviours depending on configuration 
+options and so on.
+   </para>
+
+   <para>
+Another drawback with <command>iptables-restore</command> and 
+<command>iptables-save</command> is that it is not fully functional as of 
+writing this. The problem is simply that not a lot of people use it as of 
+today and hence there is not a lot of people finding bugs, and in turn 
+some matches and targets will simply be inserted badly, which may lead to 
+some strange behaviours that you did not expect. Even though these 
+problems exist, I would highly recommend using these tools which should 
+work extremely well for most rulesets as long as they do not contain some 
+of the new targets or matches that it does not know how to handle 
+properly.
+   </para>
+
+  </section>
+
+  <section>
+   <title>iptables-save</title>
+
+   <para>
+The <command>iptables-save</command> command is, as we have already 
+explained, a tool to save the current ruleset into a file that 
+<command>iptables-restore</command> can use. This command is quite simple 
+really, and takes only two arguments. Take a look at the following 
+example to understand the syntax of the command.
+   </para>
+
+   <para>
+    <cmdsynopsis>
+     <command>iptables-save</command>
+     <arg choice="opt">-c</arg>
+     <arg choice="opt">-t <replaceable>table</replaceable></arg>
+    </cmdsynopsis>
+   </para>
+
+   <para>
+The <command>-c</command> argument tells <command>iptables-save</command> 
+to keep the values specified in the byte and packet counters. This could 
+for example be useful if we would like to reboot our main firewall, but 
+not loose byte and packet counters which we may use for statistical 
+purposes. Issuing a <command>iptables-save</command> command with the 
+<command>-c</command> argument would then make it possible for us to 
+reboot but without breaking our statistical and accounting routines. The 
+default value is, of course, to not keep the counters intact when issuing 
+this command.
+   </para>
+
+   <para>
+The <command>-t</command> argument tells the 
+<command>iptables-save</command> command which tables to save. Without
+this argument the command will automatically save all tables available 
+into the file. The following is an example on what output you can expect 
+from the <command>iptables-save</command> command if you do not have any 
+ruleset loaded.
+   </para>
+
+<literallayout>
+<computeroutput>
+# Generated by iptables-save v1.2.6a on Wed Apr 24 10:19:17 2002
+*filter
+:INPUT ACCEPT [404:19766]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [530:43376]
+COMMIT
+# Completed on Wed Apr 24 10:19:17 2002
+# Generated by iptables-save v1.2.6a on Wed Apr 24 10:19:17 2002
+*mangle
+:PREROUTING ACCEPT [451:22060]
+:INPUT ACCEPT [451:22060]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [594:47151]
+:POSTROUTING ACCEPT [594:47151]
+COMMIT
+# Completed on Wed Apr 24 10:19:17 2002
+# Generated by iptables-save v1.2.6a on Wed Apr 24 10:19:17 2002
+*nat
+:PREROUTING ACCEPT [0:0]
+:POSTROUTING ACCEPT [3:450]
+:OUTPUT ACCEPT [3:450]
+COMMIT
+# Completed on Wed Apr 24 10:19:17 2002
+</computeroutput>
+</literallayout>
+
+   <para>
+This contains a few comments starting with a # sign. Each table is marked 
+like *&lt;tablename&gt;, for example 
+<computeroutput>*mangle</computeroutput>. Then within each table we have 
+the chain specifications and rules. A chain specification looks like 
+:&lt;chainname&gt; &lt;chainpolicy&gt; 
+[&lt;packetcounter&gt;:&lt;bytecounter&gt;]. The  
+<computeroutput>chainname</computeroutput> may be for example 
+<systemitem>PREROUTING</systemitem>, the policy is described previously 
+and can for example be <systemitem>ACCEPT</systemitem>. Finally the 
+packetcounter and bytecounters are the same counters as in the output 
+from <command>iptables -L -v</command>. Finally, each table declaration 
+ends in a <computeroutput>COMMIT</computeroutput> keyword. The 
+<computeroutput>COMMIT</computeroutput> keyword tells us that at this 
+point we should commit all rules currently in the pipeline to kernel.
+   </para>
+
+   <para>
+The above example is pretty basic, and hence I believe it is nothing more
+than proper to show a brief example which contains a very small <ulink
+url="http://iptables-tutorial.frozentux.net/scripts/iptsave-ruleset.txt">
+ruleset</ulink>. If we would run <command>iptables-save</command> on 
+this, it would look something like this in the output:
+   </para>
+
+<literallayout>
+<computeroutput>
+# Generated by iptables-save v1.2.6a on Wed Apr 24 10:19:55 2002
+*filter
+:INPUT DROP [1:229]
+:FORWARD DROP [0:0]
+:OUTPUT DROP [0:0]
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT 
+-A FORWARD -i eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT 
+-A FORWARD -i eth1 -m state --state NEW,RELATED,ESTABLISHED -j ACCEPT 
+-A OUTPUT -m state --state NEW,RELATED,ESTABLISHED -j ACCEPT 
+COMMIT
+# Completed on Wed Apr 24 10:19:55 2002
+# Generated by iptables-save v1.2.6a on Wed Apr 24 10:19:55 2002
+*mangle
+:PREROUTING ACCEPT [658:32445]
+:INPUT ACCEPT [658:32445]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [891:68234]
+:POSTROUTING ACCEPT [891:68234]
+COMMIT
+# Completed on Wed Apr 24 10:19:55 2002
+# Generated by iptables-save v1.2.6a on Wed Apr 24 10:19:55 2002
+*nat
+:PREROUTING ACCEPT [1:229]
+:POSTROUTING ACCEPT [3:450]
+:OUTPUT ACCEPT [3:450]
+-A POSTROUTING -o eth0 -j SNAT --to-source 195.233.192.1 
+COMMIT
+# Completed on Wed Apr 24 10:19:55 2002
+</computeroutput>
+</literallayout>
+
+   <para>
+As you can see, each command has now been prefixed with the byte and 
+packet counters since we used the <command>-c</command> argument. Except 
+for this, the commandline is quite intact from the script. The only 
+problem now, is how to save the output to a file. Quite simple, and you 
+should already know how to do this if you have used linux at all before. 
+It is only a matter of piping the command output on to the file that you 
+would like to save it as. This could look like the following:
+   </para>
+
+   <para>
+    <command>iptables-save -c > /etc/iptables-save</command>
+   </para>
+
+   <para>
+The above command will in other words save the whole ruleset to a file 
+called <filename>/etc/iptables-save</filename> with byte and packet 
+counters still intact.
+   </para>
+
+  </section>
+
+  <section>
+   <title>iptables-restore</title>
+
+   <para>
+The <command>iptables-restore</command> command is used to restore the 
+<command>iptables</command> ruleset that was saved with the 
+<command>iptables-save</command> command. It takes all the input from 
+standard input and can not load from files as of writing this, 
+unfortunately. This is the command syntax for iptables-restore:
+   </para>
+
+   <para>
+    <cmdsynopsis>
+     <command>iptables-save</command>
+     <arg choice="opt">-c</arg>
+     <arg choice="opt">-n</arg>
+    </cmdsynopsis>
+   </para>
+
+   <para>
+The <command>-c</command> argument restores the byte and packet counters 
+and must be used if you want to restore counters that was previously saved 
+with <command>iptables-save</command>. This argument may also be written 
+in its long form <command>--counters</command>.
+   </para>
+
+   <para>
+The <command>-n</command> argument tells 
+<command>iptables-restore</command> to not overwrite the previously 
+written rules in the table, or tables, that it is writing to. The default 
+behaviour of <command>iptables-restore</command> is to flush and destroy 
+all previously inserted rules. The short <command>-n</command> argument 
+may also be replaced with the longer format <command>--noflush</command>.
+   </para>
+
+   <para>
+To load ruleset with the <command>iptables-restore</command> command, we 
+could do this in several ways, but we will mainly look at the simplest 
+and most common way here.
+   </para>
+
+   <para>
+    <command>cat /etc/iptables-save | iptables-restore -c</command>
+   </para>
+
+   <para>
+This would cat the ruleset located within the 
+<filename>/etc/iptables-save</filename> file and then pipe it to 
+<command>iptables-restore</command> which takes the ruleset on the 
+standard input and then restores it, including byte and packet counters. 
+It is that simple to begin with. This command could be varied until 
+oblivion and we could show different piping possibilities, however, this 
+is a bit out of the scope of this chapter, and hence we will skip that 
+part and leave it as an excercise for the reader to experiment with.
+   </para>
+
+   <para>
+The ruleset should now be loaded properly to kernel and everything should 
+work. If not, you may possibly have run into a bug in these commands, 
+however likely that sounds. 
+   </para>
+
+  </section>
+
+ </chapter>
+</book>

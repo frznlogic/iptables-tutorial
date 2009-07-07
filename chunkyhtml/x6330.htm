@@ -1,0 +1,4082 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Explicit matches</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="Iptables matches"
+HREF="c5572.htm"><LINK
+REL="PREVIOUS"
+TITLE="Implicit matches"
+HREF="x5796.htm"><LINK
+REL="NEXT"
+TITLE="What's next?"
+HREF="x8812.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x5796.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 10. Iptables matches</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x8812.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="EXPLICITMATCHES"
+>Explicit matches</A
+></H1
+><P
+>Explicit matches are those that have to be specifically loaded with
+the -m or --match option. State
+matches, for example, demand the directive -m state prior
+to entering the actual match that you want to use. Some of these matches may
+be protocol specific . Some may be unconnected with any specific protocol -
+for example connection states. These might be NEW (the
+first packet of an as yet unestablished connection),
+ESTABLISHED (a connection that is already registered in the
+kernel), RELATED (a new connection that was created by an
+older, established one) etc. A few may just have been evolved for testing or
+experimental purposes, or just to illustrate what iptables is capable of. This
+in turn means that not all of these matches may at first sight be of any use.
+Nevertheless, it may well be that you personally will find a use for specific
+explicit matches. And there are new ones coming along all the time, with each
+new iptables release. Whether you find a use for them or
+not depends on your imagination and your needs. The difference between
+implicitly loaded matches and explicitly loaded ones, is that the implicitly
+loaded matches will automatically be loaded when, for example, you match on
+the properties of TCP packets, while explicitly
+loaded matches will never be loaded automatically - it is up to you to
+discover and activate explicit matches.
+    </P
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="ADDRTYPEMATCH"
+>Addrtype match</A
+></H2
+><P
+>The addrtype module matches packets based on the address type. The address 
+type is used inside the kernel to put different packets into different 
+categories. With this match you will be able to match all packets based on 
+their address type according to the kernel. It should be noted that the exact 
+meaning of the different address types varies between the layer 3 protocols. I 
+will give a brief general description here however, but for more information I 
+suggest reading <A
+HREF="a13413.htm#LARTC"
+><I
+>Linux Advanced Routing 
+and Traffic Control HOW-TO</I
+></A
+> and <A
+HREF="a13413.htm#POLICYROUTING"
+><I
+>Policy 
+Routing using Linux</I
+></A
+>. The 
+available types are as follows: 
+      </P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.ADDRTYPES"
+></A
+><P
+><B
+>Table 10-6. Address types</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="104"><COL
+WIDTH="1*"><THEAD
+><TR
+><TH
+>Type</TH
+><TH
+>Description</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>ANYCAST</TD
+><TD
+><P
+>This is a one-to-many associative connection type, where only one of the many 
+receiver hosts actually receives the data. This is for example implemented in 
+DNS. You have single address to a root server, but it 
+actually has several locations and your packet will be directed to the closest 
+working server. Not implemented in Linux IPv4.
+	  </P
+></TD
+></TR
+><TR
+><TD
+>BLACKHOLE</TD
+><TD
+><P
+>A blackhole address will simply delete the packet and send no reply. It works 
+as a black hole in space basically. This is configured in the routing tables 
+of linux.
+	  </P
+></TD
+></TR
+><TR
+><TD
+>BROADCAST</TD
+><TD
+><P
+>A broadcast packet is a single packet sent to everyone in a specific network 
+in a one-to-many relation. This is for example used in ARP 
+resolution, where a single packet is sent out requesting 
+information on how to reach a specific IP, and then 
+the host that is authoritative replies with the proper MAC 
+address of that host.
+	  </P
+></TD
+></TR
+><TR
+><TD
+>LOCAL</TD
+><TD
+><P
+>An address that is local to the host we are working on. 127.0.0.1 for example.
+	  </P
+></TD
+></TR
+><TR
+><TD
+>MULTICAST</TD
+><TD
+><P
+>A multicast packet is sent to several hosts using the shortest distance and 
+only one packet is sent to each waypoint where it will be multiple copies 
+for each host/router subscribing to the specific multicast address. Commonly 
+used in one way streaming media such as video or sound.
+	  </P
+></TD
+></TR
+><TR
+><TD
+>NAT</TD
+><TD
+><P
+>An address that has been NAT'ed by the kernel. 
+	  </P
+></TD
+></TR
+><TR
+><TD
+>PROHIBIT</TD
+><TD
+><P
+>Same as blackhole except that a prohibited answer will be generated. In the 
+IPv4 case, this means an <A
+HREF="x1078.htm#ICMPDESTUNREACH"
+>ICMP communication 
+prohibited</A
+> (type 3, code 13) answer will be generated.
+	  </P
+></TD
+></TR
+><TR
+><TD
+>THROW</TD
+><TD
+><P
+>Special route in the Linux kernel. If a packet is thrown in a routing table 
+it will behave as if no route was found in the table. In normal routing, this 
+means that the packet will behave as if it had no route. In policy routing, 
+another route might be found in another routing table.
+	  </P
+></TD
+></TR
+><TR
+><TD
+>UNICAST</TD
+><TD
+><P
+>A real routable address for a single address. The most common type of route.
+	  </P
+></TD
+></TR
+><TR
+><TD
+>UNREACHABLE</TD
+><TD
+><P
+>This signals an unreachable address that we do not know how to reach. The 
+packets will be discarded and an <A
+HREF="x1078.htm#ICMPDESTUNREACH"
+>ICMP Host 
+unreachable</A
+> (type 3, code 1) will be generated.
+	  </P
+></TD
+></TR
+><TR
+><TD
+>UNSPEC</TD
+><TD
+><P
+>An unspecified address that has no real meaning.
+	  </P
+></TD
+></TR
+><TR
+><TD
+>XRESOLVE</TD
+><TD
+><P
+>This address type is used to send route lookups to userland applications 
+which will do the lookup for the kernel. This might be wanted to send ugly 
+lookups to the outside of the kernel, or to have an application do lookups 
+for you. Not implemented in Linux.
+	  </P
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>The addrtype match is loaded by using the -m addrtype 
+keyword. When this is done, the extra match options in the following table
+will be available for usage.
+	</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.ADDRTYPEMATCH"
+></A
+><P
+><B
+>Table 10-7. Addrtype match options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--src-type</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -m addrtype --src-type 
+	 UNICAST</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>The --src-type match option is used to match the source 
+address type of the packet. It can either take a single address type or 
+several separated by coma signs, for example --src-type 
+BROADCAST,MULTICAST. The match option may also be inverted by adding 
+an exclamation sign before it, for example ! --src-type 
+BROADCAST,MULTICAST.
+        </P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--dst-type</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -m addrtype --dst-type 
+	 UNICAST</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>The --dst-type works exactly the same way as 
+--src-type and has the same syntax. The only difference is 
+that it will match packets based on their destination address type.
+        </P
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="AHESPMATCH"
+>AH/ESP match</A
+></H2
+><P
+>These matches are used for the IPSEC
+AH and ESP protocols.
+IPSEC is used to create secure tunnels over an
+insecure Internet connection. The AH and
+ESP protocols are used by
+IPSEC to create these secure connections. The
+AH and ESP matches are
+really two separate matches, but are both described here since they look very
+much alike, and both are used in the same function. 
+      </P
+><P
+>I will not go into detail to describe IPSEC here,
+instead look at the following pages and documents for more information:
+      </P
+><P
+></P
+><UL
+><LI
+STYLE="list-style-type: opencircle"
+><P
+><A
+HREF="a13413.htm#RFC2401"
+><I
+>RFC 2401 - Security Architecture for the Internet 
+Protocol</I
+></A
+></P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+><A
+HREF="a13413.htm#FREESWAN"
+><I
+>FreeS/WAN</I
+></A
+></P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+><A
+HREF="a13413.htm#IPSEC-HOWTO"
+><I
+>IPSEC Howto</I
+></A
+></P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+><A
+HREF="a13413.htm#LARTC"
+><I
+>Linux Advanced Routing 
+and Traffic Control HOW-TO</I
+></A
+></P
+></LI
+></UL
+><P
+>There is also a ton more documentation on the Internet on this, but you are 
+free to look it up as needed. 
+      </P
+><P
+>To use the AH/ESP matches, you need to use
+-m ah to load the AH matches, and -m esp
+to load the ESP matches.
+      </P
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>In 2.2 and 2.4 kernels, Linux used something called
+FreeS/WAN for the IPSEC 
+implementation, but as of Linux kernel 2.5.47 and up, Linux kernels have a 
+direct implementation of IPSEC that requires no
+patching of the kernel. This is a total rewrite of the
+IPSEC implementation on Linux.
+        </P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.AHMATCH"
+></A
+><P
+><B
+>Table 10-8. AH match options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--ahspi</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p 51 -m ah --ahspi 
+500</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This matches the AH Security Parameter Index (SPI) number of the AH packets. 
+Please note that you must specify the protocol as well, since AH runs on a 
+different protocol than the standard TCP, UDP or ICMP protocols. The SPI number 
+is used in conjunction with the source and destination address and the secret 
+keys to create a security association (SA). The SA uniquely identifies each 
+and every one of the IPSEC tunnels to all hosts. The SPI is used to uniquely 
+distinguish each IPSEC tunnel connected between the same two peers. Using the 
+--ahspi match, we can match a packet based on the SPI of 
+the packets. This match can match a whole range of SPI values by using a : 
+sign, such as 500:520, which will match the whole range of SPI's.
+          </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.ESPMATCH"
+></A
+><P
+><B
+>Table 10-9. ESP match options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--espspi</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p 50 -m esp --espspi 
+500</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>The ESP counterpart Security Parameter
+Index (SPI) is used exactly the same way
+as the AH variant. The match looks exactly the same,
+with the esp/ah difference. Of course, this match can
+match a whole range of SPI numbers as well as the
+AH variant of the SPI match,
+such as --espspi 200:250 which matches the whole range of
+SPI's.
+        </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="COMMENTMATCH"
+>Comment match</A
+></H2
+><P
+>The comment match is used to add comments inside the 
+iptables ruleset and the kernel. This can make it much easier to understand 
+your ruleset and to ease debugging. For example, you could add comments 
+documenting which bash function added specific sets of rules 
+to netfilter, and why. It should be noted that this isn't actually a match. 
+The comment match is loaded using the -m comment keywords. 
+At this point the following options will be available.
+      </P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.COMMENTMATCH"
+></A
+><P
+><B
+>Table 10-10. Comment match options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--comment</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -m comment --comment "A comment"</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>The --comment option specifies the comment to actually add 
+to the rule in kernel. The comment can be a maximum of 256 characters. 
+          </P
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="CONNMARKMATCH"
+>Connmark match</A
+></H2
+><P
+>The connmark match is used very much the same way as the
+mark match is in the MARK/mark target
+and match combination. The connmark match is used to match
+marks that has been set on a connection with the CONNMARK
+target. It only takes one option.
+      </P
+><P
+>      
+      <DIV
+CLASS="IMPORTANT"
+><P
+></P
+><TABLE
+CLASS="IMPORTANT"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/important.gif"
+HSPACE="5"
+ALT="Important"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>To match a mark on the same packet as is the first to
+create the connection marking, you must use the connmark
+match after the CONNMARK target has set the mark on the
+first packet. 
+        </P
+></TD
+></TR
+></TABLE
+></DIV
+>
+ 
+      
+      
+      
+ 
+      <DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.CONNMARKMATCH"
+></A
+><P
+><B
+>Table 10-11. Connmark match options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--mark</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -m connmark --mark 12 -j ACCEPT</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>The mark option is used to match a specific mark associated
+with a connection. The mark match must be exact, and if you want to filter out
+unwanted flags from the connection mark before actually matching anything, you
+can specify a mask that will be anded to the connection mark. For example, if
+you have a connection mark set to 33
+(10001 in binary) on a connection, and want to match
+the first bit only, you would be able to run something like --mark
+1/1. The mask (00001) would be masked to
+10001, so 10001 &#38;&#38; 00001 equals
+1, and then matched against the 1. 
+              </P
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+>
+
+    </P
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="CONNTRACKMATCH"
+>Conntrack match</A
+></H2
+><P
+>The conntrack match is an extended version of the state 
+match, which makes it possible to match packets in a much more granular way. It 
+let's you look at information directly available in the connection tracking 
+system, without any "frontend" systems, such as in the state match. For more 
+information about the connection tracking system, take a look at the <A
+HREF="c4219.htm"
+><I
+>The state machine</I
+></A
+> chapter.
+      </P
+><P
+>There are a number of different matches put together in the conntrack match, 
+for several different fields in the connection tracking system. These are 
+compiled together into the list below. To load these matches, you need to 
+specify -m conntrack.
+      </P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.CONNTRACKMATCH"
+></A
+><P
+><B
+>Table 10-12. Conntrack match options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--ctstate</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp -m conntrack --ctstate RELATED</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>This match is used to match the state of a packet, according to the conntrack 
+state. It is used to match pretty much the same states as in the original 
+state match. The valid entries for this match are: 
+          </P
+><P
+></P
+><UL
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>INVALID</P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>ESTABLISHED</P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>NEW</P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>RELATED</P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>SNAT</P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>DNAT</P
+></LI
+></UL
+><P
+>The entries can be used together with each other separated by a comma. For 
+example, -m conntrack --ctstate ESTABLISHED,RELATED. It can 
+also be inverted by putting a ! in front of --ctstate. For 
+example: -m conntrack ! --ctstate ESTABLISHED,RELATED, which 
+matches all but the ESTABLISHED and 
+RELATED states.
+          </P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--ctproto</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp -m conntrack --ctproto
+TCP</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>This matches the protocol, the same as the --protocol does. 
+It can take the same types of values, and is inverted using the ! sign. For 
+example, -m conntrack ! --ctproto TCP matches all protocols 
+but the TCP protocol.
+        </P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--ctorigsrc</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp -m conntrack --ctorigsrc 
+192.168.0.0/24</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>--ctorigsrc matches based on the original source IP 
+specification of the conntrack entry that the packet is related to. The match 
+can be inverted by using a ! between the --ctorigsrc and 
+IP specification, such as --ctorigsrc ! 192.168.0.1. It 
+can also take a netmask of the CIDR form, such as --ctorigsrc 
+192.168.0.0/24. 
+        </P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--ctorigdst</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp -m conntrack --ctorigdst
+192.168.0.0/24</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>This match is used exactly as the --ctorigsrc, except that 
+it matches on the destination field of the conntrack entry. It has the same 
+syntax in all other respects.
+        </P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--ctreplsrc</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp -m conntrack --ctreplsrc
+192.168.0.0/24</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>The --ctreplsrc match is used to match based on the 
+original conntrack reply source of the packet. Basically, this is the same 
+as the --ctorigsrc, but instead we match the reply source 
+expected of the upcoming packets. This target can,  of course, be inverted and 
+address a whole range of addresses, just the same as the the previous targets 
+in this class.
+        </P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--ctrepldst</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp -m conntrack --ctrepldst
+192.168.0.0/24</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>The --ctrepldst match is the same as the 
+--ctreplsrc match, with the exception that it matches the 
+reply destination of the conntrack entry that matched the packet. It too can 
+be inverted, and accept ranges, just as the --ctreplsrc 
+match.
+        </P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--ctstatus</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp -m conntrack --ctstatus
+RELATED</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>This matches the status of the connection, as described in the <A
+HREF="c4219.htm"
+><I
+>The state machine</I
+></A
+> chapter. It can 
+match the following statuses.
+        </P
+><P
+></P
+><UL
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>NONE - The connection has no status at all.
+            </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>EXPECTED - This connection is expected and was added by one of the expectation 
+handlers.
+            </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>SEEN_REPLY - This connection has seen a reply but isn't assured yet.
+            </P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>ASSURED - The connection is assured and will not be removed until it times out 
+or the connection is closed by either end.
+            </P
+></LI
+></UL
+><P
+>This can also be inverted by using the ! sign. For example -m 
+conntrack ! --ctstatus ASSURED which will match all but the ASSURED 
+status.
+        </P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--ctexpire</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp -m conntrack --ctexpire 100:150</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>This match is used to match on packets based on how long is left on the 
+expiration timer of the conntrack entry, measured in seconds. It can either 
+take a single value and match against, or a range such as in the example 
+above. It can also be inverted by using the ! sign, such as this 
+-m conntrack ! --ctexpire 100. This will match every 
+expiration time, which does not have exactly 100 seconds left to it.
+        </P
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="DSCPMATCH"
+>Dscp match</A
+></H2
+><P
+>This match is used to match on packets based on their DSCP (Differentiated 
+Services Code Point) field. This is documented in the <A
+HREF="a13413.htm#RFC2638"
+><I
+>RFC 2638 - A Two-bit Differentiated Services Architecture 
+for the Internet</I
+></A
+> RFC. The match is 
+explicitly loaded by specifying -m dscp. The match can take 
+two mutually exclusive options, described below. </P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.DSCPMATCH"
+></A
+><P
+><B
+>Table 10-13. Dscp match options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--dscp</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp -m dscp --dscp 32</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>This option takes a DSCP value in either decimal or in hex. If the option 
+value is in decimal, it would be written like 32 or 16, et cetera. If written 
+in hex, it should be prefixed with 0x, like this: 0x20. It can also be 
+inverted by using the ! character, like this: -m dscp ! --dscp 
+32.</P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--dscp-class</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp -m dscp --dscp-class BE</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>The --dscp-class match is used to match on the DiffServ 
+class of a packet. The values can be any of the BE, EF, AFxx or CSx classes as 
+specified in the various RFC's. This match can be inverted just the same way 
+as the --dscp option.</P
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Please note that the --dscp and
+--dscp-class options are mutually exclusive and can not be
+used in conjunction with each other. </P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="ECNMATCH"
+>Ecn match</A
+></H2
+><P
+>The ecn match is used to match on the different
+ECN fields in the TCP and
+IPv4 headers. ECN is
+described in detail in the <A
+HREF="a13413.htm#RFC3168"
+><I
+>RFC 3168 - The Addition of Explicit Congestion Notification 
+(ECN) to IP</I
+></A
+> RFC. The match is explicitly loaded by using
+-m ecn in the command line. The ecn
+match takes three different options as described below.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.ECNMATCH"
+></A
+><P
+><B
+>Table 10-14. Ecn match options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--ecn</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp -m ecn --ecn-tcp-cwr</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>This match is used to match the CWR 
+(Congestion Window Received) bit, if it has been set. 
+The CWR flag is set to notify the other endpoint of 
+the connection that they have received an ECE, and 
+that they have reacted to it. Per default this matches if the CWR bit is set, but the match may also be inversed using an exclamation 
+point. </P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--ecn-tcp-ece</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp -m ecn --ecn-tcp-ece</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>This match can be used to match the ECE 
+(ECN-Echo) bit. The ECE is 
+set once one of the endpoints has received a packet with the 
+CE bit set by a router. The endpoint then sets the 
+ECE in the returning ACK packet, to notify the other 
+endpoint that it needs to slow down. The other endpoint then sends a 
+CWR packet as described in the 
+--ecn-tcp-cwr explanation. This matches per default if the 
+ECE bit is set, but may be inversed by using an 
+exclamation point.</P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--ecn-ip-ect</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp -m ecn --ecn-ip-ect 1</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>The --ecn-ip-ect match is used to match the 
+ECT (ECN Capable Transport) 
+codepoints. The ECT codepoints has several types of 
+usage. Mainly, they are used to negotiate if the connection is 
+ECN capable by setting one of the two bits to 1. The 
+ECT is also used by routers to indicate that they are 
+experiencing congestion, by setting both ECT 
+codepoints to 1. The ECT values are all available in the in the <A
+HREF="x6330.htm#ECNFIELDIP"
+><I
+>ECN Field in IP</I
+></A
+> table below.</P
+><P
+>The match can be inversed using an exclamation point, for example 
+! --ecn-ip-ect 2 which will match all ECN values but the 
+ECT(0) codepoint. The valid value range is 0-3 in iptables. See the above 
+table for their values.</P
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="TABLE"
+><A
+NAME="ECNFIELDIP"
+></A
+><P
+><B
+>Table 10-15. ECN Field in IP</B
+></P
+><TABLE
+BORDER="1"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="56"><COL
+WIDTH="32"><COL
+WIDTH="32"><COL
+WIDTH="1*"><THEAD
+><TR
+><TH
+>Iptables value</TH
+><TH
+>ECT</TH
+><TH
+>CE</TH
+><TH
+>[Obsolete] RFC 2481 names for the ECN bits.</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>0</TD
+><TD
+>0</TD
+><TD
+>0</TD
+><TD
+>Not-ECT, ie. non-ECN capable connection.</TD
+></TR
+><TR
+><TD
+>1</TD
+><TD
+>0</TD
+><TD
+>1</TD
+><TD
+>ECT(1), New naming convention of ECT codepoints in RFC 
+    3168.</TD
+></TR
+><TR
+><TD
+>2</TD
+><TD
+>1</TD
+><TD
+>0</TD
+><TD
+>ECT(0), New naming convention of ECT codepoints in RFC 
+    3168.</TD
+></TR
+><TR
+><TD
+>3</TD
+><TD
+>1</TD
+><TD
+>1</TD
+><TD
+>CE (Congestion Experienced), Used to notify endpoints of 
+    congestion</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="HASHLIMITMATCH"
+>Hashlimit match</A
+></H2
+><P
+>This is a modified version of the <A
+HREF="x6330.htm#LIMITMATCH"
+><I
+>Limit match</I
+></A
+>. Instead of just setting up a single token 
+bucket, it sets up a hash table pointing to token buckets for each destination 
+IP, source IP, destination port and source port tuple. For example, you can set it up 
+so that every IP address can receive a maximum of 1000 packets per second, or 
+you can say that every service on a specific IP address may receive a maximum 
+of 200 packets per second. The hashlimit match is loaded by 
+specifying the -m hashlimit keywords. </P
+><P
+>Each rule that uses the hashlimit match creates a separate 
+hashtable which in turn has a specific max size and a maximum number of 
+buckets. This hash table contains a hash of either a single or multiple 
+values. The values can be any and/or all of destination IP, source IP, 
+destination port and source port. Each entry then points to a token bucket 
+that works as the limit match. </P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.HASHLIMITMATCH"
+></A
+><P
+><B
+>Table 10-16. Hashlimit match options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--hashlimit</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp --dst 192.168.0.3 -m hashlimit 
+--hashlimit 1000/sec --hashlimit-mode dstip,dstport --hashlimit-name 
+hosts</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>The --hashlimit specifies the limit of each bucket. In this 
+example the hashlimit is set to 1000. In this example, we have set up the 
+hashlimit-mode to be dstip,dstport and destination 
+192.168.0.3. Hence, for every port or service on the 
+destination host, it can receive 1000 packets per second. This is the same 
+setting as the limit option for the limit match. The limit can take a 
+/sec, /minute, /hour 
+or /day postfix. If no postfix is specified, the default 
+postfix is per second.</P
+><DIV
+CLASS="IMPORTANT"
+><P
+></P
+><TABLE
+CLASS="IMPORTANT"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/important.gif"
+HSPACE="5"
+ALT="Important"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>This option is mandatory for all hashlimit matches.</P
+></TD
+></TR
+></TABLE
+></DIV
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--hashlimit-mode</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp --dst 192.168.0.0/16 -m 
+hashlimit --hashlimit 1000/sec --hashlimit-mode dstip --hashlimit-name 
+hosts</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>The --hashlimit-mode option specifies which values we 
+should use as the hash values. In this example, we use only the dstip 
+(destination IP) as the hashvalue. So, each host in the 
+192.168.0.0/16 network will be limited to receiving a 
+maximum of 1000 packets per second in this case. The possible values for the 
+--hashlimit-mode is dstip (Destination 
+IP), srcip (Source IP), dstport 
+(Destination port) and srcport (Source port). All of these 
+can also be separated by a comma sign to include more than one hashvalue, such 
+as for example --hashlimit-mode dstip,dstport. </P
+><DIV
+CLASS="IMPORTANT"
+><P
+></P
+><TABLE
+CLASS="IMPORTANT"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/important.gif"
+HSPACE="5"
+ALT="Important"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>This option is mandatory for all hashlimit matches.</P
+></TD
+></TR
+></TABLE
+></DIV
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--hashlimit-name</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp --dst 192.168.0.3 -m hashlimit 
+--hashlimit 1000 --hashlimit-mode dstip,dstport --hashlimit-name 
+hosts</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>This option specifies the name that this specific hash will be available as. 
+It can be viewed inside the <TT
+CLASS="FILENAME"
+>/proc/net/ipt_hashlimit</TT
+> 
+directory. The example above would be viewable inside the 
+<TT
+CLASS="FILENAME"
+>/proc/net/ipt_hashlimit/hosts</TT
+> file. Only the filename 
+should be specified.</P
+><DIV
+CLASS="IMPORTANT"
+><P
+></P
+><TABLE
+CLASS="IMPORTANT"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/important.gif"
+HSPACE="5"
+ALT="Important"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>This option is mandatory for all hashlimit matches.</P
+></TD
+></TR
+></TABLE
+></DIV
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--hashlimit-burst</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp --dst 192.168.0.3 -m hashlimit 
+--hashlimit 1000 --hashlimit-mode dstip,dstport --hashlimit-name 
+hosts --hashlimit-burst 2000</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>This match is the same as the --limit-burst in that it sets 
+the maximum size of the bucket. Each bucket will have a burst limit, which is 
+the maximum amount of packets that can be matched during a single time unit. 
+For an example on how a token bucket works, take a look at the <A
+HREF="x6330.htm#LIMITMATCH"
+><I
+>Limit match</I
+></A
+>.</P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--hashlimit-htable-size</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp --dst 192.168.0.3 -m hashlimit 
+--hashlimit 1000 --hashlimit-mode dstip,dstport --hashlimit-name 
+hosts --hashlimit-htable-size 500</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>This sets the maximum available buckets to be used. In this example, it means 
+that a maximum of 500 ports can be open and active at the same time.</P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--hashlimit-htable-max</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp --dst 192.168.0.3 -m hashlimit 
+--hashlimit 1000 --hashlimit-mode dstip,dstport --hashlimit-name 
+hosts --hashlimit-htable-max 500</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>The --hashlimit-htable-max sets the maximum number of 
+hashtable entries. This means all of the connections, including the inactive 
+connections that doesn't require any token buckets for the moment. </P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--hashlimit-htable-gcinterval</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp --dst 192.168.0.3 -m hashlimit 
+--hashlimit 1000 --hashlimit-mode dstip,dstport --hashlimit-name 
+hosts --hashlimit-htable-gcinterval 1000</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>How often should the garbage collection function be run. Generally speaking 
+this value should be lower than the expire value. The value is measured in 
+milliseconds. If it is set too low it will be taking up unnecessary system 
+resources and processing power, but if it's too high it can leave unused token 
+buckets lying around for too long and leaving other connections impossible. In 
+this example the garbage collector will run every second.</P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--hashlimit-htable-expire</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp --dst 192.168.0.3 -m hashlimit 
+--hashlimit 1000 --hashlimit-mode dstip,dstport --hashlimit-name 
+hosts --hashlimit-htable-expire 10000</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>This value sets after how long time an idle hashtable entry should expire. If 
+a bucket has been unused for longer than this, it will be expired and the next 
+garbage collection run will remove it from the hashtable, as well as all of 
+the information pertaining to it.</P
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="HELPERMATCH"
+>Helper match</A
+></H2
+><P
+>This is a rather unorthodox match in comparison to the other matches, in the 
+sense that it uses a little bit specific syntax. The match is used to match 
+packets, based on which conntrack helper that the packet is related to. For 
+example, let's look at the FTP session. The Control 
+session is opened up, and the ports/connection is negotiated for the Data 
+session within the Control session. The ip_conntrack_ftp 
+helper module will find this information, and create a related entry in the 
+conntrack table. Now, when a packet enters, we can see which protocol it was 
+related to, and we can match the packet in our ruleset based on which helper 
+was used. The match is loaded by using the -m helper
+keyword.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.HELPERMATCH"
+></A
+><P
+><B
+>Table 10-17. Helper match options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--helper</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp -m helper --helper ftp-21</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>The --helper option is used to specify a string value, 
+telling the match which conntrack helper to match. In the basic form, it may 
+look like --helper irc. This is where the syntax starts to 
+change from the normal syntax. We can also choose to only match packets based 
+on which port that the original expectation was caught on. For example, the 
+FTP Control session is normally transferred over port 
+21, but it may as well be port 954 or any other port. We may then specify upon 
+which port the expectation should be caught on, like --helper ftp-954. </P
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="IPRANGEMATCH"
+>IP range match</A
+></H2
+><P
+>The IP range match is used to match IP ranges, just as the --source and --destination matches are able to do as 
+well. However, this match adds a different kind of matching in the sense that 
+it is able to match in the manner of from IP - to IP, which the --source and --destination matches are unable to. 
+This may be needed in some specific network setups, and it is rather a bit 
+more flexible. The IP range match is loaded by using
+the -m iprange keyword.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.IPRANGEMATCH"
+></A
+><P
+><B
+>Table 10-18. IP range match options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--src-range</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp -m iprange --src-range 192.168.1.13-192.168.2.19</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>This matches a range of source IP addresses. The range includes every single
+IP address from the first to the last, so the example above includes
+everything from 192.168.1.13 to 192.168.2.19. The match may also be inverted
+by adding an !. The above example would then look like
+-m iprange ! --src-range 192.168.1.13-192.168.2.19, which
+would match every single IP address, except the ones specified.</P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--dst-range</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp -m iprange --dst-range 192.168.1.13-192.168.2.19</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>The --dst-range works exactly the same as the --src-range match, except that it matches destination IP's instead 
+of source IP's.</P
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="LENGTHMATCH"
+>Length match</A
+></H2
+><P
+>The length match is used to match packets based on their length. It is very 
+simple. If you want to limit packet length for some strange reason, or want to 
+block ping-of-death-like behaviour, use the length match. </P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.LENGTHMATCH"
+></A
+><P
+><B
+>Table 10-19. Length match options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--length</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp -m length --length 1400:1500</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>The example --length will match all packets with a length 
+between 1400 and 1500 bytes. The match may also be inversed using the ! sign, like this: -m length ! --length 1400:1500
+. It may also be used to match only a specific length, removing the : sign and 
+onwards, like this: -m length --length 1400. The range 
+matching is, of course, inclusive, which means that it includes all packet 
+lengths in between the values you specify.</P
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="LIMITMATCH"
+>Limit match</A
+></H2
+><P
+> 
+The limit match extension must be loaded
+explicitly with the -m limit option. This match can,
+for example, be used to advantage to give limited logging of specific
+rules etc. For example, you could use this to match all packets that do
+not exceed a given value, and after this value has been exceeded,
+limit logging of the event in question. Think of a time
+limit: You could limit how many times a certain rule may be matched in a
+certain time frame, for example to lessen the effects of
+<SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>DoS</I
+></SPAN
+> syn flood attacks. This is its main usage, but
+there are more usages, of course. The limit match may
+also be inverted by adding a ! flag in front of the
+limit match. It would then be expressed as -m limit !
+--limit 5/s.This means that all packets will be matched after they 
+have broken the limit.</P
+><P
+> To further explain the limit match, it is basically a token
+bucket filter.  Consider having a leaky bucket where the bucket leaks X
+packets per time-unit. X is defined depending on how many matching packets
+we get, so if we get 3 packets, the bucket leaks 3 packets per that
+time-unit. The --limit option tells us how many packets
+to refill the bucket with per time-unit, while the
+--limit-burst option tells us how big the bucket is in
+the first place. So, setting --limit 3/minute --limit-burst
+5, and then receiving 5 matches will empty the bucket. After 20
+seconds, the bucket is refilled with another token, and so on until the
+--limit-burst is reached again or until they get used.</P
+><P
+>Consider the example below for further explanation of how this may look.
+	</P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>We set a rule with -m limit --limit 5/second --limit-burst 10/second.
+The limit-burst token bucket is set to 10 initially. Each packet that matches
+the rule uses a token.
+		</P
+></LI
+><LI
+><P
+>We get packet that matches, 1-2-3-4-5-6-7-8-9-10, all within a 1/1000 of a 
+second.
+		</P
+></LI
+><LI
+><P
+>The token bucket is now empty. Once the token bucket is empty, the packets
+that qualify for the rule otherwise no longer match the rule and proceed to
+the next rule if any, or hit the chain policy.
+		</P
+></LI
+><LI
+><P
+>For each 1/5 s without a matching packet, the token count goes up by 1, upto a
+maximum of 10. 1 second after receiving the 10 packets, we will once again have
+5 tokens left.
+		</P
+></LI
+><LI
+><P
+>And of course, the bucket will be emptied by 1 token for each packet it 
+receives.
+		</P
+></LI
+></OL
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.LIMITMATCH"
+></A
+><P
+><B
+>Table 10-20. Limit match options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--limit</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.3, 2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -m limit --limit
+3/hour</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This sets the maximum average match rate for the
+limit match. You specify it with a number and an optional
+time unit. The following time units are currently recognized:
+/second /minute /hour
+/day. The default value here is 3 per hour, or
+3/hour. This tells the limit match how
+many times to allow the match to occur per time unit (e.g. per
+minute).</TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--limit-burst</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.3, 2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -m limit --limit-burst
+5</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This is the setting for the <SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>burst
+limit</I
+></SPAN
+> of the limit match. It tells
+iptables the maximum number of tokens available in the 
+bucket when we start, or when the bucket is full. This number gets 
+decremented by one for every packet that arrives, down to the lowest possible 
+value, 1. The bucket will be refilled by the limit value every time unit, as 
+specified by the --limit option. The default 
+--limit-burst value is 5. For a simple way of checking out 
+how this works, you can use the example <A
+HREF="x12368.htm"
+><I
+>Limit-match.txt</I
+></A
+> 
+one-rule-script. Using this script, you can see for yourself how the limit 
+rule works, by simply sending ping packets at different intervals and in 
+different burst numbers. All echo replies will be 
+blocked when the burst value has been exceeded, and then be refilled by the 
+limit value every second.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="MACMATCH"
+>Mac match</A
+></H2
+><P
+>The MAC (Ethernet  Media
+Access Control) match can be used to match packets based on their
+MAC source address. As of writing this documentation,
+this match is a little bit limited, however, in the future this may be more
+evolved and may be more useful. This match can be used to match packets on the
+source MAC address only as previously said.</P
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Do note that to use this module we explicitly load it with the -m
+mac option. The reason that I am saying this is that a lot of people
+wonder if it should not be -m mac-source, which it should
+not.</P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.MACMATCH"
+></A
+><P
+><B
+>Table 10-21. Mac match options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--mac-source</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.3, 2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -m mac --mac-source
+00:00:00:00:00:01</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This match is used to match packets based on their
+MAC source address. The MAC
+address specified must be in the form
+<SPAN
+CLASS="emphasis"
+><I
+CLASS="EMPHASIS"
+>XX:XX:XX:XX:XX:XX</I
+></SPAN
+>, else it will not be legal. The match
+may
+be reversed with an ! sign and would look like
+--mac-source ! 00:00:00:00:00:01. This would in other words
+reverse the meaning of the match, so that all packets except packets from this
+MAC address would be matched. Note that since
+MAC addresses are only used on Ethernet type
+networks, this match will only be possible to use for Ethernet interfaces. The
+MAC match is only valid in the
+PREROUTING, FORWARD and
+INPUT chains and nowhere else.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="MARKMATCH"
+>Mark match</A
+></H2
+><P
+>The mark match extension is used to match packets based on
+the marks they have set. A mark is a special field, only
+maintained within the kernel, that is associated with the packets as they
+travel through the computer. Marks may be used by different kernel
+routines for such tasks as traffic shaping and filtering. As of today, there
+is only one way of setting a mark in Linux, namely the
+MARK target in iptables. This was
+previously done with the FWMARK target in
+ipchains, and this is why people still refer to
+FWMARK in advanced routing areas. The mark field is
+currently set to an unsigned integer, or 4294967296 possible values on a
+32 bit system. In other words, you are probably not going to run into this
+limit for quite some time.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.MARKMATCH"
+></A
+><P
+><B
+>Table 10-22. Mark match options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--mark</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.3, 2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -t mangle -A INPUT -m mark --mark
+1</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This match is used to match packets that have previously
+been marked. Marks can be set with the MARK target
+which we will discuss in the next section. All packets traveling through
+Netfilter get a special mark
+field associated with them. Note that this mark
+field is not in any way propagated, within or outside the
+packet. It stays inside the computer that made it. If the mark
+field matches the mark, it is a match. The mark
+field is an unsigned integer, hence there can be a maximum of
+4294967296 different marks. You may also use a mask with the mark. The
+mark specification would then look like, for example, --mark
+1/1. If a mask is specified, it is logically AND ed with the mark
+specified before the actual comparison.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="MULTIPORTMATCH"
+>Multiport match</A
+></H2
+><P
+>The multiport match extension can be used to specify
+multiple destination ports and port ranges. Without the possibility this match
+gives, you would have to use multiple rules of the same type, just to match
+different ports.</P
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>You can not use both standard port matching and multiport matching at the
+same time, for example you can't write: --sport 1024:63353 -m
+multiport --dport 21,23,80. This will simply not work. What in fact
+happens, if you do, is that iptables honors the first element in the rule, and
+ignores the multiport instruction.</P
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.MULTIPORTMATCH"
+></A
+><P
+><B
+>Table 10-23. Multiport match options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--source-port</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.3, 2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp -m multiport --source-port
+22,53,80,110</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This match matches multiple source ports. A maximum of 15
+separate ports may be specified. The ports must be comma delimited, as in the
+above example. The match may only be used in conjunction with the -p
+tcp or -p udp matches. It is mainly an enhanced
+version of the normal --source-port match.</TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--destination-port</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.3, 2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp -m multiport
+--destination-port
+22,53,80,110</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This match is used to match multiple destination ports. It
+works exactly the same way as the above mentioned source port match, except
+that it matches destination ports. It too has a limit of 15 ports and may only
+be used in conjunction with -p tcp and -p
+udp.</TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--port</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.3, 2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp -m multiport --port
+22,53,80,110</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This match extension can be used to match packets based
+both on their destination port and their source port. It works the same
+way as the --source-port and
+--destination-port matches above. It can take a maximum of
+15 ports and can only be used in conjunction with -p tcp
+and -p udp. Note that the --port match
+will only match packets coming in from and going to the same port, for
+example, port 80 to port 80, port 110 to port 110 and so on.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="OWNERMATCH"
+>Owner match</A
+></H2
+><P
+>The owner match extension is used to match packets based
+on the identity of the process that created them. The owner
+can be specified as the process ID either of the user who issued the command
+in question, that of the group, the process, the session, or that of the
+command itself. This extension was originally written as an example of what
+iptables could be used for. The owner
+match only works within the OUTPUT chain, for obvious
+reasons: It is pretty much impossible to find out any information about the
+identity of the instance that sent a packet from the other end, or where there
+is an intermediate hop to the real destination. Even within the
+OUTPUT chain it is not very reliable, since certain
+packets may not have an owner. Notorious packets of that sort are (among
+other things) the different ICMP responses.
+ICMP responses will never match.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.OWNERMATCH"
+></A
+><P
+><B
+>Table 10-24. Owner match options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--cmd-owner</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.3, 2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A OUTPUT -m owner --cmd-owner
+httpd</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>This is the command owner match, and is used to match based on the command 
+name of the process that is sending the packet. In the example, 
+httpd is matched. This match may also be inverted by 
+using an exclamation sign, for example -m owner ! --cmd-owner 
+ssh.</P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--uid-owner</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.3, 2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A OUTPUT -m owner --uid-owner
+500</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This packet match will match if the packet was created by
+the given User ID (UID). This could be used
+to
+match outgoing packets based on who created them. One possible use would be to
+block any other user than root from opening new connections outside your
+firewall. Another possible use could be to block everyone but the
+http user from sending packets from the
+HTTP port.
+ </TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--gid-owner</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.3, 2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A OUTPUT -m owner --gid-owner
+0</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This match is used to match all packets based on their
+Group ID (GID). This means that we match all
+packets based on what group the user creating the packets is in. This could
+be used to block all but the users in the 
+network group from getting out onto the
+Internet or, as described above, only to allow members of the
+http group to create packets going out from
+the HTTP port.</TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--pid-owner</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.3, 2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A OUTPUT -m owner --pid-owner
+78</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This match is used to match packets based on the
+Process ID (PID) that was
+responsible for them. This match is a bit harder to use, but one example would
+be only to allow PID 94 to send packets from the
+HTTP port (if the HTTP
+process is not threaded, of course). Alternatively we could write a small
+script that grabs the PID from a
+ps output for a specific daemon and then adds a rule for
+it. For an example, you could have a rule as shown in the <A
+HREF="x12380.htm"
+><I
+>Pid-owner.txt</I
+></A
+> example.</TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--sid-owner</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.3, 2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A OUTPUT -m owner --sid-owner
+100</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This match is used to match packets based on the
+Session ID used by the program in question. The value
+of the SID, or Session ID of
+a process, is that of the process itself and all processes resulting from the
+originating process. These latter could be threads, or a child of the original
+process. So, for example, all of our HTTPD processes
+should have the same SID as their parent process (the
+originating HTTPD process), if our
+HTTPD is threaded (most
+HTTPDs are, Apache and Roxen for instance). To show
+this in example, we have created a small script called <A
+HREF="x12409.htm"
+><I
+>Sid-owner.txt</I
+></A
+>. This script could 
+possibly be run every hour or so together with some extra code to check if the 
+HTTPD is actually running and start it again if 
+necessary, then flush and re-enter our OUTPUT chain 
+if needed.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>The pid, sid and command matching is broken in SMP kernels since they use 
+different process lists for each processor. It might be fixed in the future 
+however</P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="PKTTYPEMATCH"
+>Packet type match</A
+></H2
+><P
+>The packet type match is used to match packets based on their type. I.e., are 
+they destined to a specific person, to everyone or to a specific group of 
+machines or users. These three groups are generally called unicast, broadcast 
+and multicast, as discussed in the <A
+HREF="c171.htm"
+><I
+>TCP/IP repetition</I
+></A
+> chapter. The match is loaded by using 
+-m pkttype.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.PKTTYPEMATCH"
+></A
+><P
+><B
+>Table 10-25. Packet type match options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--pkt-type</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.3, 2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A OUTPUT -m pkttype --pkt-type unicast</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>The --pkt-type match is used to tell the packet type match 
+which packet type to match. It can either take unicast
+, broadcast or multicast as 
+an argument, as in the example. It can also be inverted by using a ! like this: -m pkttype --pkt-type ! broadcast, 
+which will match all other packet types.</P
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="REALMMATCH"
+>Realm match</A
+></H2
+><P
+>The realm match is used to match packets based on the
+routing realm that they are part of. Routing realms are used in Linux for
+complex routing scenarios and setups such as when using
+BGP et cetera. The realm match is
+loaded by adding the -m realm keyword to the commandline.</P
+><P
+>A routing realm is used in Linux to classify routes into logical groups of 
+routes. In most dedicated routers today, the Routing Information 
+Base (RIB) and the forwarding engine are
+very close to eachother. Inside the kernel for example. Since Linux isn't
+really a dedicated routing system, it has been forced to separate its
+RIB and Forwarding Information
+Base (FIB). The RIB lives in userspace
+and the FIB lives inside kernelspace. Because of this
+separation, it becomes quite resourceheavy to do quick searches in the
+RIB. The routing realm is the Linux solution to this,
+and actually makes the system more flexible and richer. </P
+><P
+>The Linux realms can be used together with BGP and
+other routing protocols that delivers huge amounts of routes. The routing
+daemon can then sort the routes by their prefix, aspath, or source for
+example, and put them in different realms. The realm
+is numeric, but can also be named through the
+<TT
+CLASS="FILENAME"
+>/etc/iproute2/rt_realms</TT
+> file.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.REALMMATCH"
+></A
+><P
+><B
+>Table 10-26. Realm match options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--realm</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A OUTPUT -m realm --realm 4</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>This option matches the realm number and optionally a mask. If this is not a 
+number, it will also try and resolve the realm from the 
+<TT
+CLASS="FILENAME"
+>/etc/iproute2/rt_realms</TT
+> file also. If a named realm is 
+used, no mask may be used. The match may also be inverted by setting an 
+exclamation sign, for example --realm ! cosmos.</P
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="RECENTMATCH"
+>Recent match</A
+></H2
+><P
+>The recent match is a rather large and complex matching
+system, which allows us to match packets based on recent events that we have
+previously matched. For example, if we would see an outgoing
+IRC connection, we could set the IP
+addresses into a list of hosts, and have another rule that allows
+identd requests back from the
+IRC server within 15 seconds of seeing the original
+packet.</P
+><P
+>Before we can take a closer look at the match options, let's try and explain a
+little bit how it works. First of all, we use several different rules to
+accomplish the use of the recent match. The
+recent match uses several different lists of recent events.
+The default list being used is the DEFAULT list. We
+create a new entry in a list with the set option, so once a rule is entirely
+matched (the set option is always a match), we also add an entry in the recent
+list specified. The list entry contains a timestamp, and the source
+IP address used in the packet that triggered the set
+option. Once this has happened, we can use a series of different recent
+options to match on this information, as well as update the entries timestamp,
+et cetera.</P
+><P
+>Finally, if we would for some reason want to remove a list entry, we would do
+this using the --remove match option from the
+recent match. All rules using the recent
+match, must load the recent module (-m recent) as usual.
+Before we go on with an example of the recent match, let's take a look at all
+the options.
+ </P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.RECENTMATCH"
+></A
+><P
+><B
+>Table 10-27. Recent match options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--name</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A OUTPUT -m recent --name examplelist</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>The name option gives the name of the list to use. Per default the DEFAULT 
+list is used, which is probably not what we want if we are using more than one 
+list.</P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--set</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A OUTPUT -m recent --set</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>This creates a new list entry in the named recent list, which contains a 
+timestamp and the source IP address of the host that triggered the rule. This 
+match will always return success, unless it is preceded by a ! sign, in which 
+case it will return failure. </P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--rcheck</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A OUTPUT -m recent --name examplelist --rcheck</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>The --rcheck option will check if the source IP address of 
+the packet is in the named list. If it is, the match will return true, 
+otherwise it returns false. The option may be inverted by using the ! sign. In 
+the later case, it will return true if the source IP address is not in the 
+list, and false if it is in the list.</P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--update</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A OUTPUT -m recent --name examplelist --update</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>This match is true if the source combination is available in the specified 
+list and it also updates the last-seen time in the list. This match may also be 
+reversed by setting the ! mark in front of the match. For 
+example, ! --update. </P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--remove</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -m recent --name example --remove</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>This match will try to find the source address of the packet in the list, and 
+returns true if the packet is there. It will also remove the corresponding 
+list entry from the list. The command is also possible to inverse with the ! sign. </P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--seconds</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -m recent --name example --check --seconds 60</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>This match is only valid together with the --check and 
+--update matches. The --seconds match is 
+used to specify how long since the "last seen" column was updated in the recent 
+list. If the last seen column was older than this amount in seconds, the match 
+returns false. Other than this the recent match works as normal, so the 
+source address must still be in the list for a true return of the match. </P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--hitcount</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -m recent --name example --check --hitcount 20</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>The --hitcount match must be used together with the 
+--check or --update matches and it will 
+limit the match to only include packets that have seen at least the hitcount 
+amount of packets. If this match is used together with the 
+--seconds match, it will require the specified hitcount 
+packets to be seen in the specific timeframe. This match may also be reversed 
+by adding a ! sign in front of the match. Together with the 
+--seconds match, this means that a maximum of this amount 
+of packets may have been seen during the specified timeframe. If both of the 
+matches are inversed, then a maximum of this amount of packets may have been 
+seen during the last minumum of seconds.</P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--rttl</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -m recent --name example --check --rttl</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>The --rttl match is used to verify that the 
+TTL value of the current packet is the same as the 
+original packet that was used to set the original entry in the recent list. 
+This can be used to verify that people are not spoofing their source address 
+to deny others access to your servers by making use of the recent match.</P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--rsource</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -m recent --name example --rsource</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>The --rsource match is used to tell the recent match to 
+save the source address and port in the recent list. This is the default 
+behavior of the recent match. </P
+></TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--rdest</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -m recent --name example --rdest</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>The --rdest match is the opposite of the 
+--rsource match in that it tells the recent match to save 
+the destination address and port to the recent list. </P
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+>I have created a small sample script of how the recent 
+match can be used, which you can find in the <A
+HREF="x12395.htm"
+><I
+>Recent-match.txt</I
+></A
+> section. </P
+><P
+>Briefly, this is a poor replacement for the state engine available in
+netfilter. This version was created with a http server in mind, but will work
+with any TCP connection. First we have created two
+chains named http-recent and
+http-recent-final. The
+http-recent chain is used in the starting stages of
+the connection, and for the actual data transmission, while the
+http-recent-final chain is used for the last and
+final FIN/ACK, FIN
+handshake. </P
+><DIV
+CLASS="WARNING"
+><P
+></P
+><TABLE
+CLASS="WARNING"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/warning.gif"
+HSPACE="5"
+ALT="Warning"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>This is a very bad replacement for the built in state engine and can not handle 
+all of the possibilities that the state engine can handle. However, it is a 
+good example of what can be done with the recent match without being too 
+specific. Do not use this example in a real world environment. It is slow, 
+handles special cases badly, and should generally never be used more than as an 
+example. </P
+><P
+>For example, it does not handle closed ports on connection, 
+asyncronuous FIN handshake (where one of the
+connected parties closes down, while the other continues to send data), etc.</P
+></TD
+></TR
+></TABLE
+></DIV
+><P
+>Let's follow a packet through the example ruleset. First a packet enters the 
+INPUT chain, and we send it to the 
+http-recent chain. </P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>The first packet should be a SYN packet, and should
+not have the ACK,FIN or RST 
+bits set. Hence it is matched using the --tcp-flags SYN,ACK,FIN,RST 
+SYN line. At this point we add the connection to the httplist using 
+-m recent --name httplist --set line. Finally we accept the
+packet.</P
+></LI
+><LI
+><P
+>After the first packet we should receive a SYN/ACK
+packet to acknowledge that the SYN packet was
+received. This can be matched using the --tcp-flags SYN,ACK,FIN,RST
+SYN,ACK line. FIN and
+RST should be illegal at this point as well. At this
+point we update the entry in the httplist using -m recent --name
+httplist --update and finally we ACCEPT the
+packet.</P
+></LI
+><LI
+><P
+>By now we should get a final ACK packet, from the
+original creater of the connection, to acknowledge the
+SYN/ACK sent by the server.
+SYN, FIN and
+RST are illegal at this point of the connection, so
+the line should look like --tcp-flags SYN,ACK,FIN,RST ACK.
+We update the list in exactly the same way as in the previous step, and
+ACCEPT it.</P
+></LI
+><LI
+><P
+>At this point the data transmission can start. The connection should never
+contain any SYN packet now, but it will contain
+ACK packets to acknowledge the data packets that are
+sent. Each time we see any packet like this, we update the list and
+ACCEPT the packets.</P
+></LI
+><LI
+><P
+>The transmission can be ended in two ways, the simplest is the
+RST packet. RST will simply
+reset the connection and it will die. With FIN/ACK,
+the other endpoint answers with a FIN, and this
+closes down the connection so that the original source of the
+FIN/ACK can no longer send any data. The receiver of
+the FIN, will still be able to send data, hence we
+send the connection to a "final" stage chain to handle the rest.</P
+></LI
+><LI
+><P
+>In the http-recent-final chain we check if the packet is
+still in the httplist, and if so, we send it to the
+http-recent-final1 chain. In that chain we remove the
+connection from the httplist and add it to the
+http-recent-final list instead. If the connection has
+already been removed and moved over to the
+http-recent-final list, we send te packet to the
+http-recent-final2 chain. </P
+></LI
+><LI
+><P
+>In the final http-recent-final2 chain, we wait for the
+non-closed side to finish sending its data, and to close the connection from
+their side as well. Once this is done, the connection is completely removed.</P
+></LI
+></OL
+><P
+>As you can see the recent list can become quite complex, but it will give you 
+a huge set of possibilities if need be. Still, try and remember not to 
+reinvent the wheel. If the ability you need is already implemented, try and use 
+it instead of trying to create your own solution. </P
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="STATEMATCH"
+>State match</A
+></H2
+><P
+>The state match extension is used in conjunction with the
+connection tracking code in the kernel. The state match accesses the connection
+tracking state of the packets from the conntracking machine. This allows us to
+know in what state the connection is, and works for pretty much all protocols,
+including stateless protocols such as ICMP and
+UDP. In all cases,
+there will be a default timeout for the connection and it will then be dropped
+from the connection tracking database. This match needs to be loaded
+explicitly by adding a -m state statement to the rule. You
+will then have access to one new match called state. The concept of state
+matching is covered more fully in the <A
+HREF="c4219.htm"
+><I
+>The state machine</I
+></A
+> chapter, since it is such a large topic.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.STATEMATCHES"
+></A
+><P
+><B
+>Table 10-28. State match options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--state</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.3, 2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -m state --state
+RELATED,ESTABLISHED</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>This match option tells the state 
+match what states the packets must be in to be matched. There are currently 4 
+states that can be used. INVALID, 
+ESTABLISHED, NEW and
+RELATED. INVALID means that the packet is 
+associated with no known stream or connection and that it may contain faulty 
+data or headers. ESTABLISHED means that the packet is part 
+of an already established connection that has seen packets in both directions 
+and is fully valid. NEW means that the packet has or will 
+start a new connection, or that it is associated with a connection that has not 
+seen packets in both directions. Finally, RELATED means that 
+the packet is starting a new connection and is associated with an already 
+established connection. This could for example mean an FTP data 
+transfer, or an ICMP error associated 
+with a TCP or UDP 
+connection. Note that the NEW state does not look for 
+SYN bits in TCP packets 
+trying to start a new connection and should, hence, not be used unmodified in 
+cases where we have only one firewall and no load balancing between different 
+firewalls. However, there may be times where this could be useful. For more 
+information on how this could be used, read the <A
+HREF="c4219.htm"
+><I
+>The state machine</I
+></A
+> chapter.</P
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="TCPMSSMATCH"
+>Tcpmss match</A
+></H2
+><P
+>The tcpmss match is used to match a packet based on the 
+Maximum Segment Size in TCP. 
+This match is only valid for SYN and SYN/ACK packets. For a more complete explanation of the MSS 
+value, see the <A
+HREF="a13211.htm"
+><I
+>TCP options</I
+></A
+> 
+appendix, the <A
+HREF="a13413.htm#RFC793"
+><I
+>RFC 793 - Transmission Control Protocol</I
+></A
+> and the 
+<A
+HREF="a13413.htm#RFC1122"
+><I
+>RFC 1122 - Requirements for Internet Hosts - Communication 
+Layers</I
+></A
+> documents. This match 
+is loaded using -m tcpmss and takes only one option.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.TCPMSSMATCH"
+></A
+><P
+><B
+>Table 10-29. Tcpmss match options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--mss</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.3, 2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp --tcp-flags SYN,ACK,RST SYN -m tcpmss --mss 2000:2500</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+><P
+>The --mss option tells the tcpmss match which Maximum Segment Sizes to match. This can either be a single 
+specific MSS value, or a range of 
+MSS values separated by a :. The 
+value may also be inverted as usual using the ! sign, as in 
+the following example:</P
+><P
+>-m tcpmss ! --mss 2000:2500</P
+><P
+>This example will match all MSS values,
+except for values in the range 2000 through 2500.</P
+></TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="TOSMATCH"
+>Tos match</A
+></H2
+><P
+>The TOS match can be used to match packets based on their
+TOS field. TOS stands for
+Type Of Service, consists of 8 bits, and is located
+in the IP header. This match is loaded explicitly by adding -m
+tos to the rule. TOS is normally used to
+inform intermediate hosts of the precedence of the stream and its content (it
+doesn't really, but it informs of any specific requirements for the stream,
+such as it having to be sent as fast as possible, or it needing to be able to
+send as much payload as possible). How different routers and administrators
+deal with these values depends. Most do not care at all, while others try
+their best to do something good with the packets in question and the data they
+provide.</P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.TOSMATCH"
+></A
+><P
+><B
+>Table 10-30. Tos match options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--tos</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.3, 2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A INPUT -p tcp -m tos --tos
+0x16</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This match is used as described above. It can match packets
+based on their TOS field and their value. This could
+be used, among other things together with the iproute2
+and advanced routing functions in Linux, to mark packets
+for later usage. The match takes a hex or numeric value as an option, or
+possibly one of the names resulting from 'iptables -m tos
+-h'. At the time of writing it contained the following named values:
+Minimize-Delay 16 (0x10),
+Maximize-Throughput 8 (0x08),
+Maximize-Reliability 4 (0x04),
+Minimize-Cost 2 (0x02), and
+Normal-Service 0 (0x00).
+Minimize-Delay means to minimize the delay in
+putting the packets through - example of standard services that would require
+this include telnet, SSH and
+FTP-control.
+Maximize-Throughput means to find a path that
+allows as big a throughput as possible - a standard protocol would be
+FTP-data.
+Maximize-Reliability means to maximize the
+reliability of the connection and to use lines that are as reliable as
+possible - a couple of typical examples are BOOTP and
+TFTP. Minimize-Cost
+means minimizing the cost of packets getting through each link to the client
+or server; for example finding the route that costs the least to travel along.
+Examples of normal protocols that would use this would be
+RTSP (Real Time Stream Control Protocol) and other
+streaming video/radio protocols. Finally,
+Normal-Service would mean any normal protocol
+that has no special needs.</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="TTLMATCH"
+>Ttl match</A
+></H2
+><P
+>The TTL match is used to match packets based on their
+TTL (Time To Live) field
+residing in the IP headers. The TTL field contains 8
+bits of data and is decremented once every time it is processed by an
+intermediate host between the client and recipient host. If the
+TTL reaches 0, an ICMP type
+11 code 0 (TTL equals 0 during transit) or code 1 (TTL equals 0 during
+reassembly) is transmitted to the party sending the packet and informing it of
+the problem. This match is only used to match packets based on their
+TTL, and not to change anything. The latter,
+incidentally, applies to all kinds of matches. To load this match, you need to
+add an -m ttl to the rule. </P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.TTLMATCH"
+></A
+><P
+><B
+>Table 10-31. Ttl match options</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="77"><COL
+WIDTH="1*"><TBODY
+><TR
+><TD
+>Match</TD
+><TD
+>--ttl-eq</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.3, 2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A OUTPUT -m ttl --ttl-eq 60</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This match option is used to specify the TTL value to
+match exactly. It takes a numeric value and matches this value within the
+packet. There is no inversion and there are no other specifics to match. It
+could, for example, be used for debugging your local network - e.g. LAN hosts
+that seem to have problems connecting to hosts on the Internet - or to find
+possible ingress by Trojans etc. The usage is relatively limited, however; its
+usefulness really depends on your imagination. One example would be to find
+hosts with bad default TTL values (could be due to a
+badly implemented TCP/IP stack, or simply to
+misconfiguration).
+           </TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--ttl-gt</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.3, 2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A OUTPUT -m ttl --ttl-gt 64</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>This match option is used to match any TTL greater
+than the specified value. The value can be between 0 and 255 and the match can
+not be inverted. It could, for example, be used for matching any
+TTL greater than a specific value and then force them
+to a standardized value. This could be used to overcome some simple forms of
+spying by ISP's to find out if you are running
+multiple machines behind a firewall, against their policies.
+           </TD
+></TR
+><TR
+><TD
+>Match</TD
+><TD
+>--ttl-lt</TD
+></TR
+><TR
+><TD
+>Kernel</TD
+><TD
+>2.3, 2.4, 2.5 and 2.6</TD
+></TR
+><TR
+><TD
+>Example</TD
+><TD
+>iptables -A OUTPUT -m ttl --ttl-lt 64</TD
+></TR
+><TR
+><TD
+>Explanation</TD
+><TD
+>The --ttl-lt match is used to match any
+TTL smaller than the specified value. It is pretty
+much the same as the --ttl-gt match, but as already stated;
+it matches smaller TTL's. It could also be used in
+the same way as the --ttl-gt match, or to simply homogenize
+the packets leaving your network in general. 
+             </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="SECTION"
+><H2
+CLASS="SECTION"
+><A
+NAME="UNCLEANMATCH"
+>Unclean match</A
+></H2
+><P
+>The unclean match takes no options and requires
+no more than explicitly loading it when you want to use it. Note that this
+option is regarded as experimental and may not work at all times, nor will it
+take care of all unclean packages or problems. The unclean match tries to
+match packets that seem malformed or unusual, such as packets with bad headers
+or checksums and so on. This could be used to DROP
+connections and to check for bad streams, for example; however you should be
+aware that it could possibly break legal connections.
+     </P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x5796.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x8812.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Implicit matches</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c5572.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>What's next?</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

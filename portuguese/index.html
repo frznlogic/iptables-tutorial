@@ -1,0 +1,127 @@
+<HTML>
+<HEAD>
+<TITLE>Iptables Tutorial</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#840084" ALINK="#0000FF">
+
+<P>
+<B>IPTables-tutorial</B>
+<BR>
+<A HREF="iptables-tutorial.html">HTML</A> | 
+<A HREF="iptables-tutorial.ps.gz">PS</A> | 
+<!--<A HREF="iptables-tutorial.pdf.gz">PDF</A> |-->
+<A HREF="iptables-tutorial.src.tgz">DocBook</A> | 
+<A HREF="http://www.pdmi.ras.ru/~theo/debian">Debian package</A>
+<BR>
+<A HREF="ChangeLog">ChangeLog</A> | 
+<A HREF="TODO">TODO</A> | 
+<A HREF="mirrors.html">Mirrors</A>
+<P>
+The PDF version of this tutorial has been temporarily downed until I can 
+get the conversion from docbook SGML to PDF to work properly again. It 
+works for me, but nowhere else for some really strange reason. Until this 
+has been fixed, you will have to survive without it. If there are any 
+jade/docbook gurus out there reading this, you are more than welcome to 
+grab the source package above and have a look at it :-).
+
+<P>
+For those who have noticed, the tutorial has gone up and down too and 
+forth the last month or two. My apologies for this. <A 
+HREF="http://www.boingworld.com">www.boingworld.com</A> seems 
+to have gone down for an undefinite period of time, and after this I had 
+several problems finding a host both willing and able to host the 
+tutorial. My gratitude goes out to the following people/organisations for 
+their kind help, support and temporary hosting during this time:
+<P>
+<UL>
+<LI><A HREF="http://www.linux-sxs.org">Linux-SXS</A> who took the lion 
+part of this traffic on their already overloaded servers. Special thanks 
+go out to Lonni Friedmann and Douglas J Hunley
+<LI><A HREF="http://www.netfilter.org">Netfilter.org</A> and the core team 
+for help, and for preparing a host/mirror of this tutorial. Will hopefully 
+go through in the future.
+<LI><A HREF="http://www.unix-fu.org">Unix-fu.org</A> for taking some of 
+the beating in the beginning, and for being the main host quite some time 
+ago.
+<LI><A HREF="http://www.haringstad.com">Haringstad.com</A> for the "final 
+solution" hopefully. A huge thanks to Jacco van Koll for this possibility.
+<LI>And everyone else who has and still are maintaining mirrors. 
+</UL>
+
+<P>
+I hope I didn't forget anyone here, and if I did, let me know and I will 
+have him/her/them added.
+
+<P> Do note that some people reported broken links to me for the old version of
+the tutorial, which was due to bad line wrappings in my editor of choice.
+Hopefully this should now be fixed. If there  is any other suggestions(broken
+links, general problems, you name it), send a mail to me at the listed mail
+adress.
+
+<P> Other than this, there are a lot of minor changes, additions, deletions and
+so on. I am currently working feverishly on the rc.firewall file chapter to get
+it up to date with the script, however I have noticed how badly written this is
+so I am more or less rewriting the whole chapter so it may look a bit weird in
+some places.
+
+<P>
+For all of those that mails me and ask questions that are not
+strictly related to the actual tutorial, I would like to ask you to stop mailing
+me and ask me to look through your scripts and so on. If you have found a bug or
+error in the tutorial, or want to contribute, you are more than welcome,
+however, I get between 20 and 70 mail per week as it is now asking questions on
+everything from "how do I do this" to "why doesn't my iptables setup let xxx
+through to xxx" or "Want to see me nude". Anything like this will in the future
+be either sent to /dev/null, or forwarded to the netfilter mailing list which
+you can reach at <A HREF="mailto:netfilter@lists.samba.org">netfilter at
+lists.samba.org</A>. For more information on this, visit the <A
+HREF="http://www.netfilter.org">netfilter official homepage</A>. I will, of
+course, try to monitor the mailing list as intensely as I can, and I am sure
+that the awfully nice people over there will help me out by pointing out any
+mistakes I have done here if you find shortcomings and point them out there. I
+also got a generous offer from the equally nice people at linuxsecurity.com to
+do this screening if you send mail to their mailing list at <A
+HREF="mailto:security-discuss@linuxsecurity.com">security-discuss@linuxsecurity.
+com</A>. Both are fairly large, and should be able to help you much much better
+than I can.
+
+<P> I would like to give a huge thanks to <A
+HREF="http://www.ericsson.com/rsa">Ericsson Radio Access</A> for their generous
+contribution to this project. Thanks to them, I now have a fully functional <A
+HREF="/lab-net/index.html">labb network</A>.
+
+<P> NOTE: If you feel like mirroring this tutorial, please tell me about it so I
+can tell people about your mirror. This way it is possible for me to get some of
+the traffic off this server which may get heavily overloaded. Also note the cron
+script that will help you to do automatic updates of the tutorial.
+
+<P> This is the ChangeLog entry for the last version of the tutorial:
+<P>
+<PRE>
+1.1.11 (27 May 2002)
+* Fixed all tables in "how a rule is built" (??)
+* Pictures for state explanation.
+* Added the state explanation chapter.
+* Fixed everything within the state machine explanation.
+* Fixed a longer DNAT explanation on how to use this properly, and routing considerations.
+* Added a few term descriptions. (steve hnizdur <shnizdurATyahooDOTcoDOTuk>)
+* Added a note admonition in the "The ICMP chain" section.(steve hnizdur <shnizdurATyahooDOTcoDOTuk>)
+* Added mirror at linux-sxs.org (Lonni <netllamaATlinux-sxsDOTorg>)
+* Added warning admonition image
+* Changed caution to warning admonition in rc_firewall.sgml. (Jelle Kalf <JKalfATunoDOTnl>)
+* Added "how to read this document" section in the introduction.
+* Fixed statemachine.html explanation of sysctl variables etc.
+* Lots and lots of grammatical fixes (Tony Earnshaw <tonniATbillyDOTdemonDOTnl>, Valentina Barrios)
+</PRE>
+<P>
+<HR>
+<P>
+Mail: <A HREF="mailto: blueflux@koffein.net">blueflux@koffein.net</A>
+<P>
+Copyright &copy; 2001 by Boingworld organisation
+<P>
+Reproduction only allowed if written consent from responsible Boingworld
+crew-member is given.
+
+</BODY>
+</HTML>

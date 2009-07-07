@@ -1,0 +1,1160 @@
+ <chapter id="rcfirewallfile">
+  <title id="rcfirewallfile.title">El archivo rc.firewall</title>
+  <para>
+Este capítulo tratará sobre una configuración ejemplo del cortafuegos
+y cómo podría quedar el script. Hemos empleado una configuración básica,
+para después profundizar en su forma de trabajar y en qué modificaciones
+le hemos hecho. Con éllo obtendremos una idea general de cómo resolver
+diferentes problemas y de lo que necesitas pensar antes de poner a trabajar
+tus scripts. Se puede utilizar tal cual con algunos cambios en las variables,
+aunque no es recomendable puesto que es posible que no funcione correctamente
+junto a la configuración de tu red. Sin embargo, si tienes una configuración
+muy básica, es más que probable que funcione bastante bien con sólo hacerle
+algunos cambios.
+  </para>
+
+  <note>
+   <para>
+Ten en cuenta que pueden haber formas más eficientes de crear un conjunto
+de reglas, pero el script se ha escrito con la legibilidad en mente, de forma
+que cualquiera pueda entenderlo sin necesidad de tener grandes conocimientos de
+programación BASH (BASH scripting) antes de leerlo.
+    </para>
+  </note>
+
+  <section id="examplercfirewall">
+   <title id="examplercfirewall.title">Ejemplo de rc.firewall</title>
+
+   <para>
+De acuerdo, ya tienes todo listo y estás preparado para revisar un ejemplo de
+script de configuración. O al menos deberías estarlo si has llegado hasta aquí.
+El ejemplo <link linkend="rcfirewalltxt" endterm="rcfirewalltxt.title"></link>
+(también incluído en el apéndice <link linkend="examplecode"
+endterm="examplecode.title"></link>) es bastante largo pero sin demasiados
+comentarios. En vez de buscar los comentarios, te recomiendo que leas el script
+entero para tener una idea general y luego vuelvas a estas líneas para obtener
+todos los detalles prácticos.
+   </para>
+
+  </section>
+
+  <section id="explanationofrcfirewall">
+   <title id="explanationofrcfirewall.title">Explicación del rc.firewall</title>
+
+   <section id="configoptions">
+    <title id="configoptions.title">Opciones de configuración</title>
+
+    <para>
+La primera sección que observarás en el ejemplo <ulink
+url="http://iptables-tutorial.frozentux.net/scripts/rc.firewall.txt">
+rc.firewall.txt</ulink> es la de la configuración. Siempre debería ser
+modificada, pues contiene la información que resulta imprescindible para tu
+configuración actual. Por ejemplo, tu dirección IP normalmente será distinta,
+por lo cual se especifica aquí. La variable <command>$INET_IP</command>
+siempre debería ser una dirección IP válida, si es que tienes una (si no es así,
+probablemente deberías ver <link linkend="rcDHCPfirewalltxt"
+endterm="rcDHCPfirewalltxt.title"></link>, pero de todas formas sigue leyendo
+este script, ya que ofrece una introducción de bastantes cosas interesantes).
+Del mismo modo, la variable <command>$INET_IFACE</command> debe señalar al
+adaptador utilizado para tu conexión a Internet, como puede ser <systemitem>eth0</systemitem>,
+<systemitem>eth1</systemitem>, <systemitem>ppp0</systemitem>, <systemitem>tr0</systemitem>,
+etc, por nombrar unos pocos de los adaptadores posibles.
+    </para>
+
+    <para>
+Este script no contiene ninguna configuración especial para DHCP o PPPoE, por
+lo que estas secciones permanecen vacías. Lo mismo ocurre con el resto de
+secciones vacías, que sin embargo se mantienen para que puedas ver las
+diferencias entre los diferentes scripts de una forma más efectiva. Si por
+algún motivo necesitaras estas configuraciones, siempre puedes crear una mezcla
+a partir de los diferentes scripts o también crear el tuyo propio desde cero.
+    </para>
+
+    <para>
+La sección <systemitem>Configuración de la red local (LAN)</systemitem> incluye
+la mayoría de las opciones necesarias de configuración de tu <systemitem>LAN</systemitem>.
+Por ejemplo, necesitas especificar el nombre y la <systemitem>dirección IP</systemitem>
+de la interfaz física conectada a tu <systemitem>LAN</systemitem>, así como el
+<systemitem>rango IP</systemitem> que utiliza la red local.
+    </para>
+
+    <para>
+Asímismo, podrás observar que hay una sección de configuración del host local.
+Sin embargo es casi seguro que no tendrás que cambiar ningún valor en esta
+sección, puesto que normalmente utilizarás "127.0.0.1" como
+<systemitem>dirección IP</systemitem> y la interfaz casi con toda seguridad
+se llamará <systemitem>lo</systemitem>.
+    </para>
+
+
+    <para>
+Por fin, justo bajo la configuración del host local, verás una breve sección
+perteneciente a iptables. En principio sólo contiene la variable
+<command>$IPTABLES</command>, que le indica al script la situación correcta
+de la aplicación <command>iptables</command> en tu instalación. El lugar
+concreto puede variar algo, aunque al compilar a mano el paquete iptables la
+ruta por defecto es <filename>/usr/local/sbin/iptables</filename>. Sin embargo,
+muchas distribuciones sitúan la aplicación en otro directorio, como puede ser
+<filename>/usr/sbin/iptables</filename>, por ejemplo.
+    </para>
+
+   </section>
+
+   <section id="initialloading">
+    <title id="initialloading.title">Carga inicial de módulos extra</title>
+
+    <para>
+Para empezar, vemos que se comprueba si los archivos de dependencias de módulos están actualizados
+ejecutando el comando <command>/sbin/depmod -a</command>. A continuación se
+cargan los módulos que se requerirán en el script. Evita siempre cargar módulos
+que no vayas a necesitar y si es posible trata de evitar tener módulos sólo
+"por si acaso" a no ser que los vayas a usar. La razón de ésto es por seguridad,
+ya que de otra manera supondrá un esfuerzo extra escribir reglas adicionales.
+Así, si por ejemplo quieres tener soporte para los objetivos <computeroutput>LOG</computeroutput>,
+<command>REJECT</command> y <command>MASQUERADE</command> y no los tienes
+compilados estáticamente en el núcleo, deberás cargar los módulos como sigue:
+    </para>
+
+    <para>
+    <screen>
+<command>
+/sbin/insmod ipt_LOG
+/sbin/insmod ipt_REJECT
+/sbin/insmod ipt_MASQUERADE
+</command>
+    </screen>
+    </para>
+
+    <caution>
+     <para>
+En éste y los demás scripts de ejemplo forzamos la carga de módulos, lo cual
+puede originar fallos durante el proceso de carga. Estos fallos pueden deberse
+a muchos factores y generarán mensajes de error. Si alguno de los módulos más
+básicos no se cargan, el error más probable es que el módulo o funcionalidad
+esté compilado estáticamente en el núcleo. Para más información al respecto,
+léete la sección <link linkend="moduleproblems" endterm="moduleproblems.title"></link>
+del apéndice <link linkend="commonproblems" endterm="commonproblems.title"></link>.
+     </para>
+    </caution>
+
+    <para>
+Seguimos con los módulos no requeridos y encontramos la opción de cargar el
+módulo <computeroutput>ipt_owner</computeroutput>, que entre otras cosas se
+puede utilizar para permitir únicamente a determinados usuarios la posibilidad
+de establecer determinadas conexiones. Este módulo no se utiliza en el presente
+ejemplo, pero básicamente podrías permitir sólo al usuario <systemitem>root</systemitem>
+establecer conexiones <systemitem>FTP</systemitem> y <systemitem>HTTP</systemitem>
+con "redhat.com" y <command>DROP</command> (denegárselo/desechar) a todos los
+demás. También puedes denegar el acceso desde tu máquina hacia Internet a todos
+los usuarios excepto a tu propio usuario (tú mismo) y a root, lo cual puede
+no gustar a los demás, pero estarás un poco más seguro ante los ataques tipo
+"bouncing" (de forma que parezca que la conexión la realiza tu host) y ante
+los ataques en que el hacker sólo utilizará tu host como máquina intermedia.
+Para mayor información sobre la comparación <computeroutput>ipt_owner</computeroutput>
+léete la sección <link linkend="OwnerMatch" endterm="OwnerMatch.title"></link>
+del capítulo <link linkend="HowARuleIsBuilt" endterm="HowARuleIsBuilt.title"></link>.
+    </para>
+
+    <para>
+En este momento también podemos cargar módulos extra para la comparación de
+estados. Todos los módulos que mejoran el comportamiento del código de
+comparación de estados y de seguimiento de las conexiones se llaman
+<systemitem>ip_conntrack_*</systemitem> e <systemitem>ip_nat_*</systemitem>.
+Los asistentes para el seguimiento de las conexiones son módulos especiales que
+le indican al núcleo cómo hacer un seguimiento adecuado de conexiones
+de un tipo específico. Sin estos asistentes, el núcleo no sabrá qué buscar al
+intentar hacer un seguimiento de esas conexiones específicas. Por otra parte,
+los asistentes <systemitem>NAT</systemitem> son a su vez extensiones de los
+anteriores asistentes y le indican al núcleo qué buscar en paquetes específicos,
+además de cómo interpretarlos para que las conexiones funcionen. Por ejemplo,
+<systemitem>FTP</systemitem> es un protocolo complejo por definición, que envía
+la información de conexión dentro del contenido del paquete. Así pues, si una
+de tus máquinas "<systemitem>NAT</systemitem>eadas" conecta con un servidor
+<systemitem>FTP</systemitem> de Internet, enviará su propia
+<systemitem>dirección IP</systemitem> de la red local dentro del paquete y le
+indicará al servidor <systemitem>FTP</systemitem> que realice la conexión con
+esa dirección. Puesto que las direcciones locales no son válidas fuera de tu
+propia red local, el servidor <systemitem>FTP</systemitem> no sabrá qué hacer
+con éllas y la conexión se perderá. Los asistentes <systemitem>FTP NAT</systemitem>
+efectúan las conversiones necesarias en estas conexiones, de manera que el
+servidor <systemitem>FTP</systemitem> sabrá con quién debe establecer la
+conexión. El mismo caso ocurre con las transferencias (envíos) <systemitem>DCC</systemitem>
+de archivos y los chats. La creación de este tipo de conexiones precisa la
+<systemitem>dirección IP</systemitem> y los puertos con los que conectar a
+través del <systemitem>protocolo IRC</systemitem>, lo cual exige ciertas
+"traducciones". Sin estos asistentes determinadas tareas con <systemitem>FTP</systemitem>
+e <systemitem>IRC</systemitem> se podrán llevar a cabo, qué duda cabe, pero
+habrá otras que no. Por ejemplo, serás capaz de recibir ficheros mediante
+<systemitem>DCC</systemitem>, pero no podrás enviarlos. Éllo es debido a la
+manera de establecer conexiones de <systemitem>DCC</systemitem>. Al iniciar una
+conexión, le indicas al receptor que quieres enviarle un fichero y dónde debe
+conectarse. Sin los asistentes para la conexión <systemitem>DCC</systemitem>, este
+aviso inicial parecerá indicarle al receptor que debe conectarse a algún host
+de su propia red local (la del receptor). Como resultado la conexión se perderá.
+Sin embargo, cuando seas tú el que descargue ficheros no habrá problemas puesto que lo más probable
+es que el que te diga dónde debes conectar, te envíe la dirección correcta.
+    </para>
+
+    <note>
+     <para>
+Si estás experimentando problemas con los mIRC DCCs y tu cortafuegos, mientras
+que todo funciona perfectamente con otros clientes IRC, léete la sección <link
+linkend="mircdcc" endterm="mircdcc.title"></link> del apéndice <link
+linkend="commonproblems" endterm="commonproblems.title"></link>.
+     </para>
+    </note>
+
+    <para>
+En el momento de escribir estas líneas, sólo existe la opción de cargar módulos
+que añadan soporte para los protocolos <systemitem>FTP</systemitem> e
+<systemitem>IRC</systemitem>. Si necesitas una explicación más profunda sobre
+estos módulos (conntrack y nat), lee el apéndice <link linkend="commonproblems"
+endterm="commonproblems.title"></link>. También se pueden encontrar asistentes
+para seguimiento de conexiones (conntrack) de tipo <systemitem>H.323</systemitem>
+(entre otros) en el <systemitem>patch-o-matic</systemitem>, así como otros
+asistentes para <systemitem>NAT</systemitem>. Para poder utilizarlos tienes que
+utilizar el <systemitem>patch-o-matic</systemitem> y compilar tu propio núcleo.
+Para ver una explicación detallada de cómo hacer ésto, léete el capítulo <link
+linkend="preparations" endterm="preparations.title"></link>.
+    </para>
+
+    <note>
+     <para>
+Ten en cuenta que necesitas cargar los módulos <systemitem>ip_nat_irc</systemitem>
+e <systemitem>ip_nat_ftp</systemitem> si quieres que funcione correctamente
+la traducción de direcciones (<systemitem>Network Addres Translation</systemitem>)
+tanto en el protocolo <systemitem>FTP</systemitem> como en el <systemitem>IRC</systemitem>.
+Además, tendrás que cargar los módulos <systemitem>ip_conntrack_irc</systemitem>
+e <systemitem>ip_conntrack_ftp</systemitem> antes de cargar los módulos
+<systemitem>NAT</systemitem> anteriores. Se emplean de la misma forma que los
+módulos conntrack y permitirán al ordenador efectuar traducciones
+<systemitem>NAT</systemitem> en estos dos protocolos.
+     </para>
+    </note>
+
+   </section>
+
+   <section id="procsetup">
+    <title id="procsetup.title">Configuración de /proc</title>
+
+    <para>
+Es ahora cuando arrancamos el reenvío IP (<systemitem>IP forwarding</systemitem>)
+al enviar el valor "1" a <filename>/proc/sys/net/ipv4/ip_forward</filename> con
+el comando siguiente:
+    </para>
+
+    <para>
+     <command>echo "1" > /proc/sys/net/ipv4/ip_forward</command>
+    </para>
+
+    <warning>
+     <para>
+Puede valer la pena pensar dónde y cuándo arrancamos el reenvío IP. En este
+script, como en el resto de este tutorial, se arranca antes de crear cualquier
+tipo de <systemitem>filtros IP</systemitem> (o sea, los conjuntos de reglas de
+<command>iptables</command>). Esto implica que durante un breve lapso de tiempo
+el cortafuegos aceptará el reenvío de cualquier tipo de tráfico desde cualquier
+lugar, estando este lapso comprendido entre un milisegundo y algunos minutos,
+dependiendo del script que estemos ejecutando y de la velocidad de la máquina. Así pues,
+la "gente interesada" (los "chicos malos") tendrá su oportunidad de atravesar
+el cortafuegos. Como podrás comprender en realidad esta opción debería
+ejecutarse <emphasis>después</emphasis> de crear todas las reglas del
+cortafuegos, si bien he decidido hacerlo antes para mantener una estructura
+consistente en todos los scripts.
+     </para>
+    </warning>
+
+    <para>
+Si necesitaras soporte para <systemitem>IPs</systemitem> dinámicas, como cuando
+usas <systemitem>SLIP</systemitem>, <systemitem>PPP</systemitem> o <systemitem>DHCP</systemitem>,
+puedes activar la siguiente opción (<filename>ip_dynaddr</filename>) ejecutando
+lo siguiente:
+    </para>
+
+    <para>
+     <command>echo "1" > /proc/sys/net/ipv4/ip_dynaddr</command>
+    </para>
+
+    <para>
+Si existe cualquier otra opción que necesites arrancar, debes hacerlo de la
+forma indicada en los dos ejemplos anteriores. Existen otros documentos que
+explican cómo hacerlo de otra manera, aunque ésto queda fuera de los objetivos
+del tutorial. Puedes leer un buen (y corto) documento sobre el sistema proc
+disponible con el núcleo y que también tienes en el apéndice <link linkend="otherresources"
+endterm="otherresources.title"></link>. Este apéndice es un buen punto
+de partida cuando busques información de áreas específicas que no hayas encontrado
+aquí.
+    </para>
+
+    <note>
+     <para>
+El script <filename>rc.firewall.txt</filename>, así como el resto de scripts
+de este tutorial, contiene una pequeña sección de configuraciones no requeridas
+de proc, las cuales pueden ser un buen punto de partida cuando algo no funciona
+tal como deseas. Sin embargo, no cambies nada antes de saber qué significa.
+     </para>
+    </note>
+
+   </section>
+
+   <section id="displacement">
+    <title id="displacement.title">Desplazamiento de las reglas entre cadenas</title>
+
+    <para>
+En esta sección se describirán brevemente las alternativas que he escogido en
+el tutorial en lo que concierne a las cadenas específicas de usuario y algunas
+opciones más específicas del script <filename>rc.firewall.txt</filename>.
+Puedo estar equivocado en la forma de enfocar algunos temas, pero espero
+explicarlos con sus posibles problemas allí donde ocurran y en el momento en que ocurran. Además
+también se recuerda brevemente el capítulo <link linkend="traversingoftables"
+endterm="traversingoftables.title"></link>. Esperemos que la ayuda de un ejemplo
+real sea suficiente para que recuerdes cómo se atraviesan las tablas y cadenas.
+    </para>
+
+    <para>
+He dispuesto las diferentes cadenas de usuario de forma que ahorren el máximo
+de CPU, manteniendo al mismo tiempo la máxima seguridad y legibilidad posibles.
+En lugar de dejar a los paquetes <systemitem>TCP</systemitem> atravesar las
+reglas <systemitem>ICMP</systemitem>, <systemitem>UDP</systemitem> y
+<systemitem>TCP</systemitem>, simplemente escojo los paquetes <systemitem>TCP</systemitem>
+y les hago atravesar una cadena de usuario. De esta forma no sobrecargamos en
+exceso el sistema. La siguiente imagen intentará explicar los fundamentos sobre
+el camino que sigue un paquete entrante al atravesar Netfilter. Con todo éllo
+espero aclarar los objetivos de este script. Todavía no vamos a discutir
+detalles específicos, pues ésto se hará más adelante, en este mismo capítulo.
+En realidad es una simplificación de la imagen que puedes encontrar en el
+capítulo <link linkend="traversingoftables" endterm="traversingoftables.title"></link>,
+dónde se discutió el proceso completo en profundidad.
+    </para>
+
+    <para>
+     <mediaobject>
+      <imageobject>
+       <imagedata fileref="images/packet_traverse.eps" format=eps>
+      </imageobject>
+      <imageobject>
+       <imagedata fileref="images/packet_traverse.jpg" format=jpg>
+      </imageobject>
+     </mediaobject>
+    </para>
+
+    <para>
+Basándonos en este gráfico, vamos a dejar claro qué nos hemos planteado.
+La totalidad de este ejemplo asume que el escenario al que nos referimos tiene una
+red local conectada a un cortafuegos y el cortafuegos conectado a Internet. También se asume que tenemos
+una dirección <systemitem>IP</systemitem> estática para conectar con Internet
+(todo lo contrario a cuando utilizamos <systemitem>DHCP</systemitem>,
+<systemitem>PPP</systemitem>, <systemitem>SLIP</systemitem> u otros). En este
+caso, queremos permitir al cortafuegos que actúe como servidor de ciertos
+servicios de Internet y además confiamos plenamente en nuestra red local, por
+lo que no bloquearemos ningún tráfico desde ésta. Por fin, este script tiene
+como principal prioridad permitir únicamente el tráfico que explícitamente
+deseamos permitir. Para conseguirlo, estableceremos las políticas por defecto de
+las cadenas como <systemitem>DROP</systemitem> (desechar). En la práctica ésto eliminará todas
+las conexiones y paquetes que no hayamos permitido explícitamente dentro de
+nuestra red o nuestro cortafuegos.
+    </para>
+
+    <para>
+En otras palabras, deseamos que la red local pueda
+conectar con Internet. Puesto que la red local es de plena confianza, deseamos
+permitir todo tipo de tráfico desde la red hacia Internet. Sin embargo, Internet
+es una red a la que no concedemos confianza alguna, por lo que deseamos
+bloquear cualquier acceso desde élla hacia nuestra red local. Así pues, en
+base a estas premisas generales, veamos qué debemos hacer y qué es lo que no
+queremos ni debemos hacer.
+    </para>
+
+    <para>
+     <mediaobject>
+      <imageobject>
+       <imagedata fileref="images/packet_traverse_FORWARD.eps" format=eps>
+      </imageobject>
+      <imageobject>
+       <imagedata fileref="images/packet_traverse_FORWARD.jpg" format=jpg>
+      </imageobject>
+     </mediaobject>
+    </para>
+
+    <para>
+Para empezar, ya hemos dicho que deseamos que la red local sea capaz de conectarse a Internet.
+Para conseguirlo necesitaremos traducir mediante <systemitem>NAT</systemitem>
+todos los paquetes, ya que ningún ordenador de la red local tiene una dirección
+IP real [refiriéndonos a la conexión directa a Internet]. Ésto lo haremos
+dentro de la cadena <systemitem>PREROUTING</systemitem>, que se crea al final de
+este script. Esto significa que también tendremos que efectuar algún filtrado
+en la cadena <systemitem>FORWARD</systemitem>, ya que de lo contrario cualquiera
+desde el exterior tendrá acceso total a nuestra red. Confiamos al máximo en la
+red local y por éllo permitimos específicamente todo tráfico desde ésta hacia
+Internet. Ya que no queremos permitir a nadie del exterior acceder a la red
+local, bloquearemos todo tráfico desde el exterior excepto las conexiones
+establecidas y las relacionadas, lo cual significa que permitiremos todo el tráfico
+de retorno desde Internet hacia la red local.
+    </para>
+
+    <para>
+     <mediaobject>
+      <imageobject>
+       <imagedata fileref="images/packet_traverse_INPUT.eps" format=eps>
+      </imageobject>
+      <imageobject>
+       <imagedata fileref="images/packet_traverse_INPUT.jpg" format=jpg>
+      </imageobject>
+     </mediaobject>
+    </para>
+
+    <para>
+En cuanto al cortafuegos, quizá estemos algo cortos de capital, o quizá deseemos
+ofrecer algunos servicios a los navegantes de Internet. Así pues, hemos decidido
+permitir el acceso a <systemitem>HTTP</systemitem>, <systemitem>FTP</systemitem>,
+<systemitem>SSH</systemitem> e <systemitem>IDENTD</systemitem> a través del
+cortafuegos. Todos estos protocolos están disponibles en el cortafuegos, por lo
+que deben ser admitidos en la cadena <systemitem>INPUT</systemitem>, así como
+también debe estar permitido todo el tráfico de retorno (hacia Internet) a
+través de la cadena <systemitem>OUTPUT</systemitem>. Sin embargo, seguimos
+confiando completamente en la red local y tanto el periférico de bucle local
+como su  <systemitem>dirección IP</systemitem> también son de confianza. Debido
+a ésto queremos añadir reglas especiales para permitir todo el tráfico desde
+la red local así como la interfaz de bucle local. Además, no queremos permitir
+el tráfico de paquetes específicos o cabeceras de paquetes específicas en
+coyunturas específicas, así como tampoco deseamos que determinados rangos de
+direcciones IP puedan alcanzar el cortafuegos desde Internet (por ejemplo, el
+rango de direcciones <systemitem>10.0.0.0/8</systemitem> está reservado para las
+redes locales, de aquí que normalmente no queramos dejar pasar paquetes
+provenientes de este rango, ya que en un 90% de los casos serán intentos de
+acceso falseados mediante spoofing; sin embargo, antes de implementar ésto,
+debes tener en cuenta que determinados Proveedores de Servicios de Internet
+utilizan este rango en sus propias redes; si te interesa una explicación más
+detallada sobre este problema, lee el capítulo <link linkend="commonproblems"
+endterm="commonproblems.title"></link>).
+    </para>
+
+    <para>
+Puesto que tenemos un servidor <systemitem>FTP</systemitem> ejecutándose en el
+servidor y deseamos que los paquetes atraviesen el menor número de reglas
+posibles, añadimos una regla al principio de la cadena <systemitem>INPUT</systemitem>
+que permita el paso a todo el tráfico establecido y relacionado. Por la misma
+razón deseamos dividir las reglas en subcadenas, de manera que los paquetes
+sólo tengan que atravesar el menor número de reglas posible. Con éllo
+conseguiremos que el conjunto de reglas consuman el menor tiempo posible con
+cada paquete, eliminando redundancias en la red.
+    </para>
+
+    <para>
+En este script decidimos dividir los diferentes paquetes según las familias
+de protocolos, por ejemplo <systemitem>TCP</systemitem>, <systemitem>UDP</systemitem>
+o <systemitem>ICMP</systemitem>. Todos los paquetes <systemitem>TCP</systemitem>
+atraviesan una cadena específica llamada "<systemitem>tcp_packets</systemitem>",
+que contendrá reglas para todos los puertos y protocolos <systemitem>TCP</systemitem>
+que queramos permitir. Además, deseamos efectuar algunos chequeos extra a los
+paquetes <systemitem>TCP</systemitem>, por lo que nos gustaría crear otra
+subcadena para todos aquellos paquetes que sean aceptados por utilizar números
+de puerto válidos en el cortafuegos. Decidimos llamar a esta subcadena
+"<systemitem>allowed</systemitem>", y debe contener unos pocos chequeos para
+acabar de aceptar los paquetes. En cuanto a los paquetes <systemitem>ICMP</systemitem>,
+atravesarán la cadena "<systemitem>icmp_packets</systemitem>". Cuando se decidió
+el contenido de esta cadena, no se vió necesario realizar ningún chequeo extra antes
+de aceptar los paquetes, siempre que coincidieran con los tipos y códigos
+permitidos; así pues se aceptan directamente. Por último tenemos que manejar los
+paquetes <systemitem>UDP</systemitem> y los enviaremos a la cadena "<systemitem>udp_packets</systemitem>".
+Todos los paquetes que coincidan con los tipos permitidos serán aceptados de
+inmediato sin más chequeos.
+    </para>
+
+    <para>
+Dado que estamos trabajando con una red relativamente pequeña, esta máquina
+también se utiliza como estación de trabajo secundaria y para imponer una carga
+extra debido a éllo, queremos permitir que determinados protocolos específicos
+puedan contactar con el cortafuegos, como <command>speak freely</command> e <command>ICQ</command>.
+    </para>
+
+    <para>
+     <mediaobject>
+      <imageobject>
+       <imagedata fileref="images/packet_traverse_OUTPUT.eps" format=eps>
+      </imageobject>
+      <imageobject>
+       <imagedata fileref="images/packet_traverse_OUTPUT.jpg" format=jpg>
+      </imageobject>
+     </mediaobject>
+    </para>
+
+    <para>
+Por último, tenemos la cadena <systemitem>OUTPUT</systemitem>. Ya que confiamos
+bastante en el cortafuegos, permitimos casi todo el tráfico de salida. No
+efectuamos ningún bloqueo específico de usuario, así como tampoco efectuamos
+ningún bloqueo de protocolos específicos. Sin embargo, no queremos que la gente
+utilice esta máquina para camuflar (spoof) paquetes que dejen el cortafuegos, por lo
+que sólo permitiremos el tráfico desde las direcciones asignadas al cortafuegos.
+Lo más probable es que implementemos ésto añadiendo reglas que acepten
+(<systemitem>ACCEPT</systemitem>) todos lo paquetes que dejen el cortafuegos
+siempre que procedan de una de las <systemitem>direcciones IP</systemitem> que
+le han sido asignadas, siendo desechados como política por defecto todos los
+que no cumplan esta premisa.
+    </para>
+
+   </section>
+
+   <section id="defaultpolicies">
+   <title id="defaultpolicies.title">Estableciendo las políticas por defecto</title>
+
+    <para>
+Casi al comenzar el proceso de creación de nuestro conjunto de reglas,
+establecemos las políticas por defecto en las diferentes cadenas con un comando
+bastante simple, como puedes ver a continuación:
+    </para>
+
+    <para>
+     <cmdsynopsis>
+      <command>iptables</command>
+      <arg>-P <arg choice="req">cadena</arg> <arg choice="req">política</arg></arg>
+     </cmdsynopsis>
+    </para>
+
+    <para>
+La política por defecto se utiliza siempre que los paquetes no coincidan con
+ninguna regla de ninguna cadena. Por ejemplo, supongamos que llega un paquete que no
+encaja en ninguna regla de todas las que tenemos en nuestro conjunto de reglas.
+Si ésto ocurre debemos decidir qué debe pasarle al paquete en cuestión y es
+aquí donde entra en escena la política por defecto.
+    </para>
+
+    <caution>
+     <para>
+Se cuidadoso con la política por defecto que estableces en las cadenas de otras
+tablas, pues no están pensadas para filtrar como la tabla FILTER y pueden
+desembocar en comportamientos realmente extraños.
+     </para>
+    </caution>
+
+   </section>
+
+
+   <section id="settingupuser">
+    <title id="settingupuser.title">Definiendo cadenas de usario en la tabla Filter</title>
+
+    <para>
+Ahora ya tienes una buena idea de qué queremos conseguir con el cortafuegos, así
+que empecemos con la creación del conjunto de reglas. Es el momento de
+cuidarnos de especificar todas las reglas y cadenas que deseamos crear y utilizar, así
+como todos los conjuntos de reglas en las cadenas.
+    </para>
+
+    <para>
+Después de esta introducción, empezaremos por crear las diferentes cadenas
+especiales que necesitamos, mediante el comando <command>-N</command>. Las nuevas
+cadenas se crean vacías, sin ninguna regla en éllas, y tal como ya se ha dicho
+son: <systemitem>icmp_packets</systemitem>, <systemitem>tcp_packets</systemitem>,
+<systemitem>udp_packets</systemitem> y la cadena <systemitem>allowed</systemitem>,
+que es utilizada por la cadena <systemitem>tcp_packets</systemitem>. Los
+paquetes entrantes por <command>$INET_IFACE</command>, de tipo <systemitem>ICMP</systemitem>,
+serán redirigidos a la cadena <systemitem>icmp_packets</systemitem>. Los
+paquetes de tipo <systemitem>TCP</systemitem>, serán redirigidos a la cadena
+<systemitem>tcp_packets</systemitem> y los paquetes de tipo <systemitem>UDP</systemitem>
+a la cadena <systemitem>udp_packets</systemitem>. Todo ésto se explica en
+profundidad más adelante, en la sección <link linkend="inputchain" endterm="inputchain.title"></link>.
+Crear una cadena es bastante sencillo, pues sólo consiste en una
+corta declaración similar a:
+    </para>
+
+    <para>
+     <cmdsynopsis>
+      <command>iptables</command>
+      <arg>-N <replaceable>cadena</replaceable></arg>
+     </cmdsynopsis>
+    </para>
+
+    <para>
+En las secciones siguientes desarrollaremos ampliamente cada una de las cadenas
+que acabamos de crear. Veremos cómo son y qué reglas contendrán, así como qué
+conseguiremos con éllas.
+    </para>
+
+    <section id="badtcppackets">
+    <title id="badtcppackets.title">La cadena "bad_tcp_packets"</title>
+
+    <para>
+La cadena <systemitem>bad_tcp_packets</systemitem> se ha concebido para contener
+reglas que inspeccionen los paquetes entrantes e identifiquen cabeceras
+malformadas, entre otros problemas. Así pues, decidimos incluir únicamente dos
+filtros: el primero bloquea todos los paquetes <systemitem>TCP</systemitem>
+entrantes que sean considerados como nuevos (<command>NEW</command>), pero no
+tengan establecido el bit <systemitem>SYN</systemitem>; el segundo bloquea los
+paquetes <systemitem>SYN</systemitem>/<systemitem>ACK</systemitem> que se
+consideren nuevos (<systemitem>NEW</systemitem>). Esta cadena se puede utilizar
+para comprobar posibles inconsistencias como las anteriores, o también como los chequeos
+de puertos <emphasis>XMAS</emphasis>, etc. También podemos añadir reglas que
+busquen el estado <command>INVALID</command>.
+    </para>
+
+    <para>
+Si deseas entender a fondo el "NEW not SYN", deberías leerte la sección <link
+linkend="newnotsyn" endterm="newnotsyn.title"></link> del apéndice <link
+linkend="commonproblems" endterm="commonproblems.title"></link>, acerca del
+estado "NEW and non-SYN" de los paquetes que atraviesan otras reglas. Bajo
+determinadas circunstancias a estos paquetes se les puede permitir atravesar el
+cortafuegos, aunque en el 99% de los casos no querremos que pasen, por lo que
+registramos su llegada en los registros (logs) y los desechamos (DROP).
+    </para>
+
+    <para>
+El motivo para rechazar(<systemitem>REJECT</systemitem>) los paquetes SYN/ACK
+que se consideran nuevos es muy simple. Se describe en profundidad en la sección
+<link linkend="synackandnew" endterm="synackandnew.title"></link> del apéndice
+<link linkend="commonproblems" endterm="commonproblems.title"></link>.
+Básicamente, hacemos ésto como cortesía hacia otros hosts, ya que les prevendrá
+de ataques de predicción de secuencia numérica (sequence number prediction
+attack).
+    </para>
+    </section>
+
+    <section id="allowedchain">
+    <title id="allowedchain.title">La cadena "allowed"</title>
+
+    <para>
+Si un paquete que llega a la interfaz <command>$INET_IFACE</command> es del tipo
+<systemitem>TCP</systemitem>, viajará por la cadena <systemitem>tcp_packets</systemitem>,
+y si la conexión es a través de un puerto en el que permitimos el tráfico,
+desearemos hacer algunos chequeos finales para ver si realmente le
+permitiremos el paso al paquete o no. Todo estos chequeos finales se realizan en
+la cadena <systemitem>allowed</systemitem> (permitido).
+    </para>
+
+    <para>
+Empezamos comprobando si estamos ante un paquete  <systemitem>SYN</systemitem>.
+Si es así, lo más probable es que sea el primer paquete de una nueva conexión,
+por lo que, obviamente, le permitimos el paso. Entonces comprobamos si el
+paquete procede de una conexión establecida (<command>ESTABLISHED</command>) o
+relacionada (<command>RELATED</command>). Si lo es, de nuevo permitimos el paso.
+Una conexión <command>ESTABLISHED</command> es aquélla que ha "visto" tráfico en
+ambas direcciones y puesto que nos hemos encontrado con un paquete
+<systemitem>SYN</systemitem>, la conexión debe estar en el estado
+<command>ESTABLISHED</command>, de acuerdo con la máquina de estados. La última
+regla de esta cadena desechará (<command>DROP</command>) todo lo demás. Ésto
+viene a englobar todo aquéllo que no ha "visto" tráfico en ambas direcciones,
+es decir, o no hemos respondido al paquete <systemitem>SYN</systemitem>, o están
+intentando empezar una conexión mediante un paquete "no-<systemitem>SYN</systemitem>".
+<emphasis>No</emphasis> existe ninguna utilidad práctica en comenzar una
+conexión sin un paquete <systemitem>SYN</systemitem>, a excepción de la gente
+que está haciendo escaneo de puertos. Hasta dónde yo sé, no hay actualmente
+ninguna implementación de <systemitem>TCP</systemitem>/<systemitem>IP</systemitem>
+que soporte la apertura de una conexión <systemitem>TCP</systemitem> con algo
+diferente a un paquete <systemitem>SYN</systemitem>, por lo que casi con total
+certeza se tratará de un escaneo de puertos y es recomendable desechar
+(<command>DROP</command>) estos intentos de conexión.
+    </para>
+   </section>
+
+   <section id="tcpchain">
+    <title id="tcpchain.title">La cadena "tcp_packets"</title>
+
+    <para>
+La cadena <systemitem>tcp_packets</systemitem> especifica qué puertos se podrán
+alcanzar desde Internet a través del cortafuegos. Sin embargo, hay más chequeos
+para estos paquetes, ya que los enviamos a la cadena "allowed", descrita
+anteriormente.
+    </para>
+
+    <para>
+La opción <command>-A tcp_packets</command> le indica a <command>iptables</command>
+en qué cadena debe añadir la nueva regla, la cuál se incluirá al final de la
+lista de reglas de esa cadena. La opción <command>-p TCP</command> especifica el
+primer requisito a cumplir por el paquete, es decir, debe ser un paquete
+<systemitem>TCP</systemitem>; de la misma forma, <command>-s 0/0</command>
+busca (compara) las direcciones de origen, empezando por la 0.0.0.0 con máscara
+de red 0.0.0.0, es decir <emphasis>todas</emphasis> las direcciones de origen.
+Aunque éste es el comportamiento por defecto, lo indico para que todo quede lo
+más claro posible (en este caso todos los puertos de origen cumplirán el
+requisito exigido por la regla). La opción <command>--dport 21</command> indica
+el puerto de destino 21, o sea que si el paquete está destinado al puerto 21,
+cumplirá el último criterio de selección de la regla. Si todos los criterios
+coinciden, el paquete será enviado a la cadena <systemitem>allowed</systemitem>.
+Si no coincide con alguna de las opciones, será devuelto a la cadena original
+(la que generó el salto a la cadena <systemitem>tcp_packets</systemitem>).
+    </para>
+
+    <para>
+Tal como queda el ejemplo, permito el puerto <systemitem>TCP</systemitem> 21,
+o sea, el puerto de control <systemitem>FTP</systemitem>, empleado para
+controlar las conexiones <systemitem>FTP</systemitem>. Ésto unido a que más
+alante se permiten todas las conexiones relacionadas (<command>RELATED</command>),
+permitirá las conexiones ftp PASIVAS y ACTIVAS, pues en principio el módulo
+<systemitem>ip_conntrack_ftp</systemitem> ya se habrá cargado. Si no queremos
+permitir ningún tipo de conexión <systemitem>FTP</systemitem>, podemos descargar
+(o no cargar) el módulo <systemitem>ip_conntrack_ftp</systemitem> y borrar (o
+no añadir) la línea <command>$IPTABLES -A tcp_packets -p TCP -s 0/0 --dport 21
+-j allowed</command> del fichero <filename>rc.firewall.txt</filename>.
+    </para>
+
+    <para>
+El puerto 22 es el <systemitem>SSH</systemitem> y emplear este puerto cuando
+dejas a cualquiera acceder a tu máquina mediante shell, es definitivamente mucho
+mejor que permitir el acceso mediante telnet por el puerto 23. Ten en cuenta que estás trabajando con
+un cortafuegos y siempre es una mala idea permitir a alguien más que tú mismo
+cualquier tipo de acceso a la máquina del cortafuegos. Los usuarios con acceso
+al cortafuegos siempre deben limitarse al mínimo imprescindible y ninguno más.
+    </para>
+
+    <para>
+El puerto 80 es el de <systemitem>HTTP</systemitem>, o sea, tu servidor web.
+Borra esta línea si no quieres ejecutar un servidor web directamente en tu
+cortafuegos.
+    </para>
+
+    <para>
+Y, por último, se permite el puerto 113, que es el <systemitem>IDENTD</systemitem>
+y puede ser necesario para algunos protocolos como IRC, para trabajar
+correctamente. Ten en cuenta que puede ser interesante utilizar las librerías
+<command>oidentd</command> si quieres efectuar traducciones <systemitem>NAT</systemitem>
+de varios hosts en tu red local. <command>oidentd</command> admite peticiones
+de retransmisión de <systemitem>IDENTD</systemitem> a las máquinas correctas
+de tu red local.
+    </para>
+
+    <para>
+Si necesitas añadir más puertos abiertos en el script, parece bastante obvio
+cómo deberías hacerlo: simplemente copia y pega una de las líneas de la cadena
+<systemitem>tcp_packets</systemitem> y cambia el puerto que necesitas abrir.
+    </para>
+
+   </section>
+
+   <section id="udppacketschain">
+    <title id="udppacketschain.title">La cadena "udp_packets"</title>
+
+    <para>
+Si se nos presenta un paquete <systemitem>UDP</systemitem> en la cadena
+<systemitem>INPUT</systemitem>, lo enviamos a la cadena <systemitem>udp_packets</systemitem>,
+dónde comenzaremos las comprobaciones empezando por el protocolo con <command>-p UDP</command>
+y después comprobaremos que proviene de cualquier dirección comenzando por la
+0.0.0.0 y con máscara de red 0.0.0.0, o sea, que de nuevo cualquier dirección
+de origen es válida. Sin embargo sólo aceptamos puertos <systemitem>UDP</systemitem>
+específicos que queramos mantener abiertos para hosts de Internet. Puedes
+observar que no necesitamos abrir agujeros dependiendo del puerto de origen del
+host que envía el paquete, ya que de éllo se debería ocupar la máquina de
+estados. Sólo necesitamos abrir puertos en nuestro host si vamos a ejecutar un
+servidor en algún puerto <systemitem>UDP</systemitem>, como el servidor
+<systemitem>DNS</systemitem>, etc. Los paquetes que lleguen al cortafuegos y
+sean parte de una conexión ya establecida (por nuestra red local), serán
+aceptados automáticamente por las reglas <systemitem>--state ESTABLISHED,RELATED</systemitem>
+del principio de la cadena <systemitem>INPUT</systemitem>.
+    </para>
+
+    <para>
+Tal como está el ejemplo, NO aceptamos (<command>ACCEPT</command>) paquetes
+<systemitem>UDP</systemitem> entrantes por el puerto 53, pues es el puerto usual
+cuando se efectúan búsquedas <systemitem>DNS</systemitem>. Observa que la regla está
+ahí, pero por defecto está comentada (#) y por éllo no se aceptan paquetes destinados al puerto 53. Si deseas que tu cortafuegos actúe
+como servidor <systemitem>DNS</systemitem>, elimina el símbolo de comentario (para permitir el tráfico por ése puerto).
+    </para>
+
+    <para>
+Personalmente también permito el acceso por el puerto 123, que es el empleado
+por <systemitem>NTP</systemitem> (o <systemitem>Network Time Protocol</systemitem>).
+Este protocolo se emplea para ajustar la hora del reloj de tu ordenador de
+acuerdo a la hora de ciertos "servidores de horas" (time servers) que poseen relojes
+<emphasis>muy</emphasis> precisos. La mayoría de la gente probablemente no
+utiliza este protocolo y por éllo por defecto no está permitido el acceso a este puerto. Al igual que
+antes, sólo tienes que eliminar el símbolo de comentario para activar la regla.
+    </para>
+
+    <para>
+En el ejemplo autorizamos el uso del puerto 2074, empleado por ciertas aplicaciones
+<emphasis>multimedia</emphasis> en tiempo real, como <command>speak freely</command>,
+con la que puedes hablar con otra gente en tiempo real (lógicamente a través de
+Internet), mediante unos altavoces y un micrófono o bien unos auriculares con
+micro. Si no deseas utilizar este servicio, simplemente comenta la línea (#).
+    </para>
+
+    <para>
+El puerto 4000 es el del protocolo <systemitem>ICQ</systemitem>. Debería ser
+un protocolo conocidísimo, usado por la aplicación de Mirabilis
+denominada <command>ICQ</command>. Hay al menos 2 ó 3 clones diferentes de
+<command>ICQ</command> para Linux y es uno de los programas de chat más
+ampliamente difundido. Dudo que se necesiten más explicaciones.
+    </para>
+
+    <para> 
+Una vez en este punto, tienes disponibles dos reglas más para cuando
+experimentes un número excesivo de entradas en el registro debidas a distintas circunstancias.
+La primera regla bloqueará los paquetes de difusión (broadcast packets) hacia el rango
+de puertos entre el 135 y el 139. Este tipo de paquetes los emplean <systemitem>NetBIOS</systemitem>
+o <systemitem>SMB</systemitem> para gran parte de los usuarios de las plataformas de
+Microsoft. Con éllo bloquearemos todas las entradas de registro que pudiéramos
+tener a causa de Redes Microsoft desde el exterior de nuestra red local. La segunda regla también
+se ha creado para evitar los problemas de un excesivo número de entradas en el registro, pero
+en este caso se encarga de las peticiones <systemitem>DHCP</systemitem> que
+provienen del exterior. Ésto es especialmente cierto si tu red exterior se basa
+en una red de tipo "Ethernet no conmutado", donde los clientes reciben sus
+<systemitem>direcciones IP</systemitem> a través de <systemitem>DHCP</systemitem>.
+En estas circunstancias y debido únicamente a éllo, puedes verte barrido por una
+gran cantidad de registros.
+    </para>
+
+    <note>
+     <para>
+Ten en cuenta que las dos últimas reglas son especialmente opcionales, puesto
+que habrá quien tenga interés en conservar este tipo de registros. Si estás
+teniendo problemas por un excesivo número de entradas legítimas en el registro, prueba a
+eliminar las originadas por estas clases de paquetes. También hay algunas reglas
+más del mismo tipo justo antes de las reglas de registro en la cadena
+<systemitem>INPUT</systemitem>.
+     </para>
+    </note>
+
+   </section>
+
+   <section id="icmpchain">
+    <title id="icmpchain.title">La cadena "icmp_packets"</title>
+
+    <para>
+Aquí es donde decidimos qué tipos <systemitem>ICMP</systemitem> permitiremos.
+Si un paquete <systemitem>ICMP</systemitem> llega a través de la interfaz eth0
+hasta la cadena <systemitem>INPUT</systemitem>, lo enviamos a la cadena
+<computeroutput>icmp_packets</computeroutput> tal como ya se ha explicado en los
+casos anteriores. Es entonces cuando comprobamos a qué tipo <systemitem>ICMP</systemitem>
+pertenece y si le permitimos el paso o no. Por el momento, sólo permito el paso
+a las <systemitem>peticiones de eco ICMP</systemitem> (<systemitem>Echo requests</systemitem>),
+al "<systemitem>tiempo de vida del paquete nulo durante el tránsito</systemitem>" (<systemitem>TTL equals
+0 during transit</systemitem>) y al "<systemitem>tiempo de vida nulo durante el reensamblado</systemitem>"
+(<systemitem>TTL equals 0 during reassembly</systemitem>). La razón para no
+permitir el paso a ningún otro tipo ICMP como opción por defecto es que
+prácticamente todos éllos deben ser gestionados por las reglas para el estado
+"paquete relacinado" (RELATED).
+    </para>
+
+    <note>
+     <para>
+Si un paquete ICMP es enviado como respuesta a un paquete existente o a un flujo
+de paquetes, se considera como relacionado (RELATED) con el flujo original. Para
+más información sobre los estados, léete el capítulo <link linkend="statemachine"
+endterm="statemachine.title"></link>.
+     </para>
+    </note>
+
+    <para>
+A continuación explicaré las razones por las que permito estos tipo de paquetes
+<systemitem>ICMP</systemitem>: las peticiones de eco se utilizan para pedir una
+respuesta de eco de la máquina destino, lo cual sirve principalmente para hacer
+"pings" a otros hosts y ver si están disponibles en alguna red. Sin esta regla
+los demás hosts no serán capaces de hacer ping sobre nuestra máquina y no
+podrán saber si estamos disponibles en alguna conexión de red. Hay que destacar
+sin embargo que hay quien elimina esta regla, simplemente porque no desean ser
+"vistos" (ser detectables) en Internet. Borrando esta regla consigues que
+cualquier ping que llegue a tu cortafuegos sea inútil, ya que el cortafuegos no
+le contestará.
+    </para>
+
+    <para>
+En cuanto al "tiempo excedido" (<systemitem>TTL equals 0
+during transit</systemitem> o bien <systemitem>TTL equals 0 during reassembly</systemitem>),
+nos convendrá que los paquetes ICMP de este tipo tengan permiso para atravesar el
+cortafuegos siempre que deseemos conocer la ruta hasta un host (o sea, efectuar
+un trace-route), o también en los casos en los que un paquete que hayamos
+enviado a alcanzado el estado "Time To Live=0" y deseemos recibir notificación
+del evento.
+    </para>
+    
+    <para>
+Por ejemplo, cuando efectúas un trace-route a alguien, empiezas enviando un
+paquete con <systemitem>TTL</systemitem> = 1, lo cual implica que en el primer
+salto entre hosts (en el primer "hop") el TTL se reduce en una unidad y se
+iguala a 0, de forma que se envía de vuelta un paquete ICMP de tipo Time Exceeded
+desde el primer punto de la ruta de acceso que lleva al host que tratamos
+de localizar. Entonces se envía otro paquete, pero esta vez con <systemitem>TTL</systemitem> = 2
+y en el segundo "hop" la pasarela (gateway) devolverá un ICMP Time Exceeded,
+con lo que ya se conocen los dos primeros puntos de la ruta. Continuando de
+manera análoga se llegará hasta el host que deseamos alcanzar, con lo que
+conoceremos la ruta completa y podremos saber qué host intermedio tiene
+problemas.
+    </para>
+
+    <para>
+Para ver un listado completo de los tipos <systemitem>ICMP</systemitem>, léete
+el apéndice <link linkend="icmptypes" endterm="icmptypes.title"></link>. Para
+más información acerca de los tipos <systemitem>ICMP</systemitem> y su
+utilización, te recomiendo leer los siguietes documentos e informes:
+    </para>
+
+    <para>
+     <itemizedlist>
+      <listitem>
+       <para>
+<link linkend="theicmp" endterm="theicmp.title"></link> por Ralph Walden.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+<link linkend="rfc792" endterm="rfc792.title"></link> por J. Postel.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </para>
+
+    <note>
+     <para>
+Debo advertir que desde tu punto de vista puedo estar equivocado al bloquear
+algunos de los tipos <systemitem>ICMP</systemitem>, pero en mi caso todo
+funciona perfectamente después de bloquear todos los tipos <systemitem>ICMP</systemitem>
+a los que no permito el paso.
+     </para>
+    </note>
+
+    </section>
+
+   </section>
+
+   <section id="inputchain">
+    <title id="inputchain.title">La cadena INPUT</title>
+    <para>
+Tal como la he definido en el script, la cadena <systemitem>INPUT</systemitem>
+utiliza principalmente otras cadenas para hacer su trabajo. De esta forma no
+sobrecargamos demasiado a iptables y funcionará mucho mejor en máquinas lentas, que
+de otra manera desecharían paquetes en situaciones de mucha carga para el
+sistema. Ésto lo conseguimos al buscar detalles concretos que deberían coincidir
+en los paquetes del mismo tipo, enviándolos entonces a cadenas especificadas por
+el usuario. Actuando así podremos subdividir nuestro conjunto de reglas de forma
+que cada paquete deba atravesar el menor número de reglas y con éllo el
+cortafuegos sufrirá una menor carga debida al filtrado de paquetes.
+    </para>
+
+    <para>
+Para empezar realizamos ciertas comprobaciones para encontrar paquetes
+malformados o incorrectos: lo conseguimos enviando todos los <systemitem>paquetes
+TCP</systemitem> a la cadena <systemitem>bad_tcp_packets</systemitem>, la cual
+incluye unas pocas reglas para comprobar malformaciones o anomalías que no
+deseamos aceptar. Para una explicación completa, lee la sección
+<link linkend="badtcppackets" endterm="badtcppackets.title"></link> de este
+capítulo.
+    </para>
+
+    <para>
+Es ahora cuando empezamos a buscar tráfico de las redes que normalmente son de
+confianza, como el procedente del adaptador de red local
+(lan_iface), o el tráfico entrante y saliente de nuestra interfaz de
+<systemitem>bucle local</systemitem> (loopback interface, lo_iface), incluyendo
+también todas nuestras <systemitem>direcciones IP</systemitem> actualmente
+asignadas (y ésto significa todas, incluyendo nuestra <systemitem>dirección IP
+de Internet</systemitem>). Basándonos en lo anterior hemos decidido añadir la
+regla que permite la actividad de la red local (<systemitem>LAN</systemitem>)
+al principio, ya que en nuestro caso la red local genera más tráfico que la
+conexión de Internet. Éllo permite una menor sobrecarga ya que se debe comparar cada
+paquete en cada regla, por lo que es una buena idea averiguar qué tipo de
+tráfico atraviesa con más frecuencia el cortafuegos. Cuando sepamos la carga
+relativa de cada tipo, podremos reordenar las reglas para que sean más
+eficientes, produciendo así una menor sobrecarga al cortafuegos y una menor
+congestión de tu red.
+    </para>
+
+    <para>
+Antes de empezar con las "reglas auténticas" que deciden qué permitimos o no
+desde la interfaz de Internet, tenemos una regla relacionada configurada para
+reducir la carga del sistema. Es una regla de estado que permite el paso a todos
+los paquetes que sean parte de un flujo <systemitem>ESTABLISHED</systemitem>
+(establecido) o bien <systemitem>RELATED</systemitem> (relacionado) con la
+<systemitem>dirección IP</systemitem> de Internet. Existe una regla equivalente
+en la cadena "allowed", lo cual es redundante ya que antes de llegar a esa
+cadena, en este punto del script los paquetes ya son filtrados. Sin embargo la
+regla <command>--state ESTABLISHED,RELATED</command> de la cadena "allowed" se
+ha mantenido por varias razones, entre las que se encuentra el deseo de algunos
+de poder cortar y pegar esta función.
+    </para>
+
+    <para>
+Tras éllo y todavía en la cadena <systemitem>INPUT</systemitem>, filtramos todos
+los paquetes <systemitem>TCP</systemitem> que lleguen a la interfaz
+<command>$INET_IFACE</command>, enviándolos a la cadena <computeroutput>tcp_packets</computeroutput>.
+Después se efectúa la misma operación con los paquetes <systemitem>UDP</systemitem>,
+enviándolos a la cadena <systemitem>udp_packets</systemitem>. Por último los
+paquetes <systemitem>ICMP</systemitem> son enviados a la cadena
+<systemitem>icmp_packets</systemitem>.
+    </para>
+    
+    <para>
+Normalmente un cortafuegos recibirá un mayor número de paquetes <systemitem>TCP</systemitem>,
+en menor cantidad los paquetes <systemitem>UDP</systemitem> y por último los
+<systemitem>ICMP</systemitem>. Sin embargo ten en cuenta que ésto es lo normal
+pero no tiene por qué ser tu caso. Igual que hicimos con las reglas específicas
+del tipo de tráfico de la red, es conveniente averiguar qué paquetes causan
+un mayor tráfico para reordenar convenientemente estas tres reglas. Es preciso
+tener en cuenta que una máquina equivalente a un <systemitem>Pentium III</systemitem>,
+con una tarjeta <systemitem>Ethernet</systemitem> de 100Mbit trabajando a plena
+potencia, puede claudicar ante un simple conjunto de 100 reglas mal escrito.
+Es importante tenerlo en cuenta a la hora de escribir el conjunto de reglas para
+tu red local.
+    </para>
+
+    <para>
+Ahora nos encontramos con una regla extra, que por defecto es opcional (#) y
+puede utilizarse para evitar un excesivo número de registros en el caso de que
+tengas una red de Microsoft en el exterior del cortafuegos Linux: los clientes
+con sistema operativo Microsoft tienen la mala costumbre de enviar toneladas
+de paquetes de multidifusión (multicast) al rango 224.0.0.0/8, por lo que
+tenemos la oportunidad de bloquear esos paquetes de forma que no inunden los
+registros. También hay dos reglas más que hacen algo parecido en la cadena
+<systemitem>udp_packets</systemitem>, descrita en <link linkend="udppacketschain"
+endterm="udppacketschain.title"></link>.
+    </para>
+
+    <para>
+Antes de llegar a la política por defecto de la cadena <systemitem>INPUT</systemitem>,
+registramos el tráfico que no se ha filtrado aún, de manera que seamos capaces
+de encontrar posibles problemas y/o fallos: puede que sean paquetes que
+simplemente no queremos dejar pasar, puede ser alguien intentando hacernos algo
+malo, o puede ser un problema de nuestro cortafuegos que no deja pasar algún
+tráfico que debería estar permitido. En cualquier caso queremos saberlo, de
+forma que podamos solucionar el problema. De todas formas no registramos más de
+3 paquetes por minuto, ya que no queremos inundar los registros con basura y con
+éllo llenar por completo la partición del registro; además, incluímos un prefijo
+a todas las entradas para saber de dónde provenían.
+    </para>
+
+    <para>
+Todo lo que no haya sido filtrado será desechado (<command>DROP</command>) por
+la política por defecto de la cadena <systemitem>INPUT</systemitem>, que ha
+sido establecida casi al principio de este script, en la sección <link
+linkend="defaultpolicies" endterm="defaultpolicies.title"></link>.
+    </para>
+   </section>
+
+   <section id="forwardchain">
+    <title id="forwardchain.title">La cadena FORWARD</title>
+
+    <para>
+Esta cadena tiene muy pocas reglas en el escenario que establecimos al principio.
+Tenemos una regla que envía todos los paquetes a la cadena
+<systemitem>bad_tcp_packets</systemitem>, que ya ha sido descrita anteriormente
+y se ha definido de manera que pueda ser empleada por varias cadenas,
+independientemente del tipo de paquete que la atraviese.
+    </para>
+
+    <para>
+Después de este primer chequeo para buscar paquetes <systemitem>TCP</systemitem>
+incorrectos, tenemos las reglas principales de la cadena <systemitem>FORWARD</systemitem>.
+La primera regla permite el tráfico sin restricciones desde nuestra interfaz de
+red local (<command>$LAN_IFACE</command>) hacia cualquier otra interfaz. En
+otras palabras, permite todo el tráfico desde nuestra <systemitem>LAN</systemitem>
+hacia Internet. La segunda regla permite el tráfico establecido y relacionado
+(<command>ESTABLISHED</command>, <command>RELATED</command>) de vuelta a través
+del cortafuegos. Es decir, permite que los paquetes pertenecientes a conexiones
+iniciadas por nuestra red interna fluyan libremente hacia nuestra red. Estas
+reglas son necesarias para que nuestra red local sea capaz de acceder a Internet,
+ya que la política por defecto de la cadena <systemitem>FORWARD</systemitem> se ha
+establecido previamente como <command>DROP</command> (desechar). Ésta es una
+forma de actuar bastante inteligente, ya que permitirá la conexión a Internet
+a los hosts de nuestra red local, pero al mismo tiempo bloqueará a los hosts de
+Internet que estén intentando conectar con nuestros hosts internos.
+    </para>
+
+    <para>
+Por último, igual que hicimos en la cadena <systemitem>INPUT</systemitem>,
+tenemos una regla que registrará los paquetes que de alguna manera no tengan
+permiso para pasar a través de la cadena <systemitem>FORWARD</systemitem>. Con
+éllo probablemente veremos algun caso de paquete incorrectamente formado, entre
+otros problemas. Una causa posible pueden ser los intentos de ataque de hackers,
+aunque otras veces simplemente serán paquetes malformados. Esta regla es
+prácticamente la misma que la de la cadena INPUT, salvo por el prefijo de
+registro, que en este caso es <command>"IPT FORWARD packet died: "</command>.
+Los prefijos se emplean usualmente para separar entradas de registro y pueden
+emplearse para distinguir registros y saber qué cadenas los produjeron, así
+como algunas opciones de las cabeceras.
+    </para>
+
+   </section>
+
+   <section id="outputchain">
+    <title id="outputchain.title">La cadena OUTPUT</title>
+
+    <para>
+Puesto que esta máquina sólo la utilizo yo y es al mismo tiempo
+cortafuegos y estación de trabajo, permito
+prácticamente todo lo que proviene de las direcciones de origen siguientes:
+<command>$LOCALHOST_IP</command>, <command>$LAN_IP</command> o
+<command>$STATIC_IP</command>. Cualquier otra dirección debería ser un intento
+de spoofing (camuflaje de direcciones), aunque dudo que nadie que conozca
+pudiera hacer ésto en mi máquina. Por último registramos todo aquello que
+resulte desechado: si se desecha, definitivamente querremos saber por qué, de
+manera que podamos atajar el problema. Puede que sea un asqueroso error, o que
+sea un paquete extraño que ha sido "camuflado" (spoofed). Tras registrarlos,
+desechamos (<command>DROP</command>) los paquetes como política por defecto.
+    </para>
+   </section>
+
+   <section id="preroutingchain">
+    <title id="preroutingchain.title">La cadena PREROUTING de la tabla nat</title>
+
+    <para>
+La cadena <systemitem>PREROUTING</systemitem> es básicamente lo que indica su
+nombre: realiza la traducción de direcciones de red en los paquetes, antes de
+que lleguen a la decisión de asignación de ruta que les enviará a las cadenas
+<systemitem>INPUT</systemitem> o <systemitem>FORWARD</systemitem> de la tabla
+filter. La única razón por la que nos referimos a esta cadena en el script es
+que nos sentimos obligados a repetir que NO DEBES efectuar ningún tipo de
+filtrado en élla. La cadena <systemitem>PREROUTING</systemitem> sólo es
+atravesada por el primer paquete de un flujo, lo cual significa que todos los
+demás paquetes del flujo serán totalmente ignorados por esta cadena. Tal como
+está definido este script, no utilizamos en absoluto la cadena <systemitem>PREROUTING</systemitem>,
+si bien es el lugar donde deberíamos trabajar si quisiéramos hacer alguna
+traducción <systemitem>DNAT</systemitem> en paquetes específicos: por ejemplo
+si quisieras albergar tu <systemitem>servidor web</systemitem> dentro de tu red
+local. Para más información acerca de la cadena <systemitem>PREROUTING</systemitem>,
+léete el capítulo <link linkend="traversingoftables" endterm="traversingoftables.title"></link>.
+    </para>
+
+    <caution>
+     <para>
+La cadena <systemitem>PREROUTING</systemitem> no debe usarse para ningún tipo
+de filtrado puesto que, entre otras causas, esta cadena sólo es atravesada por
+el primer paquete de un flujo. La cadena <systemitem>PREROUTING</systemitem>
+debe usarse únicamente para efectuar traducciones de direcciones de red, a no
+ser que sepas realmente lo que estás haciendo.
+     </para>
+    </caution>
+   </section>
+
+   <section id="startingsnat">
+    <title id="startingsnat.title">Activando SNAT y la cadena POSTROUTING</title>
+
+    <para>
+Así pues, nuestro último cometido es tener en funcionamiento la traducción de
+direcciones (<systemitem>Network Address Translation</systemitem>), ¿no? Por lo
+menos lo es para mí. Para empezar añadimos una regla a la tabla <systemitem>nat</systemitem>,
+en la cadena <systemitem>POSTROUTING</systemitem>, que "traducirá" todos los
+paquetes que salgan de nuestra interfaz conectada a Internet. En mi caso se
+trata de la interfaz <systemitem>eth0</systemitem>. Sin embargo, existen
+variables específicas añadidas a todos los scripts de ejemplo que pueden usarse
+para configurar automáticamente estos valores. La opción <command>-t</command>
+le indica a <command>iptables</command> en qué tabla insertar la regla, que en
+nuestro caso es la tabla <systemitem>nat</systemitem>. El comando -A indica que
+queremos agregar (Append) una nueva regla a una cadena existente llamada
+<systemitem>POSTROUTING</systemitem>, mientras que <command>-o $INET_IFACE</command>
+indica que buscará todos los paquetes salientes a través de la interfaz
+<command>INET_IFACE</command> (o <systemitem>eth0</systemitem>, como valor por
+defecto en este script). Por último definimos el objetivo para que efectúe un
+<command>SNAT</command> a los paquetes. Es decir, todos los paquetes que
+concuerden con esta regla verán traducida su dirección de origen, para que
+parezca que provienen de tu interfaz de Internet. Ten en cuenta que debes
+definir la dirección IP que se les asignará a los paquetes salientes en el
+objetivo SNAT mediante la opción <command>--to-source</command>.
+    </para>
+
+    <para>
+En este script hemos decidido utilizar el objetivo <command>SNAT</command>
+en lugar de <command>MASQUERADE</command> (enmascarar) debido a dos razones:
+la primera es que este script se supone que trabaja en un cortafuegos con
+<systemitem>dirección IP</systemitem> estática; la segunda razón es consecuencia
+de la primera, ya que resulta más rápido y eficiente utilizar el objetivo
+<systemitem>SNAT</systemitem>, siempre que sea posible. Por supuesto, también
+se ha usado para mostrar cómo podría funcionar y cómo debería utilizarse en un
+caso real. Si no tienes <systemitem>direccion IP</systemitem> estática,
+definitivamente deberías pensar en cambiar al objetivo <command>MASQUERADE</command>,
+que ofrece una forma simple y sencilla de traducir las direcciones y que además
+captará automáticamente la <systemitem>dirección IP</systemitem> a utilizar.
+Ésto consume un poco más de potencia del sistema, pero valdrá la pena si
+utilizas <systemitem>DHCP</systemitem>, por ejemplo. Si quieres saber más acerca
+de cómo funciona el objetivo <command>MASQUERADE</command>, léete el script
+<link linkend="rcDHCPfirewalltxt" endterm="rcDHCPfirewalltxt.title"></link>.
+    </para>
+   </section>
+  </section>
+ </chapter>

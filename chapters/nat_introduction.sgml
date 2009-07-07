@@ -1,0 +1,510 @@
+<chapter id="natintro">
+  <title id="natintro.title">Network Address Translation Introduction</title>
+  <indexterm zone="natintro">
+    <primary>NAT</primary>
+  </indexterm>
+  <indexterm zone="natintro">
+    <primary>Basics</primary>
+    <secondary>NAT</secondary>
+  </indexterm>
+  <indexterm zone="natintro">
+    <primary>Introduction</primary>
+    <secondary>NAT</secondary>
+  </indexterm>
+ 
+  <para>
+<systemitem>NAT</systemitem> is one of the biggest<indexterm><primary>Example
+scripts</primary><secondary>biggest</secondary></indexterm>attractions of Linux and
+Iptables to this day it seems. Instead of using fairly expensive third party
+solutions such as <systemitem>Cisco PIX</systemitem> etc, a lot of smaller
+companies and personal users have chosen to go with these solutions instead.
+One of the main reasons is that it is cheap, and secure. It requires an old
+computer, a fairly new Linux distribution which you can download for free from
+the Internet, a spare network card or two and cabling. 
+  </para>
+  
+  <para>
+This chapter will describe a little bit of the basic theory about
+<systemitem>NAT</systemitem>, what it can be used for, how it works and what
+you should think about before starting to work on these subjects. 
+  </para>
+  
+  <section id="natusage">
+    <title id="natusage.title">What NAT is used for and basic terms and 
+expressions</title>
+    <indexterm zone="natusage">
+      <primary>Terms</primary>
+      <secondary>NAT</secondary>
+    </indexterm>
+    <indexterm zone="natusage">
+      <primary>SNAT</primary>
+    </indexterm>
+    <indexterm zone="natusage">
+      <primary>PNAT</primary>
+    </indexterm>
+    <indexterm zone="natusage">
+      <primary>DNAT</primary>
+    </indexterm>
+    <indexterm zone="natusage">
+      <primary>Fast-NAT</primary>
+    </indexterm>
+    <indexterm zone="natusage">
+      <primary>Netfilter-NAT</primary>
+    </indexterm>
+
+    <para>
+Basically, <systemitem>NAT</systemitem> allows a host or several hosts to
+share the same IP address in a way. For example, let's say we have a local
+network consisting of 5-10 clients. We set their default gateways to point
+through the <systemitem>NAT</systemitem> server. Normally the packet would
+simply be forwarded by the gateway machine, but in the case of an
+<systemitem>NAT</systemitem> server it is a little bit different. 
+    </para>
+  
+    <para>
+<systemitem>NAT</systemitem> servers translates the source and destination
+addresses of packets as we already said to different addresses. The
+<systemitem>NAT</systemitem> server receives the packet, rewrites the source
+and/or destination address and then recalculates the checksum of the packet.
+One of the most common usages of <systemitem>NAT</systemitem> is the
+<systemitem>SNAT</systemitem> (<systemitem>Source Network Address
+Translation</systemitem>) function. Basically, this is used in the above
+example if we can't afford or see any real idea in having a real public IP for
+each and every one of the clients. In that case, we use one of the private IP
+ranges for our local network (for example, 192.168.1.0/24), and then we turn
+on <systemitem>SNAT</systemitem> for our local network.
+<systemitem>SNAT</systemitem> will then turn all 192.168.1.0 addresses into
+it's own public IP (for example, 217.115.95.34). This way, there will be 5-10
+clients or many many more using the same shared IP address.
+    </para>
+
+    <para>
+There is also something called <systemitem>DNAT</systemitem>, which can be
+extremely helpful when it comes to setting up servers etc. First of all, you
+can help the greater good when it comes to saving IP space, second, you can
+get an more or less totally impenetrable firewall in between your server and
+the real server in an easy fashion, or simply share an IP for several servers
+that are separated into several physically different servers. For example, we
+may run a small company server farm containing a webserver and
+<systemitem>ftp</systemitem> server on the same machine, while there is a
+physically separated machine containing a couple of different chat services
+that the employees working from home or on the road can use to keep in touch
+with the employees that are on-site. We may then run all of these services on
+the same IP from the outside via <systemitem>DNAT</systemitem>. 
+    </para>
+    
+    <para>
+The above example is also based on separate port
+<systemitem>NAT</systemitem>'ing, or often called
+<systemitem>PNAT</systemitem>. We don't refer to this very often throughout
+this book, since it is covered by the <systemitem>DNAT</systemitem> and
+<systemitem>SNAT</systemitem> functionality in netfilter. 
+    </para>
+    
+    <para>
+In Linux, there are actually two separate types of
+<systemitem>NAT</systemitem> that can be used, either
+<systemitem>Fast-NAT</systemitem> or <systemitem>Netfilter-NAT</systemitem>.
+<systemitem>Fast-NAT</systemitem> is implemented inside the IP routing code of
+the Linux kernel, while <systemitem>Netfilter-NAT</systemitem> is also
+implemented in the Linux kernel, but inside the netfilter code. Since this
+book won't touch the IP routing code too closely, we will pretty much leave it
+here, except for a few notes. <systemitem>Fast-NAT</systemitem> is generally
+called by this name since it is much faster than the netfilter
+<systemitem>NAT</systemitem> code. It doesn't keep track of connections, and
+this is both its main pro and con. Connection tracking takes a lot of
+processor power, and hence it is slower, which is one of the main reasons that
+the <systemitem>Fast-NAT</systemitem> is faster than
+<systemitem>Netfilter-NAT</systemitem>. As we also said, the bad thing about
+<systemitem>Fast-NAT</systemitem> doesn't track connections, which means it
+will not be able to do <systemitem>SNAT</systemitem> very well for whole
+networks, neither will it be able to <systemitem>NAT</systemitem> complex
+protocols such as <systemitem>FTP</systemitem>, <systemitem>IRC</systemitem>
+and other protocols that <systemitem>Netfilter-NAT</systemitem> is able to
+handle very well. It is possible, but it will take much, much more work than
+would be expected from the Netfilter implementation.
+    </para>
+    
+    <para>
+There is also a final word that is basically a synonym to
+<systemitem>SNAT</systemitem>, which is the Masquerade word. In Netfilter,
+masquerade is pretty much the same as <systemitem>SNAT</systemitem> with the
+exception that masquerading will automatically set the new source IP to the
+default IP address of the outgoing network interface. 
+    </para>
+    
+  </section>
+  
+  <section id="natcaveats">
+    <title id="natcaveats.title">Caveats using NAT</title>
+    <indexterm zone="natcaveats">
+      <primary>NAT</primary>
+      <secondary>Caveats</secondary>
+    </indexterm>
+
+    <para>
+As we have already explained to some extent, there are quite a lot of 
+minor caveats with using <systemitem>NAT</systemitem>. The main problem is
+certain protocols and applications which may not work at all. Hopefully, these
+applications are not too common in the networks that you administer, and in
+such case, it should cause no huge problems. 
+    </para>
+    
+    <para>
+The second and smaller problem is applications and protocols which will only 
+work partially. These protocols are more common than the ones that will not 
+work at all, which is quite unfortunate, but there isn't very much we can do 
+about it as it seems. If complex protocols continue to be built, this is a 
+problem we will have to continue living with. Especially if the protocols 
+aren't standardized.
+    </para>
+    
+    <para>
+The third, and largest problem, in my point of view, is the fact that the user
+who sits behind a <systemitem>NAT</systemitem> server to get out on the
+internet will not be able to run his own server. It could be done, of course,
+but it takes a lot more time and work to set this up. In companies, this is
+probably preferred over having tons of servers run by different employees that
+are reachable from the Internet, without any supervision. However, when it
+comes to home users, this should be avoided to the very last. You should never
+as an Internet service provider NAT your customers from a private IP range to
+a public IP. It will cause you more trouble than it is worth having to deal
+with, and there will always be one or another client which will want this or
+that protocol to work flawlessly. When it doesn't, you will be called down
+upon.
+     </para>
+     
+     <para>
+As one last note on the caveats of <systemitem>NAT</systemitem>, it should be
+mentioned that <systemitem>NAT</systemitem> is actually just a hack more or
+less. <systemitem>NAT</systemitem> was a solution that was worked out while
+the <emphasis>IANA</emphasis> and other organisations noted that the Internet
+grew exponentially, and that the IP addresses would soon be in shortage.
+<systemitem>NAT</systemitem> was and is a short term solution to the problem
+of the <systemitem>IPv4</systemitem> (Yes, IP which we have talked about
+before is a short version of <systemitem>IPv4</systemitem> which stands for
+Internet Protocol version 4). The long term solution to the
+<systemitem>IPv4</systemitem> address shortage is the
+<systemitem>IPv6</systemitem> protocol, which also solves a ton of other
+problems. <systemitem>IPv6</systemitem> has 128 bits assigned to their
+addresses, while <systemitem>IPv4</systemitem> only have 32 bits used for IP
+addresses. This is an incredible increase in address space. It may seem like
+ridiculous to have enough IP addresses to set one IP address for every atom in
+our planet, but on the other hand, noone expected the
+<systemitem>IPv4</systemitem> address range to be too small either. 
+     </para>
+      
+  </section>
+  
+  <section id="examplenatmachine">
+    <title id="examplenatmachine.title">Example NAT machine in theory</title>
+    <indexterm zone="examplenatmachine">
+      <primary>Example scripts</primary>
+      <secondary>NAT</secondary>
+    </indexterm>
+    <indexterm zone="examplenatmachine">
+      <primary>NAT</primary>
+      <secondary>Examples</secondary>
+    </indexterm>
+ 
+    <para>
+This is a small theoretical scenario where we want a
+<systemitem>NAT</systemitem> server between 2 different networks and an
+Internet connection. What we want to do is to connect 2 networks to each
+other, and both networks should have access to each other and the Internet. We
+will discuss the hardware questions you should take into consideration, as
+well as other theory you should think about before actually starting to
+implement the <systemitem>NAT</systemitem> machine.
+    </para>
+
+    <section id="whatisneededtobuildnat">
+      <title id="whatisneededtobuildnat.title">What is needed to build a 
+NAT machine</title>
+      <indexterm zone="whatisneededtobuildnat">
+        <primary>NAT</primary>
+	<secondary>Hardware</secondary>
+      </indexterm>
+      <indexterm zone="whatisneededtobuildnat">
+        <primary>Example</primary>
+	<secondary>Hardware requirements</secondary>
+      </indexterm>
+      <indexterm zone="whatisneededtobuildnat">
+        <primary>Hardware</primary>
+	<secondary>Requirements</secondary>
+      </indexterm>
+ 
+      <para>
+Before we discuss anything further, we should start by looking at what kind of
+hardware is needed to build a Linux machine doing
+<systemitem>NAT</systemitem>. For most smaller networks, this should be no
+problem, but if you are starting to look at larger networks, it can actually
+become one. The biggest problem with <systemitem>NAT</systemitem> is that it
+eats resources quite fast. For a small private network with possibly 1-10
+users, a <emphasis>486</emphasis> with <emphasis>32 MB</emphasis> of ram will
+do more than enough. However, if you are starting to get up around 100 or more
+users, you should start considering what kind of hardware you should look at.
+Of course, it is also a good idea to consider bandwidth usage, and how many
+connections will be open at the same time. Generally, spare computers will do
+very well however, and this is one of the big pros of using a Linux based
+firewall. You can use old scrap hardware that you have left over, and hence
+the firewall will be very cheap in comparison to other firewalls.
+      </para>
+      
+      <para>
+You will also need to consider network cards. How many separate networks will
+connect to your <systemitem>NAT/filter</systemitem> machine? Most of the time
+it is simply enough to connect one network to an Internet connection. If you
+connect to the Internet via ethernet, you should generally have 2
+<systemitem>ethernet</systemitem> cards, etcetera. It can be a good idea to
+choose 10/100 mbit/s network cards of relatively good brands for this for
+scalability, but most any kinds of cards will do as long as they have drivers
+in the Linux kernel. A note on this matter: avoid using or getting network
+cards that don't have drivers actually in the Linux kernel distribution. I
+have on several occasions found network cards/brands that have separately
+distributed drivers on discs that work dismally. They are generally not very
+well maintained, and if you get them to work on your kernel of choice to begin
+with, the chance that they will actually work on the next major Linux kernel
+upgrade is very small. This will most of the time mean that you may have to
+get a little bit more costly network cards, but in the end it is worth it.
+      </para>
+      
+      <para>
+As a note, if you are going to build your firewall on really old hardware, it
+is suggested that you at least try to use <systemitem>PCI</systemitem> buses
+or better as far as possible. First of all, the network cards will hopefully
+be possible to use in the future when you upgrade. Also,
+<systemitem>ISA</systemitem> buses are extremely slow and heavy on the
+<systemitem>CPU</systemitem> usage. This means that putting a lot of load onto
+<systemitem>ISA</systemitem> network cards can next to kill your machine.
+      </para>
+      
+      <para>
+Finally, one thing more to consider is how much memory you put into the 
+<systemitem>NAT/firewall</systemitem> machine. It is a good idea to put in at
+least more than <emphasis>64 MB</emphasis> of memory if possible, even if it
+is possible run it on <emphasis>32MB</emphasis> of memory.
+<systemitem>NAT</systemitem> isn't extremely huge on memory consumption, but
+it may be wise to add as much as possible just in case you will get more
+traffic than expected. 
+      </para>
+      
+      <para>
+As you can see, there is quite a lot to think about when it comes to hardware. 
+But, to be completely honest, in most cases you don't need to think about these 
+points at all, unless you are building a <systemitem>NAT</systemitem> machine
+for a large network or company. Most home users need not think about this, but
+may more or less use whatever hardware they have handy. There are no complete
+comparisons and tests on this topic, but you should fare rather well with just
+a little bit of common sense.
+      </para>
+    </section>
+
+    <section id="natplacement">
+      <title id="natplacement.title">Placement of NAT machines</title>
+      <indexterm zone="natplacement">
+        <primary>NAT</primary>
+	<secondary>Placement</secondary>
+      </indexterm>
+      <indexterm zone="natplacement">
+        <primary>Example</primary>
+	<secondary>Machine placement</secondary>
+      </indexterm>
+      <indexterm zone="natplacement">
+        <primary>Hardware</primary>
+	<secondary>Machine placement</secondary>
+      </indexterm>
+      
+      <para>
+This should look fairly simple, however, it may be harder than you originally
+thought in large networks. In general, the <systemitem>NAT</systemitem>
+machine should be placed on the perimeter of the network, just like any
+<systemitem>filtering</systemitem> machine out there. This, most of the time,
+means that the <systemitem>NAT</systemitem> and
+<systemitem>filtering</systemitem> machines are the same machine, of course.
+Also worth a thought, if you have very large networks, it may be worth
+splitting the network into smaller networks and assign a
+<systemitem>NAT/filtering</systemitem> machine for each of these networks.
+Since <systemitem>NAT</systemitem> takes quite a lot of processing power, this
+will definitely help keep round trip time (<systemitem>RTT</systemitem>, the
+time it takes for a packet to reach a destination and the return packet to get
+back) down.
+      </para>
+      
+      <para>
+In our example network as we described above, with two networks and an
+Internet connection we should, in other words, look at how large the two
+networks are. If we can consider them to be small and depending on what
+requirements the clients have, a couple of hundred clients should be no
+problem on a decent <systemitem>NAT</systemitem> machine. Otherwise, we could
+have split up the load over several machines by setting public IP's on smaller
+<systemitem>NAT</systemitem> machines, each handling their own smaller segment
+of the network and then let the traffic congregate over a specific routing
+only machine. This of course takes into consideration that you must have
+enough public IP's for all of your <systemitem>NAT</systemitem> machines, and
+that they are routed through your routing machine. 
+      </para>
+    </section>
+
+    <section id="natproxies">
+      <title id="natproxies.title">How to place proxies</title>
+      <indexterm zone="natproxies">
+        <primary>Proxy</primary>
+	<secondary>Placement</secondary>
+      </indexterm>
+      <indexterm zone="natproxies">
+        <primary>Hardware</primary>
+	<secondary>Placement</secondary>
+      </indexterm>
+      <indexterm zone="natproxies">
+        <primary>Hardware</primary>
+	<secondary>Structure</secondary>
+      </indexterm>
+      
+      <para>
+Proxies are a general problem when it comes to <systemitem>NAT</systemitem> in
+most cases unfortunately, especially transparent proxies. Normal proxies
+should not cause too much trouble, but creating a transparent proxy is a dog
+to get to work, especially on larger networks. The first problem is that
+proxies take quite a lot of processing power, just the same as
+<systemitem>NAT</systemitem> does. To put both of these on the same machine is
+not advisable if you are going to handle large network traffic. The second
+problem is that if you <systemitem>NAT</systemitem> the source IP as well as
+the destination IP, the proxy will not be able to know what hosts to contact.
+E.g., which server is the client trying to contact? Since all that information
+is lost during the NAT translation since the packets can't contain that
+information as well if they are <systemitem>NAT</systemitem>'ed, it's a
+problem. Locally, this has been solved by adding the information in the
+internal data structures that are created for the packets, and hence proxies
+such as squid can get the information. 
+      </para>
+      
+      <para>
+As you can see, the problem is that you don't have much of a choice if 
+you are going to run a <systemitem>transparent proxy</systemitem>. There are,
+of course, possibilities, but they are not advisable really. One possibility
+is to create a <systemitem>proxy</systemitem> outside the firewall and create
+a routing entry that routes all web traffic through that machine, and then
+locally on the proxy machine <systemitem>NAT</systemitem> the packets to the
+proper ports for the <systemitem>proxy</systemitem>. This way, the information
+is preserved all the way to the <systemitem>proxy</systemitem> machine and is
+still available on it.
+      </para>
+      
+      <para>
+The second possibility is to simply create a <systemitem>proxy</systemitem>
+outside the firewall, and then block all webtraffic except the traffic going
+to the <systemitem>proxy</systemitem>. This way, you will force all users to
+actually use the <systemitem>proxy</systemitem>. It's a crude way of doing it,
+but it will hopefully work.
+      </para>
+    </section>
+    
+    <section id="natfinalstage">
+      <title id="natfinalstage.title">The final stage of our NAT machine</title> 
+      <para>
+As a final step, we should bring all of this information together, and see how
+we would solve the <systemitem>NAT</systemitem> machine then. Let's take a
+look at a picture of the networks and how it looks. We have decided to put a
+proxy just outside the <systemitem>NAT/filtering</systemitem> machine as
+described above, but inside counting from the router. This area could be
+counted upon as an <systemitem>DMZ</systemitem> in a sense, with the
+<systemitem>NAT/filter</systemitem> machine being a router between the
+<systemitem>DMZ</systemitem> and the two company networks. You can see the
+exact layout we are discussing in the image below.
+      </para>
+      
+      <para>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="images/nat-machine.eps" format=eps>
+          </imageobject>
+          <imageobject>
+            <imagedata fileref="images/nat-machine.jpg" format=jpg>
+          </imageobject>
+        </mediaobject>
+      </para>
+      
+      <para>
+All the normal traffic from the <systemitem>NAT</systemitem>'ed networks will
+be sent through the <systemitem>DMZ</systemitem> directly to the router, which
+will send the traffic on out to the internet. Except, yes, you guessed it,
+webtraffic which is instead marked inside the netfilter part of the
+<systemitem>NAT</systemitem> machine, and then routed based on the mark and to
+the proxy machine. Let's take a look at what I am talking about. Say a
+<systemitem>http</systemitem> packet is seen by the
+<systemitem>NAT</systemitem> machine. The mangle table can then be used to
+mark the packet with a <systemitem>netfilter mark</systemitem> (also known as
+nfmark). Even later when we should route the packets to our router, we will be
+able to check for the <systemitem>nfmark</systemitem> within the routing
+tables, and based on this mark, we can choose to route the http packets to the
+proxy server. The <systemitem>proxy</systemitem> server will then do it's work
+on the packets. We will touch these subjects to some extent later on in the
+document, even though much of the routing based part is happening inside the
+advanced routing topics. 
+      </para>
+      
+      <para>
+The <systemitem>NAT</systemitem> machine has a public IP available over the
+internet, as well as the router and any other machines that may be available
+on the Internet. All of the machines inside the
+<systemitem>NAT</systemitem>'ed networks will be using private IP's, hence
+saving both a lot of cash, and the Internet address space.
+      </para>      
+    </section>
+  </section>
+  
+  <section id="natwhatsnext">
+    <title id="natwhatsnext.title">What's next?</title>
+    
+    <para>
+We have in this chapter in detail explained <systemitem>NAT</systemitem> and
+the theory around it. In special we have discussed a couple of different
+angles to use, and some of the normal problems that may arise from using
+<systemitem>NAT</systemitem> together with proxies. This chapter has covered
+the following areas in detail.
+    </para>
+    
+    <itemizedlist mark=opencircle>
+      <listitem>
+        <para>
+NAT usage
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+NAT components
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+NAT history
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+Terms and words used about NAT
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+Hardware discussions regarding NAT
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+Problems with NAT
+        </para>
+      </listitem>
+    </itemizedlist>
+    
+    <para>
+All of this will always be of use when you are working with netfilter and
+iptables. <systemitem>NAT</systemitem> is very widely used in today's
+networks, even though it is only an intermediary solution for a very
+unfortunate and unexpected problem. <systemitem>NAT</systemitem> will of
+course be discussed more in depth later on when we start looking at the Linux
+netfilter and iptables implementations in more depth.
+    </para>
+  </section>
+</chapter>
+

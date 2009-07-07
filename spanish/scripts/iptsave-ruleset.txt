@@ -1,0 +1,40 @@
+#!/bin/bash
+#
+# iptsave-ruleset.txt - script de ejemplo empleado para crear los datos
+#                       de iptables-save.
+#
+# Copyright (C) 2001  Oskar Andreasson &lt;bluefluxATkoffeinDOTnet&gt;
+#
+# Este programa es software libre; puedes redistribuirlo y/o modificarlo
+# bajo los términos expresados en la "GNU General Public License", tal como
+# lo publica la Free Software Foundation; versión 2 de la Licencia.
+#
+# Este programa se distribuye con el deseo de que sea útil, pero
+# SIN NINGUNA GARANTÍA; incluso sin garantía implícita de COMPRA-VENTA
+# o ADECUACIÓN A PROPÓSITO PARTICULAR. Para más detalles, referirse a la
+# GNU General Public License.
+#
+# Deberías haber recibido una copia de la GNU General Public License
+# junto a este programa o desde el sitio web de dónde lo bajaste;
+# si no es así, escribe a la Free Software Foundation, Inc., 59 Temple
+# Place, Suite 330, Boston, MA  02111-1307   USA
+#
+
+INET_IFACE="eth0"
+INET_IP="195.233.192.1"
+
+LAN_IFACE="eth1"
+
+iptables -P INPUT DROP
+iptables -P OUTPUT DROP
+iptables -P FORWARD DROP
+
+
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+iptables -A OUTPUT -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+
+iptables -A FORWARD -i $INET_IFACE -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A FORWARD -i $LAN_IFACE -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+
+iptables -t nat -A POSTROUTING -o $INET_IFACE -j SNAT --to-source $INET_IP

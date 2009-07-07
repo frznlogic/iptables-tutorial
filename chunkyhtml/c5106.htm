@@ -1,0 +1,251 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>How a rule is built</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="PREVIOUS"
+TITLE="What's next?"
+HREF="x5100.htm"><LINK
+REL="NEXT"
+TITLE="Tables"
+HREF="x5146.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x5100.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x5146.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="HOWARULEISBUILT"
+></A
+>Chapter 9. How a rule is built</H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Table of Contents</B
+></DT
+><DT
+><A
+HREF="c5106.htm#BASICS"
+>Basics of the iptables command</A
+></DT
+><DT
+><A
+HREF="x5146.htm"
+>Tables</A
+></DT
+><DT
+><A
+HREF="x5245.htm"
+>Commands</A
+></DT
+><DT
+><A
+HREF="x5568.htm"
+>What's next?</A
+></DT
+></DL
+></DIV
+><P
+>This chapter and the upcoming three chapters will discuss at length how to 
+build your own rules. A rule could be described as the directions the firewall 
+will adhere to when blocking or permitting different connections and packets 
+in a specific chain. Each line you write that's inserted in a chain should be 
+considered a rule. We will also discuss the basic matches that are available, 
+and how to use them, as well as the different targets and how we can construct 
+new targets of our own (i.e.,new sub chains).
+  </P
+><P
+>This chapter will deal with the raw basics of how a rule is created and how you 
+write it and enter it so that it will be accepted by the userspace program 
+iptables, the different tables, as well as the commands that 
+you can issue to iptables. After that we will in the next chapter look at all 
+the matches that are available to iptables, and then get 
+more into detail of each type of target and jump.
+  </P
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="BASICS"
+>Basics of the iptables command</A
+></H1
+><P
+>As we have already explained, each rule is a line that the kernel looks at to
+find out what to do with a packet. If all the criteria - or matches - are met,
+we perform the target - or jump - instruction. Normally we would write our
+rules in a syntax that looks something like this:
+   </P
+><P
+>    <P
+>iptables [-t <TT
+CLASS="REPLACEABLE"
+><I
+>table</I
+></TT
+>]  command  [match] [target/jump]</P
+>
+   </P
+><P
+>There is nothing that says that the target instruction has to be the last 
+function in the line. However, you would usually adhere to this syntax to get 
+the best readability. Anyway, most of the rules you'll see are written in this 
+way. Hence, if you read someone else's script, you'll most likely recognize the
+syntax and easily understand the rule.
+   </P
+><P
+>If you want to use a table other than the standard table, you could insert
+the table specification at the point at which [table] is specified. However,
+it is not necessary to state explicitly what table to use, since by default
+iptables uses the filter table on
+which to implement all commands. Neither do you have to specify the table at
+just this point in the rule. It could be set pretty much anywhere along the
+line. However, it is more or less standard to put the table specification at
+the beginning.
+   </P
+><P
+>One thing to think about though: The command should always come first, or
+alternatively directly after the table specification. We use 'command' to tell
+the program what to do, for example to insert a rule or to add a rule to the
+end of the chain, or to delete a rule. We shall take a further look at this
+below.
+   </P
+><P
+>The match is the part of the rule that we send to the kernel that details the
+specific character of the packet, what makes it different from all other
+packets. Here we could specify what IP address the packet comes from, from
+which network interface, the intended IP address, port, protocol or whatever.
+There is a heap of different matches that we can use that we will look closer
+at further on in this chapter.
+   </P
+><P
+>Finally we have the target of the packet. If all the matches are met for a
+packet, we tell the kernel what to do with it. We could, for example, tell the
+kernel to send the packet to another chain that we've created ourselves, and
+which is part of this particular table. We could tell the kernel to drop the
+packet dead and do no further processing, or we could tell the kernel to send
+a specified reply to the sender. As with the rest of the content in this
+section, we'll look closer at it further on in the chapter.
+   </P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x5100.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x5146.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>What's next?</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Tables</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

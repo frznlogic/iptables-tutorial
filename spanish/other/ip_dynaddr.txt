@@ -1,0 +1,111 @@
+IP dynamic address hack-port v0.03-rst2
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+**************************************************************
+[NOTA:	este documento no lo ha escrito Oskar Andreasson, pero
+	consideramos conveniente traducirlo al castellano]
+**************************************************************
+
+[Observaciones previas: el documento siguiente procura solventar
+los problemas que se presentan en las conexiones bajo demanda,
+es decir, cuando el sistema conecta si una aplicación necesita
+acceder a Internet. El problema reside en las direcciones IP:
+al arrancar, el sistema establece 10.64.64.64 como IP local y
+hacia esa dirección establece la primera comunicación (la
+aplicación intenta contactar con el adaptador/tarjeta ppp*);
+el problema reside en que al conectarse con Internet la dirección
+(dinámica) del adaptador cambia automáticamente y la aplicación
+ya no puede contactar con él.]
+
+
+Con las siguientes instrucciones se pueden establecer conexiones
+bajo demanda (diald, dial-on-demand) "a la primera", cambiando
+dinámicamente la dirección de origen de los paquetes (y de las
+conexiones, si existen procesos locales). Funciona con las
+máquinas que efectúan conexiones TCP bajo demanda (1) y con
+el enmascaramiento IP (IP_MASQuerading)  (2).
+
+Si está activo[*] y la dirección de la interfaz de reenvío a
+cambiado:
+
+   1)  La dirección de origen de la conexión (y de los paquetes)
+       se reescribe EN LAS RETRANSMISIONES, mientras se encuentra
+       en el estado SYN_SENT (procesos de conexión bajo demanda).
+   2)  la dirección de origen enmascarada de salida cambia A LA
+       SALIDA (al efectuar la retransmisión el host interno) hasta
+       que un paquete del exterior es recibido por el tunel. Ésto
+       es especialmente útil para conexiones automáticas (bajo
+       demanda), dónde la dirección de salida "real" es desconocida
+       en el momento en que comienza la conexión. De esta manera,
+       las *mismas* peticiones (locales Y enmascaradas) que inician
+       la comunicación serán capaces de establecerla.
+
+Si activas el modo "provocador"-RST (RST-provoking), entonces la
+dirección de origen se cambiará, aún cuando la conexión esté
+establecida. Ésto significa que enviamos un paquete incorrecto al
+exterior, lo cual hace que el host remoto deseche nuestra conexión.
+Este comportamiento es el deseado, ya que una conexión así está
+destinada al fracaso, por lo que, cuanto antes "muera", mejor.
+Así evitamos que una conexión bajo demanda se mantenga con una
+conexión "muerta" y le indicamos a la aplicación que la conexión
+se ha perdido.
+
+Con el modo "provocador"-RST activado, los paquetes con la dirección
+de otra interfaz como origen son reescritos y se les asigna una nueva
+dirección de origen. Si utilizas enrutado asimétrico y las otras
+interfases tienen direcciones estáticas, activar el parche podría [**]
+ayudarte.
+
+
+[*]  Por defecto, al arrancar el sistema no se intenta reescribir
+     ninguna dirección.
+
+[**] Este código todavía no está testado/comprobado.
+
+
+Los valores para el sysctl ip_dynaddr son:
+
+  1:  Para activarlo [en modo silencioso]
+  2:  Para activar el modo detallado
+  4:  Para activar la "provocación"-RST (RST-provoking)
+  8:  Para activar el parche para enrutamiento asimétrico
+
+Las banderas (flags) se pueden combinar simplemente sumando unas a otras.
+[Es decir, para activar el modo silencioso con la provocación-RST se sumarían
+ sus valores: 1+4=5, que es el valor que le pasaremos a ip_dynaddr]
+Las configuraciones usuales podrían ser:
+
+  Para desactivar la gestión especial de las direcciones dinámicas (por defecto):
+     # echo 0 > /proc/sys/net/ipv4/ip_dynaddr
+
+  Para activar la reescritura en modo silencioso:
+     # echo 1 > /proc/sys/net/ipv4/ip_dynaddr
+
+  Para activar la reescritura en modo detallado:
+     # echo 3 > /proc/sys/net/ipv4/ip_dynaddr
+     (para compatibilidad con versiones antiguas, también puedes usar:)
+     # echo 2 > /proc/sys/net/ipv4/ip_dynaddr
+
+  Para activar el provocador-RST en modo silencioso:
+     # echo 5 > /proc/sys/net/ipv4/ip_dynaddr
+
+  Para activar el provocador-RST en modo detallado:
+     # echo 7 > /proc/sys/net/ipv4/ip_dynaddr
+
+  Para activar el provocador-RST con parche para enrutamiento asimétrico,
+     en modo silencioso:
+     # echo 13 > /proc/sys/net/ipv4/ip_dynaddr
+
+  Para activar el provocador-RST con parche para enrutamiento asimétrico,
+     en modo detallado:
+     # echo 15 > /proc/sys/net/ipv4/ip_dynaddr
+
+
+ 
+ ¡Disfrútalo!
+ 
+ Juanjo  <jjciarla@raiz.uncu.edu.ar>
+   (con el modo "provocador"-RST por Erik Corry <erik@arbat.com>
+    y el parche para enrutamiento asimétrico por Michael Mueller
+   <Michael.Mueller4@post.rwth-aachen.de>)

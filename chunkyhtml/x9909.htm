@@ -1,0 +1,240 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>MIRROR target</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="Iptables targets and jumps"
+HREF="c8815.htm"><LINK
+REL="PREVIOUS"
+TITLE="MASQUERADE target"
+HREF="x9845.htm"><LINK
+REL="NEXT"
+TITLE="NETMAP target"
+HREF="x9940.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x9845.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 11. Iptables targets and jumps</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x9940.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="MIRRORTARGET"
+>MIRROR target</A
+></H1
+><DIV
+CLASS="WARNING"
+><P
+></P
+><TABLE
+CLASS="WARNING"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/warning.gif"
+HSPACE="5"
+ALT="Warning"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Be warned, the MIRROR is dangerous and was only developed
+as an example code of the new conntrack and NAT code.
+It can cause dangerous things to happen, and very serious
+DDoS/DoS will be possible if used improperly. Avoif
+using it at all costs! It was removed from 2.5 and 2.6 kernels due to it's bad
+security implications!
+      </P
+></TD
+></TR
+></TABLE
+></DIV
+><P
+>The MIRROR target is an experimental and demonstration
+target only, and you are warned against using it, since it may result in
+really bad loops hence, among other things, resulting in serious Denial of
+Service. The MIRROR target is used to invert the source and
+destination fields in the IP header, and then to
+retransmit the packet. This can cause some really funny effects, and I'll bet
+that, thanks to this target, not just one red faced cracker has cracked his own
+box by now. The effect of using this target is stark, to say the least. Let's
+say we set up a MIRROR target for port 80 at computer A. If
+host B were to come from yahoo.com, and try to access the
+HTTP server at host A, the MIRROR
+target would return the yahoo host's own web page (since this is where the 
+request came from).
+    </P
+><P
+>    Note that the MIRROR target is only valid within the
+INPUT, FORWARD and
+PREROUTING chains, and any user-defined chains which
+are called from those chains. Also note that outgoing packets resulting from
+the MIRROR target are not seen by any of the normal chains
+in the filter, nat or mangle tables, which could give rise to loops and other
+problems. This could make the target the cause of unforeseen headaches. For
+example, a host might send a spoofed packet to another host that uses the
+MIRROR command with a TTL of 255, at the
+same time spoofing its own packet, so as to seem as if it comes from a third
+host that uses the MIRROR command. The packet will then
+bounce back and forth incessantly, for the number of hops there are to be
+completed. If there is only 1 hop, the packet will jump back and forth 240-255
+times. Not bad for a cracker, in other words, to send 1500 bytes of data and
+eat up 380 kbyte of your connection. Note that this is a best case scenario
+for the cracker or script kiddie, whatever we want to call them.
+    </P
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Works under Linux kernel 2.3 and 2.4. It was removed from 2.5 and 2.6 kernels 
+due to it's inherent insecurity. Do not use this target!
+      </P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x9845.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x9940.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>MASQUERADE target</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c8815.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>NETMAP target</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

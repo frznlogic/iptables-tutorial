@@ -1,0 +1,339 @@
+ <appendix id="icmptypes">
+  <title id="icmptypes.title">Tipos ICMP</title>
+    <para>
+He aquí un listado completo de los tipos ICMP. Las columnas "Pregunta" y "Error"
+indican si los diferentes tipos son un mensaje de error (al que nunca se
+contestará) o una pregunta (a la que se podrá contestar):
+    </para>
+
+    <table frame=all id="table.icmptypes">
+     <title id="table.icmptypes.title">Tipos ICMP</title>
+     <tgroup cols=5 align=left colsep=1 rowsep=1>
+      <colspec colwidth="1*" align="center">
+      <colspec colwidth="1*" align="center">
+      <colspec colwidth="5*" align="left">
+      <colspec colwidth="1*" align="center">
+      <colspec colwidth="1*" align="center">
+      <thead>
+       <row>
+        <entry>TIPO</entry>
+        <entry>CÓDIGO</entry>
+        <entry>Descripción</entry>
+        <entry>Pregunta</entry>
+        <entry>Error</entry>
+       </row>
+      </thead>
+      <tbody>
+
+       <row>
+        <entry>0</entry>
+        <entry>0</entry>
+        <entry>Echo Reply (respuesta de eco a un comando ping)</entry>
+        <entry>x</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>0</entry>
+        <entry>Network Unreachable (red inalcanzable)</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>1</entry>
+        <entry>Host Unreachable (host inalcanzable)</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>2</entry>
+        <entry>Protocol Unreachable (protocolo inalcanzable)</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>3</entry>
+        <entry>Port Unreachable (puerto inalcanzable)</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>4</entry>
+        <entry>Fragmentation needed but no-frag. bit set (es necesaria la
+        fragmentación, pero se ha establecido el bit de no-fragmentar)</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>5</entry>
+        <entry>Source routing failed (ha fallado el encaminamiento exigido en
+        origen: se ha especificado el camino/enrutado que deben seguir los
+        paquetes y uno de los puntos de la ruta no está disponible)</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>6</entry>
+        <entry>Destination network unknown (dirección de destino desconocida)</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>7</entry>
+        <entry>Destination host unknown (host de destino desconocido)</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+       <entry>3</entry>
+       <entry>8</entry>
+       <entry>Source host isolated (host de origen aislado; este tipo está
+       obsoleto)</entry>
+       <entry>&nbsp;</entry>
+       <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>9</entry>
+        <entry>Destination network administratively prohibited (red de destino
+        prohibida administrativamente)</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>10</entry>
+        <entry>Destination host administratively prohibited (host de destino
+        prohibido administrativamente)</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>11</entry>
+        <entry>Network unreachable for TOS (red inalcanzable para el TOS, el tipo de servicio)</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>12</entry>
+        <entry>Host unreachable for TOS (host inalcanzable para el TOS)</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>13</entry>
+        <entry>Communication administratively prohibited by filtering
+        (comunicación prohibida administrativamente mediante filtrado)</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>14</entry>
+        <entry>Host precedence violation (violación del precedente del host)</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>3</entry>
+        <entry>15</entry>
+        <entry>Precedence cutoff in effect (está actuando el límite de precedente)</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>4</entry>
+        <entry>0</entry>
+        <entry>Source quench (le indica al origen "que se calme un poco" porque
+        está saturando la capacidad de proceso del receptor; actualmente está
+        en desuso para no saturar aún más la comunicación)</entry>
+        <entry>&nbsp;</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>5</entry>
+        <entry>0</entry>
+        <entry>Redirect for network (indica que debes redireccionar tus
+        comunicaciones a otra red)</entry>
+        <entry>&nbsp;</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>5</entry>
+        <entry>1</entry>
+        <entry>Redirect for host (indica que debes redireccionar tus
+        comunicaciones a otro host)</entry>
+        <entry>&nbsp;</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>5</entry>
+        <entry>2</entry>
+        <entry>Redirect for TOS and network (indica que debes redireccionar tus
+        comunicaciones con otro TOS y a otra red)</entry>
+        <entry>&nbsp;</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>5</entry>
+        <entry>3</entry>
+        <entry>Redirect for TOS and host (indica que debes redireccionar tus
+        comunicaciones con otro TOS y a otro host)</entry>
+        <entry>&nbsp;</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>8</entry>
+        <entry>0</entry>
+        <entry>Echo request (petición de eco/ping)</entry>
+        <entry>x</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>9</entry>
+        <entry>0</entry>
+        <entry>Router advertisement (aviso de existencia del enrutador: "¡Hola,
+        estoy aquí!")</entry>
+        <entry>&nbsp;</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>10</entry>
+        <entry>0</entry>
+        <entry>Router solicitation (solicitud de existencia de enrutador: "¿Hay
+        alguien ahí?")</entry>
+        <entry>&nbsp;</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>11</entry>
+        <entry>0</entry>
+        <entry>TTL equals 0 during transit (TTL igual a 0 durante el tránsito:
+        al paquete se le ha acabado su tiempo de vida antes de alcanzar su
+        destino)</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>11</entry>
+        <entry>1</entry>
+        <entry>TTL equals 0 during reassembly (TTL igual a 0 durante el
+        reensamblado: si un paquete ha sido fragmentado y durante su
+        reensamblaje el TTL llega a 0, se genera este error)</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>12</entry>
+        <entry>0</entry>
+        <entry>IP header bad (catchall error) [cabecera IP errónea (error de
+        "cajón de sastre", o error para todo lo que no esté especificado en
+        otro sitio; o si lo prefieres, error por defecto)]
+        </entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>12</entry>
+        <entry>1</entry>
+        <entry>Required options missing (faltan opciones requeridas)</entry>
+        <entry>&nbsp;</entry>
+        <entry>x</entry>
+       </row>
+
+       <row>
+        <entry>13</entry>
+        <entry>0</entry>
+        <entry>Timestamp request (petición de la hora en origen: "¿Qué hora es
+        ahí?"; está obsoleto)</entry>
+        <entry>x</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>14</entry>
+        <entry></entry>
+        <entry>Timestamp reply (respuesta a la petición de hora: "Son las ...";
+        está obsoleto)</entry>
+        <entry>x</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>15</entry>
+        <entry>0</entry>
+        <entry>Information request (petición de información; está obsoleto)</entry>
+        <entry>x</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>16</entry>
+        <entry>0</entry>
+        <entry>Information reply (respuesta a la petición de información; está
+        obsoleto)</entry>
+        <entry>x</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>17</entry>
+        <entry>0</entry>
+        <entry>Address mask request (petición de máscara de red: cuando un host
+        sin disco duro se inicializa, efectúa una petición para saber qué
+        máscara de red debe utilizar)</entry>
+        <entry>x</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+       <row>
+        <entry>18</entry>
+        <entry>0</entry>
+        <entry>Address mask reply (respuesta a la petición de máscara de red)</entry>
+        <entry>x</entry>
+        <entry>&nbsp;</entry>
+       </row>
+
+      </tbody>
+     </tgroup>
+    </table>
+
+ </appendix>

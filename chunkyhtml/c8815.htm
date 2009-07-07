@@ -1,0 +1,404 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Iptables targets and jumps</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="PREVIOUS"
+TITLE="What's next?"
+HREF="x8812.htm"><LINK
+REL="NEXT"
+TITLE="CLASSIFY target"
+HREF="x8862.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x8812.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x8862.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="TARGETS"
+></A
+>Chapter 11. Iptables targets and jumps</H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Table of Contents</B
+></DT
+><DT
+><A
+HREF="c8815.htm#ACCEPTTARGET"
+>ACCEPT target</A
+></DT
+><DT
+><A
+HREF="x8862.htm"
+>CLASSIFY target</A
+></DT
+><DT
+><A
+HREF="x8906.htm"
+>CLUSTERIP target</A
+></DT
+><DT
+><A
+HREF="x9125.htm"
+>CONNMARK target</A
+></DT
+><DT
+><A
+HREF="x9235.htm"
+>CONNSECMARK target</A
+></DT
+><DT
+><A
+HREF="x9305.htm"
+>DNAT target</A
+></DT
+><DT
+><A
+HREF="x9474.htm"
+>DROP target</A
+></DT
+><DT
+><A
+HREF="x9488.htm"
+>DSCP target</A
+></DT
+><DT
+><A
+HREF="x9569.htm"
+>ECN target</A
+></DT
+><DT
+><A
+HREF="x9620.htm"
+>LOG target options</A
+></DT
+><DT
+><A
+HREF="x9795.htm"
+>MARK target</A
+></DT
+><DT
+><A
+HREF="x9845.htm"
+>MASQUERADE target</A
+></DT
+><DT
+><A
+HREF="x9909.htm"
+>MIRROR target</A
+></DT
+><DT
+><A
+HREF="x9940.htm"
+>NETMAP target</A
+></DT
+><DT
+><A
+HREF="x9983.htm"
+>NFQUEUE target</A
+></DT
+><DT
+><A
+HREF="x10027.htm"
+>NOTRACK target</A
+></DT
+><DT
+><A
+HREF="x10045.htm"
+>QUEUE target</A
+></DT
+><DT
+><A
+HREF="x10065.htm"
+>REDIRECT target</A
+></DT
+><DT
+><A
+HREF="x10122.htm"
+>REJECT target</A
+></DT
+><DT
+><A
+HREF="x10192.htm"
+>RETURN target</A
+></DT
+><DT
+><A
+HREF="x10214.htm"
+>SAME target</A
+></DT
+><DT
+><A
+HREF="x10272.htm"
+>SECMARK target</A
+></DT
+><DT
+><A
+HREF="x10324.htm"
+>SNAT target</A
+></DT
+><DT
+><A
+HREF="x10386.htm"
+>TCPMSS target</A
+></DT
+><DT
+><A
+HREF="x10464.htm"
+>TOS target</A
+></DT
+><DT
+><A
+HREF="x10539.htm"
+>TTL target</A
+></DT
+><DT
+><A
+HREF="x10650.htm"
+>ULOG target</A
+></DT
+><DT
+><A
+HREF="x10754.htm"
+>What's next?</A
+></DT
+></DL
+></DIV
+><P
+>The target/jumps tells the rule what to do with a packet that is a perfect
+match with the match section of the rule. There are a couple of basic targets,
+the ACCEPT and DROP targets, which we
+will deal with first. However, before we do that, let us have a brief look at
+how a jump is done.
+    </P
+><P
+>The jump specification is done in exactly the same way as in the target
+definition, except that it requires a chain within the same table to jump to.
+To jump to a specific chain, it is of course a prerequisite that that chain
+exists. As we have already explained, a user-defined chain is created with the
+-N command. For example, let's say we create a chain in the
+filter table called tcp_packets, like this:
+    </P
+><PRE
+CLASS="SCREEN"
+>iptables -N tcp_packets
+    </PRE
+><P
+>We could then add a jump target to it like this:
+    </P
+><PRE
+CLASS="SCREEN"
+>iptables -A INPUT -p tcp -j tcp_packets
+    </PRE
+><P
+>We would then jump from the INPUT chain to the
+tcp_packets chain and start traversing that chain. When/If
+we reach the end of that chain, we get dropped back to the
+INPUT chain and the packet starts traversing from the rule
+one step below where it jumped to the other chain (tcp_packets in this case).
+If a packet is ACCEPTed within one of the sub chains, it
+will be ACCEPT'ed in the superset chain also and it will
+not traverse any of the superset chains any further. However, do note that the
+packet will traverse all other chains in the other tables in a normal fashion.
+For more information on table and chain traversing, see the <A
+HREF="c3742.htm"
+><I
+>Traversing of tables and chains</I
+></A
+>
+chapter.
+    </P
+><P
+> Targets on the other hand specify an action to take on the
+packet in question. We could for example, DROP or
+ACCEPT the packet depending on what we want to do.
+There are also a number of other actions we may want to take, which we
+will describe further on in this section. Jumping to targets may incur
+different results, as it were. Some targets will cause the packet to stop
+traversing that specific chain and superior chains as described above.
+Good examples of such rules are DROP and
+ACCEPT. Rules that are stopped, will not pass through
+any of the rules further on in the chain or in superior chains. Other
+targets, may take an action on the packet, after which the packet will
+continue passing through the rest of the rules. A good example of this
+would be the LOG, ULOG and
+TOS targets. These targets can log the
+packets, mangle them and then pass them on to the other
+rules in the same set of chains. We might, for example, want this so that
+we in addition can mangle both the TTL and the
+TOS values of a specific packet/stream. Some
+targets will accept extra options (What TOS value
+to use etc), while others don't necessarily need any options - but we
+can include them if we want to (log prefixes, masquerade-to ports and so
+on). We will try to cover all of these points as we go through the target
+descriptions. Let us have a look at what kinds of targets there are.
+    </P
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="ACCEPTTARGET"
+>ACCEPT target</A
+></H1
+><P
+> This target needs no further options. As soon as the match
+specification for a packet has been fully satisfied, and we specify ACCEPT as
+the target, the rule is accepted and will not continue traversing the current
+chain or any other ones in the same table. Note however, that a packet that
+was accepted in one chain might still travel through chains within other
+tables, and could still be dropped there. There is nothing special about this
+target whatsoever, and it does not require, nor have the possibility of,
+adding options to the target. To use this target, we simply specify
+-j ACCEPT.
+    </P
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Works under Linux kernel 2.3, 2.4, 2.5 and 2.6.
+      </P
+></TD
+></TR
+></TABLE
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x8812.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x8862.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>What's next?</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>CLASSIFY target</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

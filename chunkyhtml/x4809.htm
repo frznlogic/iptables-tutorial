@@ -1,0 +1,359 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Complex protocols and connection tracking</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="UP"
+TITLE="The state machine"
+HREF="c4219.htm"><LINK
+REL="PREVIOUS"
+TITLE="Untracked connections and the raw 
+table"
+HREF="x4772.htm"><LINK
+REL="NEXT"
+TITLE="What's next?"
+HREF="x4931.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="SECTION"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x4772.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Chapter 7. The state machine</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x4931.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="COMPLEXPROTOCOLS"
+>Complex protocols and connection tracking</A
+></H1
+><P
+> Certain protocols are more complex than others. What this means
+when it comes to connection tracking, is that such protocols may be harder
+to track correctly. Good examples of these are the
+ICQ, IRC and
+FTP protocols. Each and every one of these
+protocols carries information within the actual data payload of the
+packets, and hence requires special connection tracking helpers to enable
+it to function correctly.
+   </P
+><P
+>This is a list of the complex protocols that has support inside the linux 
+kernel, and which kernel version it was introduced in.
+   </P
+><DIV
+CLASS="TABLE"
+><A
+NAME="TABLE.COMPLEXPROTOCOLS"
+></A
+><P
+><B
+>Table 7-3. Complex protocols support</B
+></P
+><TABLE
+BORDER="1"
+FRAME="border"
+RULES="all"
+CLASS="CALSTABLE"
+><COL
+WIDTH="2*"><COL
+WIDTH="1*"><THEAD
+><TR
+><TH
+>Protocol name</TH
+><TH
+>Kernel versions</TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+>FTP</TD
+><TD
+>2.3</TD
+></TR
+><TR
+><TD
+>IRC</TD
+><TD
+>2.3</TD
+></TR
+><TR
+><TD
+>TFTP</TD
+><TD
+>2.5</TD
+></TR
+><TR
+><TD
+>Amanda</TD
+><TD
+>2.5</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+><P
+></P
+><UL
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>FTP</P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>IRC</P
+></LI
+><LI
+STYLE="list-style-type: opencircle"
+><P
+>TFTP</P
+></LI
+></UL
+><P
+> Let's take the FTP protocol as the
+first example. The FTP protocol first opens up a
+single connection that is called the FTP control
+session. When we issue commands through this session, other ports are
+opened to carry the rest of the data related to that specific command.
+These connections can be done in two ways, either actively or passively.
+When a connection is done actively, the FTP
+client sends the server a port and IP address to connect to. After this,
+the FTP client opens up the port and the server
+connects to that specified port from a random unprivileged port (&#62;1024) 
+and sends the data over it.
+   </P
+><P
+> The problem here is that the firewall will not know about these
+extra connections, since they were negotiated within the actual payload
+of the protocol data. Because of this, the firewall will be unable to know
+that it should let the server connect to the client over these specific
+ports.
+   </P
+><P
+> The solution to this problem is to add a special helper to the
+connection tracking module which will scan through the data in the control
+connection for specific syntaxes and information. When it runs into the
+correct information, it will add that specific information as
+RELATED and the server will be able to track the
+connection, thanks to that RELATED entry. Consider the
+following picture to understand the states when the
+FTP server has made the connection back to the
+client.
+   </P
+><P
+>    <DIV
+CLASS="MEDIAOBJECT"
+><P
+><IMG
+SRC="images/state-tcp-server-subconn.jpg"></P
+></DIV
+>
+   </P
+><P
+>Passive FTP works the opposite way. The
+FTP client tells the server that it wants some
+specific data, upon which the server replies with an IP address to connect to
+and at what port. The client will, upon receipt of this data, connect to that
+specific port, from its own port 20(the FTP-data port), and get the data in
+question. If you have an FTP server behind your
+firewall, you will in other words require this module in addition to your
+standard iptables modules to let clients on the Internet connect to the
+FTP server properly. The same goes if you are
+extremely restrictive to your users, and only want to let them reach
+HTTP and FTP servers on the
+Internet and block all other ports. Consider the following image and its
+bearing on Passive FTP.
+   </P
+><P
+>    <DIV
+CLASS="MEDIAOBJECT"
+><P
+><IMG
+SRC="images/state-tcp-client-subconn.jpg"></P
+></DIV
+>
+   </P
+><P
+> Some conntrack helpers are already available within the kernel
+itself. More specifically, the FTP and
+IRC protocols have conntrack helpers as of
+writing this. If you can not find the conntrack helpers that you need
+within the kernel itself, you should have a look at the
+patch-o-matic tree within user-land iptables. The
+patch-o-matic tree may contain more conntrack
+helpers, such as for the ntalk or
+H.323 protocols. If they are not available in the
+patch-o-matic tree, you have a number of options. Either you can look at
+the CVS source of iptables, if it has recently gone into that tree, or you
+can contact the <A
+HREF="a13413.htm"
+>Netfilter-devel</A
+>
+mailing list and ask if it is available. If it is not, and there are no
+plans for adding it, you are left to your own devices and would most
+probably want to read the <A
+HREF="a13413.htm#NETFILTERHACKINGHOWTO"
+>Rusty
+Russell's Unreliable Netfilter Hacking HOW-TO</A
+> which is linked from
+the <A
+HREF="a13413.htm"
+><I
+>Other resources and links</I
+></A
+>
+appendix.
+
+   </P
+><P
+>Conntrack helpers may either be statically compiled into the kernel, or as
+modules. If they are compiled as modules, you can load them with the following
+command
+   </P
+><PRE
+CLASS="SCREEN"
+>modprobe ip_conntrack_ftp
+modprobe ip_conntrack_irc
+modprobe ip_conntrack_tftp
+modprobe ip_conntrack_amanda
+   </PRE
+><P
+>Do note that connection tracking has nothing to do with
+NAT, and hence you may require more modules if you
+are NAT'ing connections as well. For example, if you were to want to
+NAT and track FTP
+connections, you would need the NAT module as well.
+All NAT helpers starts with ip_nat_ and follow that
+naming convention; so for example the FTP
+NAT helper would be named
+ip_nat_ftp and the IRC
+module would be named ip_nat_irc. The conntrack
+helpers follow the same naming convention, and hence the
+IRC conntrack helper would be named
+ip_conntrack_irc, while the
+FTP conntrack helper would be named
+ip_conntrack_ftp.
+   </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x4772.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x4931.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Untracked connections and the raw 
+table</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c4219.htm"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>What's next?</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,127 @@
+  <table frame=all id="tcpheader.img">
+    <title id="tcpheader.img.title">Transmission Control Protocol headers</title>
+    <tgroup cols=32 align=left>
+      <colspec colname=0>
+      <colspec colname=1>
+      <colspec colname=2>
+      <colspec colname=3>
+      <colspec colname=4>
+      <colspec colname=5>
+      <colspec colname=6>
+      <colspec colname=7>
+      <colspec colname=8>
+      <colspec colname=9>
+      <colspec colname=10>
+      <colspec colname=11>
+      <colspec colname=12>
+      <colspec colname=13>
+      <colspec colname=14>
+      <colspec colname=15>
+      <colspec colname=16>
+      <colspec colname=17>
+      <colspec colname=18>
+      <colspec colname=19>
+      <colspec colname=20>
+      <colspec colname=21>
+      <colspec colname=22>
+      <colspec colname=23>
+      <colspec colname=24>
+      <colspec colname=25>
+      <colspec colname=26>
+      <colspec colname=27>
+      <colspec colname=28>
+      <colspec colname=29>
+      <colspec colname=30>
+      <colspec colname=31>
+
+      <thead>
+      	<row rowsep=0>
+	  <entry colname=0 align=left>0</entry>
+	  <entry colname=10 align=left>1</entry>
+	  <entry colname=20 align=left>2</entry>
+	  <entry colname=30 align=left>3</entry>
+	  <entry colname=31 align=left></entry>
+	</row>
+        <row rowsep=1>
+          <entry colsep=1>0</entry>
+          <entry colsep=1>1</entry>
+          <entry colsep=1>2</entry>
+          <entry colsep=1>3</entry>
+          <entry colsep=1>4</entry>
+          <entry colsep=1>5</entry>
+          <entry colsep=1>6</entry>
+          <entry colsep=1>7</entry>
+          <entry colsep=1>8</entry>
+          <entry colsep=1>9</entry>
+          <entry colsep=1>0</entry>
+          <entry colsep=1>1</entry>
+          <entry colsep=1>2</entry>
+          <entry colsep=1>3</entry>
+          <entry colsep=1>4</entry>
+          <entry colsep=1>5</entry>
+          <entry colsep=1>6</entry>
+          <entry colsep=1>7</entry>
+          <entry colsep=1>8</entry>
+          <entry colsep=1>9</entry>
+          <entry colsep=1>0</entry>
+          <entry colsep=1>1</entry>
+          <entry colsep=1>2</entry>
+          <entry colsep=1>3</entry>
+          <entry colsep=1>4</entry>
+          <entry colsep=1>5</entry>
+          <entry colsep=1>6</entry>
+          <entry colsep=1>7</entry>
+          <entry colsep=1>8</entry>
+          <entry colsep=1>9</entry>
+          <entry colsep=1>0</entry>
+          <entry colsep=1>1</entry>
+        </row>
+      </thead>
+
+      <tbody>
+        <row>
+          <entry namest=0 nameend=15>Source Port</entry>
+	  <entry namest=16 nameend=31>Destination Port</entry>
+        </row>
+
+        <row>
+          <entry namest=0 nameend=31>Sequence Number</entry>
+        </row>
+
+        <row>
+          <entry namest=0 nameend=31>Acknowledgment Number</entry>
+        </row>
+
+        <row>
+          <entry namest=0 nameend=3>Data Offset</entry>
+          <entry namest=4 nameend=7>Reserved</entry>
+          <entry>cwr</entry>
+          <entry>ece</entry>
+          <entry>urg</entry>
+          <entry>ack</entry>
+          <entry>psh</entry>
+          <entry>rst</entry>
+          <entry>syn</entry>
+          <entry>fin</entry>
+          <entry namest=16 nameend=31>Window</entry>
+        </row>
+
+        <row>
+          <entry namest=0 nameend=15>Checksum</entry>
+          <entry namest=16 nameend=31>Urgent Pointer</entry>
+        </row>
+
+        <row>
+          <entry namest=0 nameend=24>Options</entry>
+          <entry namest=25 nameend=31>Padding</entry>
+        </row>
+
+        <row>
+          <entry namest=0 nameend=31>Data</entry>
+        </row>
+
+      </tbody>
+    </tgroup>
+
+  </table>
+

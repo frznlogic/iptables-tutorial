@@ -1,0 +1,815 @@
+1.2.2 (19 Nov 2006)
+* Added SCTP match.
+* Added addrtype match.
+* Added link to policy routing using linux by Matthew G. Marsh.
+* Added some internal links for better cross linking.
+* Added comment match.
+* Added hashlimit match.
+* Added new --cmd-owner to owner match.
+* Added realm match.
+* Added important.gif image sign.
+* Added l7-filter to ip_filtering_introduction.sgml.
+* Added l7-filter link to other_resources.sgml.
+* Added raw table in traversing_of_tables_and_chains.sgml
+* Added raw table in how_a_rule_is_built.sgml chapter.
+* Added SECMARK and CONNSECMARK to traversing_of_tables_and_chains.sgml.
+* Added user specified chains section in traversing_of_tables_and_chains.sgml.
+* Added UNTRACKED and new untracked connections section in statemachine.sgml.
+* Added SCTP characteristics section to tcp_ip_repetition.sgml
+* Added all images for the SCTP chapters.
+* Added Whats next? to all chapters.
+* Added SCTP headers section in the tcp_ip_repetition.sgml chapter.
+* Added CLUSTERIP target.
+* Added CONNMARK target.
+* Added connmark match.
+* Added CONNSECMARK target.
+* Added SECMARK target.
+* Added NOTRACK target.
+* Added NFQUEUE target. 
+* Added index of all chapters and appendixes.
+* Updated all header images from the tcp_ip_repetition.sgml chapter.
+* Updated all diagrammatical images to a nicer look.
+* Updated admonition images (Jens Larsson <jensATcodewaterDOTcom>)
+* Updated tables_traverse.gif with raw table and switched fonts.
+* Updated information for the QUEUE target for 2.6.14 kernel. 
+* Updated ttl match explanation somewhat.
+* Updated Print indentation 0.8 inch.
+* Updated centered header and footer.
+* Removed internal catalogs etc, living off of local ones instead.
+* Removed old data in TOS and TTL targets.
+* Fixed history.sgml layout.
+* Fixed indexing system.
+* Fixed minor error in recent match explanation.
+* Fixed --limit-burst, bad explanation.
+* Fixed s/package/packet/ in MARK target. ("G.W. Haywood"
+<gedATjubileegroupDOTcoDOTuk>)
+* Fixed all sgml tables.
+* Indexed commercial_products.sgml.
+* Indexed and fixed markup of debugging.sgml.
+* Indexed and fixed markup of example_scripts.sgml.
+* Indexed and fixed markup of how_a_rule_is_built.sgml.
+* Indexed and fixed markup of introduction.sgml 
+* Indexed and fixed markup of ip_filtering_introduction.sgml.
+* Indexed and fixed markup of iptables_matches.sgml.
+* Indexed and fixed markup of iptables_targets.sgml.
+* Indexed and fixed markup of nat_introduction.sgml.
+* Indexed and fixed markup of rc_firewall.sgml.
+* Indexed and fixed markup of statemachine.sgml.
+* Indexed and fixed markup of tcp_ip_repetition.sgml.
+* Indexed and fixed markup of traversing_of_tables_and_chains.sgml.
+
+1.2.1 (29 Sep 2006)
+* Added commercial_products.sgml for commercial products based on 
+Linux/iptables.
+* Added several new entries in other_resources.
+* Added several entries in "Terms used in this document" section.
+* Fixed bad link to icmp_parameter_problem_headers.jpg (Petr Kras 
+<petrDOTkrasSNABELAemailDOTcz>)
+* Clarified ESTABLISHED,RELATED rule in allowed chain. (Andrzej Szelachowski 
+<superandrzejSNABELAepfDOTpl>)
+* Fixed inverted numbering of the OSI and TCP/IP reference model. (Ian Martin 
+<ian.martinSNABELAworkcoverqldDOTcomDOTau>)
+* Fixed PDF creation
+* Fixed PS creation
+* Upscaled all images to higher resolutions.
+* Created better image conversion routines for print versions. 300 DPI images.
+* Rewritten dsl files for print version. New margins, indentations and resized 
+for printable version of the tutorial.
+* Improved imagequality and removed artifacts.
+* Added link to ingate.
+* Fixed error in example for pkttype match. (Ortwin Glueck
+<ortwin.glueckATlogobjectDOTch>, Mao <siupamaoATyahooDOTit> and Marcos
+Roberto Greiner <rgreinerATuspDOTbr>)
+* Fixed error in extended DNAT example (-i does not work in POSTROUTING).
+(Christian Font <cjfontATgmailDOTcom> and Tatiana <tatianaAThyper-plazaDOTcom>)
+* Missing end bracket in 2.2 IP Characteristics. (Andrius
+<quakerltATyahooDOTcom>)
+* Bad grammar in State term explanation. (Alexey Dushechkin
+<foxATfpmDOTamiDOTnstuDOTru>)
+* Misspelled --ctreplsrc/dst as --ctreplysrc/dst. (Tatsuya Nonogaki
+<winfieldATsupportDOTemailDOTneDOTjp>)
+* Added secondary possibility in iptables-save command. 
+* Switched to relative numbering in TOS/DSCP/ECN explanation in IP headers
+section. (Fred <fDOTharthoornATwxsDOTnl>)
+* Added notes about ICMP type 255 in --icmp-type explanation and ICMP types
+appendix. (Fred <fDOTharthoornATwxsDOTnl>)
+* Rewritten "about the author" preface from scratch.
+* Rewritten "how to read" preface partially from scratch.
+* Minor updates to Conventions used in this document preface.
+* Fixed some bugs in the Makefile
+
+1.20.0 (20 July 2005)
+* Forgotten link to iptsave-ruleset.txt (neil <nperrinsSNABELAbtinternetDOTcom>)
+* traversing of tables and chains and how a rule is built has been translated 
+to spanish (spanish translation team).
+* Fixed explanation of SNAT target, it is possible to make non-locally 
+generated streams to log properly. (Watz <watzSNABELAgmxDOTnet>)
+* Added tcp_ip_explanation.sgml chapter.
+* Removed link to ICMP pages by Walden since it is gone.
+* Fixed description of chain traversal. the text was inconsistent.
+* Fixed bad one-line explanations of scripts. (Spanish translation team)
+* Added more text to the TCP/IP reference.
+* Finished TCP explanation.
+* Finished TCP/IP introduction chapter.
+* Finished IP filtering introduction.
+* Lots of minor updates.
+* Split how a rule is built chapter into 3 smaller chapters since it was huge.
+* Added NAT introduction chapter.
+* Added IP filtering introduction chapter.
+* Added TCP/IP Introduction chapter.
+* Added Iptables matches chapter.
+* Added Iptables targets chapter.
+* Started on debugging chapter.
+* Added TCP options appendix.
+* Added several new references in other resources appandix.
+* Debugged all the new sgml code.
+* Added field in ICMP_types pointing to RFC.
+* Added all ICMP types and codes available on iana.org.
+* Added more stuff to the wordlist in the introduction.
+* Added guis.sgml chapter.
+* Added several images pertaining to guis.sgml chapter.
+* Added field describing which kernels all targets/matches works under.
+* Added several matches.
+* Gone through a huge list of spelling fixes (Corey Becker <coreybATnebcoincDOTcom>)
+* Fixed mono space on all literallayouts.
+* Fixed broken tables/missing entries.
+* Added several new entries in the other resources appendix.
+
+1.1.19 (21 May 2003)
+* Moved all admonition images to images/ and removed stylesheet-images
+* Fixed missing admonitions in html.tgz
+* Added warning for SMTP open relay and bad logging in dnattarget (Peter van 
+Kampen <pterkSNABELAdatatailorsDOTcom>)
+* Added scripts/ and other/ to chunkyhtml.
+* Added RFC793 to other_resources.sgml.
+* Added protocols.txt to other_resources.sgml.
+* Added RFC792 to other_resources.sgml.
+* Added theicmp to other_resources.sgml.
+* Added services.txt to other_resources.sgml.
+* Added IETF to other_resources.sgml.
+* Added LARTC to other_resources.sgml.
+* Added paksecured to other_resources.sgml.
+* Added Limit-match.txt to example_scripts.sgml.
+* Added pid-owner.txt to example_scripts.sgml.
+* Added sid-owner.txt to example_scripts.sgml.
+* Added ttl-inc.txt to example_scripts.sgml.
+* Added tldp to other_resources.sgml.
+* Remade all links to internal links within the document, except for 
+other_resources.sgml and example_scripts.sgml.
+* Updated --protocol match explanation for better clarity. (Xavier Bartol 
+<webdevSNABELAarrakisDOTes>)
+* Updated TTL target explanation to reflect that it must be patched from 
+patch-o-matic (Jon ANDERSON <forevercrazedSNABELAcomcastDOTnet>)
+* Updated spanish translation (Spanish Translation team)
+* Fixed static links in html.tgz to relative ones, for downloaders.
+* Fixed static links in chunkyhtml.tgz to relative ones, for downloaders.
+* Totally rewrote changes.sh for above needs.
+* Removed dead code in the Makefile.
+* Improved limit match explanation.
+* Added new mirror at tu-darmstadt.de (Thorsten Bremer 
+<bremerSNABELAsecDOTinformatikDOTtu-darmstadtDOTde>)
+
+1.1.18 (24 Apr 2003)
+* Added spanish translation section.
+* Added firewall_rules_table_final.pdf and links in other_resources.sgml 
+(Stuart Clark <elmhurst@spacelink.com.au>)
+* Removed duplicate CONFIG_PACKET in example_scripts.sgml, strictly not needed 
+(Robert P. J. Day <rpjday@mindspring.com>)
+* Fixed a whole bunch of errors and grammatical incorrectness (Robert P. J. Day 
+<rpjday@mindspring.com>) 
+* Revised explanation of state NEW (Robert P. J. Day <rpjday@mindspring.com>)
+* Fixed bad sed fix in last version, which deleted state in -m state... (Mark 
+Orenstein <morenstein@alum.mit.edu>)
+* Deleted LAN_BROADCAST_ADDRESS variable, and corresponding rules since they 
+where just filler (Edmond Shwayri <bevier@yahoo.com>)
+* Minor changes. Some preparations to get portuguese and spanish translations 
+inside the tutorial.
+* Fixed deep links with chunkyhtml again.
+* Fixed blackened images so they now look correct.
+
+
+
+1.1.17 (6 Apr 2003)
+* Fixed lost admonition images, forgotten to reset the admon-graphics-path 
+(prerelease made under 1.1.16 name).
+* Fixed minor spelling errors etc (Geraldo Amaral Filho 
+<geraldoSNABELAbegDOTcomDOTbr>) 
+* Added how to list nat and mangle table to detailed explanations appendix.
+* Added rules for SYN/ACK and NEW packets and added explanations etc. (Ondrej 
+Suchy <ondrejDOTsuchySNABELAqlinuxDOTcz>)
+* Fixed LAN_IP variable in rc.DMZ.firewall.txt to cohere with the texts. (Dino 
+Conti <dcontiSNABELAnextgenDOTnetDOTmt>).
+* Fixed garbled programlistings in saveandrestore.sgml (Robert P. J. Day 
+<rpjdaySNABELAmindspringDOTcom>)
+* Fixed clarity in traversing_of_tables_and_chains.sgml (Robert P. J. Day 
+<rpjdaySNABELAmindspringDOTcom>)
+* Fixed inversion explanation of limit match (Velev Dimo 
+<dimoDOTvelevSNABELAsiemensDOTcom>)
+* Fixed bad statement that REJECT can be used as a policy (Spencer Rouser 
+<spencer356aSNABELAhotmailDOTcom>)
+* Fixed CONFIG_CONNTRACK to CONFIG_IP_NF_CONNTRACK in preparations.sgml 
+(DAVEONOS <DAVEONOSSNABELAterraDOTes>)
+* Added Prerequisites in bookinfo.sgml (Amanda Hickman 
+<amandaSNABELAwelfarelawDOTorg>)
+* Fixed preparations.sgml to say "shell script file" instead of "file" for 
+clarity (Amanda Hickman <amandaSNABELAwelfarelawDOTorg>)
+* Changed "state-full" to "stateful" throughout the document (Olle Jonsson 
+<olleolleolle@home.se>)
+* Added explanation of state ESTABLISHED,RELATED rule in INPUT chain of 
+rc.firewall.txt explanation (Bengt Aspvall <BengtDOTAspvallSNABELAbthDOTse>)
+
+
+
+
+1.1.16 (16 Dec 2002)
+* Fixed /docbook-dsssl/ into stylesheet-images/ properly so all images should 
+load ok now.
+* Added more download-friendly html and chunkyhtml formats for those who 
+wish to download.
+* Created a totally separate catalog for the tutorial, to get rid of problems 
+between platforms.
+* Fixed index.html to work properly for those mirroring the tutorial.
+* Fixed bad SNAT/DNAT example rules in how a rule is built (Clemens Schwaighofer 
+<c.sc@tequila.co.jp>)
+* Fixed DMZ being able to contact LAN in rc.DMZ.firewall.txt (Uwe Dippel 
+<udippelSNABELAunitenDOTeduDOTmy>).
+* Erased unused variables and chains in rc.DMZ.firewall.txt (Uwe Dippel 
+<udippelSNABELAunitenDOTeduDOTmy>).
+* Partially fixed mirroring problems which occured since I moved to Debian as a 
+main workstation.
+* Got rid of mirror target, mirror people mainly uses wget / anyways (Dave 
+Wreski <dave@guardiandigital.com>). 
+* Minor final fixes before release.
+
+
+
+1.1.15 (13 Nov 2002)
+* Bad timeout value in statemachine.sgml.
+* Fixed missed word-change in mangle table description (five instead of two)
+* defragmented should read fragmented in -f explanation.
+* Inconsistency fixed in MARK match explanation
+* Fixed all haringstad.com URL's to frozentux.net.
+* Fixed an unclear explanation in DNAT extra explanation (Mark 
+(sonarteSNABELAapplinkDOTnet>)
+* Erased part of common_problems appendix.
+* Fixed stale udpincoming_packets --jump rule.
+* Updated rc.test-iptables.txt to work with mangle5hooks.patch (A. Lester Buck 
+<buckSNABELAcompactDOTcom>)
+* Fixed tables_traverse.gif according to mangle5hooks.patch (Robert P. J. Day 
+<rpjdaySNABELAmindspringDOTcom>)
+* Updated ordering in traversing_of_tables_and_chains according to 
+mangle5hooks.patch (A. Lester Buck <buckSNABELAcompactDOTcom>)
+* Fixed consistency in most cases regarding to table names in the tutorial. 
+(Robert P. J. Day <rpjdaySNABELAmindspringDOTcom>)
+* Fixed cutnpaste error in sid-owner.txt (Robert P. J. Day 
+<rpjdaySNABELAmindspringDOTcom>)
+* Fixed unclearness about SNAT port specifications (Robert P. J. Day 
+(rpjdaySNABELAmindspringDOTcom>)
+* Updated netfilter FAQ link in other resources (Togan Muftuoglu 
+<toganmSNABELAyahooDOTcom>).
+* Got rid of routing decision that is not there in the 
+traversal_of_tables_and_chains.sgml. (Antony Stone 
+<Antony@Soft-Solutions.co.uk>)
+* Fixed tables_traverse.gif according to previous changelog entry.
+* Added more descriptive explanation of the limit match (Robert P. J. Day 
+<rpjdaySNABELAmindspringDOTcom>)
+* Fixed SNAT examples (Robert P. J. Day <rpjday@mindspring.com>)
+* Fixed some smaller typos and bad punctuation (Matthew F. Barnes 
+<matthewSNABELAbarnesDOTnet>)
+* Fixed more typos and confusing things (Otto Matejka 
+<ottoDOTmatejkaSNABELAutanetDOTat>)
+* Gone through all chapters with aspell.
+* Got through all of the appendices with aspell, as well as the bookinfo.sgml
+* Updated SGML tags to create better HTML output (Otto Matejka 
+<ottoDOTmatejkaSNABELAutanetDOTat>)
+* Added forgotten save and restore chapter (Otto Matejka 
+<ottoDOTmatejkaSNABELAutanetDOTat>)
+* Minor preparations for release.
+* Erased old passiveftpnodcc appendix, replaced in other places. (Marek 
+Januszewski <specSNABELAwebtechDOTpl>)
+
+1.1.14 (14 Oct 2002)
+* Fixed explanation of packet traversals (Carol Anne 
+<caogdinSNABELAdeepwoodsDOTcom>)
+* Fixed bad link to sid-owner.txt in how_a_rule_is_built.sgml (Manuel Minzoni 
+<epox76SNABELAnetscapeDOTnet>)
+* Fixed all code snippets inside the tutorial with proper linebreaks etc(Carol 
+Anne <caogdinSNABELAdeepwoodsDOTcom>)
+* Fixed bad state change explanation in the statemachine.sgml (Yves Soun 
+<yvesDOTsounSNABELAcertaDOTscssiDOTgovDOTfr>)
+* Fixed references to old mangle table to reflect mangle5hooks.patch.
+* Fixed tables_traverse.gif to better reflect mangle5hooks.patch, etcetera.
+* Added target for chunky HTML output. 
+* Fixed IPT_CONTINUE misunderstanding in how a rule is built (Miernik 
+<miernikSNABELActnetDOTpl>).
+* Added some rules to get rid of excessive logging of DHCP, Multicast and 
+Broadcasts (Uwe Dippel <udippelSNABELAunitenDOTeduDOTmy>)
+* Added descriptions of the new rules described above to rc_firewall.sgml (Uwe 
+Dippel <udippelSNABELAunitenDOTeduDOTmy>)
+* Added note admonition in DNAT long explanation regarding ACCEPT rules in 
+FORWARD (Dave Klipec <dklipecSNABELAiastateDOTedu>).
+* Fixed bad cutnpaste in header of retreiveip.txt (Eddy L O Jansson 
+<eddySNABELAklopperDOTnet>)
+* Fixed bad cut expression in rc.DHCP.firewall.txt example in 
+example_scripts.sgml (Eddy L O Jansson <eddySNABELAklopperDOTnet>)
+* Created a preface section in the beginning.
+* Moved data from introduction.sgml to preface.
+* Copied data from ipsysctl tutorial to preface in iptables tutorial.
+* Fixed all stale links to frozentux.net for always.
+* Erased two sed lines in Makefile, stale since all links are fixed.
+* Added ID tags to all chapters, sections and tables including the titles.
+* Fixed Makefile to copy all images necessary to correct places for chunkyhtml 
+and html target
+* Sorted all targets alphabetically.
+* Sorted Explicit matches alphabetically.
+* Fixed unclear statement about --protocol inversion.
+
+1.1.13 (22 Aug 2002)
+* Temporarily fixed HTML output, which was corrupted due to bad SGML 
+stylesheets.
+
+1.1.12 (19 Aug 2002)
+* Fixed bad TTL examples in how a rule is built (Peter Schubnell 
+<peterDOTschubnellATgmxDOTde>)
+* Typo in introduction.sgml fixed (Stephen J. Lawrence 
+<slawrenceATucdavisDOTedu>)
+* Added rules to allow the firewall to act as DHCP server on LAN (Uwe Dippel 
+<udippelATunitenDOTeduDOTmy>)
+* Fixed various problems in the appendices (Bradley Dilger 
+<dilgerATnweDOTuflDOTedu>)
+* Added usage for --set-ttl and --ttl-dec (Vegard Engen <vegard@engen.priv.no>)
+* Fixed missing nat modules in the modprobe sections (Clifford Kite 
+<kite_public1ATev1DOTnet>)
+* Fixed bad spelling in some variables in the scripts (Uwe Dippel 
+<udippelATunitenDOTeduDOTmy>)
+* Swapped order of creation for user specified chains (Uwe Dippel 
+<udippelATunitenDOTeduDOTmy>)
+* Added first part of a portuguese translation by (Alessandro Oliveira 
+<alessandroDOToATnunoferreiraDOTcomDOTbr>)
+* Redone large parts of the makefiles.
+* Added a README with installation instructions etc.
+* More spelling and grammar fixes (Tony Earnshaw <tonniATbillyDOTdemonDOTnl>)
+* Additional distrib target (Harald Welte)
+* Fixed bad example DNAT rule in "how a rule is built" (Nick Andrew 
+<nickATzetaDOTorgDOTau>).
+* Fixed small spelling error (Stepan Kasal <kasal@math.cas.cz>)
+
+1.1.11 (27 May 2002)
+* Fixed all tables in "how a rule is built"
+* Pictures for state explanation.
+* Added the state explanation chapter.
+* Fixed everything within the state machine explanation.
+* Fixed a longer DNAT explanation on how to use this properly, and routing 
+considerations.
+* Added a few term descriptions. (steve hnizdur <shnizdurATyahooDOTcoDOTuk>)
+* Added a note admonition in the "The ICMP chain" section.(steve hnizdur 
+<shnizdurATyahooDOTcoDOTuk>)
+* Added mirror at linux-sxs.org (Lonni <netllamaATlinux-sxsDOTorg>)
+* Added warning admonition image
+* Changed caution to warning admonition in rc_firewall.sgml. (Jelle Kalf 
+<JKalfATunoDOTnl>)
+* Added "how to read this document" section in the introduction.
+* Fixed statemachine.html explanation of sysctl variables etc.
+* Lots and lots of grammatical fixes (Tony Earnshaw <tonniATbillyDOTdemonDOTnl>, 
+Valentina Barrios)
+
+1.1.10 (12 April 2002)
+* Got rid of spaces which made the literallayout tags look weird.
+* Fixed allowed chain explanation.
+* Fixed tcp_packets chain explanation.
+* Fixed udpincoming_packets chain explanation.
+* Fixed icmp_packets chain explanation.
+* Fixed INPUT chain explanation.
+* Fixed FORWARD chain explanation.
+* Fixed OUTPUT chain explanation.
+* Fixed PREROUTING chain explanation.
+* Fixed a huge set of underscores in docbook identifiers.
+* Fixed accidental error where the html version is created twice in the same 
+file.
+* Fixed bad indentation of the first line in all the scripts.
+* Resized caution.gif and note.gif since they where way to large.
+* Fixed the whole rc_firewall file explanation so it is up to date, finally.
+* Fixed unnecessary diff's between rc.firewall.txt and rc.DHCP.firewall.txt.
+* Fixed unnecessary diff's between rc.firewall.txt and rc.UTIN.firewall.txt.
+* Fixed unnecessary diff's between rc.firewall.txt and rc.DMZ.firewall.txt.
+* Fixed ttl-inc.txt script to work 100%.
+* Fixed TTL explanations
+* Fixed Owner match explanations.
+* Fixed limit match explanations.
+* Fixed ULOGD explanation. Still need link to ULOGD homepage.
+* Fixed explanation of --tcp-flags inversion.
+* Added link to conntrack explanation on kalamazoolinuxDOTorg.
+* Added brief explanation on how to get DHCP through an all blocking ruleset in 
+common_problems.sgml
+* Added brief note in multiport match about mixing non-multi and multi matches.
+* Added brief retrieveip.txt script which grabs IP and BC of interfaces (Jelle 
+Kalf <jkalfATunoDOTnl>)
+* Added brief pointer to the retrieveip.txt from rc.DHCP.firewall.txt 
+explanation.
+* Added debian package link (Theodore Alexandrov <theoATpdmi.ras.ru>)
+* Fixed --mac-source example, lacked -m mac (Paul Corbett 
+<paulATbits-n-pieces.coDOTuk>)
+* Updated mirror info on brazilian mirror (Rodrigo Rubira Branco 
+<rodrigoATiptablesDOTcomDOTbr>)
+* fixed <ulink url=netfilter developing guide"netfilter developing 
+guide</ulink>
+* fixed <ulink url="ULOGD homepage">ULOGD homepage</ulink>
+* Added "mIRC DCC problems" in common_problems.sgml (Alistair Tonner 
+<AlistairATalistairt.2yDOTnet>)
+* Added link to mIRC DCC problems in rc_firewall.sgml (Alistair Tonner 
+<AlistairATalistairt.2yDOTnet>)
+* Added caution admonition to TOS target description and some text (Matthew G. 
+Marsh <mgmATpaktronixDOTcom>)
+* Added Problems loading modules section in common_problems.sgml (Uwe Dippel 
+<udippelATunitenDOTeduDOTmy>)
+* Added caution admonition in "Initial loading of modules" section. (Uwe Dippel 
+<udippelATunitenDOTeduDOTmy>)
+* Fixed all e-mail adresses to make them less "harvestable" by spammers. (Evan 
+Nemerson <evanATcoeusHYPHENgroupDOTcom>)
+* Fixed a huge set of minor bugs and errors (Marcel J.E. Mol 
+<marcelATmesaDOTnl>)
+* Swapped place on "how a rule is built" and "traversing of tables and chains" 
+(Marcel J.E. Mol <marcelATmesaDOTnl>)
+* Rewritten small pieces of the "how a rule is built" chapter.
+* Added modules required for rc.firewall.txt in the description.
+* Added modules required for rc.DMZ.firewall.txt in the description.
+* Added modules required for rc.DHCP.firewall.txt in the description.
+* Added modules required for rc.UTIN.firewall.txt in the description.
+
+1.1.9 (21 March 2002)
+* Fixed rc.firewall.txt to follow the stylesheet in firewall.sgml
+* Fixed rc.DMZ.firewall.txt to follow the stylesheet in firewall.sgml
+* Fixed the Makefile to include the stylesheet-images dir in src package and 
+site packaging
+* Fixed rc.DHCP.firewall.txt to follow the stylesheet in firewall.sgml (Vince 
+Herried <vherriedATinsight.rrDOTcom>)
+* Fixed rc.UTIN.firewall.txt to follow the stylesheet in firewall.sgml
+* Fixed ICMP types chapter (which is an error, what is a request)
+* Fixed all formatting in the rc_firewall example chapter.
+* Added link to LARTC.org.
+* Added RFC 793 and linked to it.
+* Added brief explanation of the Configuration optionsDOTsection of the 
+rc.firewall.txt in rc_firewall.sgml.
+* Fixed all tables in the "Traversing of tables and chains" chapter.
+* Fixed the "tables" table of the "how a rule is built" chapter
+* Fixed the tables within the "ICMP types" appendix.
+* Fixed PDF & PS links in the "Other resources" chapter to local files.
+* Fixed html make target to reverse links in "Other resources" to the old 
+style.
+* Fixed if statements in rc.DHCP.firewall.txt.
+* Fixed bad rules in rc.DHCP.firewall.txt (trying to use unavailable $INET_IP 
+var.
+* Looked over all required modules for rc.DHCP.firewall.txt.
+* Looked over all required modules for rc.firewall.txt.
+* Looked over all required modules for rc.UTIN.firewall.txt.
+* Looked over all required modules for rc.DMZ.firewall.txt.
+* Created a stylesheet for the tutorial (finally got it working after some 15 
+hours=)) (Togan Muftuoglu <toganmSNABELAyahooDOTcom>)
+* Created catalog file (not working yet). (Togan Muftuoglu 
+<toganmSNABELAyahooDOTcom>)
+* Fixed typo in the title (embarassing)
+* Fixed a minor set of typos all over the place.
+* Fixed broken links which did not work (due to linewrapping). (Galen Johnson 
+<gjohnsonATtrantorDOTorg>)
+* Better explanation of the --ttl match.
+* Added all RFC's referenced within the document to the local servers, and added 
+the proper links to them.
+* Changed Rodrigos e-mail adress (Rodrigo Rubira Branco 
+<iptablesADOTsecurityDOTetiDOTbr>)
+* Added brief section about automatically grabbing IP within the DHCP script 
+explanation (Kelly Ashe <darkstarATtbaytelDOTnet>)
+* Added brief explanation that ip_forward should be turned on after iptables 
+ruleset (Janne Johansson <jan.johanssonATbiomatsysDOTcom>)
+* Fixed bad > characters in the GPL appendix. (Thomas Smets 
+<tsmetsATlautreDOTnet>)
+* Fixed accidental error in the DSSSL style sheets.
+* Fixed the crashing page header and and textbody (Thomas Smets 
+<tsmetsATlautreDOTnet>, Peter Horst <phorstATspeakeasyDOTnet>)
+* Fixed bad mistake in the --destination explanation (Mitch Landers 
+<mlandersATaycanDOTde>)
+* Fixed mirror list (contact info for Neil Jolly) (Neil Jolly 
+<neilATjollDOTcom.ca>)
+* Fixed minor error in the --delete example entry in the Commands section (Jelle 
+Kalf <jkalfATunoDOTnl>)
+* Added tar -xjvf in Compiling the userland programs section (Jelle Kalf 
+<jkalfATunoDOTnl>)
+* Fixed typo (Source quelch to Source quench). (Jason Lam 
+<lamjATcmgraphicsDOTnet>)
+* Added usage for --ttl-inc (Evan Nemerson <evanATcoeusHYPHENgroupDOTcom>)
+* Created explanation of variable settings in rc_firewall.sgml
+* Created new explanation of the module loading section in the rc_firewall.sgml 
+script
+* Created new explanation of proc setting section in rc_firewall.sgml
+* Created new explanation of design goals for rc_firewall.sgml
+* Added explanation of structure used.
+* Erased para declaration in the customized stylesheet.
+* Minor markup fixes in rc_firewall.sgml
+
+1.1.8 (5 March 2002)
+* Fixed bad links (made pre-release with changes added to it).
+* Added explanation of the ACCEPT target.
+* Added explanation of the DROP target.
+* Added explanation of the RETURN target.
+* Added explanation of the LOG target.
+* Fixed the MAC match table.
+* Fixed up the LOG target tables a bit.
+* Added explanation on the MARK target.
+* Added explanation of the REJECT target.
+* Added explanation of the TOS target.
+* Added explanation of the MIRROR target.
+* Added explanation of the SNAT target.
+* Added explanation of the DNAT target.
+* Added explanation of the MASQUERADE target.
+* Added explanation of the REDIRECT target.
+* Added explanation of the TTL target.
+* Added explanation of the ULOG target.
+* Finished the How a rule is written chapter.
+* Hopefully made a good & permanent solution for these html links which
+ pointed in the wrong direction
+* Added formatting and rewritten parts of the example scripts chapter, and
+ added some id tags, etc
+* Added formatting and rewritten parts of the "How a rule is built" chapter,
+ and added some id tags, etc
+* Added formatting and rewritten parts of the introduction chapter, and added
+ some id tags, etc
+* Added formatting and rewritten parts of the preparations chapter, and added
+ some id tags, etc
+* Added formatting and rewritten parts of the Traversing of tables and chains
+ chapter, and added some id tags, etc
+* Made 2 pictures, note.gif and caution.gif for notes and cautions.
+* Added formatting and rewritten parts of the acknowledgements appendix, and
+ added some id tags, etc
+* Added formatting and rewritten parts of the Common problems appendix.
+* Added formatting and rewritten parts of the Detailed explanations appendix.
+* Added formatting and rewritten parts of the ICMP types appendix.
+* Added formatting and rewritten parts of the Other resources and links
+ appendix.
+
+1.1.7 (4 February 2002)
+* Fixed bad explanation of the --destination match. (Parimi Ravi
+ <parimiATece.arizonaDOTedu>)
+* Fixed bad cut'n'paste from last version in the rc.firewall.txt file (Phil
+ Schultz <philATalcsoftwareDOTcom>)
+* Fixed bad explanation of ip_conntrack_* in "explanation of rc.firewall"
+ chapter. (Steven McClintoc <socATepostDOTde>)
+* Added explanation of ip_nat_* in "explanation of rc.firewall" chapter. (Phil
+ Schultz <philATalcsoftwareDOTcom> and Steven McClintoc <socATepostDOTde>)
+* Added explanation of ip_nat_* in "Passive FTP but no DCC" appendix. (Phil
+ Schultz <philATalcsoftwareDOTcom> and Steven McClintoc <socATepostDOTde>)
+* Clarified explanation of the MASQUERADE target in the "NAT table"DOTsection
+ (Steven McClintoc <socATepostDOTde>)
+* Added rule to accept DHCP requests in the rc.DHCP.firewall.txt script. (Bill
+ Dossett <postmasterATbill.coDOTuk>)
+* Rearranged the variables in the rc.DHCP.firewall.txt and added comments.
+ (Bill Dossett <postmasterATbill.coDOTuk>)
+* Added variables for DHCP servers. (Bill Dossett <postmasterATbill.coDOTuk>)
+* Added PPPOE_PMTU option to the rc.DHCP.firewall.txt and comments as well as
+ rewrote that rule.
+* Organized the rc.DHCP.firewall.txt script in a better fashion.
+* Organized the rc.firewall.txt script in the same fashion as
+ rc.DHCP.firewall.txt.
+* SGML'ized the GPL document (Should be sent off to FSF for verification).
+* Inserted the SGML'ized GPL document instead of the ascii version.
+* Fixed the History section (update forgotten previous version).
+* Added new mirrors target to the Makefile. (Dave Wreski
+ <daveATguardiandigitalDOTcom>)
+* Started restructuring the tutorial, breaking it down into chapters and
+ appendices.
+* Finished the restructure after a christmas vacation. (2 january 2002)
+* Finished the --mac-source match explanation.
+* Fixed a better solution for mirroring (Dave Wreski
+ <daveATguardiandigitalDOTcom>)
+* Added explanations to the mark match.
+* Added explanations to the limit match.
+* Fixed tcp_packets chains in all scripts (Erik Sjölund <erikATxpedioDOTcom>)
+* Fixed all script links in the tutorial.
+* Fixed description of TTL target and MANGLE table in
+ traversing_of_tables_and_chains. (???)
+* Fixed loaded modules a bit in rc.firewall.txt (Adam Mansbridge
+ <Adam.MansbridgeATato.gov.au>)
+* Added new site to other resources (Vasoo Veerapen
+ <veerapenATbow.inDOTnet.mu>)
+* Fixed non-working local DNS's, possibly others, with 2 new rules in all
+ scripts (INPUT chain) ("Aladdin" <aladdinATantakalnis.lt>)
+* Added better explanation of passive and active FTP inDOTcommon problems and
+ questionmarks
+* Fixed all scripts to do ip spoofing checks in bad_tcp_packets (Rusty
+ Russell)
+* Checked through everything in the rc.firewall.txt so it runs smoothly at
+ least.
+* Fixed a ton of error messages that came up in the process of completing this
+ version of the tutorial.
+* Added Multiport match explanation in how a rule is built.
+* Added Owner match explanation in how a rule is built.
+* Added State match explanation in how a rule is built.
+* Fixed paragraphs in the how a rule is built chapter.
+* Added TOS match explanation in how a rule is built.
+* Finished the Explicit matches section for now.
+* Added generic explanation of targets/jumps section.
+* Fixed a set of bugs in the Makefile.
+* Fixed the change.sh script a bit, requires 3 variables to be known now.
+
+1.1.6 (7 December 2001)
+* Erased bad ods.dyndns.org link from Other resources and links.
+* Written small explanations of each site in the Other resources and links
+ section.
+* Added ip-sysctl.txt from kernel 2.4.14 to the site instead of doing file://
+ link
+* Added ip_dynaddr.txt from kernel 2.4.14 to the site.
+* Added iptables man page to the site and link from the Other resources and
+ links section.
+* Added other/ directory to the Makefile .src.tgz construction.
+* Added other/ directory to the Makefile site construction.
+* Finished the Generic matches for now.
+* Added an example /etc/services file to the site (add it as an appendice?)
+* Finished the TCP matches for now.
+* Finished the UDP matches for now.
+* Finished the ICMP matches for now.
+* Moved the ICMP types table to a separate apendix
+* Rewritten a few titles
+* Found out which RFC explains ICMP types and numbering.
+* Added text describing someDOTcommon problems with the rc.DHCP.firewall.txt
+ script
+* Added rule to allow $LAN_IP on $LO_IFACE in rc.firewall.txt (Jim Ramsey
+ <jwraDOTseyATsbcglobalDOTnet>)
+* Added rule to allow $INET_IP on $LO_IFACE in rc.firewall.txt (Phil Schultz
+ <philATalcsoftwareDOTcom>)
+* Commented out DNS and NTP rules in the udpiDOTcoming_chain of
+ rc.firewall.txt (Göran Båge <goran.bageAThomeDOTse>)
+* Rewritten the ICMP rules section in the scripts (Göran Båge
+ <goran.bageAThomeDOTse> and Doug Monroe <dougATplDOTnetconnectDOTcom>)
+* Fixed bad table specification in rc.flust-iptables.txt (Jasper Aikema
+ <jasperATaikemaDOTnl>)
+* Moved the NEW not SYN rules to a separate chain that is called
+ tcp_packets.(Kurt Lieber <kurtATlieberDOTorg>)
+* Renamed Contributors appendix to Acknowledgements
+* Added Dedications section.
+* Added brief History appendix.
+* Rewritten INPUT rules to accept on source adress instead of destination
+ (Chris Tallon <chrisATloggytronicDOTcom>)
+* Added section explaining NEW not SYN problems with scripts being up'ed and
+ downed periodically (Chris Martin <chris.martin2ATbtinteDOTnetDOTcom>)
+* Fixed RH7.1 installation instructions by adding paragraph about
+ iptables-save and restore etc (Jonas Pasche <mailATjonaspascheDOTde>)
+* Fixed parts of theDOTsection PREROUTING chain of the nat table. (Jan
+ Labanowski <jklAToscDOTedu>)
+* Fixed mirrors.html to include name and e-mail of Rodrigo. (Rodrigo R. Branco
+ <fockerATfeb.unesp.br>)
+* Added interans.com mirror with names etc to mirrors.html (Jacco van Koll
+ <jkoATxs2officeDOTcom>)
+* Moved all the scripts to GPL (GNU General Public LiceDOTse) licensing terms.
+* Moved the actual text to GFDL (GNU Free Documentation LiceDOTse) licensing
+ terms.
+* Added a copy of the GFDL.
+* Added a copy of the GPL.
+* Fixed missing tables_traverse.jpg in html version of the document. (Dave
+ Wreski <daveATguardiandigitalDOTcom>)
+* Fixed a few errors in the different scripts which made it impossible to
+ compile the document.
+* Fixed a few bugs in the Makefile.
+
+
+1.1.5 (14 November 2001)
+* made picture rc.firewall.gif
+* made picture rc.DHCP.firewall.gif
+* made picture rc.UTIN.firewall.gif
+* made tablesnchains-traveDOTse.gif
+* Deleted extra column in Commands table
+* Deleted erroneous table containing one of the Options
+* Added rc.firewall.jpg/eps to sgml code
+* Added rc.DHCP.firewall.jpg/eps to sgml code
+* Added rc.UTIN.firewall.jpg/eps to sgml code
+* Added introduction to the rc.firewall file chapter
+* Fixed rc.test-iptables.txt link from Example scripts chapter
+* Fixed parts of the UDP chain explanation
+* Started getting rid of some annoying emphasis and computeroutput tags
+* Got rid of /32 masks on IP's in all scripts since it is redundant and might
+ break things (feedback from "Kurt Lieber" <kurtATlieberDOTorg>)
+* Fixed INPUT chain in the rc.DHCP.firewall.txt script (feedback from "Merijn
+ Schering" <mscheringAThomeDOTnl>)
+* Fixed OUTPUT chain in the rc.DHCP.firewall.txt script (feedback from "Merijn
+ Schering" <mscheringAThomeDOTnl>)
+* Fixed Makefile to include images/templates directory in src.tgz
+* Tested to add --nochunks in %.pdf.gz target in the Makefile (will be tested
+ at release)(didn't work)
+* Erased a lot of "echo off" (AT) signs in the Makefile for easier debugging.
+* Added new mirror site at unixcircle.org
+* Fixed bad tables that fucked up both pdf and ps files.
+* Added mail adresses to maintainers of different mirrors.
+* Added addons/ directory in the source (Fabrice MARIE
+ <fabriceATcelestixDOTcom>)
+* fabpdf and eps_to_png added by Fabrice MARIE, fixes bad image handling by
+ jade (Fabrice MARIE <fabriceATcelestixDOTcom>)
+* Added explanation of fabpdf and eps_to_png (Fabrice MARIE
+ <fabriceATcelestixDOTcom>)
+* Fixed Makefile to use fabpdf and eps_to_png (Fabrice MARIE
+ <fabriceATcelestixDOTcom>)
+* Fixed sgml image links (Fabrice MARIE <fabriceATcelestixDOTcom>)
+
+1.1.4 (6 November 2001)
+* Added 2 appendices forgotten before that contains rc.test-iptables.txt and
+ rc.UTIN.firewall.txt
+* Switched names on a few sections.
+* Added explanations to deinstall the rpm based package in redhat installation
+ instructions.
+* Started explaining how rules are built.
+* Fixed bad variable assignment in rc.DMZ.firewall.txt (Kurt Lieber
+ <kurtATlieberDOTorg>)
+* Removed two unnecessary/nonfunctional rules in rc.DMZ.firewall.txt (Chris
+ Pluta <chrisATnwmailDOTcom>)
+* Fixed bad cutnpaste rules (SYN not NEW) in rc.DMZ.firewall.txt (Stig W.
+ Jensen <swjATisit.dk>)
+* Fixed inconsistency in the chain and table traversal chapter about the nat
+ table (Steve Hnizdur <shnizdurATyahoo.coDOTuk>)
+* Fixed more typos in rc.DMZ.firewall.txt (Stig W. Jensen <swjATisitDOTcom>)
+* Fixed bad netmasks on variables which bugged out DNAT and SNAT in
+ rc.DMZ.firewall.txt (Stig W. Jensen <swjATisitDOTcom>)
+* Added flushing and deleting of mangle table in rc.flush-iptables.txt (Stig
+ W. Jensen <swjATisitDOTcom>)
+* Redone the old pictures so they can have somewhat the same look as new ones.
+
+1.1.3 (9 October 2001)
+* Added section about listing the chains in a table.
+* Added info about conntrack table and how to look at it in
+ /proc/net/conntrack.
+* Added section about faulty microsoft TCP/IP behaviour.
+* Started to write the rc.UTIN.firewall.txt script, will come with this
+ release of the tutorial.
+* Added a section about the new rc.UTIN.firewall.txt script under the Example
+* Added a chapter that will explain how rules are made.
+* Added a chapter that explains traversing over the built in tables and chains.
+* Fixed Makefile error which didn't gzip files properly. (Jelle 
+Kalf <jkalfATunoDOTnl>)
+* Fixed commands to ease up the installation of iptables 
+on RedHat 7.1 ("N.Emile Akabi-Davis" <akabiAThomeDOTcom>)
+* Fixed OUTPUT chain in rc.DMZ.firewall.txt. (Joni Chu <rjchuATjonichuDOTcom>)
+* Added a script which is for testing purposes, rc.test-iptables.txt.
+* Added a section for the rc.test-iptables.txt script.
+
+1.1.2 (29 September 2001)
+* Fixed undefined variable in the rc.firewall.txt
+* Renamed certain variables.
+* Fixed bad variable assignments in rc.DMZ.firewall.txt
+* Mirror up at http://www.security.eti.br/iptablesTutorial
+* Improved userland installation section. Added how to compile and make 
+iptables and installation instructions for Red Hat 7.1.
+
+1.1.1 (26 September 2001)
+* Changed Makefile quite a lot, now has a target to pretty much make the whole 
+site, among other things
+* gzip'ed the different materials, and added it into the makefile to 
+automatically do it in the future.
+* Some grammatical changes incorporated made by Dave Richardson 
+<derATderdevDOTcom>
+* Added list of mirrors.
+* Fixed minor bug in rc.DHCP.firewall.txt script, undefined LO_IFACE variable.
+* Made an iptables-tutorial-cron.sh script which will automatically mirror this 
+site and all the content.
+* Removed unused variables which confuses the user. also dereferenced it in the 
+text of the tutorial.
+
+1.1.0 (15 September 2001)
+* Added links to rc.DHCP.firewall.txt that was forgotten.
+* Rewritten parts of the Makefile.
+* Restructured the page quite a bit, adding a front page that will contain 
+other, future documents etc.
+* Tried to make some point of goal for the whole project.
+
+1.0.9 (9 September 2001)
+* Added rc.DHCP.firewall.txt script
+* Added explanations of all(?) netfilter options in the linux 2.4.9 kernel, 
+vanilla.
+* Rewritten the kernel options needed.
+* Rewritten rc.firewall.txt to use SNAT instead of masquerading.
+* New mirror at http://www.linuxvoodoo.com/howto/iptables/
+
+
+1.0.8 (7 September 2001)
+ * Restructured the whole tutorial, indented "the tcp allowed chain", ICMP 
+chain, TCP chain and UDP chain sections under the INPUT chain section
+* Rewrote the flush-iptables.txt file a little, also renamed it to 
+rc.flush-iptables.txt
+* Changed section titles, mainly shortened them off
+* Wrote short explanations for the rc.firewall.txt and rc.flush-iptables.txt and 
+added a section for each under the example scripts section
+* Rewrote parts of introduction and made basic language updates
+* Fixed typo from 1.0.7 where I've written DROP" on certain rules rendering them 
+unable to get added to the tables.
+
+1.0.7 (23 August 2001)
+* Major bugfix to the scripts regarding the state NEW but SYN bit unset
+* Written description of state NEW but SYN bit unset problem
+* Minor fixes to the rc.firewall.txt script(readability mainly)
+* Updated text for the INPUT chain section
+* Added Fabrice Marie to the Contributors section.
+
+1.0.6
+* Added the rc.DMZ.firewall.txt file and descriptions for it.
+* Added text
+* Updates to the DocBook format
+
+1.0.5
+* Updates to the grammar
+* Small changes on the scripts
+* Updated to DocBook by Fabrice Marie
+ scripts section.

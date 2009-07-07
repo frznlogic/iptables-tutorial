@@ -1,0 +1,84 @@
+Last updated 2004 february 24
+
+1. Introduction
+2. Build requirements
+3. Installation notes
+
+Introduction
+------------
+This document requires to be built into a viewable document from the 
+DocBook SGML source before reading. This file will mainly describe how to 
+build the different viewable document types. The makefile has support for 
+building HTML, PDF and PS formats as well as the source tar ball as of 
+writing this.
+
+The build process should be fairly straight forward for most formats, 
+except the PDF which requires some special files to be moved around 
+etcetera.
+
+Build requirements
+------------------
+These will only give you a basic clue what is required. The build process 
+works quite smoothly on a standard redhat 7.x installation, but not on 
+standard slackware installation (missing certain docbook packages afaik), 
+just to name two examples.
+
+Normal:
+* sgml-tools-1.0.*
+* psgml-1.2.*
+* docbook-dtd31-sgml-*
+* sgml-common-0.6.*
+* docbook-utils-0.6
+* docbook-style-dssl-1.*
+* openjade-1.*
+* jadetex-3.*
+
+PDF:
+* All of the above
+* docbook-utils-pdf-0.6
+* fabpdf (available in iptables-tutorial/addons/)
+
+
+Installation notes
+------------------
+If you have all the above installed, you should be ok by doing the 
+following:
+
+$ make all
+
+This should build the PS, HTML and SRC targets. 
+
+If you want to build the PDF document, you need to first copy the
+iptables-tutorial/addons/fabpdf & eps_to_png file to your backend
+directory of docbook-utils. This is described in
+iptables-tutorial/addons/addons.
+
+When you have the fabpdf and eps_to_png installed properly you may issue 
+the following command to build the PDF document:
+
+$ make pdf
+
+Note: This may render a ton of errors, and most probably will. There is 
+some problems with the fabpdf backend. If this starts to emerge for you, 
+edit fabpdf with some debugging echo's etc. Hopefully it will work after a 
+while, at least it did for me (I did not change a single line of code in 
+the script that was of any real use, but all of a sudden it work).
+
+If you want to build the portuguese translation, do the following:
+
+$ make portuguese
+
+The documents are then built and saved in the 
+iptables-tutorial/portuguese/ directory. If you want to build _everything_ 
+you could do:
+
+$ make site
+
+This build everything (including portuguese translations) and puts it in 
+the iptables-tutorial/html/ directory. 
+
+If you get troubles with the build procedure, avoid contacting me unless 
+you have real good explanation for using the sources and not the 
+prebuilt versions at http://iptables-tutorial.frozentux.net :).
+
+Enjoy!

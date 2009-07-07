@@ -1,0 +1,275 @@
+ <bookinfo>
+  <title>Iptables Tutorial 1.2.2</title>
+
+  <author>
+   <firstname>Oskar</firstname>
+   <surname>Andreasson</surname>
+   <affiliation>
+    <address>
+     <email>oan@frozentux.net</email>
+    </address>
+   </affiliation>
+  </author>
+
+  <copyright>
+   <year>2001-2006</year>
+   <holder>Oskar Andreasson</holder>
+  </copyright>
+
+  <legalnotice>
+   <para> 
+Permission is granted to copy, distribute and/or modify this
+document under the terms of the GNU Free Documentation License, Version
+1.1; with the Invariant Sections being "Introduction" and all
+sub-sections, with the Front-Cover Texts being "Original Author: Oskar
+Andreasson", and with no Back-Cover Texts. A copy of the license is
+included in the section entitled "GNU Free Documentation License".
+   </para>
+   <para>
+All scripts in this tutorial are covered by the GNU General Public
+License. The scripts are free source; you can redistribute them and/or
+modify them under the terms of the GNU General Public License as published
+by the Free Software Foundation, version 2 of the License.
+   </para>
+   <para> These scripts are distributed in the hope that they will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+Public License for more details.
+   </para>
+   <para> You should have received a copy of the GNU General Public
+License within this tutorial, under the section entitled "GNU General
+Public License"; if not, write to the Free Software Foundation, Inc., 59
+Temple Place, Suite 330, Boston, MA 02111-1307 USA
+   </para>
+  </legalnotice>
+ </bookinfo>
+
+ <dedication>
+  <title>Dedications</title>
+
+  <para>
+I would like to dedicate this document to my wonderful sister, niece and 
+brother-in-law for giving me inspiration and feedback. They are a source of 
+joy and a ray of light when I have need of it.  Thank you!
+  </para>
+
+  <para>
+A special word should also be extended to Ninel for always encouraging my 
+writing and for taking care of me when I needed it the most. Thank you!
+  </para>
+
+  <para>
+Second of all, I would like to dedicate this work to all of the
+incredibly hard working Linux developers and maintainers. It is people
+like those who make this wonderful operating system possible.
+  </para>
+ </dedication>
+
+ <preface id="abouttheauthor">
+   <title>About the author</title>
+
+   <para>
+The author of the iptables tutorial was born in... 
+   </para>
+
+   <para>
+No, jokes aside. At age 8 I got my first computer for christmas present, a 
+Commodore 64 with a C-1541 diskdrive, 8 needle printer and some games etc. It 
+took me several days to even bother. My father managed to put it together and 
+after 2 days he finally learned himself how to load a game and showed how to do 
+it for myself. A life immersed in computers was born this day I guess. I played 
+mostly games at this stage, but did venture into the C-64 basic programming 
+language a couple of times on and off. After some years, I got my hands on an 
+Amiga 500, which was mainly used for games and some school work and fiddling 
+around. Amiga 1200 was next.
+   </para>
+
+   <para>
+Back in 1993-94 My father was clearsighted enough to understand that Amiga was, 
+unfortunately, not the way of the future. PC and i386 computers was. Despite 
+my screams in vain he bought me a PC, 486 50MHz with 16 MB of ram, Compaq 
+computer. This was actually one of the worst computer designs I have ever 
+seen, everything was integrated, including speakers and CRT screen. I guess 
+they where trying to mimic the Apple designs of the day, but failing miserably 
+to do so. It should be noted though, that this was the computer that got me 
+really into computers. I started coding for real, started using the Internet 
+and actually installed Linux on this machine. 
+   </para>
+
+   <para>
+I have for a long time been an avid Linux user and 
+administrator. My Linux experience started in 1994 with a slackware 
+installation from borrowed CD's. This first installation was mostly a trial 
+installation. I had no previous experience and it took me quite some time to 
+get modems running et cetera, and I kept running a dual boot system. The second 
+installation, circa 1996, I had no media around so I winded up downloading the 
+whole slackware A, AP, D and N disksets via FTP on a 28k8 modem. Since I 
+realized I would never learn anything from using graphical interfaces, I went 
+back to basics. Nothing but console, no X11 or graphics except for svgalib. In 
+the end, I believe this has helped me a lot. I believe there is nothing to 
+teach you how to use something as to actually forcing yourself to do it, as I 
+did at this time. I had no choice but to learn. I continued running like this 
+for close to 2 years. After this, I finally installed XFree86 from scratch. 
+After an 24 hour compilation, I realized that I had totally misconfigured the 
+compilation and had to restart the compilation from scratch. As a human, you 
+are always bound to do errors. It simply happens and you better get used to it. 
+Also, this kind of build process teaches you to be patient. Let things have 
+its time and don't force it.
+   </para>
+
+   <para>
+In 2000-2001 I was part of a small group of people who ran a newssite mainly 
+focusing on Amiga related news, but also some Linux and general computer news. 
+The site was called BoingWorld, located at www.boingworld.com (no long 
+available unfortunately). The Linux 2.3 kernels where reaching their end of 
+line and the 2.4 kernels where starting to pop up. At this point, I realized 
+there was a half-new concept of firewalling inside of it. Sure I had run into 
+ipfwadm and ipchains before and used it to some extent, but never truly gone 
+heads first into it. I also realized there was embaerassingly little 
+documentation and I felt it might be an interesting idea to write an iptables 
+tutorial for boingworld. Said and done, I wrote the first 5-10 pages of what 
+you are currently reading. Becoming a smashing hit, I continued to add material 
+to the tutorial. The original pages are no longer anywhere to be found in this 
+tutorial/documentation, but the concept lives on. 
+   </para>
+
+   <para>
+I have worked several different companies during this time with Linux/network 
+administration, writing documentation and course material, helped several 
+hundred, if not thousand, people emailing questions regarding iptables and 
+netfilter and general networking questions. I have attended two CERTconf's and 
+held three presentations at the same conference, and also the Netfilter 
+workshop 2003. It has been an hectic and sometimes very ungrateful job to 
+maintain and update this work, but in the end I am very happy for it and this 
+is something I am very proud of having done. At the time of writing this in end 
+of 2006, the project has been close to dead for several years, and I regret 
+this. I hope to change this in the coming years, and that a lot of people will 
+find this work to be of future use, possibly adding to the family of documents 
+with other interesting documentation that might be needed. 
+   </para>
+  </preface>
+
+  <preface id="howtoread">
+   <title>How to read</title>
+
+   <para>
+This document could either be read as a reference or from start to end. It was 
+originally written as a small introduction to iptables and to some extent 
+netfilter, but this focus has changed over the years. It aims at being an as 
+complete reference as possibly to iptables and netfilter and to at least give 
+a basic and fast primer or repetition to the areas that you might need to 
+understand. It should be noted that this document will not, nor will it be 
+able to, deal with specific bugs inside or outside the scope of iptables and 
+netfilter, nor does it really deal with how to get around bugs like this. 
+   </para>
+
+   <para>
+If you find peculiar bugs or behaviors in iptables or any of the subcomponents, 
+you should contact the Netfilter mailing lists and tell them about the problem 
+and they can tell you if this is a real bug or if it has already been fixed.
+There are security related bugs found in iptables and Netfilter, 
+one or two do slip by once in a while, it's inevitable. These are properly 
+shown on the front page of the <ulink url="http://www.netfilter.org">Netfilter 
+main page</ulink>, and that is where you should go to get information on such 
+topics.
+   </para>
+
+   <para>
+The above also implies that the rule-sets available with this tutorial are
+not written to deal with actual bugs inside Netfilter. The main goal of
+them is to simply show how to set up rules in a nice simple fashion that
+deals with all problems we may run into. For example, this tutorial will
+not cover how we would close down the HTTP port for the simple reason that
+Apache happens to be vulnerable in version 1.2.12 (This is covered really,
+though not for that reason).
+   </para>
+
+   <para>
+This document was written to give everyone a good and simple primer
+at how to get started with iptables, but at the same time it was created
+to be as complete as possible. It does not contain any targets or matches
+that are in patch-o-matic for the simple reason that it would require too
+much effort to keep such a list updated. If you need information about
+the patch-o-matic updates, you should read the info that comes with it in
+patch-o-matic as well as the other documentations available on the <ulink
+url="http://www.netfilter.org">Netfilter main page</ulink>.
+   </para>
+
+   <para>
+If you have any suggestions on additions or if you think you find any problems 
+around the area of iptables and netfilter not covered in this document feel 
+free to contact me about this. I will be more than happy to take a look at it 
+and possibly add what might be missing. 
+   </para>
+  </preface>
+
+  <preface id="prerequisites">
+   <title>Prerequisites</title>
+   <para>
+This document requires some previous knowledge about Linux/Unix, shell
+scripting, as well as how to compile your own kernel, and some simple
+knowledge about the kernel internals.
+   </para>
+
+   <para>
+I have tried as much as possible to eradicate all prerequisites needed before
+fully grasping this document, but to some extent it is simply impossible to not
+need some previous knowledge.
+   </para>
+  </preface>
+
+  <preface id="conventionsused">
+   <title>Conventions used in this document</title>
+
+   <para>
+The following conventions are used in this document when it comes to
+commands, files and other specific information.
+   </para>
+
+   <itemizedlist mark=bullet>
+
+    <listitem>
+     <para>
+Long code excerpts and command-outputs are printed like shown below. This 
+includes screendumps and larger examples taken from the console.
+     </para>
+
+     <screen>
+[blueflux@work1 neigh]$ <command>ls</command>
+default  eth0  lo
+[blueflux@work1 neigh]$
+     </screen>
+    </listitem>
+
+    <listitem>
+     <para>
+All commands and program names in the tutorial are shown in <command>bold
+typeface</command>. This includes all the commands that you might type, or 
+part of the command that you type.
+     </para>
+    </listitem>
+
+    <listitem>
+    <para>
+All system items such as hardware, and also kernel internals or abstract
+system items such as the loopback interface are all shown in an
+<systemitem>italic typeface</systemitem>.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+computer output is formatted in <computeroutput>this way</computeroutput>
+in the text. Computer output could be summed up as all the output that the 
+computer will give you on the console. 
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+filenames and paths in the file-system are shown like 
+<filename>/usr/local/bin/iptables</filename>. 
+     </para>
+    </listitem>
+   </itemizedlist>
+ </preface>

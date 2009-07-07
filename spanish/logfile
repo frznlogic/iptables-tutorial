@@ -1,0 +1,507 @@
+jade:/home/blueflux/netfilter/tutorial/spanish/iptables-tutorial.sgml:1:54:W: cannot generate system identifier for public text "-//OASIS//DTD DocBook V3.1//EN"
+jade:/home/blueflux/netfilter/tutorial/spanish/iptables-tutorial.sgml:33:0:E: reference to entity "BOOK" for which no system identifier could be generated
+jade:/home/blueflux/netfilter/tutorial/spanish/iptables-tutorial.sgml:1:0: entity was defined here
+jade:/home/blueflux/netfilter/tutorial/spanish/iptables-tutorial.sgml:33:0:E: DTD did not contain element declaration for document type name
+jade:/home/blueflux/netfilter/tutorial/spanish/iptables-tutorial.sgml:35:9:E: there is no attribute "ID"
+jade:/home/blueflux/netfilter/tutorial/spanish/iptables-tutorial.sgml:35:28:E: element "BOOK" undefined
+jade:/home/blueflux/netfilter/tutorial/spanish/bookinfo.sgml:1:10:E: element "BOOKINFO" undefined
+jade:/home/blueflux/netfilter/tutorial/spanish/bookinfo.sgml:2:8:E: element "TITLE" undefined
+jade:/home/blueflux/netfilter/tutorial/spanish/bookinfo.sgml:4:9:E: element "AUTHOR" undefined
+jade:/home/blueflux/netfilter/tutorial/spanish/bookinfo.sgml:5:13:E: element "FIRSTNAME" undefined
+jade:/home/blueflux/netfilter/tutorial/spanish/bookinfo.sgml:6:11:E: element "SURNAME" undefined
+jade:/home/blueflux/netfilter/tutorial/spanish/bookinfo.sgml:7:15:E: element "AFFILIATION" undefined
+jade:/home/blueflux/netfilter/tutorial/spanish/bookinfo.sgml:8:12:E: element "ADDRESS" undefined
+jade:/home/blueflux/netfilter/tutorial/spanish/bookinfo.sgml:9:11:E: element "EMAIL" undefined
+jade:/home/blueflux/netfilter/tutorial/spanish/bookinfo.sgml:14:12:E: element "COPYRIGHT" undefined
+jade:/home/blueflux/netfilter/tutorial/spanish/bookinfo.sgml:15:8:E: element "YEAR" undefined
+jade:/home/blueflux/netfilter/tutorial/spanish/bookinfo.sgml:16:10:E: element "HOLDER" undefined
+jade:/home/blueflux/netfilter/tutorial/spanish/bookinfo.sgml:19:14:E: element 
+   Tutorial de IPtables 1.1.19es
+
+     Oskar
+   Andreasson
+            blueflux@koffein.net
+    
+   
+  
+
+     2001-2003
+   Oskar Andreasson
+  
+
+      
+Se concede permiso para copiar, distribuir y/o modificar este documento según
+las condiciones de la Licencia de Libre Documentación de GNU (GNU Free Documentation
+License), Versión 1.1; siendo las Secciones Invariables (Invariant Sections) la
+"Introducción" y todos sus sub-apartados, con la Portada indicando "Autor
+Original: Oskar Andreasson" y sin texto en la Contraportada. Una copia
+de esta licencia en castellano se incluye en el apartado "GNU Free Documentation
+License" (también se incluye la versión oficial en inglés).
+   
+
+   Todos los "scripts" del presente tutorial quedan cubiertos por la Licencia
+Pública General de GNU (GNU General Public License). Los "scripts" son de código
+libre (free source); puedes redistribuirlos y/o modificarlos siguiendo las
+condiciones de la Licencia Pública General de GNU (GNU General Public License)
+publicada por la Fundación del Software de Libre Distribución (Free Software
+Foundation), versión 2 de la Licencia.
+   
+
+   Los "scripts" se ofrecen con la esperanza de que sean útiles, pero SIN NINGUNA
+GARANTíA; ni siquiera garantía implícita por COMPRA-VENTA o ADECUACIóN A UN
+PROPóSITO PARTICULAR. Para más detalles, referirse a la Licencia Pública General
+de GNU (GNU General Public License) [se incluye la versión en castellano].
+   
+
+   Deberías haber recibido una copia de la Licencia Pública General de GNU (GNU
+General Public License) con este tutorial, en la sección titulada "GNU General
+Public License" (en inglés y en castellano); si no es así, comunícalo a la Free
+Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+   
+  
+ 
+
+   Dedicatorias
+
+  Por encima de todo quiero dedicar este documento a mi maravillosa novia Ninel.
+Nunca podré apoyarte tanto como tú me has apoyado a mí. Deseo hacerte al menos
+tan feliz como tú me has hecho a mí.
+  
+
+  También quiero dedicar este trabajo a todos los programadores y encargados del
+mantenimiento de Linux por su trabajo tan increíblemente duro. Gracias a éllos se
+hace posible éste maravilloso sistema operativo.
+  
+ 
+
+      Notas de la traducción
+
+    Quiero expresar mi agradecimiento a Oskar Andreasson por este tutorial. Gracias
+a él todos aquellos que deseamos conocer los secretos de IPtables y por ende los
+cortafuegos, tenemos una buena guía para empezar y adquirir un nivel bastante
+aceptable. Asímismo quiero dar las gracias a mis compañeros de traducción, por
+la paciencia y tesón demostrados. Por último, me atrevo a pedir a todo aquél que
+lea esta traducción que sea condescendiente con nosotros: hemos traducido el
+tutorial de la mejor manera que hemos sabido, pero pueden haber fallos y
+agradeceríamos vuestras sugerencias y correcciones.
+    
+
+    Xavier Bartol
+    
+
+  
+
+    Acerca del autor
+
+   Soy alguien con demasiados ordenadores viejos en sus manos. Tengo mi propia red
+de área local (LAN) y deseo que todas las máquinas
+puedan conectarse a Internet, al tiempo que la red interna permanece
+suficientemente segura. En este sentido, iptables es una buena mejora del
+antiguo ipchains. Con ipchains puedes construir una red medianamente segura
+desechando cualquier paquete entrante (de Internet) no destinado a unos puertos
+determinados. Sin embargo hay temas, como el FTP pasivo,
+o DCC saliente en IRC, que
+plantean problemas. Estos servicios asignan puertos en el servidor, informan al
+cliente sobre ellos y entonces esperan a que el cliente conecte. Al principio
+tuve algunos problemas con el código de iptables y de alguna manera pensé que no
+estaba listo para publicarlo y utilizarlo en entornos productivos. Sin embargo,
+ahora recomendaría actualizarse a cualquiera que esté utilizando ipchains (o
+incluso el antiguo ipfwadm), a menos que sea feliz con los resultados que está
+obteniendo y no necesite ninguna de las características adicionales que ofrece
+iptables.
+   
+  
+
+     Cómo leer este tutorial
+
+   Este documento se ha escrito únicamente para empezar a conocer el maravilloso
+mundo de iptables. Nunca se planteó para albergar información sobre fallos de
+seguridad específicos en iptables o Netfilter. Si encuentras fallos o
+comportamientos extraños en iptables o cualquiera de sus componentes, debes
+contactar con la lista de correo de Netfilter y comentarles el problema. Éllos
+podrán decirte si en realidad es un fallo o si ya está corregido. Aunque son muy raros los
+fallos de seguridad encontrados en iptables o en Netfilter, todavía se cuelan
+uno o dos de vez en cuando y se detallan convenientemente en la
+página principal de Netfilter,
+que es donde debes ir para encontrar información sobre estos temas.
+   
+
+   Lo anterior también implica que los conjuntos de reglas (rule-sets) disponibles
+en este tutorial no se han escrito para remediar fallos en Netfilter. Su
+finalidad principal es mostrar cómo crear reglas fácilmente que solucionen todos
+los problemas con que nos podamos encontrar. Por ejemplo, este tutorial no
+explica cómo cerrar el puerto HTTP simplemente porque el servidor web Apache sea
+vulnerable en su versión 1.2.12 (en realidad veremos cómo cerrarlo, pero no por
+este motivo).
+   
+
+   Este documento se ha escrito simplemente para ofrecer un manual bueno y sencillo
+sobre cómo empezar con iptables, pero siendo al mismo tiempo lo más completo
+posible. No contiene ningún objetivo o regla de concordancia que estén en el
+"patch-o-matic" (la sección de la web de Netfilter que se encarga de ofrecer
+los últimos desarrollos aplicables al núcleo de iptables), simplemente porque
+requeriría demasiado esfuerzo mantener actualizada una lista así. Si necesitas
+información sobre estas actualizaciones, deberías leer (y entender al 100%) los
+comentarios que acompañan a cada parche y cualquier otro documento disponible en
+la web de Netfilter.
+   
+  
+
+
+     Requisitos previos
+   Este documento requiere algunos conocimientos sobre Linux/Unix, programación
+en consola (shell scripting), algunos conocimientos básicos sobre las
+interioridades del núcleo, así como saber compilar tu propio núcleo.
+   
+
+   He intentado por todos los medios eliminar todos los requisitos previos para
+aprovechar al máximo este documento, pero ciertamente es casi imposible no
+necesitar ciertos conocimientos previos.
+   
+  
+
+     Convenciones tipográficas
+
+   Para hacer referencia a comandos, archivos y otras informaciones específicas se
+emplean las siguientes convenciones tipográficas.
+   
+
+   
+         Los ejemplos de código y los resultados de los comandos (las salidas en pantalla) se muestran con
+tipografía de ancho fijo (tipo Courier), mientras que los
+comandos escritos por el usuario se muestran en ancho fijo y
+negrita:
+     
+
+     [blueflux@work1 neigh]$ ls
+default  eth0  lo
+[blueflux@work1 neigh]$
+     
+
+         Todos los comandos y nombres de programa se muestran en negrita.
+     
+    
+
+        Todo aquello referente al sistema como el hardware (la máquina en sí), las
+interioridades del núcleo (kernel) o entes abstractos como la interfaz de bucle
+local (loopback interface) se muestran en cursiva.
+     
+    
+
+         La respuesta del ordenador se muestra así en
+el texto.
+     
+    
+
+         Los archivos y las rutas de acceso se muestran así:
+/usr/local/bin/iptables.
+     
+    
+   
+ 
+
+
+ 
+
+   Introducción
+
+     Por qué se ha escrito este documento
+   
+   Bueno, encontraba un gran vacío en los CÓMOs (HOWTO's) existentes,
+en los cuales faltaba informacion sobre las funciones "iptables" y "Netfilter"
+del nuevo kernel 2.4.x de Linux. Entre otras cosas, voy a intentar
+responder las preguntas que algunos podéis tener sobre las nuevas posibilidades,
+como la comparación por estado (state matching). Muchas de estas cuestiones se
+ilustrarán con un ejemplo rc.firewall.txt que podéis usar en vuestros scripts
+/etc/rc.d/. [Sí, este archivo se basa en el COMO sobre
+enmascaramiento (masquerading), para aquellos que lo reconozcan].
+   
+
+   Además hay un pequeño guión que he escrito por si te lías tanto como yo durante
+la configuración. Está disponible como rc.flush-iptables.txt.
+   
+
+  
+
+     Cómo se ha escrito
+
+   He consultado a Marc Boucher y otras personas del equipo del núcleo de
+NetFilter. Les agradezco de todo corazón su trabajo y su ayuda en este tutorial,
+que escribí para boingworld.com y ahora lo mantengo en mi propio sitio
+web frozentux.net. Este documento os guiará paso a paso a través del proceso
+de configuración y espero que os ayude a comprender algo más acerca del
+paquete iptables. Basaré la mayor parte del estudio desarrollado aquí en el
+ejemplo del archivo rc.firewall, ya que encuentro en ese ejemplo una buena
+vía para aprender a usar iptables.
+He decidido estudiar sólamente las cadenas básicas y desde ahí adentrarme
+en todas y cada una de las cadenas atravesadas en su orden correspondiente.
+De esta forma el tutorial es un poquito mas complicado de seguir, aunque
+también es la forma más lógica. Siempre que encuentres algo difícil de
+comprender, simplemente vuelve a este tutorial.
+   
+
+  
+
+     Términos empleados en este documento
+
+   Este documento contiene algunos términos que pueden necesitar explicaciones
+más detalladas antes que los leas. Esta sección intentará cubrir los más
+obvios y cómo los he escogido para usarlos en el documento.
+   
+
+   DNAT - Destination Network Address Translation (Traducción de la Dirección de
+Red de Destino). DNAT se refiere a la técnica de traducir la dirección IP de
+destino de los paquetes, o sea, de cambiarla. Se emplea conjuntamente
+con SNAT para permitir a varios hosts (máquinas) compartir una sola dirección IP
+de conexión con Internet entre todos ellos y al mismo tiempo que todavía puedan
+seguir ofreciendo funciones de servidor. Normalmente ésto se consigue asignando
+diferentes puertos a la dirección IP externa (la dirección enrutable) y a
+continuación informando al encaminador/enrutador (router) de Linux dónde debe enviar
+el tráfico.
+   
+
+   SNAT - Source Network Address Translation (Traducción de la Dirección de Red de
+Origen). Se refiere a las técnicas empleadas para traducir la dirección de
+origen de un paquete en otra distinta. Como en DNAT, se emplea para que varios
+hosts puedan compartir una misma dirección IP de salida a Internet. Estas
+técnicas se emplean debido a que cada vez hay menos direcciones de Internet
+disponibles a causa de la propia estructura de IPv4 (la versión 6 del protocolo
+IP, IPv6, solucionará este problema).
+   
+
+   Flujo (de datos) (Stream) - Este término se refiere a una conexion que envía
+y recibe paquetes relacionados entre sí de algún modo. Básicamente,
+he usado este término para cualquier conexión que envíe 2 ó más paquetes en
+ambas direcciones. En TCP ésto puede corresponder a una conexión que envía un
+paquete SYN y entonces responde con un paquete SYN/ACK; pero también puede ser
+equivalente a una conexión que envía un paquete SYN y responde con un mensaje
+ICMP de servidor (host) inalcanzable. En otras palabras, uso este término muy
+libremente.
+   
+
+   Estado (State) - Este término se refiere a en qué estado se encuentra el
+paquete, de acuerdo con el estándar RFC 793 -
+Transmission Control Protocol o bien con los estados de usuario
+empleados en Netfilter/iptables. Ten en cuenta que los estados usados interna
+y externamente no siguen totalmente la especificación RFC 793. La razón
+principal es que Netfilter tiene hacer varias suposiciones acerca de las
+conexiones y los paquetes.
+   
+
+   Espacio de usuario (User space) - Con este término me refiero a cualquier
+cosa que tenga lugar fuera del núcleo. Por ejemplo, la ejecución de
+iptables -h tiene lugar fuera del núcleo, mientras que
+iptables -A FORWARD -p tcp -j ACCEPT tiene lugar
+(parcialmente) dentro del núcleo, puesto que se añade una nueva regla
+al conjunto de reglas.
+   
+
+   Espacio del núcleo (Kernel space) - Esto es más o menos lo opuesto al espacio
+de usuario. Ésto implica las acciones que tienen lugar dentro del núcleo y no
+fuera de él.
+   
+
+ 
+
+ 
+
+
+
+   Preparativos
+
+  El objetivo de este capítulo es iniciarte y ayudarte a entender el papel que hoy
+día tienen Netfilter e iptables dentro de Linux. Este
+capítulo debería conseguir que estés listo para experimentar e instalar tu
+cortafuegos. Dándole el tiempo necesario y con la perseverancia adecuada,
+conseguirás que funcione exactamente como desees que lo haga.
+  
+
+     Dónde conseguir iptables
+
+   El paquete de espacio de usuario de iptables se puede
+descargar desde la página de inicio de
+Netfilter. El paquete iptables también utiliza las
+capacidades del espacio del núcleo, las cuales pueden configurarse durante la
+ejecución de make configure. Los pasos necesarios se
+discutirán a continuación.
+   
+  
+
+     Configuración del núcleo (kernel)
+    Para ejecutar lo más básico de iptables tienes que configurar
+las siguientes opciones en el núcleo mientras ejecutas make config
+o uno de sus comandos relacionados:
+   
+
+   CONFIG_PACKET - Esta opción permite que las
+aplicaciones y las utilidades que lo necesiten puedan trabajar directamente con
+distintos periféricos de red. Ejemplos de estas utilidades son tcpdump o
+snort.
+   
+
+       En sentido estricto, CONFIG_PACKET no es necesario para que iptables funcione,
+pero puesto que tiene tantos usos diferentes, he decidido incluirlo. Si crees
+que no lo necesitas, no lo incluyas.
+    
+   
+
+   CONFIG_NETFILTER - Esta opción se requiere
+cuando vas a utilizar tu ordenador como cortafuegos o como puerta de enlace
+(gateway) con Internet. En otras palabras, es imprescindible para que funcione
+cualquier cosa de las que se explican en este tutorial. Entiendo que éso es lo
+que deseas, ya que estás leyendo el tutorial.
+   
+
+   Y, por supuesto, necesitas añadir los controladores (drivers) necesarios para
+que tus interfases funcionen correctamente, es decir, el adaptador Ethernet y
+las interfases PPP y SLIP.
+Todo lo anterior sólo añade un poco de lo más básico de iptables. En realidad
+no serás capaz de hacer nada realmente productivo, ya que sólo añade la
+estructura básica al núcleo. Si quieres utilizar las opciones más avanzadas de
+iptables, tendrás que configurar las opciones necesarias en el núcleo. A
+continuación te mostraré las opciones disponibles en una versión 2.4.9 básica
+del núcleo y las explicaré brevemente:
+   
+
+   CONFIG_IP_NF_CONNTRACK - Este módulo es
+necesario para efectuar el seguimiento de las conexiones. El seguimiento de las
+conexiones lo emplean, entre otros, la traducción de direcciones (NAT)
+y el enmascaramiento (Masquerading). Si necesitas
+proteger con un cortafuegos las máquinas de una red local, definitivamente debes
+marcar esta opción. Por ejemplo, este módulo lo necesita el script  para funcionar.
+   
+
+   CONFIG_IP_NF_FTP - Este módulo es necesario si
+quieres hacer seguimiento de conexiones en las conexiones FTP.
+Puesto que estas conexiones son bastante difíciles de monitorizar en condiciones
+normales, el conntrack necesita lo que se denomina un asistente y esta opción lo
+compila en el núcleo. Si no añades este módulo no serás capaz de hacer transferencias FTP
+correctamente a través del cortafuegos o la puerta de enlace.
+   
+
+   CONFIG_IP_NF_IPTABLES - Esta opción es
+necesaria si quieres realizar algún tipo de filtrado, enmascaramiento
+(masquerading) o traducción de direcciones
+(NAT). Añade toda la estructura de identificación
+de iptables al núcleo. Sin ésto, no serás capaz de hacer nada en absoluto con
+iptables.
+   
+
+   CONFIG_IP_NF_MATCH_LIMIT - Este módulo no es
+imprescindible, pero se emplea en el ejemplo . Esta opción añade la comparación LIMIT
+(límite), ofreciendo la posibilidad de controlar el número de paquetes por
+minuto que se deben comparar, gobernado por la regla adecuada. Por ejemplo,
+con -m limit --limit 3/minute compararíamos un máximo de 3
+paquetes por minuto. Mediante este módulo también podemos evitar ciertos ataques
+de denegación de servicios (en inglés: Denial of Service attacks, DoS attacks).
+   
+
+   CONFIG_IP_NF_MATCH_MAC - Este módulo nos
+permite comparar paquetes basándonos en las direcciones físicas MAC:
+cada adaptador de red Ethernet tiene su propia dirección MAC,
+distinta a la de cualquier otro adaptador, aunque sea de la misma marca y modelo.
+Así, por ejemplo podremos bloquear paquetes en función de la dirección
+MAC utilizada y bloquear ordenadores concretos puesto que
+la dirección MAC de esos ordenadores raramente cambia (ya
+que raramente se sustituye el adaptador Ethernet por uno nuevo). No se utiliza
+esta opción ni en el ejemplo 
+ni en ningún otro sitio.
+   
+
+   CONFIG_IP_NF_MATCH_MARK - Nos permite utilizar
+la comparación MARK. Por ejemplo, podemos utilizar el
+objetivo MARK para marcar paquetes, de forma que más
+adelante se puedan comparar y filtrar paquetes dependiendo de si tienen la marca
+o no. De hecho esta opción es la comparación MARK y más
+adelante veremos el objetivo MARK.
+   
+
+   CONFIG_IP_NF_MATCH_MULTIPORT - Este módulo
+permite que comparemos paquetes con un amplio rango de puertos de origen o de
+destino. Normalmente ésto no sería posible, pero con este módulo sí lo es.
+   
+
+   CONFIG_IP_NF_MATCH_TOS - Con esta comparación
+podemos comparar paquetes en base a su campo TOS, es
+decir, su Tipo de Servicio (Type Of Service). El tipo de
+servicio se puede establecer mediante determinadas reglas en la tabla
+mangle y mediante los comandos ip/tc.
+   
+
+   CONFIG_IP_NF_MATCH_TCPMSS - Esta opción nos
+ofrece la posibilidad de comparar los paquetes TCP
+en función de su campo MSS.
+   
+
+   CONFIG_IP_NF_MATCH_STATE - Aquí tenemos una de
+las mayores novedades respecto a ipchains. Con este módulo
+podemos realizar comparaciones por flujos de paquetes (stateful matching).
+Por ejemplo, si en una conexión TCP ya hemos visto
+tráfico en dos direcciones, los paquetes que les sigan serán considerados como
+ESTABLISHED (establecido), aplicándoles por éllo las mismas acciones que a
+los paquetes que iniciaron el flujo. Este módulo se usa ampliamente en el
+ejemplo .
+   
+
+   CONFIG_IP_NF_MATCH_UNCLEAN - Este módulo nos
+brinda la posibilidad de comparar paquetes IP,
+TCP, UDP e ICMP
+que no cumplen con las normas o son inválidos. En condiciones normales se
+desecharán estos paquetes, pero nunca sabremos si son legítimos o no. Además, ten
+en cuenta que esta comparación todavía está en fase experimental y puede que no
+funcione correctamente en todos los casos.
+   
+
+   CONFIG_IP_NF_MATCH_OWNER - con esta opción
+tendremos la oportunidad de comparar en base al propietario de la conexión. Por
+ejemplo, podremos permitir acceso a Internet únicamente al usuario "root". Este
+módulo se escribió para mostrar lo que se podía lograr con el nuevo
+iptables. Ten en cuenta que esta comparación es experimental
+y puede que no le funcione bien a todo el mundo.
+   
+
+   CONFIG_IP_NF_FILTER - este módulo
+añade la tabla filter básica que permitirá efectuar
+el filtrado IP. En la tabla filter
+encontraremos las cadenas INPUT, FORWARD
+y OUTPUT. Este módulo es necesario si pretendemos hacer
+algún tipo de filtrado en los paquetes que recibamos y/o enviemos.
+   
+
+   CONFIG_IP_NF_TARGET_REJECT -
+este objetivo nos permite especificar que se debe enviar un mensaje de error
+ICMP como respuesta a los mensajes entrantes, en lugar
+de simplemente desecharlos e ignorarlos. Ten en cuenta que las conexiones
+TCP, al contrario que las ICMP
+y las UDP, siempre se reinician o rechazan con un
+paquete TCP RST.
+   
+
+   l:194:17:E: element "SYSTEMITEM" undefined
+jade:/home/blueflux/netfilter/tutorial/spanish/chapters/preparations.sgml:195:19:E: element "SYSTEMITEM" undefined
+jade:/home/blueflux/netfilter/tutorial/spanish/chapters/preparations.sgml:198:8:E: element "PARA" undefined
+jade:/home/blueflux/netfilter/tutorial/spanish/chapters/preparations.sgml:199:15:E: element "COMPUTEROUTPUT" undefined
+jade:I: maximum number of errors (200) reached; change with -E option
+jade:/usr/share/docbook-utils/docbook-utils.dsl:5:73:W: cannot generate system identifier for public text "-//James Clark//DTD DSSSL Style Sheet//EN"
+jade:/usr/share/docbook-utils/docbook-utils.dsl:9:96:W: cannot generate system identifier for public text "-//Norman Walsh//DOCUMENT DocBook HTML Stylesheet//EN"
+jade:/usr/share/docbook-utils/docbook-utils.dsl:15:0:E: reference to entity "STYLE-SHEET" for which no system identifier could be generated
+jade:/usr/share/docbook-utils/docbook-utils.dsl:5:0: entity was defined here
+jade:/usr/share/docbook-utils/docbook-utils.dsl:15:0:E: DTD did not contain element declaration for document type name
+jade:/usr/share/docbook-utils/docbook-utils.dsl:9:1:E: notation "DSSSL" for entity "docbook.dsl" undefined
+jade:/usr/share/docbook-utils/docbook-utils.dsl:17:12:E: element "STYLE-SHEET" undefined
+jade:/usr/share/docbook-utils/docbook-utils.dsl:19:26:E: there is no attribute "ID"
+jade:/usr/share/docbook-utils/docbook-utils.dsl:19:38:E: there is no attribute "USE"
+jade:/usr/share/docbook-utils/docbook-utils.dsl:19:47:E: element "STYLE-SPECIFICATION" undefined
+jade:/usr/share/docbook-utils/docbook-utils.dsl:20:29:E: element "STYLE-SPECIFICATION-BODY" undefined
+jade:/usr/share/docbook-utils/docbook-utils.dsl:32:45:E: element "STYLE-SPECIFICATION" undefined
+jade:/usr/share/docbook-utils/docbook-utils.dsl:33:29:E: element "STYLE-SPECIFICATION-BODY" undefined
+jade:/usr/share/docbook-utils/docbook-utils.dsl:68:44:E: element "STYLE-SPECIFICATION" undefined
+jade:/usr/share/docbook-utils/docbook-utils.dsl:69:29:E: element "STYLE-SPECIFICATION-BODY" undefined
+jade:/usr/share/docbook-utils/docbook-utils.dsl:113:29:E: there is no attribute "ID"
+jade:/usr/share/docbook-utils/docbook-utils.dsl:113:48:E: there is no attribute "DOCUMENT"
+jade:/usr/share/docbook-utils/docbook-utils.dsl:113:61:E: element "EXTERNAL-SPECIFICATION" undefined
+jade:/usr/share/docbook-utils/docbook-utils.dsl:115:13:E: end tag for "EXTERNAL-SPECIFICATION" omitted, but its declaration does not permit this
+jade:/usr/share/docbook-utils/docbook-utils.dsl:113:2: start tag was here
+jade:E: specification document does not have the DSSSL architecture as a base architecture
+jade:E: no style-specification or external-specification with ID "HTML"
+make: *** [chunkyhtml] Error 8

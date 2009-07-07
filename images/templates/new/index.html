@@ -1,0 +1,4286 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content=
+"HTML Tidy for Linux/x86 (vers 1 September 2005), see www.w3.org">
+<title></title>
+<meta name="GENERATOR" content=
+"Modular DocBook HTML Stylesheet Version 1.79">
+<link rel="STYLESHEET" type="text/css" href="table.css">
+</head>
+<body class="BOOK" bgcolor="#FFFFFF" text="#000000" link="#0000FF"
+vlink="#840084" alink="#0000FF">
+<div class="BOOK"><a name="AEN1" id="AEN1"></a>
+<div class="TOC">
+<dl>
+<dt><b>Table of Contents</b></dt>
+<dt>1. <a href="#AEN3">Headers</a></dt>
+</dl>
+</div>
+<div class="LOT">
+<dl class="LOT">
+<dt><b>List of Tables</b></dt>
+<dt>1-1. <a href="#ICMPHEADER.ADDRESSMASK.IMG">Internet Control
+Message Protocol - Address mask/Address mask reply Message</a></dt>
+<dt>1-2. <a href="#ICMPHEADER.BASIC.IMG">Internet Control Message
+Protocol - Basic Headers</a></dt>
+<dt>1-3. <a href="#ICMPHEADER.DESTUNREACH.IMG">Internet Control
+Message Protocol - Destination Unreachable Message</a></dt>
+<dt>1-4. <a href="#ICMPHEADER.ECHO.IMG">Internet Control Message
+Protocol - Echo/Echo Reply Message</a></dt>
+<dt>1-5. <a href="#ICMPHEADER.INFORMATION.IMG">Internet Control
+Message Protocol - Information Request/Information Reply
+Message</a></dt>
+<dt>1-6. <a href="#ICMPHEADER.PARAMETERPROBLEM.IMG">Internet
+Control Message Protocol - Parameter Problem Message</a></dt>
+<dt>1-7. <a href="#ICMPHEADER.REDIRECT.IMG">Internet Control
+Message Protocol - Redirect Message</a></dt>
+<dt>1-8. <a href="#ICMPHEADER.SOURCEQUENCH.IMG">Internet Control
+Message Protocol - Source Quench Message</a></dt>
+<dt>1-9. <a href="#ICMPHEADER.TIMEEXCEEDED.IMG">Internet Control
+Message Protocol - Time Exceeded Message</a></dt>
+<dt>1-10. <a href="#ICMPHEADER.TIMESTAMP.IMG">Internet Control
+Message Protocol - Timestamp/Timestamp Reply Message</a></dt>
+<dt>1-11. <a href="#IPHEADER.IMG">Internet Protocol
+headers</a></dt>
+<dt>1-12. <a href="#SCTPHEADER.ABORT.IMG">ABORT chunk
+headers</a></dt>
+<dt>1-13. <a href="#SCTPHEADER.COOKIEACK.IMG">COOKIE ACK chunk
+headers</a></dt>
+<dt>1-14. <a href="#SCTPHEADER.COOKIEECHO.IMG">COOKIE ECHO chunk
+headers</a></dt>
+<dt>1-15. <a href="#SCTPHEADER.DATA.IMG">DATA chunk
+headers</a></dt>
+<dt>1-16. <a href="#SCTPHEADER.ERROR.IMG">ERROR chunk
+headers</a></dt>
+<dt>1-17. <a href="#SCTPHEADER.HEARTBEATACK.IMG">HEARTBEAT ACK
+chunk headers</a></dt>
+<dt>1-18. <a href="#SCTPHEADER.HEARTBEAT.IMG">HEARTBEAT chunk
+headers</a></dt>
+<dt>1-19. <a href="#SCTPHEADER.INITACK.IMG">INIT ACK chunk
+headers</a></dt>
+<dt>1-20. <a href="#SCTPHEADER.INIT.COOKIEPARAM.IMG">State Cookie
+Parameter headers</a></dt>
+<dt>1-21. <a href="#SCTPHEADER.INIT.IMG">INIT chunk
+headers</a></dt>
+<dt>1-22. <a href="#SCTPHEADER.INIT.HOSTNAMEPARAM.IMG">Hostname
+Parameter headers</a></dt>
+<dt>1-23. <a href="#SCTPHEADER.INIT.IPV4PARAM.IMG">IPv4 Parameter
+headers</a></dt>
+<dt>1-24. <a href="#SCTPHEADER.INIT.IPV6PARAM.IMG">IPv6 Parameter
+headers</a></dt>
+<dt>1-25. <a href="#SCTPHEADER.SACK.IMG">SACK chunk
+headers</a></dt>
+<dt>1-26. <a href="#SCTPHEADER.GENERIC.IMG">Generic chunk
+headers</a></dt>
+<dt>1-27. <a href="#SCTPHEADER.SHUTDOWNACK.IMG">SHUTDOWN ACK chunk
+headers</a></dt>
+<dt>1-28. <a href="#SCTPHEADER.SHUTDOWNCOMPLETE.IMG">SHUTDOWN
+COMPLETE chunk headers</a></dt>
+<dt>1-29. <a href="#SCTPHEADER.SHUTDOWN.IMG">SHUTDOWN chunk
+headers</a></dt>
+<dt>1-30. <a href="#SCTPHEADER.COMMON.IMG">Common SCTP
+headers</a></dt>
+<dt>1-31. <a href="#SCTPHEADER.GENERICLAYOUT.IMG">Generic chunk
+headerlayout</a></dt>
+<dt>1-32. <a href="#TCPHEADER.IMG">Transmission Control Protocol
+headers</a></dt>
+<dt>1-33. <a href="#SCTPHEADER.TEMPLATE.IMG">template
+headers</a></dt>
+<dt>1-34. <a href="#UDPHEADER.IMG">User Datagram Protocol
+headers</a></dt>
+</dl>
+</div>
+<div class="CHAPTER">
+<hr>
+<h1><a name="AEN3" id="AEN3"></a>Chapter 1. Headers</h1>
+<div class="TABLE"><a name="ICMPHEADER.ADDRESSMASK.IMG" id=
+"ICMPHEADER.ADDRESSMASK.IMG"></a>
+<p><b>Table 1-1. Internet Control Message Protocol - Address
+mask/Address mask reply Message</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="8">Type</td>
+<td colspan="8">Code</td>
+<td colspan="16">Checksum</td>
+</tr>
+<tr>
+<td colspan="16">Identifier</td>
+<td colspan="16">Sequence Number</td>
+</tr>
+<tr>
+<td colspan="32">Address mask</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="ICMPHEADER.BASIC.IMG" id=
+"ICMPHEADER.BASIC.IMG"></a>
+<p><b>Table 1-2. Internet Control Message Protocol - Basic
+Headers</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="4">Version</td>
+<td colspan="4">IHL</td>
+<td colspan="8">TOS/DSCP/ECN</td>
+<td colspan="16">Total Length</td>
+</tr>
+<tr>
+<td colspan="16">Identification</td>
+<td colspan="3">Flags</td>
+<td colspan="13">Fragment Offset</td>
+</tr>
+<tr>
+<td colspan="8">Time to Live</td>
+<td colspan="8">Protocol</td>
+<td colspan="16">Header Checksum</td>
+</tr>
+<tr>
+<td colspan="16">Source Address</td>
+<td colspan="16">Destination Address</td>
+</tr>
+<tr>
+<td colspan="8">Type</td>
+<td colspan="8">Code</td>
+<td colspan="16">Checksum</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="ICMPHEADER.DESTUNREACH.IMG" id=
+"ICMPHEADER.DESTUNREACH.IMG"></a>
+<p><b>Table 1-3. Internet Control Message Protocol - Destination
+Unreachable Message</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="8">Type</td>
+<td colspan="8">Code</td>
+<td colspan="16">Checksum</td>
+</tr>
+<tr>
+<td colspan="32">Unused</td>
+</tr>
+<tr>
+<td colspan="32">Internet header + 64 bits of original data
+datagram</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="ICMPHEADER.ECHO.IMG" id=
+"ICMPHEADER.ECHO.IMG"></a>
+<p><b>Table 1-4. Internet Control Message Protocol - Echo/Echo
+Reply Message</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="8">Type</td>
+<td colspan="8">Code</td>
+<td colspan="16">Checksum</td>
+</tr>
+<tr>
+<td colspan="16">Identifier</td>
+<td colspan="16">Sequence Number</td>
+</tr>
+<tr>
+<td colspan="32">Data</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="ICMPHEADER.INFORMATION.IMG" id=
+"ICMPHEADER.INFORMATION.IMG"></a>
+<p><b>Table 1-5. Internet Control Message Protocol - Information
+Request/Information Reply Message</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="8">Type</td>
+<td colspan="8">Code</td>
+<td colspan="16">Checksum</td>
+</tr>
+<tr>
+<td colspan="16">Identifier</td>
+<td colspan="16">Sequence Number</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="ICMPHEADER.PARAMETERPROBLEM.IMG" id=
+"ICMPHEADER.PARAMETERPROBLEM.IMG"></a>
+<p><b>Table 1-6. Internet Control Message Protocol - Parameter
+Problem Message</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="8">Type</td>
+<td colspan="8">Code</td>
+<td colspan="16">Checksum</td>
+</tr>
+<tr>
+<td colspan="8">Pointer</td>
+<td colspan="24">Unused</td>
+</tr>
+<tr>
+<td colspan="32">Internet header + 64 bits of original data
+datagram</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="ICMPHEADER.REDIRECT.IMG" id=
+"ICMPHEADER.REDIRECT.IMG"></a>
+<p><b>Table 1-7. Internet Control Message Protocol - Redirect
+Message</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="8">Type</td>
+<td colspan="8">Code</td>
+<td colspan="16">Checksum</td>
+</tr>
+<tr>
+<td colspan="32">Gateway Internet address</td>
+</tr>
+<tr>
+<td colspan="32">Internet header + 64 bits of original data
+datagram</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="ICMPHEADER.SOURCEQUENCH.IMG" id=
+"ICMPHEADER.SOURCEQUENCH.IMG"></a>
+<p><b>Table 1-8. Internet Control Message Protocol - Source Quench
+Message</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="8">Type</td>
+<td colspan="8">Code</td>
+<td colspan="16">Checksum</td>
+</tr>
+<tr>
+<td colspan="32">Unused</td>
+</tr>
+<tr>
+<td colspan="32">Internet header + 64 bits of original data
+datagram</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="ICMPHEADER.TIMEEXCEEDED.IMG" id=
+"ICMPHEADER.TIMEEXCEEDED.IMG"></a>
+<p><b>Table 1-9. Internet Control Message Protocol - Time Exceeded
+Message</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="8">Type</td>
+<td colspan="8">Code</td>
+<td colspan="16">Checksum</td>
+</tr>
+<tr>
+<td colspan="32">Unused</td>
+</tr>
+<tr>
+<td colspan="32">Internet header + 64 bits of original data
+datagram</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="ICMPHEADER.TIMESTAMP.IMG" id=
+"ICMPHEADER.TIMESTAMP.IMG"></a>
+<p><b>Table 1-10. Internet Control Message Protocol -
+Timestamp/Timestamp Reply Message</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="8">Type</td>
+<td colspan="8">Code</td>
+<td colspan="16">Checksum</td>
+</tr>
+<tr>
+<td colspan="16">Identifier</td>
+<td colspan="16">Sequence Number</td>
+</tr>
+<tr>
+<td colspan="32">Originate Timestamp</td>
+</tr>
+<tr>
+<td colspan="32">Receive Timestamp</td>
+</tr>
+<tr>
+<td colspan="32">Transmit Timestamp</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="IPHEADER.IMG" id="IPHEADER.IMG"></a>
+<p><b>Table 1-11. Internet Protocol headers</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="4">Version</td>
+<td colspan="4">IHL</td>
+<td colspan="8">TOS/DSCP/ECN</td>
+<td colspan="16">Total Length</td>
+</tr>
+<tr>
+<td colspan="16">Identification</td>
+<td colspan="3">Flags</td>
+<td colspan="13">Fragment Offset</td>
+</tr>
+<tr>
+<td colspan="8">Time To Live</td>
+<td colspan="8">Protocol</td>
+<td colspan="16">Header Checksum</td>
+</tr>
+<tr>
+<td colspan="32">Source Address</td>
+</tr>
+<tr>
+<td colspan="32">Destination Address</td>
+</tr>
+<tr>
+<td colspan="25">Options</td>
+<td colspan="7">Padding</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="SCTPHEADER.ABORT.IMG" id=
+"SCTPHEADER.ABORT.IMG"></a>
+<p><b>Table 1-12. ABORT chunk headers</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="8">Type = 6</td>
+<td colspan="7">Reserved</td>
+<td>T</td>
+<td colspan="16">Length</td>
+</tr>
+<tr>
+<td colspan="32">Zero or more Error Causes</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="SCTPHEADER.COOKIEACK.IMG" id=
+"SCTPHEADER.COOKIEACK.IMG"></a>
+<p><b>Table 1-13. COOKIE ACK chunk headers</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="8">Type = 11</td>
+<td colspan="8">Chunk Flags</td>
+<td colspan="16">Length = 4</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="SCTPHEADER.COOKIEECHO.IMG" id=
+"SCTPHEADER.COOKIEECHO.IMG"></a>
+<p><b>Table 1-14. COOKIE ECHO chunk headers</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="8">Type = 10</td>
+<td colspan="8">Chunk Flags</td>
+<td colspan="16">Length</td>
+</tr>
+<tr>
+<td colspan="32">Cookie</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="SCTPHEADER.DATA.IMG" id=
+"SCTPHEADER.DATA.IMG"></a>
+<p><b>Table 1-15. DATA chunk headers</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="8">Type = 0</td>
+<td colspan="5">Reserved</td>
+<td>U</td>
+<td>B</td>
+<td>E</td>
+<td colspan="16">Length</td>
+</tr>
+<tr>
+<td colspan="32">TSN</td>
+</tr>
+<tr>
+<td colspan="16">Stream Identifier S</td>
+<td colspan="16">Stream Sequence Number n</td>
+</tr>
+<tr>
+<td colspan="32">Payload Protocol Identifier</td>
+</tr>
+<tr>
+<td colspan="32">User Data (seq n of of Stream S)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="SCTPHEADER.ERROR.IMG" id=
+"SCTPHEADER.ERROR.IMG"></a>
+<p><b>Table 1-16. ERROR chunk headers</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="8">Type = 9</td>
+<td colspan="8">Chunk Flags</td>
+<td colspan="16">Length</td>
+</tr>
+<tr>
+<td colspan="32">one or more Error Causes</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="SCTPHEADER.HEARTBEATACK.IMG" id=
+"SCTPHEADER.HEARTBEATACK.IMG"></a>
+<p><b>Table 1-17. HEARTBEAT ACK chunk headers</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="8">Type = 5</td>
+<td colspan="8">Chunk Flags</td>
+<td colspan="16">Length</td>
+</tr>
+<tr>
+<td colspan="32">Heartbeat Information TLV</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="SCTPHEADER.HEARTBEAT.IMG" id=
+"SCTPHEADER.HEARTBEAT.IMG"></a>
+<p><b>Table 1-18. HEARTBEAT chunk headers</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="8">Type = 4</td>
+<td colspan="8">Chunk Flags</td>
+<td colspan="16">Length</td>
+</tr>
+<tr>
+<td colspan="32">Heartbeat Information TLV</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="SCTPHEADER.INITACK.IMG" id=
+"SCTPHEADER.INITACK.IMG"></a>
+<p><b>Table 1-19. INIT ACK chunk headers</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="8">Type = 2</td>
+<td colspan="8">Chunk Flags</td>
+<td colspan="16">Length</td>
+</tr>
+<tr>
+<td colspan="32">Initiate Tag</td>
+</tr>
+<tr>
+<td colspan="32">Advertised Receiver Window Credit</td>
+</tr>
+<tr>
+<td colspan="16">Number of Outbound Streams</td>
+<td colspan="16">Number of Inbound Streams</td>
+</tr>
+<tr>
+<td colspan="32">Initial TSN</td>
+</tr>
+<tr>
+<td colspan="32">Optional/Variable-Length Parameters</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="SCTPHEADER.INIT.COOKIEPARAM.IMG" id=
+"SCTPHEADER.INIT.COOKIEPARAM.IMG"></a>
+<p><b>Table 1-20. State Cookie Parameter headers</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="16">Type = 7</td>
+<td colspan="16">Length</td>
+</tr>
+<tr>
+<td colspan="32">State Cookie Parameter</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="SCTPHEADER.INIT.IMG" id=
+"SCTPHEADER.INIT.IMG"></a>
+<p><b>Table 1-21. INIT chunk headers</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="8">Type = 1</td>
+<td colspan="8">Chunk Flags</td>
+<td colspan="16">Length</td>
+</tr>
+<tr>
+<td colspan="32">Initiate Tag</td>
+</tr>
+<tr>
+<td colspan="32">Advertised Receiver Window Credit (a_rwnd)</td>
+</tr>
+<tr>
+<td colspan="16">Number of Outbound Streams</td>
+<td colspan="16">Number of Inbound Streams</td>
+</tr>
+<tr>
+<td colspan="32">Initial TSN</td>
+</tr>
+<tr>
+<td colspan="32">Optional Parameters</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="SCTPHEADER.INIT.HOSTNAMEPARAM.IMG" id=
+"SCTPHEADER.INIT.HOSTNAMEPARAM.IMG"></a>
+<p><b>Table 1-22. Hostname Parameter headers</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="16">Type = 11</td>
+<td colspan="16">Length</td>
+</tr>
+<tr>
+<td colspan="32">Host Name</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="SCTPHEADER.INIT.IPV4PARAM.IMG" id=
+"SCTPHEADER.INIT.IPV4PARAM.IMG"></a>
+<p><b>Table 1-23. IPv4 Parameter headers</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="16">Type = 5</td>
+<td colspan="16">Length = 8</td>
+</tr>
+<tr>
+<td colspan="32">IPv4 Address</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="SCTPHEADER.INIT.IPV6PARAM.IMG" id=
+"SCTPHEADER.INIT.IPV6PARAM.IMG"></a>
+<p><b>Table 1-24. IPv6 Parameter headers</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="16">Type = 6</td>
+<td colspan="16">Length = 20</td>
+</tr>
+<tr>
+<td colspan="32">IPv6 Address</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="SCTPHEADER.SACK.IMG" id=
+"SCTPHEADER.SACK.IMG"></a>
+<p><b>Table 1-25. SACK chunk headers</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="8">Type = 3</td>
+<td colspan="8">Chunk Flags</td>
+<td colspan="16">Length</td>
+</tr>
+<tr>
+<td colspan="32">Cumulative TSN Ack</td>
+</tr>
+<tr>
+<td colspan="32">Advertised Receiver Window Credit (a_rwnd)</td>
+</tr>
+<tr>
+<td colspan="16">Number of Gap Ack Blocks = N</td>
+<td colspan="16">Number of Duplicate TSNs = X</td>
+</tr>
+<tr>
+<td colspan="16">Gap Ack Block #1 Start</td>
+<td colspan="16">Gap Ack Block #1 End</td>
+</tr>
+<tr>
+<td colspan="32">...</td>
+</tr>
+<tr>
+<td colspan="16">Gap Ack Block #N Start</td>
+<td colspan="16">Gap Ack Block #N End</td>
+</tr>
+<tr>
+<td colspan="32">Duplicate TSN #1</td>
+</tr>
+<tr>
+<td colspan="32">...</td>
+</tr>
+<tr>
+<td colspan="32">Duplicate TSN #X</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="SCTPHEADER.GENERIC.IMG" id=
+"SCTPHEADER.GENERIC.IMG"></a>
+<p><b>Table 1-26. Generic chunk headers</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="8">Type</td>
+<td colspan="8">Chunk Flags</td>
+<td colspan="16">Chunk Length</td>
+</tr>
+<tr>
+<td colspan="32">Chunk Value</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="SCTPHEADER.SHUTDOWNACK.IMG" id=
+"SCTPHEADER.SHUTDOWNACK.IMG"></a>
+<p><b>Table 1-27. SHUTDOWN ACK chunk headers</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="8">Type = 8</td>
+<td colspan="8">Chunk Flags</td>
+<td colspan="16">Length = 4</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="SCTPHEADER.SHUTDOWNCOMPLETE.IMG" id=
+"SCTPHEADER.SHUTDOWNCOMPLETE.IMG"></a>
+<p><b>Table 1-28. SHUTDOWN COMPLETE chunk headers</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="8">Type = 14</td>
+<td colspan="7">Reserved</td>
+<td>T</td>
+<td colspan="16">Length = 4</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="SCTPHEADER.SHUTDOWN.IMG" id=
+"SCTPHEADER.SHUTDOWN.IMG"></a>
+<p><b>Table 1-29. SHUTDOWN chunk headers</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="8">Type = 7</td>
+<td colspan="8">Chunk Flags</td>
+<td colspan="16">Length = 8</td>
+</tr>
+<tr>
+<td colspan="32">Cumulative TSN Ack</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="SCTPHEADER.COMMON.IMG" id=
+"SCTPHEADER.COMMON.IMG"></a>
+<p><b>Table 1-30. Common SCTP headers</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="16">Source Port</td>
+<td colspan="16">Destination Port</td>
+</tr>
+<tr>
+<td colspan="32">Verification Tag</td>
+</tr>
+<tr>
+<td colspan="32">Checksum</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="SCTPHEADER.GENERICLAYOUT.IMG" id=
+"SCTPHEADER.GENERICLAYOUT.IMG"></a>
+<p><b>Table 1-31. Generic chunk headerlayout</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="32">Common header</td>
+</tr>
+<tr>
+<td colspan="32">Chunk #1</td>
+</tr>
+<tr>
+<td colspan="32">...</td>
+</tr>
+<tr>
+<td colspan="32">Chunk #n</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="TCPHEADER.IMG" id="TCPHEADER.IMG"></a>
+<p><b>Table 1-32. Transmission Control Protocol headers</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="16">Source Port</td>
+<td colspan="16">Destination Port</td>
+</tr>
+<tr>
+<td colspan="32">Sequence Number</td>
+</tr>
+<tr>
+<td colspan="32">Acknowledgment Number</td>
+</tr>
+<tr>
+<td colspan="4">Data Offset</td>
+<td colspan="4">Reserved</td>
+<td>cwr</td>
+<td>ece</td>
+<td>urg</td>
+<td>ack</td>
+<td>psh</td>
+<td>rst</td>
+<td>syn</td>
+<td>fin</td>
+<td colspan="16">Window</td>
+</tr>
+<tr>
+<td colspan="16">Checksum</td>
+<td colspan="16">Urgent Pointer</td>
+</tr>
+<tr>
+<td colspan="25">Options</td>
+<td colspan="7">Padding</td>
+</tr>
+<tr>
+<td colspan="32">Data</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="SCTPHEADER.TEMPLATE.IMG" id=
+"SCTPHEADER.TEMPLATE.IMG"></a>
+<p><b>Table 1-33. template headers</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="8">Type = 6</td>
+<td colspan="7">Reserved</td>
+<td>T</td>
+<td colspan="16">Length</td>
+</tr>
+<tr>
+<td colspan="32">Zero or more Error Causes</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="TABLE"><a name="UDPHEADER.IMG" id="UDPHEADER.IMG"></a>
+<p><b>Table 1-34. User Datagram Protocol headers</b></p>
+<table border="1" frame="border" class="CALSTABLE">
+<col width="1*" title="0">
+<col width="1*" title="1">
+<col width="1*" title="2">
+<col width="1*" title="3">
+<col width="1*" title="4">
+<col width="1*" title="5">
+<col width="1*" title="6">
+<col width="1*" title="7">
+<col width="1*" title="8">
+<col width="1*" title="9">
+<col width="1*" title="10">
+<col width="1*" title="11">
+<col width="1*" title="12">
+<col width="1*" title="13">
+<col width="1*" title="14">
+<col width="1*" title="15">
+<col width="1*" title="16">
+<col width="1*" title="17">
+<col width="1*" title="18">
+<col width="1*" title="19">
+<col width="1*" title="20">
+<col width="1*" title="21">
+<col width="1*" title="22">
+<col width="1*" title="23">
+<col width="1*" title="24">
+<col width="1*" title="25">
+<col width="1*" title="26">
+<col width="1*" title="27">
+<col width="1*" title="28">
+<col width="1*" title="29">
+<col width="1*" title="30">
+<col width="1*" title="31">
+<thead>
+<tr>
+<th class=firsttr>0</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>1</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>2</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr>&nbsp;</th>
+<th class=firsttr0>3</th>
+<th class=firsttr>&nbsp;</th>
+</tr>
+<tr>
+<th class=secondtrstartth>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+<th class=secondtr>2</th>
+<th class=secondtr>3</th>
+<th class=secondtr>4</th>
+<th class=secondtr>5</th>
+<th class=secondtr>6</th>
+<th class=secondtr>7</th>
+<th class=secondtr>8</th>
+<th class=secondtr>9</th>
+<th class=secondtr0>0</th>
+<th class=secondtr>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td colspan="16">Source Port</td>
+<td colspan="16">Destination Port</td>
+</tr>
+<tr>
+<td colspan="16">Length</td>
+<td colspan="16">Checksum</td>
+</tr>
+<tr>
+<td colspan="32">Data</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</body>
+</html>

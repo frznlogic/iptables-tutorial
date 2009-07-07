@@ -1,0 +1,68 @@
+ <appendix id="examplecode">
+  <title id="examplecode.title">Código fuente de los scripts de ejemplo</title>
+  <section id="include.rcfirewall">
+   <title id="include.rcfirewall.title">Script de ejemplo rc.firewall</title>
+
+   <para>
+    <programlisting>
+&rcfirewall;
+    </programlisting>
+   </para>
+
+  </section>
+
+  <section id="include.rcdmzfirewall">
+   <title id="include.rcdmzfirewall.title">Script de ejemplo rc.DMZ.firewall</title>
+
+   <para>
+    <programlisting>
+&rcdmzfirewall;
+    </programlisting>
+   </para>
+
+  </section>
+
+  <section id="include.rcutinfirewall">
+   <title id="include.rcutinfirewall.title">Script de ejemplo rc.UTIN.firewall</title>
+
+   <para>
+    <programlisting>
+&rcutinfirewall;
+    </programlisting>
+   </para>
+
+  </section>
+
+  <section id="include.rcdhcpfirewall">
+   <title id="include.rcdhcpfirewall.title">Script de ejemplo rc.DHCP.firewall</title>
+
+   <para>
+    <programlisting>
+&rcdhcpfirewall;
+    </programlisting>
+   </para>
+
+  </section>
+
+  <section id="include.flushiptables">
+   <title id="include.flushiptables.title">Script de ejemplo rc.flush-iptables</title>
+
+   <para>
+    <programlisting>
+&flushtables;
+    </programlisting>
+   </para>
+
+  </section>
+
+  <section id="include.testtables">
+   <title id="include.testtables.title">Script de ejemplo rc.test-iptables</title>
+
+   <para>
+    <programlisting>
+&testtables;
+    </programlisting>
+   </para>
+
+  </section>
+ </appendix>

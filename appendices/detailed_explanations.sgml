@@ -1,0 +1,146 @@
+ <appendix id="detailedexplanations">
+  <title id="detailedexplanations.title">Detailed explanations of special commands</title>
+   <indexterm zone="detailedexplanations">
+     <primary>Detailed explanations</primary>
+   </indexterm>
+
+  <section id="listingruleset">
+   <title id="listinruleset.title">Listing your active rule-set</title>
+   <indexterm zone="listingruleset">
+     <primary>Common problems</primary>
+     <secondary>Listing rule-sets</secondary>
+   </indexterm>
+   <indexterm zone="listingruleset">
+     <primary>Debugging</primary>
+     <secondary>Listing rule-sets</secondary>
+   </indexterm>
+   <indexterm zone="listingruleset">
+     <primary>Detailed explanations</primary>
+     <secondary>Listing rule-sets</secondary>
+   </indexterm>
+
+   <para>
+To list your currently active rule-set you run a special option to the
+<command>iptables</command> command, which we have discussed briefly previously
+in the <link linkend="howaruleisbuilt"
+endterm="howaruleisbuilt.title"></link> chapter. This would look like the
+following:
+   </para>
+
+   <para>
+    <command>iptables -L</command>
+   </para>
+
+   <para>
+This command should list your currently active rule-set, and translate
+everything possible to a more readable form. For example, it will
+translate all the different ports according to the
+<filename>/etc/services</filename> file as well as <systemitem>DNS</systemitem>
+all the IP addresses to get <systemitem>DNS</systemitem> records instead. The
+latter can be a bit of a problem though. For example, it will try to resolve
+<systemitem>LAN</systemitem> IP addresses, i.e.
+<computeroutput>192.168.1.1</computeroutput>, to something useful.
+<computeroutput>192.168.0.0/16</computeroutput> is a private range though and
+should not resolve to anything and the command will seem to hang while resolving
+the IP. To get around this problem we would do something like the following:
+
+   </para>
+
+   <para>
+    <command>iptables -L -n</command>
+   </para>
+
+   <para>
+Another thing that might be interesting is to see a few statistics about
+each policy, rule and chain. We could get this by adding the verbose
+flag. It would then look something like this:
+   </para>
+
+   <para>
+    <command>iptables -L -n -v</command>
+   </para>
+
+   <para>
+Don't forget that it is also possible to list the nat and mangle tables. This 
+is done with the -t switch, like this:
+   </para>
+
+   <para>
+    <command>iptables -L -t nat</command>
+   </para>
+
+   <para>
+There are also a few files that might be interesting to look at in the
+<filename>/proc</filename> file system. For example, it might be interesting
+to know what connections are currently in the conntrack table. This table
+contains all the different connections currently tracked and serves as a basic
+table so we always know what state a connection currently is in. This table
+can't be edited and even if it was possible, it would be a bad idea. To
+see the table you can run the following command:
+
+   </para>
+
+   <para>
+    <command>cat /proc/net/ip_conntrack | less</command>
+   </para>
+
+   <para>
+The above command will show all currently tracked connections even though
+it might be a bit hard to understand everything.
+   </para>
+  </section>
+
+  <section id="updatingtables">
+   <title id="updatingtables.title">Updating and flushing your tables</title>
+   <indexterm zone="updatingtables">
+     <primary>Common problems</primary>
+     <secondary>Updating and flushing</secondary>
+   </indexterm>
+   <indexterm zone="updatingtables">
+     <primary>Debugging</primary>
+     <secondary>Updating and flushing</secondary>
+   </indexterm>
+   <indexterm zone="updatingtables">
+     <primary>Detailed explanations</primary>
+     <secondary>Updating and flushing</secondary>
+   </indexterm>
+
+   <para> If at some point you screw up your <command>iptables</command>,
+there are actually commands to flush them, so you don't have to reboot.
+I've actually gotten this question a couple times by now so I thought I'd
+answer it right here. If you added a rule in error, you might just change
+the <command>-A</command> parameter to <command>-D</command> in the line
+you added in error. <command>iptables</command> will find the erroneous
+line and erase it for you, in case you've got multiple lines looking
+exactly the same in the chain, it erases the first instance it finds
+matching your rule. If this is not the wanted behavior you might try to
+use the <command>-D</command> option as <command>iptables -D INPUT
+10</command> which will erase the 10th rule in the
+<systemitem>INPUT</systemitem> chain.
+   </para>
+
+   <para> There are also instances where you want to flush a whole chain,
+in this case you might want to run the <command>-F</command> option. For
+example, <command>iptables -F INPUT</command> will erase the whole
+<systemitem>INPUT</systemitem> chain, though, this will not change
+the default policy, so if this is set to
+<systemitem>DROP</systemitem> you'll block the whole
+<systemitem>INPUT</systemitem> chain if used as above. To reset
+the chain policy, do as you did to set it to
+<systemitem>DROP</systemitem>, for example <command>iptables -P
+INPUT ACCEPT</command>.
+   </para>
+
+   <para>
+   I have made a <link linkend="rcflush-iptablestxt" 
+endterm="rcflush-iptablestxt.title"></link> (available as an appendix as well) 
+that will flush and reset your <command>iptables</command> that you might 
+consider using while setting up your <filename>rc.firewall.txt</filename> file 
+properly. One thing though; if you start mucking around in the 
+<systemitem>mangle</systemitem> table, this script will not erase those, it is 
+rather simple to add the few lines needed to erase those but I have not added 
+those here since the <systemitem>mangle</systemitem> table is not used in my
+<filename>rc.firewall.txt</filename> script so far.
+   </para>
+  </section>
+ </appendix>

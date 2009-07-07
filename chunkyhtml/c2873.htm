@@ -1,0 +1,311 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN""http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>IP filtering introduction</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Iptables Tutorial 1.2.2"
+HREF="book1.htm"><LINK
+REL="PREVIOUS"
+TITLE="What's next?"
+HREF="x2856.htm"><LINK
+REL="NEXT"
+TITLE="IP filtering terms and 
+expressions"
+HREF="x2940.htm"><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="table.css"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Iptables Tutorial 1.2.2</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x2856.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x2940.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="IPFILTERING"
+></A
+>Chapter 3. IP filtering introduction</H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Table of Contents</B
+></DT
+><DT
+><A
+HREF="c2873.htm#WHATISANIPFILTER"
+>What is an IP filter</A
+></DT
+><DT
+><A
+HREF="x2940.htm"
+>IP filtering terms and 
+expressions</A
+></DT
+><DT
+><A
+HREF="x3032.htm"
+>How to plan an IP filter</A
+></DT
+><DT
+><A
+HREF="x3144.htm"
+>What's next?</A
+></DT
+></DL
+></DIV
+><P
+>This chapter will discuss the theoretical details about an
+IP filter, what it 
+is, how it works and basic things such as where to place firewalls, policies, 
+etcetera.
+    </P
+><P
+>Questions for this chapter may be, where to actually put the firewall? In most
+cases, this is a simple question, but in large corporate environments it may
+get trickier. What should the policies be? Who should have access where? What
+is actually an IP filter? All of these questions
+should be fairly well answered later on in this chapter.
+    </P
+><DIV
+CLASS="SECTION"
+><H1
+CLASS="SECTION"
+><A
+NAME="WHATISANIPFILTER"
+>What is an IP filter</A
+></H1
+><P
+>It is important to fully understand what an IP filter is. Iptables is an IP 
+filter, and if you don't fully understand this, you will get serious problems 
+when designing your firewalls in the future. 
+      </P
+><P
+>An IP filter operates mainly in layer 2, of the
+TCP/IP reference stack. Iptables however has the
+ability to also work in layer 3, which actually most IP
+filters of today have. But per definition an IP
+filter works in the second layer.
+      </P
+><P
+>If the IP filter implementation is strictly following
+the definition, it would 
+in other words only be able to filter packets based on their
+IP headers
+(Source and Destionation address, TOS/DSCP/ECN,
+TTL, Protocol, etc. Things 
+that are actually in the IP header.) However, since the Iptables implementation 
+is not perfectly strict around this definition, it is also able to filter 
+packets based on other headers that lie deeper into the packet
+(TCP, UDP, 
+etc), and shallower (MAC source address).
+      </P
+><P
+>There is one thing however, that iptables is rather strict about these days.
+It does not "follow" streams or puzzle data together. This would simply be too
+processor- and memoryconsuming . The implications of this will be discussed a
+little bit more  further on. It does keep track of packets and see if they are
+of the same stream (via sequence numbers,
+port numbers, etc.) almost exactly the same way as
+the real TCP/IP stack. This is called connection
+tracking, and thanks to this we can do things such as
+Destination and Source Network Address
+Translation (generally called
+DNAT
+and SNAT),
+ as well as state matching of
+packets.
+      </P
+><P
+>As I implied above, iptables can not connect data from different packets to 
+each other (per default), and hence you can never be fully certain that you
+will see the complete data at all times. I am specifically mentioning this
+since there are constantly at least a couple of questions about this on the
+different mailing lists pertaining to netfilter and iptables and how to do
+things that are generally considered a really bad idea. For example, every
+time there is a new windows based virus, there are a couple of different
+persons asking how to drop all streams containing a specific string. The bad
+idea about this is that it is so easily circumvented. For example if we match
+for something like this:
+      </P
+><P
+>cmd.exe</P
+><P
+>Now, what happens if the virus/exploit writer is smart enough to make the 
+packet size so small that cmd winds up in one packet, and 
+.exe winds up in the next packet? Or what if the packet has 
+to travel through a network that has this small a packet size on its own? Yes, 
+since these string matching functions is unable to work across packet 
+boundaries, the packet will get through anyway.
+      </P
+><P
+>Some of you may now be asking yourself, why don't we simply make it possible 
+for the string matches, etcetera to read across packet boundaries? It is 
+actually fairly simple. It would be too costly on processor time. Connection 
+tracking is already taking way to much processor time to be totally 
+comforting. To add another extra layer of complexity to connection tracking, 
+such as this, would probably kill more firewalls than anyone of us could 
+expect. Not to think of how much memory would be used for this simple task on 
+each machine.
+      </P
+><P
+>There is also a second reason for this functionality not being developed.
+There  is a technology called proxies.
+Proxies
+ were developed to handle
+traffic in  the higher layers, and are hence much better at fullfilling these
+requirements. Proxies were originally developed to handle downloads and often
+used pages and to help you get the most out of slow Internet connections. For
+example, <A
+HREF="a13413.htm#SQUIDPROXY"
+><I
+>Squid</I
+></A
+> is a
+webproxy. A
+person who wants to download a page sends the request, the proxy either grabs
+the request or receives the request and opens the connection to the web
+browser, and then connects to the webserver and downloads the file, and when
+it has downloaded the file or page, it sends it to the client. Now, if a
+second browser wants to read the same page again, the file or page is already
+downloaded to the proxy, and can be sent directly, and saves bandwidth for
+us.
+      </P
+><P
+>As you may understand, proxies also have quite a lot of functionality to go in 
+and look at the actual content of the files that it downloads. Because of 
+this, they are much better at looking inside the whole streams, files, pages 
+etc.
+      </P
+><P
+>Now, after warning you about the inherent problems of doing level 7 filtering
+in iptables and netfilter, there is actually a set of patches that has
+attacked these problems. This is called <A
+HREF="a13413.htm#L7-FILTER"
+><I
+>http://l7-filter.sourceforge.net/</I
+></A
+>. It can be used to match on a lot of layer
+7 protocols but is mainly to be used together with
+QoS and traffic accounting,
+even though it can be used for pure filtering as well. The
+l7-filter is still
+experimental and developed outside the kernel and netfilter coreteam, and
+hence you will not hear more about it here.
+      </P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x2856.htm"
+ACCESSKEY="P"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.htm"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x2940.htm"
+ACCESSKEY="N"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>What's next?</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>IP filtering terms and 
+expressions</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>
