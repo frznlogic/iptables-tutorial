@@ -29,7 +29,7 @@ site: all spanish portuguese
 	-rm -rf html/scripts/CVS html/other/CVS
 	-cp TODO ChangeLog html/
 	-cp -r chunkyhtml html/
-	-cp mirrors.html index.php html/
+#	-cp mirrors.html index.php html/
 	-cp -r portuguese/html html/portuguese
 	-cp -r spanish/html html/spanish
 	-@echo "Done."
