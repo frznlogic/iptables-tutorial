@@ -142,12 +142,12 @@ chunkyhtml: $(images_jpg) $(chapters) $(appendices) $(scripts) \
 	cp -r scripts chunkyhtml/scripts
 	@echo "Done."
 
-%.pdf.gz : $(images_png) $(chapters) $(appendices) $(scripts) \
+%.pdf.gz : $(images_eps) $(chapters) $(appendices) $(scripts) \
  $(license) %.sgml
 	@echo "Building PDF version..."
 	mkdir -p pdf/images; cp -R licensing scripts appendices \
-	 chapters styles *.sgml pdf; cp -R images/*.png pdf/images/; cd pdf; \
-	 jw --backend fabpdf -d styles/print.dsl $*.sgml; cd ..
+	 chapters styles *.sgml pdf; cp -R images/*.eps pdf/images/; cd pdf; \
+	 jw --backend pdf -d styles/print.dsl $*.sgml; cd ..
 	mv pdf/$*.pdf ./
 	rm -rf pdf
 	gzip -f $*.pdf
