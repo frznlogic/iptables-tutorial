@@ -9,16 +9,11 @@ images_eps= $(patsubst %.gif,%.eps,$(wildcard images/*.gif))
 images_jpg= $(patsubst %.gif,%.jpg,$(wildcard images/*.gif))
 images_png= $(patsubst %.gif,%.png,$(wildcard images/*.gif))
 
-simages_eps= $(patsubst %.gif,%.eps,$(wildcard stylesheet-images/*.gif))
-simages_jpg= $(patsubst %.gif,%.jpg,$(wildcard stylesheet-images/*.gif))
-simages_png= $(patsubst %.gif,%.png,$(wildcard stylesheet-images/*.gif))
-
 .PHONY: site
 site: all
 	@echo "Making site..."
 	-@mkdir html
 	-@mkdir html/images
-	-@mkdir html/stylesheet-images
 	-@mkdir html/other
 	-@mkdir html/scripts
 	-@mkdir html/chunkyhtml
@@ -26,10 +21,8 @@ site: all
 	-@cp iptables-tutorial.chunky.tgz iptables-tutorial.html.tgz html/
 	-@cp -r other/* html/other/
 	-@cp images/*.jpg html/images/
-	-@cp -r stylesheet-images/* html/stylesheet-images/
 	-@cp -r scripts/* html/scripts/
 	-@cp -r chunkyhtml/* html/chunkyhtml/
-	-@rm -rf html/scripts/CVS html/stylesheet-images/CVS html/other/CVS
 	-@cp TODO ChangeLog html/
 	-@cp index.html html/
 	-@echo "Done."
@@ -142,6 +135,4 @@ clean:
 	rm -rf pdf/
 	rm -rf images/*.jpg images/*.png images/*~ images/*.eps *.log *.aux \
 	*.out *.tex
-	rm -rf stylesheet-images/*.jpg stylesheet-images/*.png \
-	 stylesheet-images/*~ stylesheet-images/*.eps
 	rm -rf html/ chunkyhtml/ iptables-tutorial.chunky.tgz iptables-tutorial.html.tgz
