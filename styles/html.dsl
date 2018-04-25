@@ -15,6 +15,12 @@
 ;; sheet.  Definitions inserted in this file take precedence over
 ;; definitions in the 'use'd stylesheet(s).
 
+(define %html-ext%
+ ".html")
+
+;;(define %root-filename%
+;; #t)
+
 (define %title-font-family%
  "Arial")
 (define %body-font-family%
