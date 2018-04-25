@@ -1,0 +1,23 @@
+sudo: false
+addons:
+  apt:
+    packages:
+    - dblatex
+    - ditaa
+    - doc-base
+    - docbook
+    - docbook-dsssl
+    - docbook-utils
+    - docbook-xml
+    - docbook-xsl
+    - docbook2odf
+    - texlive-font-utils
+    - ghostscript
+    - libbatik-java
+    - netpbm
+    - pstoedit
+    - python-pygments
+notifications:
+  email: false
+script:
+- "make all"
