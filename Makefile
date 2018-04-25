@@ -68,6 +68,9 @@ htmltgz: index iptables-tutorial.html.tgz
 .PHONY: index
 index: $(images_jpg) iptables-tutorial-index.sgml
 
+.PHONY: images
+images: $(images_jpg) $(images_eps) $(images_png)
+
 %-index.sgml: $(images_jpg) $(chapters) $(appendices) $(scripts) \
  $(license) $(mains)
 	collateindex.pl -N -o $*-index.sgml
