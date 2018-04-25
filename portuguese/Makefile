@@ -52,8 +52,6 @@ htmltgz: $(images_jpg) $(chapters) $(appendices) $(scripts) \
 %.chunky.tgz: chunky
 	@echo "Building chunky tgz version..."
 	@cp -r chunkyhtml chunkytgz
-	@cp ../addons/changes.sh chunkytgz
-	@cd chunkytgz; sh ./changes.sh
 	@tar -cf $*.chunky.tar chunkyhtml 
 	@gzip $*.chunky.tar
 	@mv $*.chunky.tar.gz $*.chunky.tgz
