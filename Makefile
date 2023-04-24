@@ -172,10 +172,10 @@ images/%.jpg : images/%.gif
 	convert -resize 50% images/$*.gif images/$*.jpg
 
 images/%.eps : images/%.gif
-	giftopnm images/$*.gif | pnmtopng -phys 11811 11811 1 | convert - images/$*.eps
+	giftopnm images/$*.gif | pnmtopng -size "11811 11811 1" | convert - images/$*.eps
 
 images/%.png : images/%.gif
-	giftopnm images/$*.gif | pnmtopng -phys 11811 11811 1 > images/$*.png
+	giftopnm images/$*.gif | pnmtopng -size "11811 11811 1" > images/$*.png
 
 .PHONY: clean
 clean:
