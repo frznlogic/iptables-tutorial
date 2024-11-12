@@ -1884,7 +1884,7 @@ The <command>connmark</command> match is used very much the same way as the
 and match combination. The <command>connmark</command> match is used to match
 marks that has been set on a connection with the <command>CONNMARK</command>
 target. It only takes one option.
-      <para>
+      </para>
       
       <important>
         <para>
