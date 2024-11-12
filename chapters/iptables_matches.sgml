@@ -2240,7 +2240,7 @@ match.
        <row>
         <entry>Example</entry>
         <entry><command>iptables -A INPUT -p tcp -m conntrack --ctstatus
-RELATED</command></entry>
+ASSURED</command></entry>
        </row>
        <row>
         <entry>Explanation</entry>
@@ -2484,7 +2484,7 @@ match takes three different options as described below.
 <tbody>
 <row>
 <entry>Match</entry>
-<entry><command>--ecn</command></entry>
+<entry><command>--ecn-tcp-cwr</command></entry>
 </row>
 <row>
 <entry>Kernel</entry>

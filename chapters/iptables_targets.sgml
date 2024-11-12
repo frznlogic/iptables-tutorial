@@ -618,7 +618,7 @@ take one of four different options as seen below.
             <entry>
 This option sets a mark on the connection. The mark can be an
 <systemitem>unsigned long int</systemitem>, which means values between
-<systemitem>0</systemitem> and <systemitem>4294967295l</systemitem> is valid.
+<systemitem>0</systemitem> and <systemitem>4294967295</systemitem> is valid.
 Each bit can also be masked by doing <command>--set-mark 12/8</command>. This
 will only allow the bits in the mask to be set out of all the bits in the mark.
 In this example, only the 4th bit will be set, not the 3rd. 12 translates to

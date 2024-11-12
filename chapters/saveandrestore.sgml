@@ -77,7 +77,7 @@ this, it takes more time to extract and insert the rule-set.
 
    <para>
 To solve this problem, there is the <command>iptables-save</command> and 
-<command>restore</command> commands. The <command>iptables-save</command> 
+<command>iptables-restore</command> commands. The <command>iptables-save</command>
 command is used to save the rule-set into a specially formatted text-file, 
 and the <command>iptables-restore</command> command is used to load this 
 text-file into kernel again. The best parts of these commands is that they 
