@@ -597,7 +597,7 @@ go.
 
     <para>
 The <ulink
-url="http://iptables-tutorial.frozentux.net/scripts/rc.firewall.txt">
+url="http://www.frozentux.net/iptables-tutorial/scripts/rc.firewall.txt">
 rc.firewall.txt</ulink> script is the main core on which the rest of
 the scripts are based upon. The <link linkend="rcfirewallfile"
 endterm="rcfirewallfile.title"></link> chapter should explain every detail in
@@ -698,7 +698,7 @@ depending on what you want to use.
 
     <para>
 The <ulink
-url="http://iptables-tutorial.frozentux.net/scripts/rc.DMZ.firewall.txt">
+url="http://www.frozentux.net/iptables-tutorial/scripts/rc.DMZ.firewall.txt">
 rc.DMZ.firewall.txt</ulink> script was written for those people out there
 that have one <systemitem>Trusted Internal Network</systemitem>, one
 <systemitem>De-Militarized Zone</systemitem> and one <systemitem>Internet
@@ -853,7 +853,7 @@ the tutorial, mail me since it is probably a fault on my side.
 
     <para>
 The <ulink
-url="http://iptables-tutorial.frozentux.net/scripts/rc.DHCP.firewall.txt">
+url="http://www.frozentux.net/iptables-tutorial/scripts/rc.DHCP.firewall.txt">
 rc.DHCP.firewall.txt</ulink> script is pretty much identical to the original
 <link linkend="rcfirewalltxt" endterm="rcfirewalltxt.title"></link>. However,
 this script no longer uses the <command>STATIC_IP</command> variable, which is
@@ -1066,7 +1066,7 @@ problems, and to keep order in it.
 
     <para>
     The <ulink
-url="http://iptables-tutorial.frozentux.net/scripts/rc.UTIN.firewall.txt">
+url="http://www.frozentux.net/iptables-tutorial/scripts/rc.UTIN.firewall.txt">
 rc.UTIN.firewall.txt</ulink> script will in contrast to the other scripts block the
 <systemitem>LAN</systemitem> that is sitting behind us. In other words, we don't
 trust anyone on any networks we are connected to. We also disallow people on our
@@ -1159,7 +1159,7 @@ hints at what we would normally let through etc.
  
     <para>
 The <ulink
-url="http://iptables-tutorial.frozentux.net/scripts/rc.test-iptables.txt">
+url="http://www.frozentux.net/iptables-tutorial/scripts/rc.test-iptables.txt">
 rc.test-iptables.txt</ulink> script can be used to test all the different
 chains, but it might need some tweaking depending on your configuration, such
 as turning on <command>ip_forwarding</command>, and setting up
@@ -1211,10 +1211,10 @@ you that would be unlogged after the initial Denial of Service attack.
  
     <para>
 The <ulink
-url="http://iptables-tutorial.frozentux.net/scripts/rc.flush-iptables.txt">
+url="http://www.frozentux.net/iptables-tutorial/scripts/rc.flush-iptables.txt">
 rc.flush-iptables.txt</ulink> script should not really be called
 a script in itself. The <ulink
-url="http://iptables-tutorial.frozentux.net/scripts/rc.flush-iptables.txt">
+url="http://www.frozentux.net/iptables-tutorial/scripts/rc.flush-iptables.txt">
 rc.flush-iptables.txt</ulink>  script will reset and flush
 all your tables and chains. The script starts by setting the default policies
 to <command>ACCEPT</command> on the <systemitem>INPUT</systemitem>,
@@ -1268,7 +1268,7 @@ with readability in mind and will continue being so.
  
      <para>
 The <ulink 
-url="http://iptables-tutorial.frozentux.net/scripts/limit-match.txt">limit-match.txt</ulink> 
+url="http://www.frozentux.net/iptables-tutorial/scripts/limit-match.txt">limit-match.txt</ulink>
 script is a minor test script which will let you test the limit match and see 
 how it works. Load the script up, and then send ping packets at different 
 intervals to see which gets through, and how often they get through. All 
@@ -1296,7 +1296,7 @@ for the burst limit has again been reached.
  
     <para>
 The <ulink
-url="http://iptables-tutorial.frozentux.net/scripts/pid-owner.txt">pid-owner.txt</ulink>
+url="http://www.frozentux.net/iptables-tutorial/scripts/pid-owner.txt">pid-owner.txt</ulink>
 is a small example script that shows how we could have used the PID owner
 match before it became obsolete in newer kernels. It does nothing real, but you would have
 been able to run the script, and
@@ -1320,7 +1320,7 @@ that the rule actually matches.
  
     <para>
 The <ulink
-url="http://iptables-tutorial.frozentux.net/scripts/recent-match.txt">
+url="http://www.frozentux.net/iptables-tutorial/scripts/recent-match.txt">
 recent-match.txt</ulink> script is a small example of how the 
 <systemitem>recent</systemitem> match can be used. For a complete explanation 
 of this script take a look at the <link linkend="recentmatch" endterm="recentmatch.title"></link> section in the <link linkend="matches" 
@@ -1347,7 +1347,7 @@ endterm="matches.title"></link> chapter.
  
     <para>
 The <ulink 
-url="http://iptables-tutorial.frozentux.net/scripts/sid-owner.txt">sid-owner.txt</ulink> 
+url="http://www.frozentux.net/iptables-tutorial/scripts/sid-owner.txt">sid-owner.txt</ulink>
 is a small example script that shows how we could have used the SID owner
 match before it became obsolete, similarly to the pid-owner script. It does nothing real,
 but you would have been able to run the script, and
@@ -1371,7 +1371,7 @@ that the rule actually matches.
  
     <para>
 A small example <ulink 
-url="http://iptables-tutorial.frozentux.net/scripts/ttl-inc.txt">ttl-inc.txt</ulink> 
+url="http://www.frozentux.net/iptables-tutorial/scripts/ttl-inc.txt">ttl-inc.txt</ulink>
 script. This script shows how we could make the firewall/router invisible to 
 traceroutes, which would otherwise reveal much information to possible 
 attackers.
@@ -1389,7 +1389,7 @@ attackers.
     </indexterm>
  
     <para>
-A small <ulink url="http://iptables-tutorial.frozentux.net/scripts/iptsave-ruleset.txt">
+A small <ulink url="http://www.frozentux.net/iptables-tutorial/scripts/iptsave-ruleset.txt">
 example script</ulink> used in the <link linkend="saveandrestore" 
 endterm="saveandrestore.title"></link> chapter to illustrate how iptables-save 
 may be used. This script is non-working, and should hence not be used for 
