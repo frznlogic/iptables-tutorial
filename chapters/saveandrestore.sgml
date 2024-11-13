@@ -164,7 +164,8 @@ firewall or where you want different behaviors depending on configuration
 options and so on.
    </para>
 
-   <para>
+<!-- "I can't believe the following paragraph is still true - edrulrd@hotmail.com - September 2024" -->
+<!--   <para>
 Another drawback with <command>iptables-restore</command> and 
 <command>iptables-save</command> is that it is not fully functional as of 
 writing this. The problem is simply that not a lot of people use it as of 
@@ -176,6 +177,7 @@ work extremely well for most rule-sets as long as they do not contain some
 of the new targets or matches that it does not know how to handle 
 properly.
    </para>
+-->
 
   </section>
 
