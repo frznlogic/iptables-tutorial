@@ -30,23 +30,23 @@ linkend="rcflush-iptablestxt" endterm="rcflush-iptablestxt.title"></link>.
 
    <para>
 I originally wrote this as a very small tutorial for boingworld.com, which was 
-an Amiga/Linux/General newssite that a small group of people, including me, 
+an Amiga/Linux/General news site that a small group of people, including me,
 ran a couple of years back. Due to the fantastic amount of readers and 
 comments that I got from it, I continued to write on it. The original version 
 was approximately 10-15 A4 pages in printed version and has since been growing 
-slowly but steadily. A huge amount of people has helped me out, spellchecking, 
+slowly but steadily. A huge amount of people have helped me out, spell-checking,
 bug corrections, etc. At the time of writing this, the 
-http://iptables-tutorial.frozentux.net/ site has had over 600.000 unique hits 
+http://www.frozentux.net/iptables-tutorial site has had over 600.000 unique hits
 alone. 
    </para>
 
    <para>
-This document was written to guide you through the setup process step by step 
+This document was written to guide you through the setup process step by step,
 and hopefully help you to understand some more about the iptables package. I 
 have based most of the stuff here on the example rc.firewall file, since I 
 found that example to be a good way to learn how to use iptables. I 
 decided to just follow the basic chain structure and from there walk
-through each and one of the chains traversed and explain how the script works. 
+through each and every one of the chains traversed and explain how the script works.
 That way the tutorial is a little bit harder to follow, though this way is 
 more logical. Whenever you find something that's hard to understand, just come 
 back to this tutorial.
@@ -73,7 +73,7 @@ obvious ones and how I have chosen to use them within this document.
 Connection<indexterm><primary>Connection</primary></indexterm> - This is
 generally referred to in this document as a series of packets relating to each
 other. These packets refer to each other as an established kind of connection.
-A connection is in another word a series of exchanged packets. In TCP, this
+A connection is in other words a series of exchanged packets. In TCP, this
 mainly means establishing a connection via the 3-way handshake, and then this
 is considered a connection until the release handshake.
    </para>
@@ -108,7 +108,7 @@ the actions that take place within the kernel, and not outside of the kernel.
    <para>
 Packet<indexterm><primary>Packet</primary></indexterm> - A singular unit sent
 over a network, containing a header and a data portion. For example, an
-<systemitem>IP</systemitem> packet or an <systemitem>TCP</systemitem> packet.
+<systemitem>IP</systemitem> packet or a <systemitem>TCP</systemitem> packet.
 In <systemitem>Request For Comments</systemitem>
 (<systemitem>RFC</systemitem>'s) a packet isn't so generalized, instead
 <systemitem>IP</systemitem> packets are called datagrams, while
@@ -128,7 +128,7 @@ external resources on the subject.
 
    <para>
 Segment<indexterm><primary>Segment</primary></indexterm> - A
-<systemitem>TCP</systemitem> segment is pretty much the same as an packet, but
+<systemitem>TCP</systemitem> segment is pretty much the same as a packet, but
 a formalized word for a <systemitem>TCP</systemitem> packet. 
    </para>
 
@@ -138,7 +138,7 @@ connection that sends and receives packets that are related to each other in
 some fashion. Basically, I have used this term for any kind of connection that
 sends two or more packets in both directions. In <systemitem>TCP</systemitem>
 this may mean a connection that sends a <systemitem>SYN</systemitem> and then
-replies with an <systemitem>SYN/ACK</systemitem>, but it may also mean a
+replies with a <systemitem>SYN/ACK</systemitem>, but it may also mean a
 connection that sends a <systemitem>SYN</systemitem> and then replies with an
 <systemitem>ICMP Host unreachable</systemitem>. In other words, I use this
 term very loosely.
@@ -194,13 +194,14 @@ technique used to create <systemitem>VPN</systemitem> connections.
    <title>What's next?</title>
 
    <para>
-This chapter has given some small insight into why this document was written
+This chapter has given some small insights into why this document was written
 and how it was written. It also explained some common terms used throughout
 the document.
    </para>
 
    <para>
-The next chapter will bring up a rather lengthy introduction and repetition to
+The next chapter will bring up a rather lengthy introduction and repetition of
+the fundamentals of
 TCP/IP. Basically this means the IP protocol and some of its sub-protocols
 that are commonly used with iptables and netfilter. These are TCP, UDP, ICMP
 and SCTP. SCTP is a rather new standard in comparison to the other protocols,

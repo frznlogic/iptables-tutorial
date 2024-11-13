@@ -324,7 +324,7 @@ the firewall itself.</entry>
     </table>
 
     <para>
-In this example, we're assuming that the packet is destined for another host on
+In this next example, we're assuming that the packet is destined for another host on
 another network. The packet goes through the different steps in the following
 fashion:
    </para>
@@ -749,7 +749,7 @@ not be available in early 2.6 and 2.4 kernels unless patched.
 The <systemitem>filter</systemitem> table is mainly used for filtering
 packets. We can match packets and filter them in whatever way we want. This is
 the place that we actually take action against packets and look at what they
-contain and <command>DROP</command> or /<command>ACCEPT</command> them,
+contain and <command>DROP</command> or <command>ACCEPT</command> them,
 depending on their content. Of course we may also do prior filtering; however,
 this particular table is the place for which filtering was designed. Almost
 all targets are usable in this table. We will be more prolific about the
@@ -759,19 +759,19 @@ do your main filtering.
    </section>
 
    <section id="usertables">
-     <title id="usertables.title">User specified chains</title>
+     <title id="usertables.title">User-specified chains</title>
 <indexterm zone="usertables">
   <primary>Chain</primary>
-  <secondary>User specified</secondary>
+  <secondary>User-specified</secondary>
 </indexterm>
 <indexterm zone="usertables">
-  <primary>User specified chains</primary>
+  <primary>User-specified chains</primary>
 </indexterm>
 
      <para>
 If a packet enters a chain such as the <systemitem>INPUT</systemitem> chain in
 the filter table, we can specify a jump rule to a different chain within the
-same table. The new chain must be userspecified, it may not be a built-in
+same table. The new chain must be user-specified, it may not be a built-in
 chain such as the <systemitem>INPUT</systemitem> or
 <systemitem>FORWARD</systemitem> chain for example. If we consider a pointer
 pointing at the rule in the chain to execute, the pointer will go down from
@@ -793,7 +793,7 @@ default policy of the built-in chain will be applied.
      </para>
 
      <para>
-If one of the rules that matches points to another userspecified chain in the
+If one of the rules that matches points to another user-specified chain in the
 jump specification, the pointer will jump over to this chain and then start
 traversing that chain from the top to bottom. For example, see how the rule
 execution jumps from rule number 3 to chain 2 in the above image. The packet
@@ -803,10 +803,10 @@ set to send the packet on for further examination in chain 2.
 
      <note>
        <para>
-Userspecified chains can not have a default policy at the end of the chain.
-Only built in chains can have this. This can be circumvented by appending a
+User-specified chains can not have a default policy at the end of the chain.
+Only built-in chains can have this. This can be circumvented by appending a
 single rule at the end of the chain that has no matches, and hence it will
-behave as a default policy. If no rule is matched in a userspecified chain,
+behave as a default policy. If no rule is matched in a user-specified chain,
 the default behaviour is to jump back to the originating chain. As seen in the
 image above, the rule execution jumps from chain 2 and back to chain 1 rule 4,
 below the rule that sent the rule execution into chain 2 to begin with.
@@ -814,11 +814,11 @@ below the rule that sent the rule execution into chain 2 to begin with.
      </note>
 
      <para>
-Each and every rule in the user specified chain is traversed until either one
+Each and every rule in the user-specified chain is traversed until either one
 of the rules matches -- then the target specifies if the traversing should end
 or continue -- or the end of the chain is reached. If the end of the user
 specified chain is reached, the packet is sent back to the invoking chain. The
-invoking chain can be either a user specified chain or a built-in chain. 
+invoking chain can be either a user-specified chain or a built-in chain.
      </para>
 
    </section>
@@ -828,9 +828,9 @@ invoking chain can be either a user specified chain or a built-in chain.
 
      <para>
 In this chapter we have discussed several of the chains and tables and how
-they are traversed, including the standard built-in chains and userspecified
+they are traversed, including the standard built-in chains and user-specified
 chains. This is a very important area to understand. It may be simple, but
-unless fully understood, fatal mistakes can be equally easily.
+unless fully understood, fatal mistakes can be easily made.
      </para>
 
      <para>

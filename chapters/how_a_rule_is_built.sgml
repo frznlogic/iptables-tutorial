@@ -12,15 +12,15 @@ This chapter and the upcoming three chapters will discuss at length how to
 build your own rules. A rule could be described as the directions the firewall 
 will adhere to when blocking or permitting different connections and packets 
 in a specific chain. Each line you write that's inserted in a chain should be 
-considered a rule. We will also discuss the basic matches that are available, 
-and how to use them, as well as the different targets and how we can construct 
-new targets of our own (i.e.,new sub chains).
+considered a rule. We will also discuss the basic matches that are available
+and how to use them, as well as the different targets, and how we can construct
+new targets of our own (i.e., new sub chains).
   </para>
   
   <para>
 This chapter will deal with the raw basics of how a rule is created and how you 
 write it and enter it so that it will be accepted by the userspace program 
-<command>iptables</command>, the different tables, as well as the commands that 
+<command>iptables</command>. We will cover the different tables, as well as the commands that
 you can issue to iptables. After that we will in the next chapter look at all 
 the matches that are available to <command>iptables</command>, and then get 
 more into detail of each type of target and jump.
@@ -121,7 +121,7 @@ section, we'll look closer at it further on in the chapter.
    </indexterm>
  
    <para>
-The <command>-t</command> option specifies which table to use. Per default,
+The <command>-t</command> option specifies which table to use. By default,
 the <systemitem>filter</systemitem> table is used. We may specify one of the
 following tables with the <command>-t</command> option. Do note that this is
 an extremely brief summary of some of the contents of the <link
@@ -178,8 +178,8 @@ chapter.
 The <systemitem>nat</systemitem> table is used mainly for <systemitem>Network
 Address Translation</systemitem>. "<systemitem>NAT</systemitem>"ed packets
 get their  IP  addresses  altered, according to our rules. Packets  in a
-stream only traverse this table once. We assume that the first  packet  of  a
-stream is allowed. The rest of the packets in the same  stream are
+stream only traverse this table once. Assuming that the first  packet  of  a
+stream is allowed, the rest of the packets in the same  stream are
 automatically "<systemitem>NAT</systemitem>"ed or Masqueraded etc, and will be
 subject  to the same actions as the first packet. These will, in other words,
 not  go  through  this  table again, but will nevertheless be treated  like
@@ -201,8 +201,9 @@ of this would be to change the <command>TTL</command>, <command>TOS</command>
 or <command>MARK</command>. Note that the <command>MARK</command> is not
 really a change to the packet, but a mark value for the packet is set in
 kernel space. Other rules or programs might use this mark further along in the
-firewall to filter or do advanced routing on; tc is one example. The table
-consists of five built in chains, the <systemitem>PREROUTING</systemitem>,
+firewall to filter or do advanced routing on; with the <command>tc</command>
+command is one example. The table
+consists of five built-in chains, the <systemitem>PREROUTING</systemitem>,
 <systemitem>POSTROUTING</systemitem>, <systemitem>OUTPUT</systemitem>,
 <systemitem>INPUT</systemitem> and <systemitem>FORWARD</systemitem> chains.
 <systemitem>PREROUTING</systemitem> is used for altering packets just as they
@@ -216,7 +217,7 @@ actually sees the data. <systemitem>FORWARD</systemitem> is used to mangle
 packets after they have hit the first routing decision, but before they
 actually hit the last routing decision. Note that mangle can't be used for any
 kind of <systemitem>Network Address Translation</systemitem> or
-<systemitem>Masquerading</systemitem>, the nat table was made for these kinds
+<systemitem>Masquerading</systemitem>, as the nat table was made for these kinds
 of operations.
 	 </para></entry>
        </row>
@@ -227,7 +228,7 @@ The <systemitem>filter</systemitem> table should be used exclusively for
 filtering packets. For example, we could <command>DROP</command>,
 <command>LOG</command>, <command>ACCEPT</command> or <command>REJECT</command>
 packets without problems, as we can in the other tables. There are three
-chains built in to this table. The first one is named
+chains built-in to this table. The first one is named
 <systemitem>FORWARD</systemitem> and is used on all non-locally generated
 packets that are not destined for our local host (the firewall, in other
 words). <systemitem>INPUT</systemitem> is used on all packets that are
@@ -540,7 +541,7 @@ to list the built-in help for <command>iptables</command> or get the version
 of the
 command. To get the version, use the <command>-v</command> option and to get 
 the help
-message, use the <command>-h</command> option. As usual, in other words. Next
+message, use the <command>-h</command> option. Next
 comes a few options that can be used with various different commands. Note
 that we tell you with which commands the options can be used and what effect
 they will have. Also note that we do not include any options here that
@@ -710,7 +711,7 @@ used with all commands.</entry>
 
     <para>
 This chapter has discussed some of the basic commands for iptables and the
-tables very briefly that can be used in netfilter. The commands makes it
+tables very briefly that can be used in netfilter. The commands make it
 possible to do quite a lot of different operations on the netfilter package
 loaded inside kernel as you have seen.
     </para>

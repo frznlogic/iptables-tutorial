@@ -5,11 +5,11 @@
     </indexterm>
     
     <para>
-One large and rather overlooked sides of writing your own rulesets is how
-to debug the rulesets on your own, and how to find where you have done your 
-mistakes in the rulesets. This chapter will show you a few basic steps you can
+One large and rather overlooked side of writing your own rulesets is how
+to debug them on your own, and how to find where you have made your
+mistakes in them. This chapter will show you a few basic steps you can
 take to debug your scripts and find out what is wrong with them, as well as
-some more elaborate things to look for and what can be done to avoid being
+some more elaborate things to look for, and what can be done to avoid being
 unable to connect to your firewall in case you accidentally run a bad ruleset
 on it.
     </para>
@@ -20,7 +20,7 @@ written in bash shell scripts, but they should be easy to apply in other
 environments as well. Rulesets that have been saved with
 <command>iptables-save</command><indexterm><primary>iptables-save</primary>
 </indexterm>
-are another piece of code alltogether unfortunately, and pretty much none of
+are another piece of code altogether unfortunately, and pretty much none of
 these debugging methods will give you much luck. On the other hand,
 <command>iptables-save</command> files are much simpler and since they can't
 contain any scripting code that will create specific rules either, they are
@@ -131,7 +131,7 @@ Simply put, each line that gets executed is output to your screen as well. One
 thing that may be nice to see, is that all of the lines that bash outputs are 
 prefixed by a +<indexterm><primary>Bash</primary><secondary>+-sign</secondary>
 </indexterm> sign. This makes it a little bit easier to discern error or 
-warning messages from the actual script, rather than just one big mesh of 
+warning messages from the actual script, rather than just one big mess of
 output. 
       </para>
       
@@ -139,7 +139,7 @@ output.
 The <command>-x</command> option is also very interesting for debugging a
 couple of other rather common problems that you may run into with a little bit
 more complex rulesets. The first of them is to find out exactly what happens
-with what you thought was a simple loop, such as an for, if or while
+with what you thought was a simple loop, such as a for, if or while
 statement? For example, let's look at an example.
       </para>
       
@@ -316,7 +316,7 @@ be called. All netfilter generated messages are sent using this facility.
       </para>
       
       <para>
-The log level tells syslog how high priority the log messages have. There are 
+The log level tells syslog how high of a priority the log messages have. There are
 several priorities that can be used, listed below.
       </para>
       
@@ -356,9 +356,9 @@ several priorities that can be used, listed below.
       
       <para>
 Depending on these priorities, we can send them to different log files using 
-the syslog.conf. For example, to send all messages from the kern facility with 
+the syslog.conf file. For example, to send all messages from the kern facility with
 warning priority to a file called <filename>/var/log/kernwarnings</filename>,
-we could do as shown below. The line should go into the
+we could do as shown below. The line should go into
 <filename>/etc/syslog.conf</filename>.<indexterm><primary>syslog.conf</primary>
 </indexterm>
 <note>
@@ -545,7 +545,7 @@ which changed to .ko for files in the 2.6 kernels.
       <para>
 Another way of getting help from iptables itself is to simply comment out a 
 whole chain from your script to see if that fixes the problem. This is kind of 
-a last resort problem solver, that may be very effective if you don't even know 
+a last resort problem solver that may be very effective if you don't even know
 which chain is causing the problem. By removing the whole chain and simply 
 setting a default policy of <command>ACCEPT</command>, and then testing, if it
 works better, then this is the chain that is causing the problems. If it
@@ -679,7 +679,7 @@ and so on.
         
         <para>
 While <command>nmap</command> is more of a low level scanner, showing open
-ports etcetera, the <command>nessus</command> program is an actual security
+ports et cetera, the <command>nessus</command> program is an actual security
 scanner. <command>Nmap</command> tries to connect to different ports, and to
 find out at most, what kind of version the different servers are running.
 <command>Nessus</command> takes this a step further, by finding all open
@@ -715,7 +715,7 @@ report may look something like in the example below.
           <para>
 <command>Nessus</command> should be used with some caution however, since it
 can crash a machine or a service that it is specified to attack. Those attacks
-that risk crashing a machine are per default turned off luckily.
+that risk crashing a machine are by default turned off luckily.
           </para>
         </caution>
                

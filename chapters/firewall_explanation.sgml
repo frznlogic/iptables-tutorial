@@ -2,8 +2,8 @@
  <title id="rcfirewalltxtscriptstructure.title">rc.firewall.txt script
 structure</title>
  <para>
- All scripts written for this tutorial has been written after a specific
-structure. The reason for this is that they should be fairly conformable to
+All scripts written for this tutorial have been written with a specific
+structure. The reason for this is that they should be fairly comparable to
 each other and to make it easier to find the differences between the scripts.
 This structure should be fairly well documented in this brief chapter. This
 chapter should hopefully give a short understanding to why all the scripts has
@@ -41,7 +41,7 @@ options should pretty much always be the first thing in any shell-script.
       <para><emphasis>Internet</emphasis> - This is the configuration section
 which pertains to the Internet connection. This could be skipped if we do not
 have any Internet connection. Note that there may be more subsections than those
-listed here, but only such that pertains to our Internet connection.
+listed here, but only ones that pertain to our Internet connection.
 
       </para>
 
@@ -55,9 +55,9 @@ configuration options here.
        </listitem>
 
        <listitem>
-        <para><emphasis>PPPoE</emphasis> - If there are a possibility that the
+        <para><emphasis>PPPoE</emphasis> - If there is a possibility that the
 user that wants to use this specific script, and if there are any special
-circumstances that raises the chances that he is using a PPPoE connection, we
+circumstances that raises the chances that they are using a PPPoE connection, we
 will add specific options for those here.
         </para>
        </listitem>
@@ -75,9 +75,9 @@ likely, hence this section will almost always be available.
      </listitem>
 
      <listitem>
-      <para><emphasis>DMZ</emphasis> - If there is any reason to it, we will add
-a DMZ zone configuration at this point. Most scripts lacks this section, mainly
-because any normal home network, or small corporate network, will not have one.
+      <para><emphasis>DMZ</emphasis> - If there is any reason to having it, we will add
+a DMZ zone configuration at this point. Most scripts lack this section, mainly
+because any normal home network, or small corporate network will not have one.
       </para>
      </listitem>
 
@@ -136,7 +136,7 @@ adds special services to the administrator or clients.
      <listitem>
       <para><emphasis>Non-required modules</emphasis> - This section contains
 modules that are not required for normal operations. All of these modules should
-be commented out per default, and if you want to add the service it provides, it
+be commented out by default, and if you want to add the service it provides, it
 is up to you.
       </para>
      </listitem>
@@ -148,7 +148,7 @@ is up to you.
     <para><emphasis>proc configuration</emphasis> - This section should take
 care of any special configuration needed in the /proc file system. If some of
 these options are required, they will be listed as such, if not, they should be
-commented out per default, and listed under the non-required proc
+commented out by default, and listed under the non-required proc
 configurations. Most of the useful proc configurations will be listed here, but
 far from all of them.
      </para>
@@ -179,8 +179,8 @@ or nodes.
    <listitem>
     <para><emphasis>rules set up</emphasis> - By now the scripts should most
 probably be ready to insert the rule-set. I have chosen to split all the rules
-down after table and then chain names. All user specified chains are created
-before we do anything to the system built in chains. I have also chosen to set
+down after table and then chain names. All user-specified chains are created
+before we do anything to the system built-in chains. I have also chosen to set
 the chains and their rule specifications in the same order as they are output
 by the <command>iptables -L</command> command.
     </para>
@@ -189,7 +189,7 @@ by the <command>iptables -L</command> command.
 
      <listitem>
       <para><emphasis>Filter table</emphasis> - First of all we go through the
-filter table and its content. First of all we should set up all the policies in
+filter table and its content. We set up all the policies in
 the table.
 
       </para>
@@ -205,8 +205,8 @@ people use.
        </listitem>
 
        <listitem>
-       <para><emphasis>Create user specified chains</emphasis> - At this point
-we create all the user specified chains that we want to use later on within this
+       <para><emphasis>Create user-specified chains</emphasis> - At this point
+we create all the user-specified chains that we want to use later on within this
 table. We will not be able to use these chains in the system chains anyways if
 they are not already created so we could as well get to it as soon as possible.
 
@@ -214,10 +214,10 @@ they are not already created so we could as well get to it as soon as possible.
        </listitem>
 
        <listitem>
-       <para><emphasis>Create content in user specified chains</emphasis> -
-After creating the user specified chains we may as well enter all the rules
+       <para><emphasis>Create content in user-specified chains</emphasis> -
+After creating the user-specified chains we may as well enter all the rules
 within these chains. The only reason I have to enter this data at this point
-already is that may as well put it close to the creation of the user specified
+already is that we may as well put it close to the creation of the user-specified
 chains. You may as well put this later on in your script, it is totally up to
 you.
        </para>
@@ -260,9 +260,9 @@ not be too much to do at this point.
 
      <listitem>
       <para><emphasis>nat table</emphasis> - After the filter table we take care
-of the nat table. This is done after the filter table because of a number of
+of the nat table. This is done after the filter table for a number of
 reasons within these scripts. First of all we do not want to turn the whole
-forwarding mechanism and NAT function on at a too early stage, which could
+forwarding mechanism and NAT function on at too early a stage, which could
 possibly lead to packets getting through the firewall at just the wrong
 time point (i.e., when the NAT has been turned on, but none of the filter
 rules has been run). Also, I look upon the nat table as a sort of layer that
@@ -287,18 +287,18 @@ there is no reason not to do so.
        </listitem>
 
        <listitem>
-       <para><emphasis>Create user specified chains</emphasis> - At this point
-we create any user specified chains that we want within the nat table. Normally
+       <para><emphasis>Create user-specified chains</emphasis> - At this point
+we create any user-specified chains that we want within the nat table. Normally
 I do not have any of these, but I have added this section anyways, just in case.
-Note that the user specified chains must be created before they can actually be
+Note that the user-specified chains must be created before they can actually be
 used within the system chains.
        </para>
        </listitem>
 
        <listitem>
-       <para><emphasis>Create content in user specified chains</emphasis> - By
-now it should be time to add all the rules to the user specified chains in the
-nat table. The same thing goes here as for the user specified chains in the
+       <para><emphasis>Create content in user-specified chains</emphasis> - By
+now it should be time to add all the rules to the user-specified chains in the
+nat table. The same thing goes here as for the user-specified chains in the
 filter table. We add this material here since I do not see any reason not to.
        </para>
        </listitem>
@@ -355,17 +355,17 @@ other, and you are encouraged not to do so either.
        </listitem>
 
        <listitem>
-       <para><emphasis>Create user specified chains</emphasis> - Create all the
-user specified chains. Since I have barely used the mangle table at all in the
-scripts, I have neither created any chains here since it is fairly unusable
+       <para><emphasis>Create user-specified chains</emphasis> - Create all the
+user-specified chains. Since I have barely used the mangle table at all in the
+scripts, I have not created any chains here since it is fairly unusable
 without any data to use within it. However, this section was added just in case
 someone, or I, would have the need for it in the future.
        </para>
        </listitem>
 
        <listitem>
-       <para><emphasis>Create content in user specified chains</emphasis> - If
-you have any user specified chains within this table, you may at this point add
+       <para><emphasis>Create content in user-specified chains</emphasis> - If
+you have any user-specified chains within this table, you may at this point add
 the rules that you want within them here.
        </para>
        </listitem>

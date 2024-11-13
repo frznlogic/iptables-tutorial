@@ -175,7 +175,7 @@ sent, the state machine of <command>Netfilter</command> closes
 the connection and it is no longer in the conntrack table. At this point the
 faulty Microsoft implementation sends another packet which is considered as
 state <command>NEW</command> but lacks the <systemitem>SYN</systemitem> bit
-and hence gets matched by the above rules. In other words, don't worry to much
+and hence gets matched by the above rules. In other words, don't worry too much
 about this rule, or if you are worried anyways, set the
 <command>--log-headers</command> option to the rule and log the headers too
 and you'll get a better look at what the packet looks like.
@@ -196,12 +196,12 @@ telnet connection from a host not on the actual firewall. To put it simply, you
 connect with <command>telnet</command> or some other stream connection. Start
 the connection tracking modules, then load the <command>NEW</command> not
 <systemitem>SYN</systemitem> packet rules. Finally, the <command>telnet
-client</command> or <command>daemon</command> tries to send something. the
+client</command> or <command>daemon</command> tries to send something. The
 connection tracking code will not recognize this connection as a legal
 connection since it has not seen packets in any direction on this connection
 before, also there will be no <systemitem>SYN</systemitem> bits set since it is
-not actually the first packet in the connection. Hence, the packet will match to
-the rules and be logged and after-wards dropped to the ground.
+not actually the first packet in the connection. Hence, the packet will match
+the rules and be logged, and afterwards dropped to the ground.
    </para>
   </section>
 
@@ -223,14 +223,14 @@ the rules and be logged and after-wards dropped to the ground.
    </indexterm>
 
    <para>
-Certain <systemitem>TCP</systemitem> spoofing attacks uses a technique called
+Certain <systemitem>TCP</systemitem> spoofing attacks use a technique called
 Sequence Number Prediction. In this type of attack, the attacker spoofs some
-other hosts <systemitem>IP</systemitem> address, while  attacking someone, and
+other host's <systemitem>IP</systemitem> address while  attacking someone, and
 tries to predict the Sequence number used by that host. 
    </para>
 
    <para>
-Let's look on typical <systemitem>TCP</systemitem> spoofing by sequence number
+Let's look at typical <systemitem>TCP</systemitem> spoofing by sequence number
 prediction. Players: "attacker" [A], trying to send packets to a "victim" [V],
 pretending to be some "other host" [O].
    </para>
@@ -239,7 +239,7 @@ pretending to be some "other host" [O].
 <listitem><para>[A] sends SYN to [V] with source IP of [O].</para></listitem>
 <listitem><para>[V] replies to [O] by SYN/ACK.</para></listitem>
 <listitem><para>now [O] should reply to an unknown SYN/ACK by RST and the
-attack is unsuccesful, but let's assume [O] is down (flooded, turned off or
+attack is unsuccessful, but let's assume [O] is down (flooded, turned off or
 behind firewall that has dropped the packets).</para></listitem>
 <listitem><para>if [O] didn't mess it up, [A] now can talk to [V] pretending
 to be [O] as long as it predicts correct sequence numbers.</para></listitem>
@@ -268,7 +268,7 @@ iptables -A bad_tcp_packets -p tcp --tcp-flags SYN,ACK SYN,ACK \
 The chance of being [O] in this scenario should be relatively small, but these 
 rules should be safe in almost all cases. Except when you run several redundant 
 firewalls which will often take over packets or streams from each other. In such
-case, some connections may be blocked, even though they are legit. This rule 
+a case, some connections may be blocked, even though they are legit. This rule
 may actually also allow a few portscans to see our firewall as well, but they 
 should not be able to tell much more than that.
    </para>
@@ -287,13 +287,13 @@ should not be able to tell much more than that.
    </indexterm>
 
    <para>
-   I have added this since a friend of mine told me something I have
+   I have added this since a friend of mine told me something I had
 totally forgotten. Certain stupid Internet Service Providers use
 IP addresses assigned by <emphasis>IANA</emphasis> for their local
 networks on which you connect to. For example, the Swedish Internet Service
 Provider and phone monopoly Telia uses this approach for example on their
 <systemitem>DNS</systemitem> servers, which uses the 10.x.x.x IP address range.
-A common problem that you may run into when writing your scripts, is that you 
+A common problem that you may run into when writing your scripts is that you
 do not allow connections from any IP addresses in the 10.x.x.x range to 
 yourself, because of spoofing possibilities. Well, here is unfortunately an 
 example where you actually might have to lift a bit on those rules. You might 

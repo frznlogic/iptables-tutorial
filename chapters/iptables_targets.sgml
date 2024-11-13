@@ -9,7 +9,7 @@
   </indexterm>
 
    <para>
-The target/jumps tells the rule what to do with a packet that is a perfect
+The target and jump actions tell the rule what to do with a packet that is a perfect
 match with the match section of the rule. There are a couple of basic targets,
 the <command>ACCEPT</command> and <command>DROP</command> targets, which we
 will deal with first. However, before we do that, let us have a brief look at
@@ -165,8 +165,8 @@ CLASSIFY --set-class 20:10</command>
         <entry>Explanation</entry>
         <entry>
 The <command>CLASSIFY</command> target only takes one argument, the
-<command>--set-class</command>. This tells the target how to class the packet.
-The class takes 2 values separated by a coma sign,  like this MAJOR:MINOR.
+<command>--set-class</command>. This tells the target how to classify the packet.
+The class takes 2 values separated by a colon;  like this MAJOR:MINOR.
 Once again, if you want more information on this, check the <link
 linkend="lartc" endterm="lartc.title"></link> webpage.
        </entry>
@@ -204,9 +204,9 @@ form of clustering where you set up a <systemitem>Virtual IP</systemitem>
 then use the <command>CLUSTERIP</command> on each host that is supposed to
 answer the requests. The <command>CLUSTERIP</command> match requires no special
 <systemitem>load balancing</systemitem> hardware or machines, it simply does
-its work on each host part of the cluster of machines. It is a very simple
-clustering solution and not suited for large and complex clusters, neither does
-it have built in <systemitem>heartbeat</systemitem> handling, but it should be
+its work on each host that is part of the cluster of machines. It is a very simple
+clustering solution and not suited for large and complex clusters, nor does
+it have built in <systemitem>heartbeat</systemitem> handling, and it could be
 easily implemented as a simple script. 
      </para>
 
@@ -227,7 +227,7 @@ hosts as well.
        <para>
 Remember that the <command>CLUSTERIP</command> might break protocols such as
 <systemitem>SSH</systemitem> et cetera. The connection will go through
-properly, but if you try the same time again to the same host, you might be
+properly, but if you try the same command again to the same host, you might be
 connected to another machine in the cluster, with a different keyset, and hence
 your <systemitem>ssh client</systemitem> might refuse to connect or give you
 errors. For this reason, this will not work very well with some protocols, and
@@ -238,7 +238,7 @@ maintenance and administration. Another solution is to use the same
      </important>
 
      <para>
-The <systemitem>cluster</systemitem> can be loadbalanced with three kinds of
+The <systemitem>cluster</systemitem> can be load-balanced with three kinds of
 <systemitem>hashmodes</systemitem>. The first one is only <systemitem>source
 IP</systemitem> (<systemitem>sourceip</systemitem>), the second is
 <systemitem>source IP</systemitem> and <systemitem>source port</systemitem>
@@ -274,7 +274,7 @@ Each <command>CLUSTERIP</command> cluster gets a separate file in the
 <systemitem>VIP</systemitem> is <systemitem>192.168.0.5</systemitem> for
 example, you could <command>cat /proc/net/ipt_CLUSTERIP/192.168.0.5</command>
 to see which nodes this machine is answering for. To make the machine answer
-for another machine, lets say node 2, add it using <command>echo "+2" &gt;&gt;
+for another machine, let's say node 2, add it using <command>echo "+2" &gt;&gt;
 /proc/net/ipt_CLUSTERIP/192.168.0.5</command>. To remove it, run <command>echo
 "-2" &gt;&gt; /proc/net/ipt_CLUSTERIP/192.168.0.5</command>.
      </para>
@@ -547,7 +547,7 @@ The <command>CONNMARK</command> target is a perfect solution in that case.
 The <command>CONNMARK</command> target is available in all chains and all
 tables, but remember that the nat table is only traversed by the first packet
 in a connection, so the <command>CONNMARK</command> target will have no effect
-if you try to use it for subsequent packets after the first one in here. It can
+if you try to use it for subsequent packets after the first one in there. It can
 take one of four different options as seen below. 
     </para>
 
@@ -729,10 +729,10 @@ is used to set the mark on the whole connection.
     <para>
 <systemitem>SELinux</systemitem> is beyond the scope of this document, but
 basically it is an addition of <systemitem>Mandatory Access
-Control</systemitem> to Linux. This is more finegrained than the original
+Control</systemitem> to Linux. This is more fine-grained than the original
 security systems of most Linux and Unix security controls. Each object can
 have security attributes, or <systemitem>security context</systemitem>,
-connected to it, and these attributes are then matched to eachother before
+connected to it, and these attributes are then matched to each other before
 allowing or denying a specific task to be performed. This target will allow a
 <systemitem>security context</systemitem> to be set on a connection. 
     </para>
@@ -782,7 +782,7 @@ allowing or denying a specific task to be performed. This target will allow a
             <entry>Explanation</entry>
             <entry>
 Save the <systemitem>security context</systemitem> mark from the packet to the
-connection if the connection is not marked since before. 
+connection if the connection was not marked before.
             </entry>
           </row>
 
@@ -830,13 +830,13 @@ context</systemitem> mark associated with the connection on the packet.
     The <command>DNAT</command> target is used to do <systemitem>Destination
 Network Address Translation</systemitem>, which means that it is used to
 rewrite the <envar>Destination IP</envar> address of a packet. If a packet is
-matched, and this is the target of the rule, the packet, and all subsequent
-packets in the same stream will be translated, and then routed on to the
+matched, the packet, and all subsequent
+packets in the same stream will be translated, and then routed onto the
 correct device, host or network. This target can be extremely useful, for
-example,when you have a host running your web server inside a
+example, when you have a host running your web server inside a
 <emphasis>LAN</emphasis>, but no real IP to give it that will work on the
 Internet. You could then tell the firewall to forward all packets going to its
-own <systemitem>HTTP</systemitem> port, on to the real web server within the
+own <systemitem>HTTP</systemitem> port, onto the real web server within the
 <emphasis>LAN</emphasis>. We may also specify a whole range of destination IP
 addresses, and the <command>DNAT</command> mechanism will choose the
 destination IP address at random for each stream. Hence, we will be able to
@@ -887,7 +887,7 @@ the <systemitem>POSTROUTING</systemitem> chain.
         <entry>The <command>--to-destination</command> option tells the
 <systemitem>DNAT</systemitem> mechanism which <systemitem>Destination
 IP</systemitem> to set in the IP header, and where to send packets that are
-matched. The above example would send on all packets destined for IP address
+matched. The above example would send all packets destined for IP address
 15.45.23.67 to a range of <emphasis>LAN</emphasis> IP's, namely 192.168.1.1
 through 10. Note, as described previously, that a single stream will always
 use the same host, and that each stream will randomly be given an IP address
@@ -938,7 +938,7 @@ iptables -t nat -A PREROUTING --dst $INET_IP -p tcp --dport 80 -j DNAT \
     <para> Now, all packets from the Internet going to port 80 on our
 firewall are redirected (or <command>DNAT</command>'ed) to our internal
 <systemitem>HTTP</systemitem> server. If you test this from the Internet,
-everything should work just perfect. So, what happens if you try
+everything should work just perfectly. So, what happens if you try
 connecting from a host on the same local network as the
 <systemitem>HTTP</systemitem> server? It will simply not work. This is a
 problem with routing really.  We start out by dissecting what happens in a
@@ -951,7 +951,7 @@ to maintain readability.
      <listitem>
       <para>
      Packet leaves the connecting host going to
-<command>$INET_IP</command> and source <command>$EXT_BOX</command>.
+<command>$INET_IP</command> with source <command>$EXT_BOX</command>.
       </para>
      </listitem>
 
@@ -964,7 +964,7 @@ to maintain readability.
      <listitem>
       <para>
      Firewall <command>DNAT</command>'s the packet and runs the packet
-through all different chains etcetera.
+through all different chains et cetera.
       </para>
      </listitem>
 
@@ -1097,7 +1097,7 @@ the firewall.
 This can also have even more severe implications. Take an SMTP
 server on the LAN, that allows requests from the internal network, and you have
 your firewall set up to forward SMTP traffic to it. You have now effectively
-created an open relay SMTP server, with horrenduously bad logging!
+created an open relay SMTP server, with horrendously bad logging!
      </para>
 
      <para>
@@ -1114,7 +1114,7 @@ our <systemitem>LAN</systemitem>.
      <para>
 You will, in other words, be better off solving these problems by either setting
 up a separate DNS server for your LAN, or to actually set up a separate DMZ,
-the latter being preferred if you have the money.
+the latter being preferred.
      </para>
     </warning>
 
@@ -1313,7 +1313,7 @@ available. You can find more information at <link linkend="ciscodscp"
 endterm="ciscodscp.title"></link> site. Do note that the
 <command>--set-dscp-class</command> and <command>--set-dscp</command> commands
 are mutually exclusive, which means you can not use both of them in the same
-command!
+command.
         </entry>
        </row>
 
@@ -1441,7 +1441,7 @@ Works under Linux kernel 2.5 and 2.6.
  
 
     <para>
-The <command>LOG</command> target is specially designed for logging detailed
+The <command>LOG</command> target is specifically designed for logging detailed
 information about packets. These could, for example, be considered as illegal.
 Or, logging can be used purely for bug hunting and error finding. The
 <command>LOG</command> target will return specific information on packets,
@@ -1463,7 +1463,7 @@ direct logging to <systemitem>MySQL databases</systemitem> and suchlike.
 
     <note>
      <para>
-Note that if you get undesired logging direct to consoles, this is not
+Note that if you get undesired logging directly to consoles, this is not
 an <command>iptables</command> or <systemitem>Netfilter</systemitem>
 problem, but rather a problem caused by your syslogd configuration - most
 probably <filename>/etc/syslog.conf</filename>. Read more in <command>man
@@ -1473,7 +1473,7 @@ syslog.conf</command> for information about this kind of problem.
      <para>
 You may also need to tweak your <command>dmesg</command> settings. 
 <command>dmesg</command> is the command that changes which errors from the 
-kernel that should be shown on the console. <command>dmesg -n 1</command> 
+kernel should be shown on the console. <command>dmesg -n 1</command>
 should prevent all messages from showing up on the console, except panic 
 messages. The dmesg message levels matches exactly the syslogd levels, and it 
 only works on log messages from the kernel facility. For more information, 
@@ -1585,7 +1585,7 @@ then letting all your <command>LOG</command> messages in
 <command>iptables</command> use log level info, would make all messages appear
 in the <filename>/var/log/iptables</filename> file. Note that there may be
 other messages here as well from other parts of the kernel that uses the info
-priority. For more information on logging I recommend you to read the
+priority. For more information on logging I recommend you read the
 <command>syslog</command> and <filename>syslog.conf</filename> man-pages as
 well as other HOWTOs etc.
         </entry>
@@ -1627,7 +1627,7 @@ Sequence</systemitem> numbers are special numbers that identify each packet and
 where it fits into a <systemitem>TCP sequence</systemitem>, as well as how the
 stream should be reassembled. Note that this option constitutes a security
 risk if the logs are readable by unauthorized users, or by the world for that
-matter. As does any log that contains output from <command>iptables</command>.
+matter, as does any log that contains output from the <command>iptables</command> command.
         </entry>
        </row>
 
@@ -1703,7 +1703,7 @@ Works under Linux kernel 2.3, 2.4, 2.5 and 2.6.
 The <command>MARK</command> target is used to set <command>Netfilter</command>
 mark values that are associated with specific packets. This target is only 
 valid in the <systemitem>mangle</systemitem> table, and will not work outside 
-there. The <command>MARK</command> values may be used in conjunction with the
+it. The <command>MARK</command> values may be used in conjunction with the
 advanced routing capabilities in Linux to send different packets through 
 different routes and to tell them to use different queue disciplines (qdisc), 
 etc. For more information on advanced routing, check out the <link
@@ -1900,10 +1900,10 @@ Works under Linux kernel 2.3, 2.4, 2.5 and 2.6.
     <warning>
       <para>
 Be warned, the <command>MIRROR</command> is dangerous and was only developed
-as an example code of the new conntrack and <systemitem>NAT</systemitem> code.
+as an example for the new conntrack and <systemitem>NAT</systemitem> code.
 It can cause dangerous things to happen, and very serious
-<systemitem>DDoS/DoS</systemitem> will be possible if used improperly. Avoif
-using it at all costs! It was removed from 2.5 and 2.6 kernels due to it's bad
+<systemitem>DDoS/DoS</systemitem> will be possible if used improperly. Avoid
+using it at all costs! It was removed from 2.5 and 2.6 kernels due to its bad
 security implications!
       </para>
     </warning>
@@ -1947,7 +1947,7 @@ for the cracker or script kiddie, whatever we want to call them.
     <note>
       <para>
 Works under Linux kernel 2.3 and 2.4. It was removed from 2.5 and 2.6 kernels 
-due to it's inherent insecurity. Do not use this target!
+due to its inherent insecurity. Do not use this target!
       </para>
     </note>
 
@@ -1969,7 +1969,7 @@ due to it's inherent insecurity. Do not use this target!
 of the IP address isn't changed. It provides a 1:1 <systemitem>NAT</systemitem> 
 function for whole networks which isn't available in the standard 
 <command>SNAT</command> and <command>DNAT</command> functions. For example, 
-lets say we have a network containing 254 hosts using private IP addresses (a 
+let's say we have a network containing 254 hosts using private IP addresses (a
 /24 network), and we just got a new /24 network of public IP's. Instead of 
 walking around and changing the IP of each and every one of the hosts, we would 
 be able to simply use the <command>NETMAP</command> target like -j NETMAP -to 
@@ -2166,7 +2166,7 @@ linkend="netfilterhackinghowto">Netfilter Hacking HOW-TO</link>.
     <important>
       <para>
 As of kernel 2.6.14 the behavior of netfilter has changed. A new system for
-talking to the <command>QUEUE</command> has been deviced, called the
+talking to the <command>QUEUE</command> has been devised, called the
 <systemitem>nfnetlink_queue</systemitem>. The <command>QUEUE</command>
 target is basically a pointer to the <command>NFQUEUE</command> 0 nowadays.
 For programming questions, still see the above link. This requires the
@@ -2289,7 +2289,7 @@ Works under Linux kernel 2.3, 2.4, 2.5 and 2.6.
 The <command>REJECT</command> target works basically the same as the 
 <command>DROP</command> target, but it also sends back an error message to the 
 host sending the packet that was blocked. The <command>REJECT</command> target 
-is as of today only valid in the <systemitem>INPUT</systemitem>, 
+is only valid in the <systemitem>INPUT</systemitem>,
 <systemitem>FORWARD</systemitem> and <systemitem>OUTPUT</systemitem> chains or 
 their sub chains. After all, these would be the only chains in which it would 
 make any sense to put this target. Note that all chains that use the 
@@ -2364,7 +2364,7 @@ connections gracefully. For more information about the <systemitem>TCP
 RST</systemitem> read <link linkend="rfc793" endterm="rfc793.title">
 </link>. As stated in the <command>iptables</command> man page, this is mainly 
 useful for blocking ident probes which frequently occur when sending mail to 
-broken mail hosts, that won't otherwise accept your mail.
+broken mail hosts that won't otherwise accept your mail.
         </entry>
        </row>
 
@@ -2409,7 +2409,7 @@ and all of a sudden it matches a specific rule which has the <command>--jump
 RETURN</command> target set. It will then jump back to the
 <systemitem>INPUT</systemitem> chain. Another example would be if the packet
 hit a <command>--jump RETURN</command> rule in the
-<systemitem>INPUT</systemitem> chain. It would then be dropped to the default
+<systemitem>INPUT</systemitem> chain. It would then be dropped by the default
 policy as previously described, and no more actions would be taken in this
 chain.
     </para>
@@ -2435,7 +2435,7 @@ Works under Linux kernel 2.3, 2.4, 2.5 and 2.6.
 
     <para>
 The <command>SAME</command> target works almost in the same fashion as the 
-<command>SNAT</command> target, but it still differs. Basically, the 
+<command>SNAT</command> target. Basically, the
 <command>SAME</command> target will try to always use the same outgoing IP 
 address for all connections initiated by a single host on your network. For 
 example, say you have one /24 network (192.168.1.0) and 3 IP addresses 
@@ -2543,7 +2543,7 @@ Works under Linux kernel 2.5 and 2.6.
 The <command>SECMARK</command> target is used to set a <systemitem>security
 context</systemitem> mark on a single packet, as defined by
 <systemitem>SELinux</systemitem> and security systems. This is still somewhat
-in it's infancy in Linux, but should pick up more and more in the future.
+in its infancy in Linux, but should pick up more and more in the future.
 Since <systemitem>SELinux</systemitem> is out of the scope of this document, I
 suggest going to the <link linkend="selinux" endterm="selinux.title"></link>
 webpage for more information. 
@@ -2648,7 +2648,7 @@ within the <systemitem>POSTROUTING</systemitem> chain. This is in other words
 the only chain in which you may use <command>SNAT</command>. Only the first
 packet in a connection is mangled by <command>SNAT</command>, and after that
 all future packets using the same connection will also be
-<command>SNAT</command>ted. Furthermore, the initial rules in the
+<command>SNAT</command>'ed. Furthermore, the initial rules in the
 <systemitem>POSTROUTING</systemitem> chain will be applied to all the packets
 in the same stream.
      </para>
@@ -2965,7 +2965,7 @@ TOS --set-tos 0x10</command></entry>
         <entry>Explanation</entry>
         <entry>The <command>--set-tos</command> option tells the
 <command>TOS</command> mangler what <systemitem>TOS</systemitem> value to set
-onpackets that are matched. The option takes a numeric value, either in hex or
+on packets that are matched. The option takes a numeric value, either in hex or
 in decimal value. As the <systemitem>TOS</systemitem> value consists of 8
 bits, the value may be 0-255, or in hex 0x00-0xFF. Note that in the standard
 TOS target you are limited to using the named values available (which should
@@ -2979,7 +2979,7 @@ hex 0x02) or <computeroutput>Normal-Service</computeroutput> (decimal value 0,
 hex value 0x00). The default value on most packets is
 <computeroutput>Normal-Service</computeroutput>, or 0. Note that you can, of
 course, use the actual names instead of the actual hex values to set the
-<systemitem>TOS</systemitem> value; in fact this is generally to be
+<systemitem>TOS</systemitem> value; in fact this is generally
 recommended, since the values associated with the names may be changed in
 future. For a complete listing of the "descriptive values", do an
 <command>iptables -j TOS -h</command>. 
@@ -3014,7 +3014,7 @@ The <command>TTL</command> target is used to modify the <systemitem>Time
 To Live</systemitem> field in the IP header. One useful application of this is 
 to change all <systemitem>Time To Live</systemitem> values to the same value
 on all outgoing packets. One reason for doing this is if you have a bully
-<emphasis>ISP</emphasis> which don't allow you to have more than one machine
+<emphasis>ISP</emphasis> that doesn't allow you to have more than one machine
 connected to the same Internet connection, and who actively pursues this.
 Setting all <command>TTL</command> values to the same value, will effectively
 make it a little bit harder for them to notice that you are doing this. We may
@@ -3032,8 +3032,8 @@ the <command>sysctl</command> man page.
 
     <para>
 The <command>TTL</command> target is only valid within the
-<systemitem>mangle</systemitem> table, and nowhere else. It takes 3 options as
-of writing this, all of them described below in the table.
+<systemitem>mangle</systemitem> table, and nowhere else. It takes 3 options,
+as described below.
     </para>
 
     <indexterm zone="table.ttltarget">
@@ -3093,7 +3093,7 @@ of writing this, all of them described below in the table.
 <command>TTL</command> target which <systemitem>TTL</systemitem> value to set
 on the packet in question. A good value would be around 64 somewhere. It's not
 too long, and it is not too short. Do not set this value too high, since it
-may affect your network and it is a bit immoral to set this value to high,
+may affect your network and it is a bit immoral to set this value too high,
 since the packet may start bouncing back and forth between two mis-configured
 routers, and the higher the <systemitem>TTL</systemitem>, the more bandwidth
 will be eaten unnecessarily in such a case. This target could be used to limit
@@ -3151,7 +3151,7 @@ option. This means that we should raise the <systemitem>TTL value</systemitem>
 with the value specified in the <command>--ttl-inc</command> option, and if we
 specified <command>--ttl-inc 4</command>, a packet entering with a
 <systemitem>TTL</systemitem> of 53 would leave the host with
-<systemitem>TTL</systemitem> 56. Note that the same thing goes here, as for 
+<systemitem>TTL</systemitem> 56. Note that the same thing goes here as for
 the previous example of the <command>--ttl-dec</command> option, where the 
 network code will automatically decrement the <systemitem>TTL 
 value</systemitem> by 1, which it always does. This may be used to make our 
@@ -3199,7 +3199,7 @@ subscribe to various multicast groups and receive the packet. This is in other
 words a more complete and more sophisticated logging facility that is only
 used by iptables and Netfilter so far, and it contains much better facilities
 for logging packets. This target enables us to log information to
-<systemitem>MySQL</systemitem> databases, and other databases, making it much
+<systemitem>MySQL</systemitem> or other databases, making it much
 simpler to search for specific packets, and to group log entries. You can find
 the <systemitem>ULOGD</systemitem> user-land applications at the <link
 linkend="ulogdsite" endterm="ulogdsite.title"></link>.
@@ -3337,8 +3337,8 @@ to user-space.
 before actually sending the data to user-space. For example, if we set the
 threshold to 10 as above, the kernel would first accumulate 10 packets inside
 the kernel, and then transmit it outside to the user-space as one single
-netlink multi part message. The default value here is 1 because of backward
-compatibility, the user-space daemon did not know how to handle multi-part
+netlink multipart message. The default value here is 1 because of backward
+compatibility; the user-space daemon did not know how to handle multipart
 messages previously.
         </entry>
        </row>

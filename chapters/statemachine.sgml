@@ -53,7 +53,7 @@ write much tighter rule-sets.
    </para>
 
    <para> Within iptables, packets can be related to tracked connections
-in four different so called states. These are known as
+in four different so-called states. These are known as
 <command>NEW</command>, <command>ESTABLISHED</command>,
 <command>RELATED</command> and <command>INVALID</command>. We will discuss
 each of these in more depth later. With the <command>--state</command>
@@ -62,7 +62,7 @@ sessions.
    </para>
 
    <para>
-All of the connection tracking is done by special framework within the kernel
+All of the connection tracking is done by a special framework within the kernel
 called conntrack. conntrack may be loaded either as a module, or as an
 internal part of the kernel itself. Most of the time, we need and want more
 specific connection tracking than the default conntrack engine can maintain.
@@ -80,7 +80,7 @@ address</systemitem>, <systemitem>destination port</systemitem> and
 
    <para>
 In previous kernels, we had the possibility to turn on and off
-defragmentation. However, since iptables and Netfilter were introduced
+defragmentation. However, since iptables and Netfilter were introduced,
 and connection tracking in particular, this option was gotten rid of. The
 reason for this is that connection tracking can not work properly without
 defragmenting packets, and hence defragmenting has been incorporated into
@@ -157,7 +157,7 @@ Next comes the actual state that this entry is in at the present point of
 time. In the above mentioned case we are looking at a packet that is in the
 <computeroutput>SYN_SENT</computeroutput> state. The internal value of a
 connection is slightly different from the ones used externally with
-<command>iptables</commanD>. The
+<command>iptables</command>. The
 value <computeroutput>SYN_SENT</computeroutput> tells us that we are looking
 at a connection that has only seen a <systemitem>TCP SYN</systemitem> packet
 in one direction. Next, we see the <systemitem>source IP
@@ -195,7 +195,7 @@ will also change.
 Recently there was a new patch made available in iptables patch-o-matic,
 called tcp-window-tracking. This patch adds, among other things, all of
 the above timeouts to special sysctl variables, which means that they can
-be changed on the fly, while the system is still running. Hence, this
+be changed on the fly while the system is still running. Hence, this
 makes it unnecessary to recompile the kernel every time you want to change
 the timeouts.
      </para>
@@ -445,7 +445,7 @@ In this section and the upcoming ones, we will take a closer look at the
 states and how they are handled for each of the three basic protocols
 <systemitem>TCP</systemitem>, <systemitem>UDP</systemitem> and
 <systemitem>ICMP</systemitem>. Also, we will take a closer look at how
-connections are handled per default, if they can not be classified as either
+connections are handled by default if they can not be classified in either
 of these three protocols. We have chosen to start out with the
 <systemitem>TCP</systemitem> protocol since it is a stateful protocol in
 itself, and has a lot of interesting details with regard to the state machine
@@ -564,7 +564,7 @@ iptables are aware. Normally, the stream will be
    
    <para>
 A connection may also enter the <command>ESTABLISHED</command> state, but not
-be<computeroutput>[ASSURED]</computeroutput>.
+be <computeroutput>[ASSURED]</computeroutput>.
 <indexterm><primary>[ASSURED]</primary></indexterm> This happens if we have
 connection pickup turned on (Requires the tcp-window-tracking patch, and the
 ip_conntrack_tcp_loose
@@ -603,7 +603,7 @@ closed down immediately.
    <para>
 When the <systemitem>TCP</systemitem> connection has been closed down, the
 connection enters the <computeroutput>TIME_WAIT</computeroutput> state, which
-is per default set to 2 minutes. This is used so that all packets that have
+is by default set to 2 minutes. This is used so that all packets that have
 gotten out of order can still get through our rule-set, even after the
 connection has already closed. This is used as a kind of buffer time so that
 packets that have gotten stuck in one or another congested router can still
@@ -613,7 +613,7 @@ get to the firewall, or to the other end of the connection.
    <para>
    If the connection is reset by a <systemitem>RST</systemitem> packet,
 the state is changed to <computeroutput>CLOSE</computeroutput>. This
-means that the connection per default has 10 seconds before the whole
+means that the connection by default has 10 seconds before the whole
 connection is definitely closed down. <systemitem>RST</systemitem> packets are
 not acknowledged in any sense, and will break the connection directly. There
 are also other states than the ones we have told you about so far. Here is the
@@ -784,7 +784,7 @@ udp      17 20 src=192.168.1.2 dst=192.168.1.5 sport=137 dport=1025 \
    </screen>
 
    <para>
-As you can see from the first and second values, this is an
+As you can see from the first and second values, this is a
 <systemitem>UDP</systemitem> packet. The
 first is the protocol name, and the second is protocol number. This is just
 the same as for <systemitem>TCP</systemitem> connections. The third value
@@ -796,7 +796,7 @@ point, the <computeroutput>[UNREPLIED]</computeroutput> flag tells us that
 there's so far been no response to the packet. Finally, we get a brief list of
 the expectations for returning packets. Do note that the latter entries are
 in reverse order to the first values. The timeout at this
-point is set to 30 seconds, as per default.
+point is set to 30 seconds by default.
 
    </para>
 
@@ -889,7 +889,7 @@ an idea of how this could look, have a look at the following image.
    <para>
 As you can see in the above picture, the host sends an <systemitem>echo
 request</systemitem> to the target, which is considered as
-<command>NEW</command> by the firewall. The target then responds with a
+<command>NEW</command> by the firewall. The target then responds with an
 <systemitem>echo reply</systemitem> which the firewall considers as state
 <command>ESTABLISHED</command>. When the first echo request has been seen, the
 following state entry goes into the <filename>ip_conntrack</filename>.
@@ -911,7 +911,7 @@ called <computeroutput>type</computeroutput>,
 They are not special in any way, the <computeroutput>type</computeroutput>
 field contains the <systemitem>ICMP</systemitem> type and the
 <computeroutput>code</computeroutput> field contains the
-<systemitem>ICMP</systemitem> code. These are all available in <link
+<systemitem>ICMP</systemitem> code. These are all available in the <link
 linkend="icmptypes" endterm="icmptypes.title"></link> appendix. The final
 <computeroutput>id</computeroutput> field, contains the <systemitem>ICMP
 ID</systemitem>. Each <systemitem>ICMP</systemitem> packet gets an ID set to
@@ -962,7 +962,7 @@ all other traffic types.
    </note>
 
    <para>
-ICMP requests has a default timeout of 30 seconds, which you can change in the
+ICMP requests have a default timeout of 30 seconds, which you can change in the
 <filename>/proc/sys/net/ipv4/netfilter/ip_ct_icmp_timeout</filename> entry.
 This should in general be a good timeout value, since it will be able to catch
 most packets in transit.  You may also be able to confirm this by checking the
@@ -1006,7 +1006,7 @@ a specific address. This is considered as a <command>NEW</command> connection
 by the firewall. However, the network the packet is trying to reach is
 unreachable, so a router returns a network unreachable
 <systemitem>ICMP</systemitem> error to us. The connection tracking code can
-recognize this packet as <command>RELATED</command>. thanks to the already
+recognize this packet as <command>RELATED</command> thanks to the already
 added tracking entry, so the <systemitem>ICMP</systemitem> reply is correctly
 sent to the client which will then hopefully abort. Meanwhile, the firewall
 has destroyed the connection tracking entry since it knows this was an error
@@ -1033,10 +1033,10 @@ connections if they run into any problem like the above. All
    </para>
 
    <para>
-This time an <systemitem>UDP</systemitem> packet is sent to the host. This
+This time a <systemitem>UDP</systemitem> packet is sent to the host. This
 <systemitem>UDP</systemitem> connection is considered as
 <command>NEW</command>. However, the network is administratively prohibited by
-some firewall or router on the way over. Hence, our firewall receives a
+some firewall or router on the way over. Hence, our firewall receives an
 <systemitem>ICMP Network Prohibited</systemitem> in return. The firewall knows
 that this <systemitem>ICMP</systemitem> error message is related to the
 already opened <systemitem>UDP</systemitem> connection and sends it as a
@@ -1079,7 +1079,7 @@ variable (or net.netfilter.nf_conntrack_generic_timeout variable as seen by runn
 <command>sysctl -a</command>). The default value here is 600 seconds, or 10 minutes. Depending
 on
 what traffic you are trying to send over a link that uses the default
-connection tracking behavior, this might need changing. Especially if you are
+connection tracking behavior, this might need changing, especially if you are
 bouncing traffic through satellites and such, which can take a long time.
    </para>
 
@@ -1103,7 +1103,7 @@ table</title>
 
    <para>
 <command>UNTRACKED</command> is a rather special keyword when it comes to 
-connection tracking in Linux. Basically, it is used to match packets that has 
+connection tracking in Linux. Basically, it is used to match packets that have
 been marked in the <systemitem>raw</systemitem> table not to be tracked. 
    </para>
 
@@ -1135,7 +1135,7 @@ for the firewall itself by <command>ACCEPT</command>'ing all packets with
 destination your host in the <systemitem>raw</systemitem> table, and then set 
 the <command>NOTRACK</command> for all other traffic. This would then allow 
 you to have stateful matching on incoming traffic for the router itself, 
-but at the same time save processing power from not handling all the crossing 
+but at the same time, save processing power from not handling all the crossing
 traffic.
    </para>
 
@@ -1143,9 +1143,9 @@ traffic.
 Another example when <command>NOTRACK</command> can be used is if you have 
 a highly trafficked webserver and want to do stateful tracking, but don't want 
 to waste processing power on tracking the web traffic. You could then set up a 
-rule that turns of tracking for port 80 on all the locally owned IP addresses, 
+rule that turns off tracking for port 80 on all the locally owned IP addresses,
 or the ones that are actually serving web traffic. You could then enjoy 
-statefull tracking on all other services, except for webtraffic which might 
+stateful tracking on all other services except for web traffic, which might
 save some processing power on an already overloaded system.
    </para>
 
@@ -1153,11 +1153,11 @@ save some processing power on an already overloaded system.
 There is however some problems with <command>NOTRACK</command> that you must 
 take into consideration. If a whole connection is set with 
 <command>NOTRACK</command>, then you will not be able to track related 
-connections either, <systemitem>conntrack</systemitem> and 
+connections either. <systemitem>conntrack</systemitem> and
 <systemitem>nat</systemitem> helpers will simply not work for
 <systemitem>untracked connections</systemitem>, nor will related 
-<systemitem>ICMP</systemitem> errors do. You will have to open up for these 
-manually in other words. When it comes to complex protocols such as 
+<systemitem>ICMP</systemitem> errors. You will have to open up for these
+manually, in other words. When it comes to complex protocols such as
 <systemitem>FTP</systemitem> and <systemitem>SCTP</systemitem> et cetera, this 
 can be very hard to manage. As long as you are aware of this, you should be 
 able to handle this however.
@@ -1304,10 +1304,10 @@ client.
 <systemitem>FTP</systemitem> client tells the server that it wants some
 specific data, upon which the server replies with an IP address to connect to
 and at what port. The client will, upon receipt of this data, connect to that
-specific port, from its own port 20(the FTP-data port), and get the data in
+specific port from its own port 20 (the FTP-data port), and get the data in
 question. If you have an <systemitem>FTP</systemitem> server behind your
-firewall, you will in other words require this module in addition to your
-standard iptables modules to let clients on the Internet connect to the
+firewall, you will in other words, require this module in addition to your
+standard iptables modules, to let clients on the Internet connect to the
 <systemitem>FTP</systemitem> server properly. The same goes if you are
 extremely restrictive to your users, and only want to let them reach
 <systemitem>HTTP</systemitem> and <systemitem>FTP</systemitem> servers on the
@@ -1365,7 +1365,7 @@ modprobe ip_conntrack_amanda
    <para>
 Do note that connection tracking has nothing to do with
 <systemitem>NAT</systemitem>, and hence you may require more modules if you
-are NAT'ing connections as well. For example, if you were to want to
+are NAT'ing connections as well. For example, if you wanted to
 <systemitem>NAT</systemitem> and track <systemitem>FTP</systemitem>
 connections, you would need the <systemitem>NAT</systemitem> module as well.
 All <systemitem>NAT</systemitem> helpers starts with ip_nat_ and follow that

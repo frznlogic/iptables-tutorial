@@ -17,8 +17,8 @@
     </indexterm>
 
     <para>
-Iptables is an extremely knowledge intensive tool. This means that iptables 
-takes quite a bit of knowledge to be able to use iptables to it's full extent. 
+Iptables is an extremely knowledge intensive tool. This means that iptables
+takes quite a bit of knowledge to be able to use iptables to its full extent.
 Among other things, you must have a very good understanding of the
 <systemitem>TCP/IP</systemitem> protocol.    
     </para>
@@ -59,7 +59,7 @@ endterm="ipfiltering.title"></link> chapter.
       <para>
 <systemitem>TCP/IP</systemitem> is, as already stated, multi-layered. This
 means that we have one functionality running at one depth, and another one at
-another level, etcetera. The reason that we have all of these layers is
+another level, et cetera. The reason that we have all of these layers is
 actually very simple.
       </para>
 
@@ -68,9 +68,9 @@ The biggest reason is that the whole architecture is very extensible. We can
 add new functionality to the application layers, for example, without having to
 reimplement the whole <systemitem>TCP/IP</systemitem> stack code, or to
 include a complete <systemitem>TCP/IP</systemitem> stack into the actual
-application. Just the same way as we don't need to rewrite every single
+application. This is just the same way as we don't need to rewrite every single
 program, every time that we make a new network interface card. Each layer
-should need to know as little as possible about each other, to keep them
+should need to know as little as possible about each other to keep them
 separated.
       </para>
 
@@ -80,7 +80,7 @@ When we are talking about the programming code of
 <systemitem>TCP/IP</systemitem> which resides inside the kernel, we are often
 talking about the <systemitem>TCP/IP</systemitem> stack. The
 <systemitem>TCP/IP</systemitem> stack simply means all of the sublayers used,
-from the Network access layer and all the way up to the Application layer.
+from the Network access layer all the way up to the Application layer.
         </para>
       </note>
 
@@ -89,7 +89,7 @@ There are two basic architectures to follow when talking about layers. One of
 them is the <systemitem>OSI</systemitem> (<systemitem>Open Systems
 Interconnect</systemitem>) Reference Model and consists of 7 layers. We will
 only look at it superficially here since we are more interested in the
-<systemitem>TCP/IP</systemitem> layers. However, from an historical point,
+<systemitem>TCP/IP</systemitem> layers. However, from an historical point of view,
 this is interesting to know about, especially if you are working with lots of
 different types of networks. The layers are as follows in the <link
 linkend="osireference">OSI Reference Model</link> list.
@@ -100,9 +100,9 @@ linkend="osireference">OSI Reference Model</link> list.
 There is some discussion as to which of these reference models is mostly used, 
 but it seems that the <systemitem>OSI</systemitem> reference model still is
 the prevalent reference model. This might also depend on where you live,
-however, in most US and EU countries it seems as you can default to
-<systemitem>OSI</systemitem> reference model while speaking to technicians and
-salespeople. 
+however, in most US and EU countries it seems you can default to the
+<systemitem>OSI</systemitem> reference model when speaking to technicians and
+salespeople.
         </para>
         
         <para>
@@ -211,8 +211,8 @@ However, throughout the rest of this document, we will mainly refer to the
       <para>
 A packet that is sent by us, goes from the top and to the bottom of this list, 
 each layer adding its own set of <emphasis>headers</emphasis> to the packet in 
-what we call the encapsulation phase. When the packet finally reaches it's 
-destination the packet goes backwards through the list and the headers are 
+what we call the encapsulation phase. When the packet finally reaches its
+destination, the packet goes backwards through the list and the headers are
 stripped out of the packet, one by one, each header giving the destination host 
 all of the needed information for the packet data to finally reach the 
 application or program that it was destined for.
@@ -334,26 +334,26 @@ V. Andersgardsgatan 2
       <para>
 This would in the analogy be the same as the <systemitem>Internet
 layer</systemitem>. The <systemitem>internet layer</systemitem> contains
-information telling us where to reach the recipient, or host, in a
-<systemitem>TCP/IP</systemitem> network. Just the same way as the recipient on
+information telling us where to reach the recipient, or host in a
+<systemitem>TCP/IP</systemitem> network - just the same way as the recipient on
 an envelope. This would be the equivalent of the IP address in other words
 (e.g., IP 192.168.0.4).
       </para>
 
       <para>
 The final step is to put the whole letter in a postbox. Doing this would
-approximately equal to putting a packet into the <systemitem>Network Access
+approximately be equal to putting a packet into the <systemitem>Network Access
 Layer</systemitem>. The <systemitem>network access layer</systemitem> contains
 the functions and routines for accessing the actual physical network that the
 packet should be transported over.
       </para>
 
       <para>
-When the receiver finally receives the letter, he will open the whole letter 
-from the envelope and address etc (decapsulate it). The letter he receives may 
+When the receiver finally receives the letter, they will open the whole letter
+from the envelope and address, etc (decapsulate it). The letter they receive may
 either require a reply or not. In either case, the letter may be replied upon
 by the receiver, by reversing the receiver and transmitter addresses on the
-original letter he received, so that receiver becomes transmitter, and
+original letter received, so that the receiver becomes transmitter, and
 transmitter becomes receiver.
       </para>
 
@@ -369,7 +369,7 @@ designed for this, nor is it very suitable for those purposes.
 
         <para>
 For example, if we use a string match and match for a specific string inside
-the packet, lets say <command>get /index.html</command>. Will that work?
+the packet, let's say <command>"get /index.html"</command>, will that work?
 Normally, yes. However, if the packet size is very small, it will not. The
 reason is that iptables is built to work on a <emphasis>per packet</emphasis>
 basis, which means that if the string is split into several separate packets,
@@ -402,7 +402,7 @@ protocol of  the <systemitem>Internet</systemitem> layer, and
 The <systemitem>ICMP</systemitem> protocol is actually sort of a mix between
 the two layers. It runs in the <systemitem>Internet</systemitem> layer, but it
 has the exact same headers as the <systemitem>IP</systemitem> protocol, but
-also a few extra headers, and then directly inside that encapsulation, the
+with a few extra headers, and then directly inside that encapsulation, the
 data. We will discuss this in more detail further on, in the <link
 linkend="icmpcharacteristics" endterm="icmpcharacteristics.title"></link>.
         </para>
@@ -425,7 +425,7 @@ The <systemitem>IP</systemitem> protocol resides in the
 <systemitem>Internet</systemitem> layer, as we have already said. The
 <systemitem>IP</systemitem>
 protocol is the protocol in the <systemitem>TCP/IP</systemitem> stack that is responsible for letting
-your machine, routers, switches and etcetera, know where a specific packet is
+your machine, routers, switches and et cetera, know where a specific packet is
 going. This protocol is the very heart of the whole
 <systemitem>TCP/IP</systemitem> stack, and makes up
 the very foundation of everything in the Internet.
@@ -452,7 +452,7 @@ The <systemitem>IP</systemitem> protocol has a couple of basic functionalities
 that it must be able to handle. It must be able to define the datagram, which
 is the next building block created by the transport layer (this may in other
 words be <systemitem>TCP</systemitem>, <systemitem>UDP</systemitem> or
-<systemitem>ICMP</systemitem> for example). The <systemitem>IP</systemitem>
+<systemitem>ICMP</systemitem>, for example). The <systemitem>IP</systemitem>
 protocol also defines the Internet addressing system that we use today. This
 means that the <systemitem>IP</systemitem> protocol is what defines how to
 reach between hosts, and this also affects how we are able to route packets,
@@ -469,20 +469,20 @@ and 0's (<emphasis>127.0.0.1</emphasis> would hence be read as
 
       <para>
 The <systemitem>IP</systemitem> protocol has even more magic it must perform
-up it's sleeve. It must also be able to decapsulate and encapsulate the
+up its sleeve. It must also be able to decapsulate and encapsulate the
 <systemitem>IP datagram</systemitem> (<systemitem>IP data</systemitem>) and
 send or receive the datagram from either the <systemitem>Network access
 layer</systemitem>, or the <systemitem>transport layer</systemitem>. This may
 seem obvious, but sometimes it is not. On top of all this, it  has two big
-functions it must perform as well, that will be of quite interest for the
+functions it must perform as well that will be quite of interest for the
 firewalling and routing community. The <systemitem>IP</systemitem> protocol is
 responsible for routing packets from one host to another, as well as packets
 that we may receive from one host destined for another. Most of the time on
-single network access host, this is a very simple process. You have two
+single network accessed host, this is a very simple process. You have two
 different options, either the packet is destined for our locally attached
-network, or possibly through a default gateway. but once you start working
+network, or possibly through a default gateway. But once you start working
 with firewalls or security policies together with multiple network interfaces
-and different routes, it may cause quite some headache for many network
+and different routes, it may cause quite a headache for many network
 administrators. The last of the responsibilities for the
 <systemitem>IP</systemitem> protocol is that it must fragment and reassemble
 any datagram that has previously been fragmented, or that needs to be
@@ -499,7 +499,7 @@ mention the actual data.
 As of Linux kernel 2.4 series, and iptables, this should no longer be a problem
 for most linux firewalls. The connection tracking system used by iptables for
 state matching and <systemitem>NAT</systemitem>'ing etc must be able to read
-the packet defragmented. Because of this, conntrack automatically defragments
+the defragmented packet. Because of this, conntrack automatically defragments
 all packets before they reach the netfilter/iptables structure in the kernel.
         </para>
       </tip>
@@ -536,7 +536,7 @@ received or not. It simply receives a packet from the transport layer and does
 its thing, and then passes it on to the <systemitem>network access
 layer</systemitem>, and then nothing more to it. It may receive a return
 packet, which traverses from network access layer to the
-<systemitem>IP</systemitem> protocol which  does it's thing again, and then
+<systemitem>IP</systemitem> protocol which  does its thing again, and then
 passes it on upwards to the <systemitem>Transport layer</systemitem>. However,
 it doesn't care if it gets a reply packet, or if the packet was received at
 the other end. Same thing applies for the unreliability of
@@ -590,8 +590,8 @@ to be transmitted.
       <para>
 The <systemitem>IP</systemitem> packet contains several different parts in the header as you have
 understood from the previous introduction to the <systemitem>IP</systemitem> protocol. The whole header 
-is meticuluously divided into different parts, and each part of the header is
-allocated as small of a piece as possible to do it's work, just to give the
+is meticulously divided into different parts, and each part of the header is
+allocated as small of a piece as possible to do its work, just to give the
 protocol as little overhead as possible. You will see the exact configuration of
 the IP headers in the <link linkend="ipheaders" 
 endterm="ipheaders.title"></link> image.
@@ -664,7 +664,7 @@ Version
 <indexterm><primary>IP</primary><secondary>Version</secondary></indexterm>
 <indexterm><primary>Version</primary></indexterm> - bits 0-3. This is a
 version number of the <systemitem>IP</systemitem> protocol in binary.
-<systemitem>IPv4</systemitem> iscalled 0100, while
+<systemitem>IPv4</systemitem> is called 0100, while
 <systemitem>IPv6</systemitem> is called 0110. This field is generally not used
 for filtering very much. The version described in <systemitem>RFC
 791</systemitem> is <systemitem>IPv4</systemitem>.
@@ -678,7 +678,7 @@ header is in 32 bit words. As you can see, we have split the header up in this
 way (32 bits per line) in the image as well. Since the
 <systemitem>Options</systemitem> field is of 
 optional length, we can never be absolutely sure of how long the whole header 
-is, without this field. The minimum length of this of the header is 5 words.
+is, without this field. The minimum length of the header is 5 words.
       </para>
 
       <para>
@@ -766,8 +766,8 @@ size is 65535 octets, or bytes, for a single packet. The minimum packet size
 is 576 bytes, not caring if the packet arrives in fragments or not. It is only
 recommended to send larger packets than this limit if it can be guaranteed
 that the host can receive it, according to RFC 791.<indexterm>
-<primary>RFC</primary> <secondary>791</secondary></indexterm> However, these
-days most networks runs at 1500 byte packet size. This includes almost all
+<primary>RFC</primary> <secondary>791</secondary></indexterm> However these
+days, most networks run with a 1500 byte packet size. This includes almost all
 ethernet connections, and most Internet connections.
       </para>
 
@@ -783,7 +783,7 @@ Identification
 Flags <indexterm><primary>IP</primary><secondary>Flags</secondary>
 </indexterm> <indexterm><primary>Flags</primary></indexterm> - bits 47 - 49.
 This field contains a few miscellaneous flags pertaining to fragmentation. The
-first bit is reserved, but still not used, and must be set to 0. The second
+first bit is reserved, is not used and must be set to 0. The second
 bit is set to 0 if the packet may be fragmented, and to 1 if it may not be
 fragmented. The third and last bit can be set to 0 if this was the last
 fragment, and 1 if there are more fragments of this same packet.
@@ -819,7 +819,7 @@ Protocol <indexterm><primary>IP</primary><secondary>Protocol</secondary>
 example, this may be <systemitem>TCP</systemitem>,
 <systemitem>UDP</systemitem> or <systemitem>ICMP</systemitem> among others.
 All of these numbers are defined by the <emphasis>Internet Assigned Numbers
-Authority</emphasis>. All numbers can befound on their homepage <link
+Authority</emphasis>. All numbers can be found on their homepage <link
 linkend="iana.org" endterm="iana.org.title"></link>.
       </para>
 
@@ -827,10 +827,10 @@ linkend="iana.org" endterm="iana.org.title"></link>.
 Header <indexterm><primary>IP</primary><secondary>Header
 checksum</secondary></indexterm> <indexterm><primary>Header
 checksum</primary></indexterm> checksum - bits 81 - 96. This is a checksum of
-the <systemitem>IP</systemitem> header of the packet.This field is recomputed
+the <systemitem>IP</systemitem> header of the packet. This field is recomputed
 at every host that changes the header, which means pretty much every host that
 the packet traverses over, since they most often change the packets
-<systemitem>TTL</systemitem> field or some other.
+<systemitem>TTL</systemitem> field or some others.
       </para>
 
       <para>
@@ -917,20 +917,20 @@ the program in the right order. All of this is possible through the
       </para>
       
       <para>
-The <systemitem>TCP</systemitem> protocol looks at data as an continuous data
+The <systemitem>TCP</systemitem> protocol looks at data as a continuous data
 stream with a start and a stop signal. The signal that indicates that a new
 stream is waiting to be opened is called a <systemitem>SYN</systemitem>
 three-way handshake in <systemitem>TCP</systemitem>, and consists of one
 packet sent with the <systemitem>SYN</systemitem> bit set. The other end then
 either answers with <systemitem>SYN/ACK</systemitem> or
 <systemitem>SYN/RST</systemitem> to let the client know if the connection was
-accepted or denied, respectively. If the client receives an
+accepted or denied, respectively. If the client receives a
 <systemitem>SYN/ACK</systemitem> packet, it once again replies, this time with
 an <systemitem>ACK</systemitem> packet. At this point, the whole connection is
 established and data can be sent. During this initial handshake, all of the
 specific options that will be used throughout the rest of the
 <systemitem>TCP</systemitem> connection is also negotiated, such as
-<systemitem>ECN</systemitem>, <systemitem>SACK</systemitem>, etcetera.
+<systemitem>ECN</systemitem>, <systemitem>SACK</systemitem>, et cetera.
       </para>
       
       <para>
@@ -1032,9 +1032,9 @@ number on each <systemitem>TCP</systemitem> packet so that the
 <systemitem>TCP</systemitem> stream <indexterm><primary>TCP</primary>
 <secondary>Sequence number</secondary></indexterm>
 <indexterm><primary>Sequence Number</primary></indexterm> can be properly
-sequenced (e.g., the packets winds up in the correct order). The
+sequenced (e.g., the packets wind up in the correct order). The
 <systemitem>Sequence number</systemitem> is then returned in the
-<systemitem>ACK</systemitem> field to ackonowledge that the packet was
+<systemitem>ACK</systemitem> field to acknowledge that the packet was
 properly received.
       </para>
 
@@ -1044,7 +1044,7 @@ Acknowledgment <indexterm><primary>TCP</primary>
 <indexterm><primary>Acknowledgment Number</primary></indexterm> Number - bit
 64 - 95. This field is used when we acknowledge a specific packet a host has
 received. For example, we receive a packet with one <systemitem>Sequence
-number</systemitem> set, and if everything is okey with the packet, we reply
+number</systemitem> set, and if everything is okay with the packet, we reply
 with an <systemitem>ACK</systemitem> packet with the
 <systemitem>Acknowledgment number</systemitem> set to the same as the original
 <systemitem>Sequence number</systemitem>.
@@ -1088,7 +1088,7 @@ RFC 3268 <indexterm><primary>RFC</primary>
 <systemitem>Congestion Window Reduced</systemitem>, and is used by the data
 sending part to inform the receiving part that the congestion window has been
 reduced. When the congestion window is reduced, we send less data per
-timeunit, to be able to cope with the total network load.
+time-unit, to be able to cope with the total network load.
       </para>
     
       <para>
@@ -1120,7 +1120,7 @@ use <systemitem>Urgent pointer</systemitem>.
 ACK <indexterm><primary>TCP</primary> <secondary>ACK</secondary></indexterm>
 <indexterm><primary>ACK</primary></indexterm> - bit 107. This bit is set to a
 packet to indicate that this is in reply to another packet that we received,
-and that contained data. An Acknowledgment packet is always sent to indicate
+and that it contained data. An Acknowledgment packet is always sent to indicate
 that we have actually received a packet, and that it contained no errors. If
 this bit is set, the original data sender will check the Acknowledgment Number
 to see which packet is actually acknowledged, and then dump it from the
@@ -1135,8 +1135,8 @@ PSH <indexterm><primary>TCP</primary> <secondary>PSH</secondary></indexterm>
 <systemitem>TCP</systemitem> protocol on any intermediate hosts to send the
 data on to the actual user, including the <systemitem>TCP</systemitem>
 implementation on the receiving host. This will push all data through,
-unregardless of where or how much of the <systemitem>TCP Window</systemitem>
-that has been pushed through yet. 
+regardless of where or how much of the <systemitem>TCP Window</systemitem>
+has been pushed through yet.
       </para>
 
       <para>
@@ -1183,7 +1183,7 @@ acknowledge, and the <systemitem>Window field</systemitem> then contains the
 maximum accepted sequence <indexterm><primary>TCP</primary>
 <secondary>Window</secondary></indexterm>
 <indexterm><primary>Window</primary></indexterm> numbers that the sending host
-can use before he receives the next <systemitem>ACK</systemitem> packet. The
+can use before it receives the next <systemitem>ACK</systemitem> packet. The
 next <systemitem>ACK</systemitem> packet will update accepted Window which the
 sender may use.
       </para>
@@ -1261,7 +1261,7 @@ zeros.
 The <systemitem>User Datagram Protocol</systemitem>
 (<systemitem>UDP</systemitem>) is a very basic and simple protocol on top of
 the <systemitem>IP</systemitem> protocol. It was developed to allow for very
-simple data transmission without any error detection of any kind, and it is
+simple data transmission without any error detection of any kind and it is
 stateless. However, it is very well fit for query/response kind of
 applications, such as for example <systemitem>DNS</systemitem>, et cetera,
 since we know that unless we get a reply from the <systemitem>DNS</systemitem>
@@ -1331,7 +1331,7 @@ Length <indexterm><primary>UDP</primary>
 <indexterm><primary>Length</primary></indexterm> - bit 32-47. The
 <systemitem>length</systemitem> field specifies the length of the whole packet
 in octets, including header and data portions. The shortest possible packet
-can be 8 octets long. 
+can be is 8 octets long.
       </para>
 
       <para>
@@ -1399,7 +1399,7 @@ the actual <systemitem>IP</systemitem> header is an integral part of the
 <systemitem>ICMP</systemitem> packet, and the <systemitem>ICMP</systemitem>
 protocol lives on the same level as the <systemitem>IP</systemitem> protocol
 in a sense. <systemitem>ICMP</systemitem> does use the
-<systemitem>IP</systemitem> protocol as if it where a higher level protocol,
+<systemitem>IP</systemitem> protocol as if it were a higher level protocol,
 but at the same time not. <systemitem>ICMP</systemitem> is an integral part of
 <systemitem>IP</systemitem>, and <systemitem>ICMP</systemitem> must be
 implemented in every <systemitem>IP</systemitem> implementation.
@@ -1419,7 +1419,7 @@ implemented in every <systemitem>IP</systemitem> implementation.
       </indexterm>
  
       <para>
-As already explained, the headers differs a little bit from
+As already explained, the headers differ a little bit from
 <systemitem>ICMP type</systemitem> to <systemitem>ICMP type</systemitem>. Most
 of the <systemitem>ICMP</systemitem> types are possible to group by their
 headers. Because of this, we will discuss the basic header form first, and
@@ -1625,7 +1625,7 @@ a type 0.
         <para>
 When the reply is sent, the <systemitem>source</systemitem> and
 <systemitem>destination addresses</systemitem> switch places as well. After
-both of those changes has been done, the <systemitem>checksum</systemitem> is
+both of those changes have been done, the <systemitem>checksum</systemitem> is
 recomputed, and the reply is sent. There is only one code for both of these
 types, they are always set to 0.
         </para>
@@ -1652,8 +1652,8 @@ and is incremented by 1 for each packet.
         </itemizedlist>
 
         <para>
-The packets also contains a data part. Per default, the data part is generally
-empty, but it can contain a userspecified amount of random data.
+The packets also contain a data part. By default, the data part is generally
+empty, but it can contain a user-specified amount of random data.
         </para>
 
       </section>
@@ -1757,7 +1757,7 @@ this message is returned.
 Code 8 - Source host isolated (obsolete)<indexterm><primary>Destination
 Unreachable</primary> <secondary>Source host isolated</secondary></indexterm>
 - If a host is isolated, this message should be returned. This code is
-obsoleted today.
+obsolete today.
             </para>
           </listitem>
           <listitem>
@@ -1775,7 +1775,7 @@ your packet was unable to reach it because of this, you should get this
 Code 10 - Destination host administratively prohibited
 <indexterm><primary>Destination Unreachable</primary>
 <secondary>Destination host administratively
-prohibited</secondary></indexterm> - If you where unable to reach a host
+prohibited</secondary></indexterm> - If you were unable to reach a host
 because it was administratively prohibited (e.g., routing administration),
 you will get this message back.
             </para>
@@ -1861,8 +1861,8 @@ fileref="images/icmp-source-quench-headers.jpg"  format=jpg>
 
         <para>
 A source quench packet can be sent to tell the originating source of a packet or
-stream of packets to slow down when continuing to send data. Note that gateway
-or destination host that the packets traverses can also be quiet and silently
+stream of packets to slow down when continuing to send data. Note that the gateway
+or destination host that the packets traverse can also be quiet and silently
 discard the packets, instead of sending any <systemitem>source quench</systemitem> packets.
         </para>
 
@@ -1934,12 +1934,12 @@ The main header of the <systemitem>Redirect</systemitem> type is the
 <systemitem>Gateway Internet Address</systemitem> field. This field tells the
 host about the proper gateway, which should really be used. The packet also
 contains the <systemitem>IP</systemitem> header of the original packet, and
-the 64 first bits of data in the original packet, which is used to connect it
+the first 64 bits of data in the original packet, which is used to connect it
 to the proper process sending the data.
         </para>
         
         <para>
-The <systemitem>Redirect</systemitem> type has 4 different codes as well,
+The <systemitem>Redirect</systemitem> type has 4 different codes as well;
 these are the following.
         </para>
         
@@ -2079,7 +2079,7 @@ uses type 12 and it has 2 codes that it uses as well. <systemitem>Parameter
 problem</systemitem> messages are used to tell the sending host that the
 gateway or receiving host had problems understanding parts of the
 <systemitem>IP</systemitem> headers such as errors, or that some required
-options where missing.
+options were missing.
         </para>
         
         <para>
@@ -2295,7 +2295,7 @@ extra layer of abstraction in <systemitem>TCP</systemitem> in other words.
 and co-exist with <systemitem>TCP</systemitem> for bandwidth. It scales up and
 down based on network load conditions just the same as
 <systemitem>TCP</systemitem>. It also has the same algorithms for slow
-starting when packets where lost. <systemitem>ECN</systemitem> <indexterm>
+starting when packets were lost. <systemitem>ECN</systemitem> <indexterm>
 <primary>SCTP</primary> <secondary>ECN</secondary> </indexterm> is also
 supported.
         </para>
@@ -2315,7 +2315,7 @@ rely on the <systemitem>IP</systemitem> layer for resilience.
 streams inside the same stream. Hence the name <systemitem>Stream Control 
 Transmission Protocol</systemitem>. A single stream can for example be opened 
 to download a single webpage, and all the images and html documents can then 
-be downloaded within the same stream simultaneously. Or why not a database 
+be downloaded within the same stream simultaneously. Or, why not have a database
 protocol which can create a separate control stream and then use several 
 streams to receive the output from the different queries simultaneously.
         </para>
@@ -2326,7 +2326,7 @@ streams to receive the output from the different queries simultaneously.
 <systemitem>Initiation</systemitem>. 4 packet initiation of connections where 
 packet 3 and 4 can be used to send data. The equivalent of 
 <systemitem>syncookies</systemitem> is implemented by default to avoid 
-<systemitem>DoS</systemitem> attacks. <systemitem>INIT collision 
+<systemitem>DoS</systemitem> attacks, and <systemitem>INIT collision
 resolution</systemitem> to avoid several simultaneous 
 <systemitem>SCTP</systemitem> connections. 
         </para>
@@ -2347,7 +2347,7 @@ not <systemitem>packets</systemitem> or <systemitem>windows</systemitem>
 anymore. An <systemitem>SCTP frame</systemitem> can contain several different 
 <systemitem>chunks</systemitem> since the protocol is message oriented. A 
 <systemitem>chunk</systemitem> can either be a control or a data chunk. 
-<systemitem>Control chunks</systemitem> is used to control the session, and 
+<systemitem>Control chunks</systemitem> are used to control the session, and
 <systemitem>data chunks</systemitem> are used to send actual data.
        </para>
       </note>
@@ -2469,7 +2469,7 @@ mandatory parameters et cetera.
 The <systemitem>SCTP</systemitem> connection is finally closed by either an 
 <systemitem>ABORT chunk</systemitem> or by a graceful 
 <systemitem>SHUTDOWN chunk</systemitem>. <systemitem>SCTP</systemitem> doesn't 
-have a half-closed state as <systemitem>TCP</systemitem>, in other words one 
+have a half-closed state like <systemitem>TCP</systemitem>. In other words, one
 side can not continue sending data while the other end has closed its sending 
 socket. 
         </para>
@@ -2561,7 +2561,7 @@ fileref="images/sctp-generic-header.jpg"  format=jpg>
         </para>
 
 	<para>
-This is a generic overview of how a <systemitem>SCTP</systemitem> packet is 
+This is a generic overview of how an <systemitem>SCTP</systemitem> packet is
 laid out. Basically, you have a common header first with information describing 
 the whole packet, and the source and destination ports etc. See more below for 
 information on the common header.
@@ -2690,7 +2690,7 @@ fileref="images/sctp-chunks-generic-fields.jpg"  format=jpg>
           </mediaobject>
 
         <para>
-All <systemitem>SCTP</systemitem> chunks has a special layout that they all
+All <systemitem>SCTP</systemitem> chunks have a special layout that they all
 adhere to as can be seen above. This isn't an actual header, but rather a
 formalized way of how they do look. 
 	</para>
@@ -3223,7 +3223,7 @@ chunk may contain one or more <systemitem>Error Causes</systemitem>, which
 notifies the opposite peer of a problem with the connection. Each
 <systemitem>Error Cause</systemitem> follows a specific format, as described
 in the <link linkend="rfc2960" endterm="rfc2960.title"></link> document. We
-will not go into them here more than to say that they all contain an
+will not go into them here more than to say that they all contain a
 <systemitem>Cause Code</systemitem>, cause length and cause specific
 information field. The following <systemitem>Error Causes</systemitem> are
 possible:
@@ -3370,7 +3370,7 @@ fileref="images/sctp-chunk-heartbeat-header.jpg"  format=jpg>
 	<para>
 The <systemitem>HEARTBEAT</systemitem> chunk is sent by one of the peers to
 probe and find out if a specific <systemitem>SCTP</systemitem> endpoint address
-is up. This is sent to the different addresses that was negotiated during the
+is up. This is sent to the different addresses that were negotiated during the
 initialization of the association to find out if they are all up.
 	</para>
 
@@ -3737,7 +3737,7 @@ fileref="images/sctp-chunk-init-param-host-name-header.jpg"  format=jpg>
 
 	<para>
 The <systemitem>Hostname</systemitem> parameter is used to send a single
-hostname as an address. Thea receiving host must then look up the hostname and
+hostname as an address. The receiving host must then look up the hostname and
 use any and/or all of the addresses it receives from there. If a hostname
 parameter is sent, no other <systemitem>IPv4</systemitem>,
 <systemitem>IPv6</systemitem> or <systemitem>Hostname</systemitem> parameters
@@ -3784,7 +3784,7 @@ fileref="images/sctp-chunk-init-ack-header.jpg"  format=jpg>
         </para>
 
 	<para>
-The <systemitem>INIT ACK</systemitem> chunk is sent in response to a
+The <systemitem>INIT ACK</systemitem> chunk is sent in response to an
 <systemitem>INIT</systemitem> chunk and contains basically the same headers,
 but with values from the recipient of the original
 <systemitem>INIT</systemitem> chunk. In addition, it has two extra variable
@@ -3997,7 +3997,7 @@ fileref="images/sctp-chunk-sack-header.jpg"  format=jpg>
 
 	<para>
 The <systemitem>SACK</systemitem> chunk is used to tell the sender of
-<systemitem>DATA</systemitem> chunks which chunks has been received and where
+<systemitem>DATA</systemitem> chunks which chunks have been received and where
 there has been a gap in the stream, based on the received
 <systemitem>TSN</systemitem>'s. Basically, the <systemitem>SACK</systemitem>
 chunk acknowledges that it has received data up to a certain point (the
@@ -4057,7 +4057,7 @@ of Gap Ack Blocks</secondary> </indexterm>- bit 96-111. The number of
 	<para>
 Number of Duplicate TSNs <indexterm> <primary>SCTP</primary> <secondary>Number
 of Duplicate TSNs</secondary> </indexterm>- bit 112-127. The number of
-<systemitem>DATA</systemitem> chunks that has been duplicated. Each duplicated
+<systemitem>DATA</systemitem> chunks that have been duplicated. Each duplicated
 <systemitem>TSN</systemitem> is listed after the <systemitem>Gap Ack
 Blocks</systemitem> in the chunk, and each <systemitem>TSN</systemitem> takes
 32 bits to send. 
@@ -4071,7 +4071,7 @@ chunk. If there are no gaps in the received <systemitem>DATA</systemitem>
 chunk <systemitem>TSN</systemitem> numbers, there will be no <systemitem>Gap
 Ack Blocks</systemitem> at all. However, if <systemitem>DATA</systemitem>
 chunks are received out of order or some <systemitem>DATA</systemitem> chunks
-where lost during transit to the host, there will be gaps. The gaps that has
+were lost during transit to the host, there will be gaps. The gaps that have
 been seen will be reported with <systemitem>Gap Ack Blocks</systemitem>. The
 <systemitem>Gap Ack Block</systemitem> start point is calculated by adding the
 <systemitem>Gap Ack Block Start</systemitem> parameter to the
@@ -4085,7 +4085,7 @@ Block #1 End</secondary> </indexterm>- bit 144-159. This value reports the end
 of the first <systemitem>Gap Ack Block </systemitem>in the stream. All the
 <systemitem>DATA</systemitem> chunks with the <systemitem>TSN</systemitem>
 between the <systemitem>Gap Ack Block Start</systemitem> and the
-<systemitem>Gap Ack Block End</systemitem> has been received. The
+<systemitem>Gap Ack Block End</systemitem> have been received. The
 <systemitem>Gap Ack Block End</systemitem> value is added to the
 <systemitem>Cumulative TSN</systemitem>, just as the Start parameter, to get
 the actual last <systemitem>TSN</systemitem> of the block chunks to be
@@ -4114,13 +4114,13 @@ Block #N End</secondary> </indexterm>- bits variable. Same as for the
 Duplicate TSN #1 <indexterm> <primary>SCTP</primary> <secondary>Duplicate TSN
 #1</secondary> </indexterm>- bits variable. These fields report a duplicate
 <systemitem>TSN</systemitem>, in which case we have already received a
-specific chunk, but receive the same <systemitem>TSN</systemitem> several
+specific chunk, but received the same <systemitem>TSN</systemitem> several
 times more. This can either be router glitches (retransmitting already sent
 data) or a case of retransmission from the sending endpoint, or a score of
 other possibilities. Each instance of a duplicate <systemitem>TSN</systemitem>
 should be reported once. For example, if 2 duplicate
 <systemitem>TSN</systemitem>'s has been received after acknowledging the first
-one, each of these duplicate <systemitem>TSN</systemitem>'s should be sent
+one, each of these duplicate <systemitem>TSN</systemitem>'s should be
 sent in the next <systemitem>SACK</systemitem> message that is being sent. If
 even more duplicate <systemitem>TSN</systemitem>'s should appear after this
 second <systemitem>SACK</systemitem> is sent, the new duplicates should be
