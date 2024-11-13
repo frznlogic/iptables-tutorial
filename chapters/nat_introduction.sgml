@@ -166,6 +166,7 @@ internet will not be able to run his own server. It could be done, of course,
 but it takes a lot more time and work to set this up. In companies, this is
 probably preferred over having tons of servers run by different employees that
 are reachable from the Internet, without any supervision. However, when it
+<!-- The following is standard ISP practice nowadays in my opinion - edrulrd@hotmail.com 20240901 -->
 comes to home users, this should be avoided to the very last. You should never
 as an Internet service provider NAT your customers from a private IP range to
 a public IP. It will cause you more trouble than it is worth having to deal

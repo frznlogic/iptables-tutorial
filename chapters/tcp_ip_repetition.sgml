@@ -1068,8 +1068,9 @@ also included the <systemitem>CWR</systemitem> and
 and <systemitem>ECE</systemitem> fields) must be set to zero to be fully
 compliant. Later on, when we started introducing <systemitem>ECN</systemitem>,
 this caused a lot of troubles because a lot of Internet appliances such as
-firewalls and routers dropped packets with them set. This is still true as of
-writing this. 
+firewalls and routers dropped packets with them set.
+<!-- not sure if the following statement is still needed. edrulrd@hotmail.com - 20240901 -->
+This is still true as of writing this.
       </para>
     
       <para>
@@ -1092,12 +1093,13 @@ added with RFC 3268 <indexterm><primary>RFC</primary>
 <systemitem>ECN</systemitem>. <systemitem>ECE</systemitem> stands for
 <systemitem>ECN Echo</systemitem>. It is used by the
 <systemitem>TCP/IP</systemitem> stack on the receiver host to  let the sending
-host know that it has received an <systemitem>CE</systemitem> packet. The same
+host know that it has received a <systemitem>CE</systemitem> packet. The same
 thing applies here, as for the <systemitem>CWR</systemitem> bit, it was
 originally a part of the reserved field and because of this, some networking
 appliances will simply drop the packet if these fields contain anything else
-than zeroes. This is actually still true for a lot of appliances
-unfortunately. 
+than zeroes.
+<!-- not sure if the following statement is still needed. edrulrd@hotmail.com - 20240901 -->
+This is actually still true for a lot of appliances unfortunately.
       </para>
 
       <para>
