@@ -28,7 +28,7 @@ state matching code.
       <ulink url="mailto:fenATimprobusDOTcom"><emphasis>Frode E.
 Nyboe</emphasis></ulink>, For greatly improving the
 <filename>rc.firewall</filename> rules and giving great inspiration while
-i was to rewrite the rule-set and being the one who introduced the multiple table
+I was to rewrite the rule-set and being the one who introduced the multiple table
 traversing into the same file.
       </para>
     </listitem>
@@ -38,7 +38,7 @@ traversing into the same file.
       <ulink url="mailto:kakadu_crocATyahooDOTcom"><emphasis>Chapman
 Brad</emphasis></ulink>, <ulink
 url="mailto:yallaATynfonaticDOTde"><emphasis>Alexander W.
-Janssen</emphasis></ulink>, Both for making me realize I was thinking wrong
+Janssen</emphasis></ulink>, Both for making me realize I was thinking wrongly
 about how packets traverse the basic NAT and filters tables and in which order
 they show up.      </para>
     </listitem>

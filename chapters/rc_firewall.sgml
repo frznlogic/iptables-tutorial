@@ -16,7 +16,7 @@ on how to solve different problems and what you may need to think about before
 actually putting your scripts to work. It could be used as is with some
 changes to the variables, but is not suggested since it may not work perfectly
 together with your network setup. As long as you have a very basic setup
-however, it will very likely run quite smooth with just a few fixes to it.
+however, it will very likely run quite smoothly with just a few fixes to it.
   </para>
 
   <note>
@@ -45,7 +45,7 @@ OK, so you have everything set up and are ready to check out an example
 configuration script. You should at least be if you have come this far. This
 example <link linkend="rcfirewalltxt" endterm="rcfirewalltxt.title"></link> 
 (also included in the <link linkend="examplecode" endterm="examplecode.title"></link> 
-appendix) is fairly large but not a lot of comments in it. Instead of looking 
+appendix) is fairly large but it does not have a lot of comments in it. Instead of looking
 for comments, I suggest you read through the script file to get a basic hum 
 about how it looks, and then you return here to get the nitty gritty about the 
 whole script.
@@ -116,7 +116,7 @@ connected to the <systemitem>LAN</systemitem> through.
 
     <para>
     Also, as you may see there is a Localhost configuration section. We do
-provide it, however you will with 99% certainty not change any of the values
+provide it, however, you will with 99% certainty not change any of the values
 within this section since you will almost always use the 127.0.0.1
 <systemitem>IP address</systemitem> and the interface will almost certainly be
 named <systemitem>lo</systemitem>. Also, just below the Localhost configuration,
@@ -217,7 +217,7 @@ chapter.
 that extend the state matching code and connection tracking code are called
 <systemitem>ip_conntrack_*</systemitem> and <systemitem>ip_nat_*</systemitem>.
 Connection tracking helpers are special modules that tell the kernel how to
-properly track the specific connections. Without these so called helpers, the
+properly track the specific connections. Without these so-called helpers, the
 kernel would not know what to look for when it tries to track specific
 connections. The <systemitem>NAT</systemitem> helpers on the other hand, are
 extensions of the connection tracking helpers that tell the kernel what to look
@@ -225,7 +225,7 @@ for in specific packets and how to translate these so the connections will
 actually work. For example, <systemitem>FTP</systemitem> is a complex protocol
 by definition, and it sends connection information within the actual payload of
 the packet. So, if one of your <systemitem>NAT</systemitem>ed boxes connect to
-a <systemitem>FTP</systemitem> server on the Internet, it will send its own
+an <systemitem>FTP</systemitem> server on the Internet, it will send its own
 local network <systemitem>IP address</systemitem> within the payload of the
 packet, and tell the <systemitem>FTP</systemitem> server to connect to that
 <systemitem>IP address</systemitem>. Since this local network address is not
@@ -234,7 +234,7 @@ know what to do with it and hence the connection will break down. The
 <systemitem>FTP NAT</systemitem> helpers do all of the translations within these
 connections so the <systemitem>FTP</systemitem> server will actually know where
 to connect. The same thing applies for <systemitem>DCC</systemitem> file
-transfers (sends) and chats. Creating these kind of connections requires the
+transfers (sends) and chats. Creating these kind of connections require the
 <systemitem>IP address</systemitem> and ports to be sent within the
 <systemitem>IRC protocol</systemitem>, which in turn requires some translation
 to be done. Without these helpers, some <systemitem>FTP</systemitem> and
@@ -242,7 +242,7 @@ to be done. Without these helpers, some <systemitem>FTP</systemitem> and
 things will not work. For example, you may be able to receive files over
 <systemitem>DCC</systemitem>, but not be able to send files. This is due to how
 the <systemitem>DCC</systemitem> starts a connection. First off, you tell the
-receiver that you want to send a file and where he should connect to. Without
+receiver that you want to send a file and where they should connect to. Without
 the helpers, the <systemitem>DCC</systemitem> connection will look as if it
 wants the receiver to connect to some host on the receiver's own local network.
 In other words, the whole connection will be broken. However, the other way
@@ -344,7 +344,7 @@ you use <systemitem>SLIP</systemitem>, <systemitem>PPP</systemitem> or
     </para>
 
     <para>
-If there is any other options you might need to turn on you should follow
+If there are any other options you might need to turn on, you should follow
 that style. There's other documentation on how to do these things and this
 is out of the scope of this documentation. There is a good but rather brief
 document about the proc system available within the kernel, which is also
@@ -380,7 +380,7 @@ knowing what they mean.
 
     <para>
     This section will briefly describe my choices within the tutorial
-regarding user specified chains and some choices specific to the
+regarding user-specified chains and some choices specific to the
 <filename>rc.firewall.txt</filename> script. Some of the paths I have
 chosen to go here may be wrong from one or another aspect. I hope to
 point these aspects and possible problems out to you when and where they
@@ -397,12 +397,12 @@ weight on security and readability. Instead of letting a
 <systemitem>ICMP</systemitem>, <systemitem>UDP</systemitem> and
 <systemitem>TCP</systemitem> rules, I simply match all
 <systemitem>TCP</systemitem> packets and then let the
-<systemitem>TCP</systemitem> packets traverse a user specified chain.
+<systemitem>TCP</systemitem> packets traverse a user-specified chain.
 This way we do not get too much overhead out of it all. The following
 picture will try to explain the basics of how an incoming packet traverses
 Netfilter. With these pictures and explanations, I wish to explain and
 clarify the goals of this script. We will not discuss any specific details
-yet, but instead further on in the chapter. This is a really trivial
+yet, but will instead further on in the chapter. This is a really trivial
 picture in comparison to the one in the <link linkend="traversingoftables"
 endterm="traversingoftables.title"></link> chapter where we discussed the
 whole traversal of chains and tables in depth.
@@ -538,7 +538,7 @@ the local network as well as the loopback network interface. Also, we do not
 want to allow specific packets or packet headers in specific conjunctions, nor
 do we want to allow some IP ranges to reach the firewall from the Internet. For
 instance, the <systemitem>10.0.0.0/8</systemitem> address range is reserved for
-local networks and hence we would normally not want to allow packets from such a
+local networks and hence we would normally not want to allow packets from such an
 address range since they would with 90% certainty be spoofed. However, before we
 implement this, we must note that certain Internet Service Providers actually
 use these address ranges within their own networks. For a closer discussion of
@@ -662,13 +662,13 @@ strange behaviors.
 
 
    <section id="settingupuser">
-    <title id="settingupuser.title">Setting up user specified chains in the filter table</title>
+    <title id="settingupuser.title">Setting up user-specified chains in the filter table</title>
     <indexterm zone="settingupuser">
-      <primary>User specified chains</primary>
+      <primary>User-specified chains</primary>
     </indexterm>
     <indexterm zone="settingupuser">
       <primary>Basics</primary>
-      <secondary>User specified chains</secondary>
+      <secondary>User-specified chains</secondary>
     </indexterm>
 
     <para>
@@ -840,7 +840,7 @@ sake of being complete. The rule that will be used is placed at the top of the
     <para>
 The <systemitem>tcp_packets</systemitem> chain specifies what ports are allowed 
 to use on the firewall from the Internet. There is, however, even more checks 
-to do, hence we send each and every one of the packets on to the allowed chain, 
+to do, hence we send each and every one of the packets onto the allowed chain,
 which we described previously.
     </para>
 
@@ -890,7 +890,7 @@ might be necessary for some protocols like IRC, etc to work properly. Do note
 that it may be worth it to use the <command>oidentd</command> package if you
 <systemitem>NAT</systemitem> several hosts on your local network.
 <command>oidentd</command> has support for relaying
-<systemitem>IDENTD</systemitem> requests on to the correct boxes within your
+<systemitem>IDENTD</systemitem> requests onto the correct boxes within your
 local network.
     </para>
 
@@ -931,7 +931,7 @@ port you want to open.
     </indexterm>
 
     <para>
-If we do get a <systemitem>UDP</systemitem> packet on the
+If we get a <systemitem>UDP</systemitem> packet on the
 <systemitem>INPUT</systemitem> chain, we send them on to
 <systemitem>udp_packets</systemitem> where we once again do a match for
 the <systemitem>UDP</systemitem> protocol with <command>-p UDP</command> and
@@ -951,7 +951,7 @@ the top of the <systemitem>INPUT</systemitem> chain.
     <para>
 As it is, we do not <command>ACCEPT</command> incoming
 <systemitem>UDP</systemitem> packets from port 53, which is what we use to do
-<systemitem>DNS</systemitem> lookups. The rule is there, but it is per
+<systemitem>DNS</systemitem> lookups. The rule is there, but it is by
 default commented out. If you want your firewall to act as a
 <systemitem>DNS</systemitem> server, uncomment this line.
     </para>
@@ -961,7 +961,7 @@ I personally also allow port 123, which is <systemitem>NTP</systemitem> or
 <systemitem>network time protocol</systemitem>. This protocol is used to set
 your computer clock to the same time as certain other time servers which have
 <emphasis>very</emphasis> accurate clocks. Most of you probably do not
-use this protocol and hence I am not allowing it per default. The same thing
+use this protocol and hence I am not allowing it by default. The same thing
 applies here, however, the rule is there and it is simple to uncomment to get it
 working.
     </para>
@@ -1047,7 +1047,7 @@ to allow. For now, I only allow incoming <systemitem>ICMP</systemitem>
 <systemitem>Echo requests</systemitem>, <systemitem>TTL equals 0 during
 transit</systemitem> and <systemitem>TTL equals 0 during
 reassembly</systemitem>. The reason that we do not allow any other ICMP types
-per default here, is that almost all other ICMP types should be covered by the
+by default here, is that almost all other ICMP types should be covered by the
 RELATED state rules.
     </para>
 
@@ -1089,7 +1089,7 @@ is broken.
     <para>
 For a complete listing of all <systemitem>ICMP</systemitem> types, see the
 <link linkend="icmptypes" endterm="icmptypes.title"></link> appendix . For more
-information on <systemitem>ICMP</systemitem> types and their usage, i suggest
+information on <systemitem>ICMP</systemitem> types and their usage, I suggest
 reading the following documents and reports:
 
     </para>
@@ -1141,8 +1141,8 @@ other chains to do the hard work. This way we do not get too much load from
 iptables, and it will work much better on slow machines which might otherwise
 drop packets at high loads. This is done by checking for specific details that
 should be the same for a lot of different packets, and then sending those
-packets into specific user specified chains. By doing this, we can split down
-our rule-set to contain much less rules that need to be traversed by each
+packets into specific user-specified chains. By doing this, we can split down
+our rule-set to contain many less rules that need to be traversed by each
 packet and hence the firewall will be put through a lot less overhead by packet
 filtering.
 
@@ -1197,8 +1197,8 @@ Now we do the same match for <systemitem>UDP</systemitem> packets on the
 <systemitem>udp_packets</systemitem> chain, and after this all
 <systemitem>ICMP</systemitem> packets are sent to the
 <systemitem>icmp_packets</systemitem> chain. Normally, a firewall would be
-hardest hit by <systemitem>TCP</systemitem> packets, than
-<systemitem>UDP</systemitem> and last of them all <systemitem>ICMP</systemitem>
+hardest hit by <systemitem>TCP</systemitem> packets, then
+<systemitem>UDP</systemitem> and last of them all, <systemitem>ICMP</systemitem>
 packets. This is in normal case, mind you, and it may be wrong for you. The
 absolute same thing should be looked upon here, as with the network specific
 rules. Which causes the most traffic? Should the rules be thrown around to
@@ -1211,7 +1211,7 @@ to look at when writing a rule-set for your own local network.
     </para>
 
     <para>
-At this point we have one extra rule, that is per default opted out, that 
+At this point we have one extra rule, that is by default opted out, that
 can be used to get rid of some excessive logging in case we have some 
 Microsoft network on the outside of our Linux firewall. Microsoft clients 
 have a bad habit of sending out tons of multicast packets to the 
@@ -1230,7 +1230,7 @@ be someone who is doing something bad to us, or finally it might be a problem in
 our firewall not allowing traffic that should be allowed. In either case we want
 to know about it so it can be dealt with. Though, we do not log more than 3
 packets per minute as we do not want to flood our logs with crap which in turn
-may fill up our whole logging partition, also we set a prefix to all log entries
+may fill up our whole logging partition. Also, we set a prefix to log all entries
 so we know where it came from.
     </para>
 
@@ -1271,7 +1271,7 @@ scenario. We have a single rule which sends all packets to the
 <systemitem>bad_tcp_packets</systemitem> chain, which was also used in the
 <systemitem>INPUT</systemitem> chain as described previously. The
 <systemitem>bad_tcp_packets</systemitem> chain is constructed in such a fashion
-that it can be used recycled in several calling chains, regardless of what
+that it can be used again in several calling chains, regardless of what
 packet traverses it.
     </para>
 
@@ -1295,7 +1295,7 @@ internal network.
 
     <para>
     Finally we also have a logging rule which will log packets that are not
-allowed in one or another way to pass through the
+allowed in one way or another to pass through the
 <systemitem>FORWARD</systemitem> chain. This will most likely show one or
 another occurrence of a badly formed packet or other problem. One cause may be
 hacker attacks, and others may be malformed packets. This is exactly the same
@@ -1434,7 +1434,7 @@ the first one, would hence be that it is faster and more efficient to use
 the <systemitem>SNAT</systemitem> target if possible. Of course, it was
 also used to show how it would work and how it would be used in a real
 live example. If you do not have a static <systemitem>IP
-address</systemitem>, you should definitely give thought to use the
+address</systemitem>, you should definitely give thought to using the
 <command>MASQUERADE</command> target instead which provides a simple and
 easy facility that will also do <systemitem>NAT</systemitem> for you, but
 that will automatically grab the <systemitem>IP address</systemitem> that
@@ -1456,7 +1456,7 @@ endterm="rcDHCPfirewalltxt.title"></link> script.
 This chapter has explained some of the layout of the different scripts, but
 specifically the <filename>rc.firewall.txt</filename> script. The layout and
 inner workings of scripts described here and those found in other places can
-differ tremenduously. Everyone has their own coding style and how we write
+differ tremendously. Everyone has their own coding style and how we write
 rulesets or code or scripts differ from person to person, and the style you've
 seen here is my style. 
     </para>
@@ -1464,7 +1464,7 @@ seen here is my style.
     <para>
 The next chapter will give some brief introductions to the different scripts
 available within this document. They will give you some basic idea what
-scenarios the scripts where written for, and then you should hopefully have
+scenarios the scripts were written for, and then you should hopefully have
 taught yourself enough to grasp the rest of the scripts on your own. All of
 these scripts are also available for download on the main site of this
 document. 

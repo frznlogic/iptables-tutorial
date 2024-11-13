@@ -74,7 +74,7 @@ There are also a few files that might be interesting to look at in the
 <filename>/proc</filename> file system. For example, it might be interesting
 to know what connections are currently in the conntrack table. This table
 contains all the different connections currently tracked and serves as a basic
-table so we always know what state a connection currently is in. This table
+table so we always know what state a connection is currently in. This table
 can't be edited and even if it was possible, it would be a bad idea. To
 see the table you can run the following command:
 
@@ -125,7 +125,7 @@ I've actually gotten this question a couple times by now so I thought I'd
 answer it right here. If you added a rule in error, you might just change
 the <command>-A</command> parameter to <command>-D</command> in the line
 you added in error. <command>iptables</command> will find the erroneous
-line and erase it for you, in case you've got multiple lines looking
+line and erase it for you. In case you've got multiple lines looking
 exactly the same in the chain, it erases the first instance it finds
 matching your rule. If this is not the wanted behavior you might try to
 use the <command>-D</command> option as <command>iptables -D INPUT

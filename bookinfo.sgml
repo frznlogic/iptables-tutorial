@@ -73,10 +73,10 @@ The author of the iptables tutorial was born in...
    </para>
 
    <para>
-No, jokes aside. At age 8 I got my first computer for christmas present, a 
+No, jokes aside. At age 8 I got my first computer for a Christmas present, a
 Commodore 64 with a C-1541 diskdrive, 8 needle printer and some games etc. It 
 took me several days to even bother. My father managed to put it together and 
-after 2 days he finally learned himself how to load a game and showed how to do 
+after 2 days he finally taught himself how to load a game and showed how to do
 it for myself. A life immersed in computers was born this day I guess. I played 
 mostly games at this stage, but did venture into the C-64 basic programming 
 language a couple of times on and off. After some years, I got my hands on an 
@@ -85,7 +85,7 @@ around. Amiga 1200 was next.
    </para>
 
    <para>
-Back in 1993-94 My father was clearsighted enough to understand that Amiga was, 
+Back in 1993-94 My father was clear-sighted enough to understand that Amiga was,
 unfortunately, not the way of the future. PC and i386 computers was. Despite 
 my screams in vain he bought me a PC, 486 50MHz with 16 MB of ram, Compaq 
 computer. This was actually one of the worst computer designs I have ever 
@@ -110,7 +110,7 @@ the end, I believe this has helped me a lot. I believe there is nothing to
 teach you how to use something as to actually forcing yourself to do it, as I 
 did at this time. I had no choice but to learn. I continued running like this 
 for close to 2 years. After this, I finally installed XFree86 from scratch. 
-After an 24 hour compilation, I realized that I had totally misconfigured the 
+After a 24 hour compilation, I realized that I had totally misconfigured the
 compilation and had to restart the compilation from scratch. As a human, you 
 are always bound to do errors. It simply happens and you better get used to it. 
 Also, this kind of build process teaches you to be patient. Let things have 
@@ -118,14 +118,14 @@ its time and don't force it.
    </para>
 
    <para>
-In 2000-2001 I was part of a small group of people who ran a newssite mainly 
+In 2000-2001 I was part of a small group of people who ran a news site mainly
 focusing on Amiga related news, but also some Linux and general computer news. 
-The site was called BoingWorld, located at www.boingworld.com (no long 
+The site was called BoingWorld, located at www.boingworld.com (no longer
 available unfortunately). The Linux 2.3 kernels where reaching their end of 
 line and the 2.4 kernels where starting to pop up. At this point, I realized 
 there was a half-new concept of firewalling inside of it. Sure I had run into 
 ipfwadm and ipchains before and used it to some extent, but never truly gone 
-heads first into it. I also realized there was embaerassingly little 
+head first into it. I also realized there was embarrassingly little
 documentation and I felt it might be an interesting idea to write an iptables 
 tutorial for boingworld. Said and done, I wrote the first 5-10 pages of what 
 you are currently reading. Becoming a smashing hit, I continued to add material 
@@ -134,14 +134,14 @@ tutorial/documentation, but the concept lives on.
    </para>
 
    <para>
-I have worked several different companies during this time with Linux/network 
+I have worked at several different companies during this time with Linux/network
 administration, writing documentation and course material, helped several 
 hundred, if not thousand, people emailing questions regarding iptables and 
 netfilter and general networking questions. I have attended two CERTconf's and 
 held three presentations at the same conference, and also the Netfilter 
-workshop 2003. It has been an hectic and sometimes very ungrateful job to 
+workshop 2003. It has been a hectic and sometimes very ungrateful job to
 maintain and update this work, but in the end I am very happy for it and this 
-is something I am very proud of having done. At the time of writing this in end 
+is something I am very proud of having done. At the time of writing this at the end
 of 2006, the project has been close to dead for several years, and I regret 
 this. I hope to change this in the coming years, and that a lot of people will 
 find this work to be of future use, possibly adding to the family of documents 
@@ -183,9 +183,9 @@ nftables would be worth looking into.
    <para>
 This document could either be read as a reference or from start to end. It was 
 originally written as a small introduction to iptables and to some extent 
-netfilter, but this focus has changed over the years. It aims at being an as 
-complete reference as possibly to iptables and netfilter and to at least give 
-a basic and fast primer or repetition to the areas that you might need to 
+netfilter, but this focus has changed over the years. It aims at being as
+complete a reference as possible to iptables and netfilter and to at least give
+a basic and fast primer or review to the areas that you might need to
 understand. It should be noted that this document will not, nor will it be 
 able to, deal with specific bugs inside or outside the scope of iptables and 
 netfilter, nor does it really deal with how to get around bugs like this. 

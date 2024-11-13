@@ -24,7 +24,7 @@
  
   <para>
 The <command>iptables</command> package comes with two more tools that 
-are very useful, specially if you are dealing with larger rule-sets. These 
+are very useful, especially if you are dealing with larger rule-sets. These
 two tools are called <command>iptables-save</command> and 
 <command>iptables-restore</command> and are used to save and restore 
 rule-sets to a specific file-format that looks quite a bit different from 
@@ -95,7 +95,7 @@ you use.
 
    <para>
 As you can understand, these tools are definitely something for you if 
-you are working on a huge set of rules that needs to be inserted. However, 
+you are working on a huge set of rules that need to be inserted. However,
 they do have drawbacks that we will discuss more in the next section.
    </para>
 
@@ -147,8 +147,8 @@ clumsy solution.
    <para>
 A second possibility is to do as previously described. Make a script that 
 outputs rules in <command>iptables-restore</command> format, and then feed 
-them on standard input of <command>iptables-restore</command>. For very large 
-rulesets this would be to be preferred over running iptables itself, since it 
+them to standard input of <command>iptables-restore</command>. For very large
+rulesets, this would be preferred over running individual iptables commands, since it
 has a bad habit of taking a lot of processing power on very large rulesets as 
 previously described in this chapter.
    </para>
@@ -208,7 +208,7 @@ The <command>-c</command> argument tells <command>iptables-save</command>
 to keep the values specified in the byte and packet counters. This could 
 for example be useful if we would like to reboot our main firewall, but 
 not lose byte and packet counters which we may use for statistical 
-purposes. Issuing a <command>iptables-save</command> command with the 
+purposes. Issuing an <command>iptables-save</command> command with the
 <command>-c</command> argument would then make it possible for us to 
 reboot without breaking our statistical and accounting routines. The 
 default value is, of course, to not keep the counters intact when issuing 
@@ -408,8 +408,8 @@ part and leave it as an exercise for the reader to experiment with.
    </para>
 
    <para>
-The rule-set should now be loaded properly to kernel and everything should 
-work. If not, you may possibly have run into a bug in these commands. 
+The rule-set should now be loaded properly into the kernel and everything should
+work.
    </para>
   </section>
 
@@ -420,12 +420,12 @@ work. If not, you may possibly have run into a bug in these commands.
 This chapter has discussed the <command>iptables-save</command> and
 <command>iptables-restore</command> programs to some extent and how they can
 be used. Both applications are distributed with the iptables package, and can
-be used to quickly save large rulesets and then inserting them into the kernel
+be used to quickly save large rulesets and then insert them into the kernel
 again. 
     </para>
 
     <para>
-The next chapter will take a look at the syntax of a iptables rule and how to
+The next chapter will take a look at the syntax of an iptables rule and how to
 write properly formatted rule-sets. It will also show some basic good coding
 styles to adhere to, as required. 
     </para>

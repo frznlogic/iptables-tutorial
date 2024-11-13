@@ -52,7 +52,7 @@ running Linux (except for naming conventions in the interface, and so forth).
       </para>
       
       <para>
-A lot of effort has been put into creating a nicely advanced webinterface to 
+A lot of effort has been put into creating a nicely advanced web interface to
 configure and administrate the firewall from. The <link linkend="ingate">InGate 
 1200 firewall</link> has 2 10/100 Mbps Ethernet connectors and the larger 
 versions has more (up to 6 10/100/1000 Mbps Ethernet connectors and 2 mini Gbic 
@@ -86,7 +86,7 @@ linkend="rfc2401">ipsec</link> implementations, including "Road Warrior" roaming
 The device also has a very simple to setup logging facility. The machine can
 either log locally, or via <systemitem>syslog</systemitem> and/or
 <systemitem>mail</systemitem>. The local logging facility has exceptionally
-good and finegrained search capabilities through the logs. My only problem
+good and fine-grained search capabilities through the logs. My only problem
 with the local logging facility is that the search engine might be a little
 bit too slow. This is actually my main and only concern with the whole
 firewall, the whole user interface is a bit slow, and sometimes it jumps to
@@ -105,11 +105,11 @@ expected when using a new and unknown (to you) interface.
       </para>
       
       <para>
-The default values are very good. In other words, they are non-existant except 
+The default values are very good. In other words, they are non-existent except
 for the most basic options. The first thing you do, is to set the IP address of 
 the device via a "magic ping" (set the device mac address to an IP address and 
 then ping the IP address - this must be done locally). The opposite ethernet 
-port is per default turned off, until you turn it on, and no configuration 
+port is by default turned off until you turn it on, and no configuration
 except the most basic is done by the InGate developers (log groups and so on).
       </para>
       
@@ -145,7 +145,7 @@ Well, this was the last chapter. What's left is just the different appendices.
 Some of them contains some rather interesting information that didn't quite
 fit into any specific chapter, and others are just generic tables, and so
 forth. If you have any further interest in the area, there is tons and tons of
-material to read, and why not join the mailinglists available at the netfilter
+material to read, and why not join the mailing lists available at the netfilter
 website? Or why not start developing for iptables and netfilter? I hope you
 have enjoyed reading this document and that you have been able to set some of
 it to the real world test. 

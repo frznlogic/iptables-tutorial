@@ -27,7 +27,7 @@ structure</title>
    </indexterm>
  
    <para>
-All scripts written for this tutorial have been written after a specific
+All scripts written for this tutorial have been written using a specific
 structure. The reason for this is that they should be fairly similar to
 each other and to make it easier to find the differences between the scripts.
 This structure should be fairly well documented in this brief chapter. This
@@ -79,7 +79,7 @@ shell-script.
 scripts</primary><secondary>Internet</secondary></indexterm> - This is the
 configuration section which pertains to the Internet connection. This could be
 skipped if we do not have any Internet connection. Note that there may be more
-subsections than those listed here, but only such that pertain to our Internet
+subsections than those listed here, but only those that pertain to our Internet
 connection.
         </para>
 
@@ -100,7 +100,7 @@ configuration options here.
 <emphasis>PPPoE</emphasis><indexterm><primary>Example
 scripts</primary><secondary>PPPoE</secondary></indexterm> - If there is a
 possibility that the user that wants to use this specific script, and if there
-are any special circumstances that raises the chances that he is using a
+are any special circumstances that raises the chances that they are using a
 <systemitem>PPPoE</systemitem> connection, we will add specific options for
 those here.
           </para>
@@ -115,7 +115,7 @@ those here.
 <emphasis>LAN</emphasis><indexterm><primary>Example
 scripts</primary><secondary>LAN</secondary></indexterm> - If there is any
 <systemitem>LAN</systemitem> available behind the firewall, we will add
-options pertaining to that in this section. This is most likely, hence this
+options pertaining to that in this section. This is most likely, so this
 section will almost always be available.
         </para>
        </listitem>
@@ -125,7 +125,7 @@ section will almost always be available.
 <emphasis>DMZ</emphasis><indexterm><primary>Example
 scripts</primary><secondary>DMZ</secondary></indexterm> - If there is any
 reason to it, we will add a <systemitem>DMZ</systemitem> zone configuration at
-this point. Most scripts lacks this section, mainly because any normal home
+this point. Most scripts lack this section, mainly because any normal home
 network, or small corporate network, will not have one.
         </para>
        </listitem>
@@ -207,7 +207,7 @@ add to the security or add special services to the administrator or clients.
 <emphasis>Non-required modules</emphasis><indexterm><primary>Example
 scripts</primary><secondary>Non-required modules</secondary></indexterm> -
 This section contains modules that are not required for normal operations. All
-of these modules should be commented out per default, and if you want to add
+of these modules should be commented out by default, and if you want to add
 the service it provides, it is up to you.
         </para>
        </listitem>
@@ -221,7 +221,7 @@ the service it provides, it is up to you.
 scripts</primary><secondary>proc configuration</secondary></indexterm> - This
 section should take care of any special configuration needed in the /proc file
 system. If some of these options are required, they will be listed as such, if
-not, they should be commented out per default, and listed under the
+not, they should be commented out by default and listed under the
 non-required proc configurations. Most of the useful proc configurations will
 be listed here, but far from all of them.
        </para>
@@ -262,8 +262,8 @@ scripts</primary><secondary>Rules set up</secondary></indexterm> -  By now the
 scripts should most probably be ready to insert the
 <systemitem>rule-set</systemitem>. I have chosen to split all the rules down
 after table and then chain names in the rule-sets, to make them easier to
-follow and read. All user specified chains are created before we do anything
-to the system built in chains. I have also chosen to set the chains and their
+follow and read. All user-specified chains are created before we do anything
+to the system built-in chains. I have also chosen to set the chains and their
 rule specifications in the same order as they are output by the
 <command>iptables -L</command> command.
       </para>
@@ -275,7 +275,7 @@ rule specifications in the same order as they are output by the
 <emphasis>Filter table</emphasis><indexterm><primary>Example
 scripts</primary><secondary>Filter table</secondary></indexterm>
 <indexterm><primary>Filter table</primary></indexterm> - First of all we go
-through the filter table and its content. First of all we should set up all
+through the filter table and its content. We also should set up all
 the policies in the table.
         </para>
 
@@ -285,7 +285,7 @@ the policies in the table.
 <emphasis>Set policies</emphasis><indexterm><primary>Example
 scripts</primary><secondary>Set policies</secondary></indexterm> - Set up all
 the default policies for the system chains. Normally I will set
-<command>DROP</command> policies on the chainsa in the
+<command>DROP</command> policies on the chains in the
 <systemitem>filter</systemitem> table, and specifically
 <command>ACCEPT</command> services and streams that I want to allow inside.
 This way we will get rid of all ports that we do not want to let people use.
@@ -294,9 +294,9 @@ This way we will get rid of all ports that we do not want to let people use.
 
          <listitem>
           <para>
-<emphasis>Create user specified chains</emphasis><indexterm><primary>Example
-scripts</primary><secondary>User specified chains</secondary></indexterm> - At
-this point we create all the user specified chains that we want to use later
+<emphasis>Create user-specified chains</emphasis><indexterm><primary>Example
+scripts</primary><secondary>User-specified chains</secondary></indexterm> - At
+this point we create all the user-specified chains that we want to use later
 on within this table. We will not be able to use these chains in the system
 chains anyway if they are not already created so we might as well get to it as
 soon as possible.
@@ -305,12 +305,12 @@ soon as possible.
 
          <listitem>
           <para>
-<emphasis>Create content in user specified chains</emphasis>
-<indexterm><primary>Example scripts</primary><secondary>User specified chains
-content</secondary></indexterm> - After creating the user specified chains we
+<emphasis>Create content in user-specified chains</emphasis>
+<indexterm><primary>Example scripts</primary><secondary>User-specified chains
+content</secondary></indexterm> - After creating the user-specified chains we
 may as well enter all the rules within these chains. The only reason I have to
 enter this data at this point already is that you may as well put it close to
-the creation of the user specified chains. You may as well put this later on
+the creation of the user-specified chains. You may as well put this later on
 in your script, it is totally up to you.
           </para>
          </listitem>
@@ -367,8 +367,8 @@ of the nat table. This is done after the filter table because of a number of
 reasons within these scripts. First of all we do not want to turn the whole
 forwarding mechanism and NAT function on at too early a stage, which could
 possibly lead to packets getting through the firewall at just the wrong
-time point (i.e., when the NAT has been turned on, but none of the filter
-rules has been run). Also, I look upon the nat table as a sort of layer that
+point in time (i.e., when the NAT has been turned on, but none of the filter
+rules have been run). Also, I look upon the nat table as a sort of layer that
 lies just outside the filter table and kind of surrounds it. The filter table
 would hence be the core, while the nat table acts as a layer lying around the
 filter table, and finally the mangle table lies around the nat table as a
@@ -392,19 +392,19 @@ there is no reason not to do so.
 
          <listitem>
           <para>
-<emphasis>Create user specified chains</emphasis> - At this point
-we create any user specified chains that we want within the nat table. Normally
+<emphasis>Create user-specified chains</emphasis> - At this point
+we create any user-specified chains that we want within the nat table. Normally
 I do not have any of these, but I have added this section anyways, just in case.
-Note that the user specified chains must be created before they can actually be
+Note that the user-specified chains must be created before they can actually be
 used within the system chains.
           </para>
          </listitem>
 
          <listitem>
           <para>
-<emphasis>Create content in user specified chains</emphasis> - By
-now it should be time to add all the rules to the user specified chains in the
-nat table. The same thing goes here as for the user specified chains in the
+<emphasis>Create content in user-specified chains</emphasis> - By
+now it should be time to add all the rules to the user-specified chains in the
+nat table. The same thing goes here as for the user-specified chains in the
 filter table. We add this material here since I do not see any reason not to.
           </para>
          </listitem>
@@ -470,16 +470,16 @@ may be used for.
           <para>
 <emphasis>Set policies</emphasis> - Set the default policies within
 the chain. The same thing goes here as for the nat table, pretty much. The table
-was not made for filtering, and hence you should avoid it alltogether. I have
-not set any policies in any of the scripts in the mangle table one way or the
-other, and you are encouraged not to do so either.
+was not made for filtering, and hence you should avoid it altogether. I have
+not set any policies in any of the scripts in the mangle table one way or
+another, and you are encouraged not to do so either.
           </para>
          </listitem>
 
          <listitem>
           <para>
-<emphasis>Create user specified chains</emphasis> - Create all the
-user specified chains. Since I have barely used the mangle table at all in the
+<emphasis>Create user-specified chains</emphasis> - Create all the
+user-specified chains. Since I have barely used the mangle table at all in the
 scripts, I have neither created any chains here since it is fairly unusable
 without any data to use within it. However, this section was added just in case
 someone, or I, would have the need for it in the future.
@@ -488,8 +488,8 @@ someone, or I, would have the need for it in the future.
 
          <listitem>
           <para>
-<emphasis>Create content in user specified chains</emphasis> - If
-you have any user specified chains within this table, you may at this point add
+<emphasis>Create content in user-specified chains</emphasis> - If
+you have any user-specified chains within this table, you may at this point add
 the rules that you want within them here.
           </para>
          </listitem>
@@ -542,7 +542,7 @@ however.
 <emphasis>POSTROUTING chain</emphasis><indexterm><primary>Chain</primary>
 <secondary>POSTROUTING</secondary></indexterm> - This chain is basically not
 in use by any of the scripts in the tutorial as of writing this, but it could
-be used to setting values for all packets leaving both the host or firewall
+be used to set values for all packets leaving both the host or firewall
 itself, and traffic traversing the machine. For example, it could be used to
 reset the <systemitem>MTU</systemitem> of packets, set
 <systemitem>TTL</systemitem> or <systemitem>TOS</systemitem> et cetera.
@@ -1021,7 +1021,7 @@ example, but it is questionable.
 
      <listitem>
       <para>
-     If you got rules that are static and always want to be around, it is
+     If you have rules that are static and always want to be around, it is
 rather harsh to add and erase rules all the time, without hurting the already
 existing ones. For example, if you want to block hosts on your
 <systemitem>LAN</systemitem> to connect to the firewall, but at the same time
@@ -1164,7 +1164,7 @@ rc.test-iptables.txt</ulink> script can be used to test all the different
 chains, but it might need some tweaking depending on your configuration, such
 as turning on <command>ip_forwarding</command>, and setting up
 <systemitem>masquerading</systemitem> etc. It will work for most everyone 
-who has all the basic set up and all the basic tables loaded into kernel.
+who has all the basic set up and all the basic tables loaded into the kernel.
 All it really does is set some <command>LOG</command> targets which will log
 ping replies and ping requests. This way, you will get information on which
 chain was traversed and in which order. For example, run this script and then
@@ -1188,8 +1188,7 @@ unless the log entries are swapped around for some reason.
 This script was written for testing purposes only. In other words,
 it's not a good idea to have rules like this that log everything of one sort
 since your log partitions might get filled up quickly and it would be an
-effective Denial of Service attack against you and might lead to real attacks on
-you that would be unlogged after the initial Denial of Service attack.
+effective Denial of Service attack against you.
      </para>
     </note>
 
@@ -1233,7 +1232,7 @@ default values.
 After this we flush all chains first in the <systemitem>filter</systemitem>
 table and then in the <systemitem>NAT</systemitem> table. This way we know there
 are no redundant rules lying around anywhere. When all of this is done, we jump
-down to the next section where we erase all the user specified chains in the
+down to the next section where we erase all the user-specified chains in the
 <systemitem>NAT</systemitem> and <systemitem>filter</systemitem> tables. When
 this step is done, we consider the script done. You may consider adding rules
 to flush your <systemitem>mangle</systemitem> table if you use it.
@@ -1401,7 +1400,7 @@ anything else than a reference.
      <title>What's next?</title>
 
      <para>
-The chapter you have just read basically gave you a brief overlook of all the
+The chapter you have just read basically gave you a brief overview of all the
 different scripts that are available with this tutorial and the basic idea
 that they are trying to bring across to you. Hopefully it has been able to
 explain something at the very least.
@@ -1411,10 +1410,10 @@ explain something at the very least.
 The next chapter will discuss some different graphical user interfaces that
 are available for iptables and netfilter. This is far from a complete listing
 of all the different interfaces available, but as you can see, there are quite
-a lot of othem. These interfaces mostly tries to simplify creating iptables
+a lot of them. These interfaces mostly try to simplify creating iptables
 scripts for you, and for simple setups they are more than enough most of the
 time. At other times, you may have higher and more complex needs and you must
-have to write your own script none the less.
+write your own script nonetheless.
      </para>
    </section>
 

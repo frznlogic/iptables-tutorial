@@ -26,7 +26,7 @@ they do to the kernel.  Also, see the manpage for sysctl.
      <para>
 <ulink url="http://www.ingate.com" id="ingate.title">InGate</ulink> - InGate 
 is a commercial firewall producer that uses Linux as the base for their 
-firewall products. Their productrange goes from basic firewalls to SIP gateways 
+firewall products. Their product range goes from basic firewalls to SIP gateways
 and QoS machines. 
      </para>
     </listitem>
@@ -36,7 +36,7 @@ and QoS machines.
 <ulink url="https://www.rfc-editor.org/info/rfc768"
 id="rfc768.title">RFC 768 - User Datagram Protocol</ulink> - This is the 
 official RFC describing how the UDP protocol should be used, in detail, and all 
-of it's headers.
+of its headers.
      </para>
     </listitem>
 
@@ -75,7 +75,7 @@ originally a Department of Defense standard written by J. Postel.
      <ulink url="https://www.rfc-editor.org/info/rfc1122"
 id="rfc1122.title">RFC 1122 - Requirements for Internet Hosts - Communication 
 Layers</ulink> - This RFC defines the requirements of the software running on 
-a Internet host, specifically the communication layers.
+an Internet host, specifically the communication layers.
 
      </para>
     </listitem>
@@ -133,7 +133,7 @@ originally by D. Clark and van Jacobsen at the Munich IETH meeting 1997.
      <para>
 <ulink url="https://www.rfc-editor.org/info/rfc2960"
 id="rfc2960.title">RFC 2960 - Stream Control Transmission Protocol</ulink> - 
-This is a relatively new protocol developed by several large telecoms companies 
+This is a relatively new protocol developed by several large telecom companies
 to complement UDP and TCP as a layer 3 protocol with higher reliability and 
 resilience.
      </para>
@@ -216,7 +216,7 @@ id="selinux.title">Security-Enhanced Linux</ulink> - The official site
 of the Security-Enhanced Linux (SELinux) system developed as a proof of
 concept by the National Security Agency (NSA). SELinux is a fine grained
 Mandatory Access Control system, which lets you have a much higher control on
-who can do what and what processes has what privileges, et cetera. 
+who can do what and what processes have what privileges, et cetera.
       </para>
     </listitem>
 
@@ -274,8 +274,8 @@ Questions</emphasis>. Also a good place to start at when wondering what
     <listitem>
      <para>
       <ulink
-- Rusty Russells Unreliable Guide to packet filtering. Excellent documentation
 url="https://www.netfilter.org/documentation/HOWTO/packet-filtering-HOWTO.html">https://www.netfilter.org/documentation/HOWTO/packet-filtering-HOWTO.html</ulink>
+- Rusty Russell's Unreliable Guide to packet filtering. Excellent documentation
 about basic packet filtering with <command>iptables</command> written by one of
 the core developers of <command>iptables</command> and
 <command>Netfilter</command>.
@@ -285,8 +285,8 @@ the core developers of <command>iptables</command> and
     <listitem>
      <para>
       <ulink
-- Rusty Russells Unreliable Guide to Network Address Translation. Excellent
 url="https://www.netfilter.org/documentation/HOWTO/NAT-HOWTO.html">https://www.netfilter.org/documentation/HOWTO/NAT-HOWTO.html</ulink>
+- Rusty Russell's Unreliable Guide to Network Address Translation. Excellent
 documentation about <systemitem>Network Address Translation</systemitem> in
 <command>iptables</command> and <command>Netfilter</command> written by one of
 the core developers, Rusty Russell.
@@ -296,8 +296,8 @@ the core developers, Rusty Russell.
     <listitem id="netfilterhackinghowto">
      <para>
       <ulink
-- Rusty Russells Unreliable Netfilter Hacking HOW-TO. One of the few
 url="https://www.netfilter.org/documentation/HOWTO/netfilter-hacking-HOWTO.html">https://www.netfilter.org/documentation/HOWTO/netfilter-hacking-HOWTO.html</ulink>
+- Rusty Russell's Unreliable Netfilter Hacking HOW-TO. One of the few
 documentations on how to write code in the <command>Netfilter</command> and
 <command>iptables</command> user-space and kernel space code-base. This was also
 written by Rusty Russell.
@@ -319,7 +319,7 @@ different purposes.
       <para>
 <ulink url="http://www.policyrouting.org" id="policyrouting.title">Policy 
 Routing using Linux</ulink> - The best book I have ever read on Policy routing 
-nad linux. This is an absolute must when it comes to routing in linux. Written 
+and linux. This is an absolute must when it comes to routing in linux. Written
 by Matthew G. Marsh.
       </para>
     </listitem>
@@ -337,7 +337,7 @@ DSCP, and so on.
       <para>
         <ulink url="http://www.ietf.org/html.charters/sip-charter.html" 
 id="sip.title">IETF SIP Working Group</ulink> - SIP is one of the "next big
-things" it seems. Basically it is the defacto standards for Internet telephony
+things" it seems. Basically it is the defacto standard for Internet telephony
 today. It is horribly complex as you can see from the amount of documentation
 on the working groups homepage, and should hopefully be able to cope with pretty 
 much any needs of session initiation in the future. It is used mainly to setup
@@ -477,7 +477,7 @@ site.
    <listitem id="tldp">
       <para>
 The <ulink url="http://www.linuxdoc.org" id="tldp.title">Linux Documentation Project</ulink> 
-is a great site for documentation. Most big documents for Linux is available 
+is a great site for documentation. Most big documents for Linux are available
 here, and if not in the TLDP, you will have to search the net very 
 carefully. If there is anything you want to know more about, check this site 
 out.
@@ -499,7 +499,7 @@ kind of attack or break-in it can do different actions that can be defined
 <ulink url="http://www.tripwire.org" id="tripwireids.title">Tripwire</ulink> - 
 tripwire is an excellent security tool which can be used to find out about 
 host intrusions. It makes checksums of all the files specified in a 
-configuration file, and then it tells the administrator about any files that has 
+configuration file, and then it tells the administrator about any files that have
 been tampered with in an illegit way every time it is run.
       </para>
     </listitem>

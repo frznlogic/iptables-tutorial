@@ -14,7 +14,7 @@
  
   <para>
 <systemitem>NAT</systemitem> is one of the biggest<indexterm><primary>Example
-scripts</primary><secondary>biggest</secondary></indexterm>attractions of Linux and
+scripts</primary><secondary>biggest</secondary></indexterm> attractions of Linux and
 Iptables to this day it seems. Instead of using fairly expensive third party
 solutions such as <systemitem>Cisco PIX</systemitem> etc, a lot of smaller
 companies and personal users have chosen to go with these solutions instead.
@@ -54,15 +54,15 @@ expressions</title>
 
     <para>
 Basically, <systemitem>NAT</systemitem> allows a host or several hosts to
-share the same IP address in a way. For example, let's say we have a local
+share the same IP address. For example, let's say we have a local
 network consisting of 5-10 clients. We set their default gateways to point
 through the <systemitem>NAT</systemitem> server. Normally the packet would
-simply be forwarded by the gateway machine, but in the case of an
+simply be forwarded by the gateway machine, but in the case of a
 <systemitem>NAT</systemitem> server it is a little bit different. 
     </para>
   
     <para>
-<systemitem>NAT</systemitem> servers translates the source and destination
+<systemitem>NAT</systemitem> servers translate the source and destination
 addresses of packets as we already said to different addresses. The
 <systemitem>NAT</systemitem> server receives the packet, rewrites the source
 and/or destination address and then recalculates the checksum of the packet.
@@ -81,8 +81,8 @@ clients or many many more using the same shared IP address.
     <para>
 There is also something called <systemitem>DNAT</systemitem>, which can be
 extremely helpful when it comes to setting up servers etc. First of all, you
-can help the greater good when it comes to saving IP space, second, you can
-get an more or less totally impenetrable firewall in between your server and
+can help the greater good when it comes to saving IP space. Second, you can
+get a more or less totally impenetrable firewall in between your server and
 the real server in an easy fashion, or simply share an IP for several servers
 that are separated into several physically different servers. For example, we
 may run a small company server farm containing a webserver and
@@ -165,10 +165,11 @@ who sits behind a <systemitem>NAT</systemitem> server to get out on the
 internet will not be able to run his own server. It could be done, of course,
 but it takes a lot more time and work to set this up. In companies, this is
 probably preferred over having tons of servers run by different employees that
-are reachable from the Internet, without any supervision. However, when it
+are reachable from the Internet, without any supervision.
 <!-- The following is standard ISP practice nowadays in my opinion - edrulrd@hotmail.com 20240901 -->
+However, when it
 comes to home users, this should be avoided to the very last. You should never
-as an Internet service provider NAT your customers from a private IP range to
+as an Internet service provider, NAT your customers from a private IP range to
 a public IP. It will cause you more trouble than it is worth having to deal
 with, and there will always be one or another client which will want this or
 that protocol to work flawlessly. When it doesn't, you will be called down
@@ -191,7 +192,7 @@ problems. <systemitem>IPv6</systemitem> has 128 bits assigned to their
 addresses, while <systemitem>IPv4</systemitem> only have 32 bits used for IP
 addresses. This is an incredible increase in address space. It may seem like
 ridiculous to have enough IP addresses to set one IP address for every atom in
-our planet, but on the other hand, noone expected the
+our planet, but on the other hand, no one expected the
 <systemitem>IPv4</systemitem> address range to be too small either. 
      </para>
       
@@ -256,7 +257,7 @@ You will also need to consider network cards. How many separate networks will
 connect to your <systemitem>NAT/filter</systemitem> machine? Most of the time
 it is simply enough to connect one network to an Internet connection. If you
 connect to the Internet via ethernet, you should generally have 2
-<systemitem>ethernet</systemitem> cards, etcetera. It can be a good idea to
+<systemitem>ethernet</systemitem> cards, et cetera. It can be a good idea to
 choose 10/100 mbit/s network cards of relatively good brands for this for
 scalability, but most any kinds of cards will do as long as they have drivers
 in the Linux kernel. A note on this matter: avoid using or getting network
@@ -408,7 +409,7 @@ we would solve the <systemitem>NAT</systemitem> machine then. Let's take a
 look at a picture of the networks and how it looks. We have decided to put a
 proxy just outside the <systemitem>NAT/filtering</systemitem> machine as
 described above, but inside counting from the router. This area could be
-counted upon as an <systemitem>DMZ</systemitem> in a sense, with the
+counted upon as a <systemitem>DMZ</systemitem> in a sense, with the
 <systemitem>NAT/filter</systemitem> machine being a router between the
 <systemitem>DMZ</systemitem> and the two company networks. You can see the
 exact layout we are discussing in the image below.
@@ -431,14 +432,14 @@ be sent through the <systemitem>DMZ</systemitem> directly to the router, which
 will send the traffic on out to the internet. Except, yes, you guessed it,
 webtraffic which is instead marked inside the netfilter part of the
 <systemitem>NAT</systemitem> machine, and then routed based on the mark and to
-the proxy machine. Let's take a look at what I am talking about. Say a
+the proxy machine. Let's take a look at what I am talking about. Say an
 <systemitem>http</systemitem> packet is seen by the
 <systemitem>NAT</systemitem> machine. The mangle table can then be used to
 mark the packet with a <systemitem>netfilter mark</systemitem> (also known as
 nfmark). Even later when we should route the packets to our router, we will be
 able to check for the <systemitem>nfmark</systemitem> within the routing
 tables, and based on this mark, we can choose to route the http packets to the
-proxy server. The <systemitem>proxy</systemitem> server will then do it's work
+proxy server. The <systemitem>proxy</systemitem> server will then do its work
 on the packets. We will touch these subjects to some extent later on in the
 document, even though much of the routing based part is happening inside the
 advanced routing topics. 
@@ -459,7 +460,7 @@ saving both a lot of cash, and the Internet address space.
     
     <para>
 We have in this chapter in detail explained <systemitem>NAT</systemitem> and
-the theory around it. In special we have discussed a couple of different
+the theory around it. In particular we have discussed a couple of different
 angles to use, and some of the normal problems that may arise from using
 <systemitem>NAT</systemitem> together with proxies. This chapter has covered
 the following areas in detail.

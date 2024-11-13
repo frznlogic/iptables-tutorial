@@ -64,7 +64,7 @@ over and run them on the target system. It is able to handle everything from
 very simple rulesets to large and rather complicated ones. It has extensive
 abilities to handle different versions and installations of
 <systemitem>iptables</systemitem>, by configuration of which targets/matches
-are available on each host system, etcetera. The end result may be saved in an
+are available on each host system, et cetera. The end result may be saved in an
 xml file, or a system parsable configuration file (e.g., the real firewall
 scripts). 
       </para>
@@ -102,7 +102,7 @@ The latest release available for download is version 5.1, circa March 2012.
       <para>
 Turtle Firewall is an excellent, yet simpler kind of user interface to 
 iptables. It is integrated in something called webmin (a web administration 
-interface). It is fairly basic, and neither as complex nor able to handle as 
+interface). It is fairly basic, and neither as complex nor as able to handle
 complex changes as the fwbuilder package, but it is more than able to handle 
 most simpler firewalls, as well as some more advanced ones as well.
       </para>
@@ -144,7 +144,7 @@ format=jpg>
       </para>
       
       <para>
-This final screenshot shows the turtlefirewalls main screen, and with the whole 
+This final screenshot shows the Turtle Firewall's main screen, and with the whole
 ruleset expanded at the bottom. The whole ruleset isn't showing, as you can see, 
 but you get a good general idea of what it looks like in Turtle Firewall.
       </para>
@@ -176,37 +176,20 @@ ISCS integrates several functionalities into a single suite
 of administration and management user interface.
 Being able to fully configure all your
 firewalls from a centralized point using a single GUI, including VPN's, VLAN's, 
-Tunnels, sysctl's, etcetera.
+Tunnels, sysctl's, et cetera, is a goal of this package.
       </para>
       
       <para>
 The main attack angle that the developer(s) of ISCS has, is to simplify 
 management and administration and to remove tedious work for the 
-administrators, so to save as much work hours as possible for the 
-administrators. This is done by putting together policies, and then the 
-programs creates the rulesets and "pushes" them out to the "enforcements 
-points" (e.g., firewalls, proxies, etcetera). The administrator doesn't 
+administrators, so to save as many work hours as possible for them.
+This is done by putting together policies, and then the
+programs create the rulesets and "pushes" them out to the "enforcements
+points" (e.g., firewalls, proxies, et cetera). The administrator doesn't
 actually "write" or "click" together the rulesets, just simply put together 
 policies that are then enforced by ISCS.
       </para>
-      
-      <para>
-This tool isn't finished yet, as of writing this. However, I have been in touch 
-with the main developer of this project before, and this is indeed a very large 
-project. When it is finished, I believe this will be one of the best tools on 
-the market. Of course, time can only tell, but it is well worth mentioning 
-here. You can find the ISCS project over at <ulink 
-url="http://iscs.sourceforge.net/">http://iscs.sourceforge.net/</ulink>. 
-      </para>
-      
-      <note>
-        <para>
-The main developer, John Sullivan, of ISCS has specifically asked me to ask 
-people to join his development efforts. The project is very big, and he would 
-definitely like as much help with the project as possible. If you are able to 
-help, you are, in other words, more than welcome.
-        </para>
-      </note>
+
     </section>
     
 <!-- IPmenu no longer appears to be available - edrulrd@hotmail.com - 20240901 -->
@@ -317,40 +300,9 @@ graphical user interfaces, and other user interfaces as well. Note that there
 are several more user interfaces around on the market. This chapter has mainly 
 given you an idea of the different types of firewall administration interfaces 
 around on the market. Most of them are open source and free to use, while some 
-will cost a bit of money to get full support or functionality from. 
+will cost a bit of money to get full support or functionality from them.
       </para>
       
     </section>
    
   </chapter>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -98,7 +98,7 @@ endterm="rcfirewalltxt.title"></link> script to work.
 <computeroutput>CONFIG_IP_NF_FTP</computeroutput> - This module is required if
 you want to do connection tracking on <systemitem>FTP</systemitem>
 connections. Since <systemitem>FTP</systemitem> connections are quite hard to
-do connection tracking on in normal cases, conntrack needs a so called helper;
+do connection tracking on in normal cases, conntrack needs a so-called helper;
 this option compiles the helper. If you do not add this module you won't be
 able to FTP through a firewall or gateway properly.
    </para>
@@ -214,8 +214,8 @@ are always reset or refused with a <systemitem>TCP RST</systemitem> packet.
 packets to be bounced back to the sender of the packet. For example, if we set
 up a <systemitem>MIRROR</systemitem> target on destination port
 <systemitem>HTTP</systemitem> on our <systemitem>INPUT</systemitem> chain and
-someone tries to access this port, we would bounce his packets back to him and
-finally he would probably see his own homepage.
+someone tries to access this port, we would bounce their packets back to them and
+finally they would probably see their own homepage.
    </para>
    
    <warning>
@@ -305,7 +305,7 @@ options in the kernel. <systemitem>POM</systemitem> fixes are additions
 that are supposed to be added in the kernel in the future but have not
 quite reached the kernel yet. This may be for various reasons
 - such as the patch not being stable yet, to Linus Torvalds being unable
-to keep up, or not wanting to let the patch in to the mainstream kernel
+to keep up, or not wanting to let the patch into the mainstream kernel
 yet since it is still experimental.
    </para>
 
@@ -403,7 +403,7 @@ script which you should be studying now.
 the most part configuration and compilation of iptables goes hand in hand with
 the kernel configuration and compilation. Certain distributions come with
 the <command>iptables</command> package preinstalled, one of these is Red
-Hat. However, in old Red Hat it is disabled per default. We will check closer
+Hat. However, in old Red Hat it is disabled by default. We will check closer
 on how to enable it and take a look at other distributions further on in
 this chapter.
    </para>
@@ -430,7 +430,7 @@ program to run.
     </para>
 
     <para> After this, there you have the option of configuring and
-installing extra modules and options etcetera for the kernel.The step
+installing extra modules and options et cetera for the kernel. The step
 described here will only check and install standard patches that are
 pending for inclusion to the kernel, there are some even more experimental
 patches further along, which may only be available when you carry out
@@ -597,7 +597,7 @@ following command should do it:
 
     <para> By doing this we move all the soft links that points to the
 <filename>/etc/rc.d/init.d/ipchains</filename> script to K92ipchains. The
-first letter which per default would be S, tells the initscripts to start
+first letter which by default would be S, tells the initscripts to start
 the script. By changing this to K we tell it to Kill the service instead,
 or to not run it if it was not previously started. Now the service won't
 be started in the future.
@@ -659,7 +659,7 @@ service run in  run-level 2, 3 and 5. If you'd like the
 have to issue the same command in those. However, none of the other run-levels
 should be used, so you should not really need to activate it for those
 run-levels. Level 1 is for single user mode, i.e, when you need to fix a
-screwedup box. Level 4 should be unused, and level 6 is for shutting the
+screwed up box. Level 4 should be unused, and level 6 is for shutting the
 computer down.
     </para>
 
@@ -673,7 +673,7 @@ command:
     </para>
 
     <para> There are no rules in the <command>iptables</command> script.
-To add rules to an Red Hat 7.1 box, there is two common ways. Firstly, you
+To add rules to a Red Hat 7.1 box, there are two common ways. Firstly, you
 could edit the <filename>/etc/rc.d/init.d/iptables</filename> script. This
 would have the undesired effect of deleting all the rules if you updated
 the iptables package by RPM. The other way would be to load the rule-set
@@ -681,14 +681,14 @@ and then save it with the <command>iptables-save</command> command and
 then have it loaded automatically by the rc.d scripts.
     </para>
 
-    <para> First we will describe the how to set up
+    <para> First we will describe how to set up
 <command>iptables</command> by cutting and pasting to the
 <command>iptables</command> init.d script. To add rules that are to be run
 when the computer starts the service, you add them under the start)
 section, or in the start() function. Note, if you add the rules under the
 start) section don't forget to stop the start() function in the start)
-section from running. Also, don't forget to edit a the stop) section
-either which tells the script what to do when the computer is going down
+section from running. Also, don't forget to edit the stop) section
+which tells the script what to do when the computer is going down
 for example, or when we are entering a run-level that doesn't require
 <command>iptables</command>.  Also, don't forget to check out the restart
 section and condrestart. Note that all this work will probably be trashed
@@ -720,13 +720,13 @@ firewall configuration useless.
     <para>
 When all of these steps are finished, you can deinstall the currently
 installed <command>ipchains</command> and <command>iptables</command> packages.
-This because we don't want the system to mix up the new
+This is because we don't want the system to mix up the new
 <command>iptables</command> user-land application with the old preinstalled
-<command>iptables</command> applications. This step is only necessary if you
+<command>iptables</command> application. This step is only necessary if you
 are going to install <command>iptables</command> from the source package. It's
 not unusual for the new and the old package to get mixed up, since the rpm
 based installation installs the package in non-standard places and won't get
-overwritten by the installation for the new <command>iptables</command>
+overwritten by the installation of the new <command>iptables</command>
 package. To carry out the deinstallation, do as follows:
     </para>
 

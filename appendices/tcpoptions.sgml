@@ -8,7 +8,7 @@
     <para>
 This appendix is a simple and brief list of all the
 <systemitem>TCP</systemitem> options that are officially recognized. These
-references and numbers were all retreived from the <link linkend="iana.org"
+references and numbers were all retrieved from the <link linkend="iana.org"
 endterm="iana.org.title"></link> website. The master file can be found at
 <ulink url="http://www.iana.org/assignments/tcp-parameters">this
 location</ulink>. The full contact details of the people referenced in this
