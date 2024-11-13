@@ -18,7 +18,7 @@ from, etc :
 url="http://iptables-tutorial.frozentux.net/other/ip-sysctl.txt"
 id="ip-sysctltxt.title">ip-sysctl.txt</ulink> - from the 2.4.14 kernel. A
 little bit short but a good reference for the IP networking controls and what
-they do to the kernel.
+they do to the kernel.  Also, see the manpage for sysctl.
      </para>
     </listitem>
 
@@ -185,7 +185,8 @@ file system.
 url="http://iptables-tutorial.frozentux.net/other/iptables.html">
 iptables.8</ulink> - The iptables 1.3.1 man page. This is an HTMLized
 version of the man page which is an excellent reference when reading/writing
-iptables rule-sets. Always have it at hand.
+iptables rule-sets. Always have it at hand.  Alternatively, open the man page
+with <command>man iptables</command>.
      </para>
     </listitem>
 
@@ -194,7 +195,8 @@ iptables rule-sets. Always have it at hand.
       <ulink url="http://ipsysctl-tutorial.frozentux.net">Ipsysctl 
 tutorial</ulink> - Another tutorial I have written about the IP System Control 
 in Linux. A try to make a complete listing of all the IP variables that can be 
-set on the fly in Linux. 
+set on the fly in Linux.  Alternatively, open the man page
+with <command>man sysctl</command>.
      </para>
     </listitem>
 
@@ -401,7 +403,7 @@ computer automatically add hostile sites to a special ban list in
 id="protocolstxt.title"><filename>/etc/protocols</filename></ulink> - An example 
 protocols file taken from the Slackware distribution. This can be used to find out
 what protocol number different protocols have, such as the IP, ICMP or TCP 
-protocols have.
+protocols have.  Alternatively, refer to <filename>/etc/protocols</filename>.
      </para>
     </listitem>
 
@@ -411,7 +413,7 @@ protocols have.
 id="servicestxt.title"><filename>/etc/services</filename></ulink> - An example 
 services file taken from the Slackware distribution. This is extremely good to
 get used to reading once in a while, specifically if you want to get a basic look
-at what protocols runs on different ports.
+at what protocol runs on different ports. Alternatively, refer to <filename>/etc/services</filename>.
      </para>
     </listitem>
     

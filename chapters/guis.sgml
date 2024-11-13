@@ -207,6 +207,8 @@ help, you are, in other words, more than welcome.
       </note>
     </section>
     
+<!-- IPmenu no longer appears to be available - edrulrd@hotmail.com - 20240901 -->
+<!--
     <section id="ipmenu">
       <title id="ipmenu.title">IPMenu</title>
       <indexterm zone="ipmenu">
@@ -255,6 +257,7 @@ url="http://users.pandora.be/stes/ipmenu.html">
 http://users.pandora.be/stes/ipmenu.html</ulink>. 
       </para>
     </section>
+-->
     
     <section id="easyfwgenerator">
       <title id="easyfwgenerator.title">Easy Firewall Generator</title>
@@ -298,6 +301,7 @@ This screenshot shows one of the final stages of configuring the firewall
 script that is about to be created by the script. You can find more 
 information, and a working version of the Easy Firewall Generator at <ulink 
 url="http://easyfwgen.morizot.net/">http://easyfwgen.morizot.net/</ulink>.
+The latest release available for download is version 1.17, circa May 2005.
       </para>
     
     </section>

@@ -361,6 +361,11 @@ warning priority to a file called <filename>/var/log/kernwarnings</filename>,
 we could do as shown below. The line should go into the
 <filename>/etc/syslog.conf</filename>.<indexterm><primary>syslog.conf</primary>
 </indexterm>
+<note>
+<para>
+The actual filename may be different depending on your Linux distribution.
+</para>
+</note>
       </para>
       
       <screen>
@@ -520,7 +525,7 @@ iptables: No chain/target/match by that name
       <para>
 The easiest way to see if we have simply forgotten to depmod, or if the module 
 is actually missing is to look in the directory where the modules should be. 
-This is the <filename>/lib/modules/2.6.4/kernel/net/ipv4/netfilter</filename> 
+This is the <filename>/lib/modules/$(uname -r)/kernel/net/ipv4/netfilter</filename>
 directory. All ipt_*<indexterm><primary>ipt_*</primary></indexterm> files that
 are written in uppercase letters are targets, while all the ones with
 lowercase letters are matches. For example,
@@ -638,24 +643,14 @@ will know fairly well what the attacker knows about your OS as well.
         </para>
         
         <para>
-Nmap also comes with a graphical user interface that can be used, called the
-nmapfe<indexterm><primary>Nmapfe</primary></indexterm> (<systemitem>Nmap Front
-End</systemitem>). It is an excellent frontend of the nmap program, and if
-you know that you will need a little bit more complicated searches, you may
-wish to use it. For an example screenshot, take a look below.
+Nmap also comes with a graphical user interface that can be used, called
+zenmap<indexterm><primary>Zenmap</primary></indexterm> (<systemitem>Nmap Front
+End</systemitem>). It is available from
+      <ulink
+url="https://nmap.org/zenmap"
+id="zenmap.title">Zenmap</ulink>
         </para>
          
-        <para>
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="images/nmapfe.eps" format=eps>
-            </imageobject>
-            <imageobject>
-              <imagedata fileref="images/nmapfe.jpg" format=jpg>
-            </imageobject>
-          </mediaobject>
-        </para>
-
         <para>
 Of course, the nmap tool has more usages than this, which you can find out more 
 about on the nmap homepage. For more information, take a look at the <link 

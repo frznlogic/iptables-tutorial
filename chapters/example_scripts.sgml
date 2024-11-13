@@ -219,7 +219,7 @@ the service it provides, it is up to you.
       <para>
 <emphasis>proc configuration</emphasis><indexterm><primary>Example
 scripts</primary><secondary>proc configuration</secondary></indexterm> - This
-section should take care of any special configuration needed in the proc file
+section should take care of any special configuration needed in the /proc file
 system. If some of these options are required, they will be listed as such, if
 not, they should be commented out per default, and listed under the
 non-required proc configurations. Most of the useful proc configurations will
@@ -1173,12 +1173,12 @@ do:
 
     <screen>
 <command>
-ping -c 1 host.on.the.internet
+ping -c 1 any.host.on.the.internet
 </command>
     </screen>
 
     <para>
-And <command>tail -n 0 -f /var/log/messages</command> while doing the first
+And run <command>tail -n 0 -f /var/log/messages</command> or <command>journalctl -n 0 -f</command> while doing the first
 command. This should show you all the different chains used, and in which order,
 unless the log entries are swapped around for some reason.
     </para>
@@ -1297,9 +1297,10 @@ for the burst limit has again been reached.
     <para>
 The <ulink
 url="http://iptables-tutorial.frozentux.net/scripts/pid-owner.txt">pid-owner.txt</ulink>
-is a small example script that shows how we could use the PID owner 
-match. It does nothing real, but you should be able to run the script, and 
-then from the output of <command>iptables -L -v</command> be able to tell 
+is a small example script that shows how we could have used the PID owner
+match before it became obsolete in newer kernels. It does nothing real, but you would have
+been able to run the script, and
+then from the output of <command>iptables -L -v</command> been able to tell
 that the rule actually matches.
     </para>
    </section>
@@ -1347,9 +1348,10 @@ endterm="matches.title"></link> chapter.
     <para>
 The <ulink 
 url="http://iptables-tutorial.frozentux.net/scripts/sid-owner.txt">sid-owner.txt</ulink> 
-is a small example script that shows how we could use the SID owner
-match. It does nothing real, but you should be able to run the script, and
-then from the output of <command>iptables -L -v</command> be able to tell
+is a small example script that shows how we could have used the SID owner
+match before it became obsolete, similarly to the pid-owner script. It does nothing real,
+but you would have been able to run the script, and
+then from the output of <command>iptables -L -v</command> been able to tell
 that the rule actually matches.
     </para>
    </section>

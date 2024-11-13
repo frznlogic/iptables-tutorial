@@ -348,8 +348,8 @@ counters still intact.
 The <command>iptables-restore</command> command is used to restore the 
 <command>iptables</command> rule-set that was saved with the 
 <command>iptables-save</command> command. It takes all the input from 
-standard input and can't load from files as of writing this, 
-unfortunately. This is the command syntax for iptables-restore:
+standard input and can't load from a file directly, but does accept redirection from the shell.
+This is the command syntax for iptables-restore:
    </para>
 
    <para>

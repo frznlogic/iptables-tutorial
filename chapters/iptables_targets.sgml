@@ -3026,7 +3026,8 @@ standardized value, such as 64 as specified in the Linux kernel.
 For more information on how to set the default value used in Linux, read the
 <link linkend="ip-sysctltxt" endterm="ip-sysctltxt.title"></link>, which you
 may find within the <link linkend="otherresources"
-endterm="otherresources.title"></link> appendix.
+endterm="otherresources.title"></link> appendix.  Alternatively, see the
+the <command>sysctl</command> man page.
     </para>
 
     <para>

@@ -149,6 +149,34 @@ with other interesting documentation that might be needed.
    </para>
   </preface>
 
+  <preface id="preamble">
+   <title>Preamble</title>
+
+<para>
+Despite the age of this document, the contents continue to be very relevant even now in the mid 2020's
+and the need for packet filtering is not going away anytime soon.  According to the
+<ulink url="http://www.netfilter.org">Netfilter main page</ulink>,
+the project continues with updates still being applied to iptables.  Nevertheless, the site also indicates
+that iptables has a successor product called nftables.  To quote the site "The netfilter project is
+commonly associated with iptables and its successor nftables."
+</para>
+
+<para>
+So, should I read this document?  The answer is an emphatic "Yes!".  There is no doubt that in your
+networking career that you will come across iptables, and this document contains the background
+needed to understand the underlying filtering technology, as well as how to read and understand the
+iptables rulesset.
+</para>
+
+<para>
+Most of the knowledge in this document is directly applicable to nftables.  It has a newer command
+syntax that is supposed to be easier to use.  In summary, if you need to modify or extend the iptables
+rules on a system, then by all means, it's probably wise to make your revisions using iptables.  However,
+if you are setting up filtering on a server that does not yet have any filtering, considering to use
+nftables would be worth looking into.
+</para>
+</preface>
+
   <preface id="howtoread">
    <title>How to read</title>
 

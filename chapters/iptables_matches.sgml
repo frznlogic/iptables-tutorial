@@ -3396,9 +3396,8 @@ limit value every second.</entry>
 
 <para>The <systemitem>MAC</systemitem> (<systemitem>Ethernet  Media
 Access Control</systemitem>) match can be used to match packets based on their
-<systemitem>MAC source address</systemitem>. As of writing this documentation,
-this match is a little bit limited, however, in the future this may be more
-evolved and may be more useful. This match can be used to match packets on the
+<systemitem>MAC source address</systemitem>.
+This match can be used to match packets on the
 source <systemitem>MAC address</systemitem> only as previously said.
 </para>
 
@@ -3717,6 +3716,13 @@ is an intermediate hop to the real destination. Even within the
 packets may not have an owner. Notorious packets of that sort are (among
 other things) the different <systemitem>ICMP responses</systemitem>.
 <systemitem>ICMP responses</systemitem> will never match.
+<note>
+<para>
+Since some of these options are no longer available with newer kernels,
+confirming available options by checking the man pages on your system
+is recommended.
+</para>
+</note>
 </para>
 
 <indexterm zone="table.ownermatch">
@@ -3789,7 +3795,7 @@ other things) the different <systemitem>ICMP responses</systemitem>.
 </row>
 <row>
 <entry>Kernel</entry>
-<entry>2.3, 2.4, 2.5 and 2.6</entry>
+<entry>2.3, 2.4, 2.5, 2.6 and subsequently obsoleted</entry>
 </row>
 <row>
 <entry>Example</entry>
@@ -3804,6 +3810,7 @@ name of the process that is sending the packet. In the example,
 <systemitem>httpd</systemitem> is matched. This match may also be inverted by 
 using an exclamation sign, for example <command>-m owner ! --cmd-owner 
 ssh</command>.
+This match is obsolete in recent kernels.
 </para></entry>
 </row>
 
@@ -3866,7 +3873,7 @@ the <systemitem>HTTP</systemitem> port.
 </row>
 <row>
 <entry>Kernel</entry>
-<entry>2.3, 2.4, 2.5 and 2.6</entry>
+<entry>2.3, 2.4, 2.5, 2.6 and subsequently obsoleted</entry>
 </row>
 <row>
 <entry>Example</entry>
@@ -3885,6 +3892,7 @@ script that grabs the <systemitem>PID</systemitem> from a
 <command>ps</command> output for a specific daemon and then adds a rule for
 it. For an example, you could have a rule as shown in the <link 
 linkend="pid-ownertxt" endterm="pid-ownertxt.title"></link> example.
+This match is obsolete in recent kernels.
 </entry>
 </row>
 
@@ -3894,7 +3902,7 @@ linkend="pid-ownertxt" endterm="pid-ownertxt.title"></link> example.
 </row>
 <row>
 <entry>Kernel</entry>
-<entry>2.3, 2.4, 2.5 and 2.6</entry>
+<entry>2.3, 2.4, 2.5, 2.6 and subsequently obsoleted</entry>
 </row>
 <row>
 <entry>Example</entry>
@@ -3918,7 +3926,8 @@ linkend="sid-ownertxt" endterm="sid-ownertxt.title"></link>. This script could
 possibly be run every hour or so together with some extra code to check if the 
 <systemitem>HTTPD</systemitem> is actually running and start it again if 
 necessary, then flush and re-enter our <systemitem>OUTPUT</systemitem> chain 
-if needed.</entry>
+if needed. This match is obsolete in recent kernels.
+</entry>
 </row>
 
 </tbody>
@@ -3927,9 +3936,8 @@ if needed.</entry>
 
 <note>
 <para>
-The pid, sid and command matching is broken in SMP kernels since they use 
-different process lists for each processor. It might be fixed in the future 
-however
+The pid, sid, and command matching were broken in SMP kernels and were thus
+removed from updated releases of iptables.
 </para>
 </note>
 
