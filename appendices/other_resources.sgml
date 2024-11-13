@@ -15,8 +15,8 @@ from, etc :
     <listitem id="ip-sysctltxt">
      <para>
       <ulink
-url="http://iptables-tutorial.frozentux.net/other/ip-sysctl.txt"
-id="ip-sysctltxt.title">ip-sysctl.txt</ulink> - from the 2.4.14 kernel. A
+url="https://www.kernel.org/doc/Documentation/networking/ip-sysctl.txt"
+id="ip-sysctltxt.title">ip-sysctl.txt</ulink> - since the 2.4.14 kernel. A
 little bit short but a good reference for the IP networking controls and what
 they do to the kernel.  Also, see the manpage for sysctl.
      </para>
@@ -33,7 +33,7 @@ and QoS machines.
 
     <listitem id="rfc768">
      <para>
-<ulink url="http://iptables-tutorial.frozentux.net/other/rfc768.txt"
+<ulink url="https://www.rfc-editor.org/info/rfc768"
 id="rfc768.title">RFC 768 - User Datagram Protocol</ulink> - This is the 
 official RFC describing how the UDP protocol should be used, in detail, and all 
 of it's headers.
@@ -42,7 +42,7 @@ of it's headers.
 
     <listitem id="rfc791">
      <para>
-<ulink url="http://iptables-tutorial.frozentux.net/other/rfc791.txt"
+<ulink url="https://www.rfc-editor.org/info/rfc791"
 id="rfc791.title">RFC 791 - Internet Protocol</ulink> - The IP specification 
 as still used on the Internet, with additions and updates. The basic is still 
 the same for IPv4.
@@ -51,7 +51,7 @@ the same for IPv4.
 
     <listitem id="rfc792">
      <para>
-<ulink url="http://iptables-tutorial.frozentux.net/other/rfc792.txt"
+<ulink url="https://www.rfc-editor.org/info/rfc792"
 id="rfc792.title">RFC 792 - Internet Control Message Protocol</ulink> -
 The definitive resource for all information about ICMP packets. Whatever
 technical information you need about the ICMP protocol, this is where you
@@ -61,7 +61,7 @@ should turn first. Written by J. Postel.
     
     <listitem id="rfc793">
      <para> 
-     <ulink url="http://iptables-tutorial.frozentux.net/other/rfc793.txt"
+     <ulink url="https://www.rfc-editor.org/info/rfc793"
 id="rfc793.title">RFC 793 - Transmission Control Protocol</ulink> - This is the 
 original resource on how TCP should behave on all hosts. This document has been 
 the standard on how TCP should work since 1981 and forward. Extremely technical, 
@@ -72,7 +72,7 @@ originally a Department of Defense standard written by J. Postel.
 
     <listitem id="rfc1122">
      <para>
-     <ulink url="http://iptables-tutorial.frozentux.net/other/rfc1122.txt" 
+     <ulink url="https://www.rfc-editor.org/info/rfc1122"
 id="rfc1122.title">RFC 1122 - Requirements for Internet Hosts - Communication 
 Layers</ulink> - This RFC defines the requirements of the software running on 
 a Internet host, specifically the communication layers.
@@ -82,7 +82,7 @@ a Internet host, specifically the communication layers.
 
     <listitem id="rfc1349">
      <para>
-     <ulink url="http://iptables-tutorial.frozentux.net/other/rfc1349.txt" 
+     <ulink url="https://www.rfc-editor.org/info/rfc1349"
 id="rfc1349.title">RFC 1349 - Type of Service in the Internet Protocol 
 Suite</ulink> - RFC describing some changes and clarifications of the TOS 
 field in the IP header.
@@ -91,7 +91,7 @@ field in the IP header.
 
     <listitem id="rfc1812">
      <para>
-     <ulink url="http://iptables-tutorial.frozentux.net/other/rfc1812.txt" 
+     <ulink url="https://www.rfc-editor.org/info/rfc1812"
 id="rfc1812.title">RFC 1812 - Requirements for IP Version 4 Routers</ulink> -
 This RFC specifies how routers on the Internet should behave and how they are
 expected to handle different situations. Very interesting reading.
@@ -100,7 +100,7 @@ expected to handle different situations. Very interesting reading.
 
     <listitem id="rfc2401">
      <para> 
-     <ulink url="http://iptables-tutorial.frozentux.net/other/rfc2401.txt"
+     <ulink url="https://www.rfc-editor.org/info/rfc2401"
 id="rfc2401.title">RFC 2401 - Security Architecture for the Internet 
 Protocol</ulink> - This is an RFC talking about the IPSEC implementation and 
 standardisation. Well worth reading if you are working with IPSEC.
@@ -110,7 +110,7 @@ standardisation. Well worth reading if you are working with IPSEC.
     
     <listitem id="rfc2474">
      <para> 
-     <ulink url="http://iptables-tutorial.frozentux.net/other/rfc2474.txt"
+     <ulink url="https://www.rfc-editor.org/info/rfc2474"
 id="rfc2474.title">RFC 2474 - Definition of the Differentiated Services Field 
 (DS Field) in the IPv4 and IPv6 Headers</ulink> - In this document you will 
 find out how the DiffServ works, and you will find much needed information 
@@ -121,7 +121,7 @@ to work.
 
     <listitem id="rfc2638">
      <para> 
-     <ulink url="http://iptables-tutorial.frozentux.net/other/rfc2638.txt"
+     <ulink url="https://www.rfc-editor.org/info/rfc2638"
 id="rfc2638.title">RFC 2638 - A Two-bit Differentiated Services Architecture 
 for the Internet</ulink> - This RFC describes a method of implementing two 
 different differentiated service architecture into one. Both where described 
@@ -131,7 +131,7 @@ originally by D. Clark and van Jacobsen at the Munich IETH meeting 1997.
 
     <listitem id="rfc2960">
      <para>
-<ulink url="http://iptables-tutorial.frozentux.net/other/rfc2960.txt" 
+<ulink url="https://www.rfc-editor.org/info/rfc2960"
 id="rfc2960.title">RFC 2960 - Stream Control Transmission Protocol</ulink> - 
 This is a relatively new protocol developed by several large telecoms companies 
 to complement UDP and TCP as a layer 3 protocol with higher reliability and 
@@ -141,7 +141,7 @@ resilience.
 
     <listitem id="rfc3168">
      <para> 
-     <ulink url="http://iptables-tutorial.frozentux.net/other/rfc3168.txt"
+     <ulink url="https://www.rfc-editor.org/info/rfc3168"
 id="rfc3168.title">RFC 3168 - The Addition of Explicit Congestion Notification 
 (ECN) to IP</ulink> - This RFC defines how ECN is to be used on a technical 
 level and how it should be implemented in the TCP and IP protocols. Written by 
@@ -151,7 +151,7 @@ K. Ramakrishnan, S. Floyd and D. Black.
 
     <listitem id="rfc3260">
      <para> 
-     <ulink url="http://iptables-tutorial.frozentux.net/other/rfc3260.txt"
+     <ulink url="https://www.rfc-editor.org/info/rfc3260"
 id="rfc3260.title">RFC 3260 - New Terminology and Clarifications for 
 Diffserv</ulink> - This memo captures Diffserv working group agreements 
 concerning new and improved terminology, and provides minor technical 
@@ -161,7 +161,7 @@ clarifications.
 
     <listitem id="rfc3286">
      <para>
-<ulink url="http://iptables-tutorial.frozentux.net/other/rfc3286.txt" 
+<ulink url="https://www.rfc-editor.org/info/rfc3286"
 id="rfc3286.title">RFC 3286 - An Introduction to the Stream Control 
 Transmission Protocol</ulink> - RFC introducing the Stream Control Transmission 
 Protocol, a relatively new layer 3 protocol in the TCP/IP stack. Developed by 
@@ -172,7 +172,7 @@ several large telecom companies.
     <listitem>
      <para>
       <ulink
-url="http://iptables-tutorial.frozentux.net/other/ip_dynaddr.txt">
+url="https://www.frozentux.net/iptables-tutorial/other/ip_dynaddr.txt">
 ip_dynaddr.txt</ulink> - from the 2.4.14 kernel. A really short
 reference to the ip_dynaddr settings available via sysctl and the proc
 file system.
@@ -182,7 +182,7 @@ file system.
     <listitem>
      <para>
       <ulink
-url="http://iptables-tutorial.frozentux.net/other/iptables.html">
+url="https://www.frozentux.net/iptables-tutorial/other/iptables.html">
 iptables.8</ulink> - The iptables 1.3.1 man page. This is an HTMLized
 version of the man page which is an excellent reference when reading/writing
 iptables rule-sets. Always have it at hand.  Alternatively, open the man page
@@ -192,7 +192,7 @@ with <command>man iptables</command>.
 
     <listitem>
      <para>
-      <ulink url="http://ipsysctl-tutorial.frozentux.net">Ipsysctl 
+      <ulink url="http://www.frozentux.net/ipsysctl-tutorial">Ipsysctl
 tutorial</ulink> - Another tutorial I have written about the IP System Control 
 in Linux. A try to make a complete listing of all the IP variables that can be 
 set on the fly in Linux.  Alternatively, open the man page
@@ -211,7 +211,7 @@ definitely worth buying. Written by Matthew G. Marsh.
 
     <listitem id="selinux">
       <para>
-        <ulink url="http://www.nsa.gov/selinux/"
+        <ulink url="https://github.com/SELinuxProject"
 id="selinux.title">Security-Enhanced Linux</ulink> - The official site
 of the Security-Enhanced Linux (SELinux) system developed as a proof of
 concept by the National Security Agency (NSA). SELinux is a fine grained
@@ -223,7 +223,7 @@ who can do what and what processes has what privileges, et cetera.
     <listitem>
      <para>
       <ulink
-url="http://iptables-tutorial.frozentux.net/other/firewall_rules_table_final.pdf">
+url="https://www.frozentux.net/iptables-tutorial/other/firewall_rules_table_final.pdf">
 Firewall rules table</ulink> - A small PDF document gracefully given to this
 project by Stuart Clark, which gives a reference form where you can write all of
 the information needed for your firewall, in a simple manner.
@@ -274,8 +274,8 @@ Questions</emphasis>. Also a good place to start at when wondering what
     <listitem>
      <para>
       <ulink
-url="http://www.netfilter.org/unreliable-guides/packet-filtering-HOWTO/index.html">http://www.netfilter.org/unreliable-guides/packet-filtering-HOWTO/index.html</ulink>
 - Rusty Russells Unreliable Guide to packet filtering. Excellent documentation
+url="https://www.netfilter.org/documentation/HOWTO/packet-filtering-HOWTO.html">https://www.netfilter.org/documentation/HOWTO/packet-filtering-HOWTO.html</ulink>
 about basic packet filtering with <command>iptables</command> written by one of
 the core developers of <command>iptables</command> and
 <command>Netfilter</command>.
@@ -285,8 +285,8 @@ the core developers of <command>iptables</command> and
     <listitem>
      <para>
       <ulink
-url="http://www.netfilter.org/unreliable-guides/NAT-HOWTO/index.html">http://www.netfilter.org/unreliable-guides/NAT-HOWTO/index.html</ulink>
 - Rusty Russells Unreliable Guide to Network Address Translation. Excellent
+url="https://www.netfilter.org/documentation/HOWTO/NAT-HOWTO.html">https://www.netfilter.org/documentation/HOWTO/NAT-HOWTO.html</ulink>
 documentation about <systemitem>Network Address Translation</systemitem> in
 <command>iptables</command> and <command>Netfilter</command> written by one of
 the core developers, Rusty Russell.
@@ -296,8 +296,8 @@ the core developers, Rusty Russell.
     <listitem id="netfilterhackinghowto">
      <para>
       <ulink
-url="http://www.netfilter.org/unreliable-guides/netfilter-hacking-HOWTO/index.html">http://www.netfilter.org/unreliable-guides/netfilter-hacking-HOWTO/index.html</ulink>
 - Rusty Russells Unreliable Netfilter Hacking HOW-TO. One of the few
+url="https://www.netfilter.org/documentation/HOWTO/netfilter-hacking-HOWTO.html">https://www.netfilter.org/documentation/HOWTO/netfilter-hacking-HOWTO.html</ulink>
 documentations on how to write code in the <command>Netfilter</command> and
 <command>iptables</command> user-space and kernel space code-base. This was also
 written by Rusty Russell.
@@ -307,7 +307,7 @@ written by Rusty Russell.
     <listitem>
      <para>
       <ulink
-url="http://www.linuxguruz.org/iptables/">http://www.linuxguruz.org/iptables/</ulink>
+url="http://www.linuxguruz.com/forum/viewforum.php?f=35">http://www.linuxguruz.com/forum/viewforum.php?f=35</ulink>
  - Excellent link-page with links to most of the pages on the Internet
 about <command>iptables</command> and <command>Netfilter</command>. Also
 maintains a list of <systemitem>iptables scripts</systemitem> for
@@ -326,7 +326,7 @@ by Matthew G. Marsh.
 
     <listitem id="ciscodscp">
      <para>
-      <ulink url="http://www.cisco.com/warp/public/105/dscpvalues.html" 
+      <ulink url="https://www.cisco.com/c/en/us/support/docs/quality-of-service-qos/qos-packet-marking/10103-dscpvalues.html"
 id="ciscodscp.title">Implementing Quality of Service Policies with DSCP</ulink> 
 - A link about the cisco implementation of DSCP. This shows some classes used in 
 DSCP, and so on.
@@ -385,6 +385,7 @@ information there.
       </para>
     </listitem>
     
+<!-- The following no longer seems to be available - edrulrd@hotmail.com - 20241111
     <listitem>
      <para>
       <ulink 
@@ -395,11 +396,11 @@ computer automatically add hostile sites to a special ban list in
 <command>iptables</command>
 .     </para>
     </listitem>
-
+-->
 
     <listitem id="protocolstxt">
      <para>
-<ulink url="http://iptables-tutorial.frozentux.net/other/protocols.txt" 
+<ulink url="http://www.frozentux.net/iptables-tutorial/other/protocols.txt"
 id="protocolstxt.title"><filename>/etc/protocols</filename></ulink> - An example 
 protocols file taken from the Slackware distribution. This can be used to find out
 what protocol number different protocols have, such as the IP, ICMP or TCP 
@@ -409,7 +410,7 @@ protocols have.  Alternatively, refer to <filename>/etc/protocols</filename>.
 
     <listitem id="servicestxt">
      <para>
-<ulink url="http://iptables-tutorial.frozentux.net/other/services.txt"
+<ulink url="http://www.frozentux.net/iptables-tutorial/other/services.txt"
 id="servicestxt.title"><filename>/etc/services</filename></ulink> - An example 
 services file taken from the Slackware distribution. This is extremely good to
 get used to reading once in a while, specifically if you want to get a basic look
@@ -467,7 +468,7 @@ written by Matthew G. Marsh. Among others, the FTOS patch is available here.
   
    <listitem id="ulogdsite">
     <para>
-<ulink url="http://www.gnumonks.org/gnumonks/projects/project_details?p_id=1" 
+<ulink url="https://www.netfilter.org/projects/ulogd/index.html"
 id="ulogdsite.title">ULOGD project page</ulink> - The homepage of the ULOGD 
 site.
     </para>
@@ -505,7 +506,7 @@ been tampered with in an illegit way every time it is run.
 
     <listitem id="squidproxy">
       <para>
-<ulink url="http://www.squid.org" id="squidproxy.title">Squid</ulink> - This is 
+<ulink url="https://www.squid-cache.org" id="squidproxy.title">Squid</ulink> - This is
 one of the most known webproxies available on the market. It is open source, and 
 free. It can do several of the filtering tasks that should be done before the 
 traffic actually hits your webserver, as well as doing the standard webcaching 
@@ -513,6 +514,7 @@ functions for your networks.
       </para>
     </listitem>
         
+<!-- The following no longer seems to be available - edrulrd@hotmail.com - 20241111
     <listitem>
      <para>
       <ulink
@@ -523,7 +525,10 @@ their work in Netfilter. If you are interested in more documentation on
 conntrack, this is a "must read".
      </para>
     </listitem>
+-->
 
+
+<!-- The following no longer seems to be available - edrulrd@hotmail.com - 20241111
     <listitem>
      <para>
       <ulink url="http://www.docum.org">http://www.docum.org</ulink> -
@@ -533,12 +538,13 @@ the few sites that has any information at all about these programs. Maintained
 by Stef Coene.
      </para>
     </listitem>
+-->
 
     <listitem id="netfilterlist">
      <para>
       <ulink
-url="http://lists.samba.org/mailman/listinfo/netfilter">http://lists.samba.org/m
-ailman/listinfo/netfilter</ulink>- The official Netfilter mailing-list. 
+url="https://www.netfilter.org/mailinglists.html">https://www.netfilter.org/mailinglists.html
+</ulink>- The official Netfilter mailing-list.
 Extremely useful in case you have questions about something not covered in this 
 document or any of the other links here.
       </para>
