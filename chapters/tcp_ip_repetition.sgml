@@ -431,6 +431,12 @@ going. This protocol is the very heart of the whole
 the very foundation of everything in the Internet.
       </para>
 
+      <note>
+      <para>
+The scope of the material in this document is mostly on IPv4 and not IPv6.
+      </para>
+      </note>
+
       <para>
 The <systemitem>IP</systemitem> protocol encapsulates the
 <systemitem>Transport</systemitem> layer packet with information about which
