@@ -82,7 +82,21 @@ see the table you can run the following command:
 
    <para>
     <command>cat /proc/net/ip_conntrack | less</command>
+or, if installed, issue the command:
+    <command>conntrack -L | less</command>
    </para>
+
+  <note>
+   <para>
+Newer kernels use "nf" files instead.  So the replacement command would be
+    <command>cat /proc/net/nf_conntrack | less</command>
+   </para>
+
+   <para>
+The output can be made more readable by distributing the output into columns
+    <command>cat /proc/net/nf_conntrack | column -t | less</command>
+   </para>
+  </note>
 
    <para>
 The above command will show all currently tracked connections even though

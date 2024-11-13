@@ -146,7 +146,7 @@ is up to you.
 
    <listitem>
     <para><emphasis>proc configuration</emphasis> - This section should take
-care of any special configuration needed in the proc file system. If some of
+care of any special configuration needed in the /proc file system. If some of
 these options are required, they will be listed as such, if not, they should be
 commented out per default, and listed under the non-required proc
 configurations. Most of the useful proc configurations will be listed here, but

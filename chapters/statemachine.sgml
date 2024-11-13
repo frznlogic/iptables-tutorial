@@ -250,6 +250,24 @@ to 32768 conntrack entries. An example of this would be:
 <prompt>work3:/home/blueflux#</prompt>
       </screen>
 
+    <note>
+     <para>
+With IPv6 now generally being an integral component of the operating system,
+<filename>/proc/net/ip_conntrack</filename> has been replaced with
+<filename>/proc/net/nf_conntrack</filename>.  The format is practically the same
+except for the addition of 2 fields at the beginning of each record to indicate
+the ip version used in the entry.
+     </para>
+     <para>
+If installed, the <command>conntrack -L</command> command will also display the connection tracking list.
+     </para>
+     <para>
+Also, instead of modifying entries in the
+<filename>/proc/sys/net/ipv4/netfilter</filename> directory, the
+<command>sysctl</command> command can be used for this purpose.
+     </para>
+    </note>
+
     </section>
 
     <section id="userlandstates">
@@ -670,6 +688,16 @@ values are set in seconds. Early versions of the patch used jiffies (which
 was a bug).
    </para>
 
+    <note>
+     <para>
+As noted above, the connection tracking status for systems that include IPv6
+is in <filename>/proc/net/nf_conntrack</filename>.  You can also see connection tracking
+state with the <command>conntrack -L</command>.
+To see the timeout settings for your system, see the
+net.netfilter.nf_conntrack_tcp_timeout_* values
+displayed when <command>sysctl -a</command> is run.
+     </para>
+    </note>
    <note>
     <para>
 Also note that the User-land side of the state machine does not look at 
@@ -937,7 +965,10 @@ all other traffic types.
 ICMP requests has a default timeout of 30 seconds, which you can change in the
 <filename>/proc/sys/net/ipv4/netfilter/ip_ct_icmp_timeout</filename> entry.
 This should in general be a good timeout value, since it will be able to catch
-most packets in transit.
+most packets in transit.  You may also be able to confirm this by checking the
+value of the net.netfilter.nf_conntrack_icmp_timeout entry displayed from
+running <command>sysctl -a</command>.
+
    </para>
 
    <para>
@@ -1044,7 +1075,8 @@ considered <command>ESTABLISHED</command>.
 When the default behavior is used, all of these packets will attain the same
 default timeout value. This can be set via the
 <filename>/proc/sys/net/ipv4/netfilter/ip_ct_generic_timeout</filename>
-variable. The default value here is 600 seconds, or 10 minutes. Depending 
+variable (or net.netfilter.nf_conntrack_generic_timeout variable as seen by running
+<command>sysctl -a</command>). The default value here is 600 seconds, or 10 minutes. Depending
 on
 what traffic you are trying to send over a link that uses the default
 connection tracking behavior, this might need changing. Especially if you are

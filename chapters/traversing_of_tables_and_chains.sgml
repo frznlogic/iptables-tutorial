@@ -680,6 +680,15 @@ might provide for your <systemitem>PPP</systemitem>,
 the Internet.
    </para>
 
+   <para>
+The <command>REDIRECT</command> <indexterm> <primary>REDIRECT
+target</primary> </indexterm> target is a special case of the
+<command>DNAT</command>, but simply sends the packet back to the incoming
+interface.  This is useful, for example, if the traffic simply needs to be
+redirected to a process listening on a different port, for example, a
+proxy server running on the same server.
+   </para>
+
   </section>
 
   <section id="rawtable">

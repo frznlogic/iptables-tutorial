@@ -457,7 +457,7 @@ of course. The addresses we are talking about are what we generally call an
 <systemitem>IP</systemitem> addresses more readable for the human eye, since
 the <systemitem>IP</systemitem> address is actually just a 32 bit field of 1's
 and 0's (<emphasis>127.0.0.1</emphasis> would hence be read as
-<emphasis>01111111000000000000000000000001</emphasis> within the actual
+<emphasis>01111111000000000000000000000001</emphasis> or 0x7F000001 within the actual
 <systemitem>IP</systemitem> header).
       </para>
 
