@@ -128,7 +128,10 @@ images: $(images_jpg) $(images_eps) $(images_png)
 %.html: $(images_jpg) $(chapters) $(appendices) $(scripts) \
  $(license) %.sgml
 	@echo "Building HTML version..."
-	jw -d styles/html.dsl --backend html --nochunks $*.sgml
+	mkdir tmphtml; rsync -a . --exclude=tmphtml/ tmphtml;
+	$(foreach file, $(chapters) $(appendices), sed '/colwidth=".*"/d' $(file) > tmphtml/$(file);)
+	jw -d styles/html.dsl --backend html --nochunks tmphtml/$*.sgml
+	rm -rf tmphtml
 	@echo "Done."
 
 chunkyhtml: $(images_jpg) $(chapters) $(appendices) $(scripts) \
