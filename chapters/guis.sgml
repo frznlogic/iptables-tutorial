@@ -83,7 +83,8 @@ scripts).
       <para>
 You can see the configuration of the "firewall" in the above example, and the 
 main menus of the whole fwbuilder system. fwbuilder can be found at <ulink 
-url="http://www.fwbuilder.org">http://www.fwbuilder.org</ulink>.
+url="https://fwbuilder.sourceforge.net/">http:/fwbuilder.sourceforge.net</ulink>.
+The latest release available for download is version 5.1, circa March 2012.
       </para>
       
     </section>
@@ -150,7 +151,8 @@ but you get a good general idea of what it looks like in Turtle Firewall.
       
       <para>
 You can find the Turtle Firewall Project and more information over at <ulink 
-url="http://www.turtlefirewall.com/">http://www.turtlefirewall.com/</ulink>.
+url="http://turtlefirewall.sourceforge.net/">http://turtlefirewall.sourceforge.net/</ulink>.
+The latest release available for download is version 1.38-1, circa May 2011.
       </para>
 
     </section>
@@ -166,13 +168,13 @@ url="http://www.turtlefirewall.com/">http://www.turtlefirewall.com/</ulink>.
       </indexterm>
       
       <para>
-The Integrated Secure Communications System, or shortly ISCS, is still 
-undergoing development, and no public version has been released. However, this 
-looks like it will become an extremely helpful tool once it is finished. The 
-developer has very high standards, and this is the main reason that it has not 
-been released yet. ISCS integrates several functionalities into a single suite 
-of administration and management user interface. Basically this means that once 
-this project is released, you will be able to fully configure all your 
+The latest public version of the Integrated Secure Communications System, or shortly ISCS,
+version 0.5, was released according to
+<ulink url="http://iscs.sourceforge.net/">http://iscs.sourceforge.net/</ulink>.
+circa April 2013.
+ISCS integrates several functionalities into a single suite
+of administration and management user interface.
+Being able to fully configure all your
 firewalls from a centralized point using a single GUI, including VPN's, VLAN's, 
 Tunnels, sysctl's, etcetera.
       </para>
