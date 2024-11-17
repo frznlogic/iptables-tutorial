@@ -180,6 +180,15 @@ images/%.eps : images/%.gif
 images/%.png : images/%.gif
 	giftopnm images/$*.gif | pnmtopng -size "11811 11811 1" > images/$*.png
 
+.PHONY: dockerimage
+dockerimage:
+	echo "User ${USER} userid $(id -u) groupid $(id -g)"
+	docker build --build-arg USERNAME=${USER} \
+				 --build-arg USERID=$(shell id -u) \
+				 --build-arg GROUPID=$(shell id -g) \
+				 -t iptables-tutorial:latest build-env/
+
+
 .PHONY: clean
 clean:
 	rm -rf iptables-tutorial.html iptables-tutorial.ps.gz \
