@@ -182,7 +182,7 @@ images/%.png : images/%.gif
 
 .PHONY: dockerimage
 dockerimage:
-	echo "User ${USER} userid $(id -u) groupid $(id -g)"
+	echo "User ${USER} userid $(shell id -u) groupid $(shell id -g)"
 	docker build --build-arg USERNAME=${USER} \
 				 --build-arg USERID=$(shell id -u) \
 				 --build-arg GROUPID=$(shell id -g) \
