@@ -1,5 +1,5 @@
  <bookinfo>
-  <title>Iptables Tutorial 1.2.2</title>
+  <title>Iptables Tutorial 1.2.3</title>
 
   <author>
    <firstname>Oskar</firstname>
@@ -13,7 +13,7 @@
 
   <copyright>
    <year>2001-2006</year>
-   <holder>Oskar Andreasson</holder>
+   <holder>Oscar Andreasson</holder>
   </copyright>
 
   <legalnotice>

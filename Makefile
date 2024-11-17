@@ -194,8 +194,8 @@ clean:
 	rm -rf iptables-tutorial.html iptables-tutorial.ps.gz \
 	 iptables-tutorial.pdf.gz iptables-tutorial.src.tgz *~ \
 	 iptables-tutorial.html.tgz iptables-tutorial.chunky.tgz \
-	 iptables-tutorial-index.sgml
-	rm -rf pdf/ chunkyhtml/
+	 iptables-tutorial-index.sgml iptables-tutorial.chunky.tar.gz
+	rm -rf pdf/ chunkyhtml/ chunkytgz/
 	rm -rf images/*.jpg images/*.png images/*~ images/*.eps *.log *.aux \
 	*.out *.tex
 	rm -rf html/
