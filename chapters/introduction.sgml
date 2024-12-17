@@ -200,7 +200,7 @@ the document.
    </para>
 
    <para>
-The next chapter will bring up a rather lengthy introduction and repetition of
+The next chapter will bring up a rather lengthy introduction and review of
 the fundamentals of
 TCP/IP. Basically this means the IP protocol and some of its sub-protocols
 that are commonly used with iptables and netfilter. These are TCP, UDP, ICMP
