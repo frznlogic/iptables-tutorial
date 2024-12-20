@@ -1,3 +1,28 @@
+1.2.3 (19 Dec 2024)
+c197ce3 Fixing some build issues and creating release 1.2.3
+ce1430f Add docker build-env
+535d8d4 README update
+d3a10bf wording and grammatical changes
+47807c5 IPv4 vs IPv6 relevancy statement
+2786534 Web page table formatting
+64d6e9f updated external reference sites in guis.sgml
+bdcc1b4 updated external reference sites in example_scripts.sgml
+0681dd6 updated external reference sites in other_resources.sgml
+c6fc33c internal comments
+2966198 technical wording enhancements
+840f1b2 correction of technical issues
+53fb946 SGML Tag adjustments
+dec50f4 Fixed compilation issue ImageMagick has changed and phys was deprecated for a while, it's now called size and is given a single parameter.
+33ed5d6 Add .travis.yml file
+5be9928 html.dsl: Change filename extension
+90e3ea8 Remove addons/changes*.sh
+2231863 gitignore: Add iptables-tutorial-index.sgml
+87636a4 Add Jenkinsfile Remove non-source code
+7f18a79 Remove stylesheet-images from other languages
+b0226a4 Fix generation of pdf files
+f580a48 Add .gitignore
+
+
 1.2.2 (19 Nov 2006)
 * Added SCTP match.
 * Added addrtype match.
