@@ -119,7 +119,7 @@ images: $(images_jpg) $(images_eps) $(images_png)
 	tar -cf temp.tar iptables-tutorial.sgml scripts/* TODO \
 	 ChangeLog Makefile spanish/* portuguese/* images/*.gif images/templates/* styles/* \
 	 addons/* other/* licensing/* chapters/* \
-	 appendices/* addons/* other/* bookinfo.sgml changes.sh README \
+	 appendices/* addons/* other/* bookinfo.sgml changes.sh README.md \
 	 > /dev/null
 	gzip -f temp.tar
 	mv temp.tar.gz $*.src.tgz
