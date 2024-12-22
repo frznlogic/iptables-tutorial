@@ -2,7 +2,7 @@
 #
 # limit-match.txt - ejemplo de regla sobre cómo se puede usar la comparación "limit".
 #
-# Copyright (C) 2001  Oskar Andreasson &lt;bluefluxATkoffeinDOTnet&gt;
+# Copyright (C) 2001  Oscar Andreasson &lt;bluefluxATkoffeinDOTnet&gt;
 #
 # Este programa es software libre; puedes redistribuirlo y/o modificarlo
 # bajo los términos expresados en la "GNU General Public License", tal como

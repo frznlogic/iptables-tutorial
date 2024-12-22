@@ -2,7 +2,7 @@
 #
 # changes.sh - used for iptables-tutorial mirroring
 #
-# Copyright (C) 2001  Oskar Andreasson &lt;blueflux@koffein.net&gt;
+# Copyright (C) 2001  Oscar Andreasson &lt;blueflux@koffein.net&gt;
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

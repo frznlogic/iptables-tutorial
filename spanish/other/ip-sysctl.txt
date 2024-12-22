@@ -3,7 +3,7 @@ Variables /proc/sys/net/ipv4/* :
 
 
 **************************************************************
-[NOTA:	este documento no lo ha escrito Oskar Andreasson, pero
+[NOTA:	este documento no lo ha escrito Oscar Andreasson, pero
 	consideramos conveniente traducirlo al castellano]
 **************************************************************
 

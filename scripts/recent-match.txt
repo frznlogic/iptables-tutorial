@@ -2,7 +2,7 @@
 #
 # recent-match.txt - Example rule on how the recent match could be used.
 #
-# Copyright (C) 2005  Oskar Andreasson &lt;bluefluxATkoffeinDOTnet&gt;
+# Copyright (C) 2005  Oscar Andreasson &lt;bluefluxATkoffeinDOTnet&gt;
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

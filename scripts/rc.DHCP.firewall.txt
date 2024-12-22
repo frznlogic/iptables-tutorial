@@ -2,7 +2,7 @@
 #
 # rc.DHCP.firewall - DHCP IP Firewall script for Linux 2.4.x and iptables
 #
-# Copyright (C) 2001  Oskar Andreasson &lt;bluefluxATkoffeinDOTnet&gt;
+# Copyright (C) 2001  Oscar Andreasson &lt;bluefluxATkoffeinDOTnet&gt;
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

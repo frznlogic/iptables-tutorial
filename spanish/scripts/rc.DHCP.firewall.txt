@@ -3,7 +3,7 @@
 # rc.DHCP.firewall - Script de cortafuegos con IP basada en DHCP bajo
 #                    Linux 2.4.x e iptables
 #
-# Copyright (C) 2001  Oskar Andreasson &lt;bluefluxATkoffeinDOTnet&gt;
+# Copyright (C) 2001  Oscar Andreasson &lt;bluefluxATkoffeinDOTnet&gt;
 #
 # Este programa es software libre; puedes redistribuirlo y/o modificarlo
 # bajo los términos expresados en la "GNU General Public License", tal como

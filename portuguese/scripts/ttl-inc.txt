@@ -2,7 +2,7 @@
 #
 # ttl-inc.txt - short script to increase TTL of all packets on port 33434 - 33542
 #
-# Copyright (C) 2001  Oskar Andreasson &lt;bluefluxATkoffeinDOTnet&gt;
+# Copyright (C) 2001  Oscar Andreasson &lt;bluefluxATkoffeinDOTnet&gt;
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

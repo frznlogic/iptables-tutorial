@@ -3,7 +3,7 @@
 # retreiveip.txt - script conteniendo dos funciones que capturan
 #                  automáticamente la IP de una forma dinámica.
 #
-# Copyright (C) 2001  Oskar Andreasson &lt;bluefluxATkoffeinDOTnet&gt;
+# Copyright (C) 2001  Oscar Andreasson &lt;bluefluxATkoffeinDOTnet&gt;
 #
 # Escrito y cedido originalmente por Jelle Kalf &lt;jkalfATunoDOTnl&gt;.
 # Los saludos, agradecimientos y comentarios por el script deben serle
