@@ -1436,6 +1436,9 @@ format=eps>
             <imagedata fileref="images/icmp-basic-headers.jpg"
 format=jpg>
           </imageobject>
+          <caption>
+          <para>Internet Control Message Protocol - Basic Headers</para>
+          </caption>
         </mediaobject>
       </para>
 
