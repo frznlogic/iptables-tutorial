@@ -161,9 +161,12 @@ chunkyhtml: $(images_jpg) $(chapters) $(appendices) $(scripts) \
 %.ps.gz : $(images_eps) $(chapters) $(appendices) $(scripts) \
  $(license) %.sgml
 	@echo "Building PS version..."
-	mkdir -p ps/images; cp -R licensing scripts appendices chapters \
-	 styles *.sgml ps; cp -R images/*.eps ps/images/; cd ps; jw \
-	 --backend ps -d styles/print.dsl $*.sgml; cd ..
+	mkdir -p ps/images; \
+	 cp -R licensing scripts appendices chapters styles *.sgml ps; \
+	 cp -R images/*.eps ps/images/; \
+	 cd ps; \
+	 jw --backend ps -d styles/print.dsl $*.sgml; \
+	 cd ..
 	mv ps/$*.ps ./
 	rm -rf ps
 	gzip -f $*.ps
